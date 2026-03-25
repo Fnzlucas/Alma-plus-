@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/',
-        destination: '/alma-plus-landing.html',
+        destination: '/landing',
         permanent: false,
       },
     ]
