@@ -10,14 +10,3 @@ export async function GET() {
     headers: { 'Content-Type': 'text/html; charset=utf-8' }
   })
 }
-```
-
-**4. Renomme ce fichier en `app/route.js`** — pas `page.js`, **`route.js`**
-
-Donc la structure finale :
-```
-app/
-  route.js        ← landing
-  layout.js
-  login/page.js
-  dashboard/page.js
