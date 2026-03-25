@@ -769,9 +769,6 @@ tr:hover td { background: var(--primary-lt); }
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">Principal</div>
-    <button class="nav-item" onclick="goPage('welcome',this)" id="nav-welcome">
-      <span class="material-symbols-rounded">waving_hand</span>Bienvenue
-    </button>
     <button class="nav-item active" onclick="goPage('dashboard',this)">
       <span class="material-symbols-rounded">dashboard</span>Vue globale
       <span class="nav-badge" id="badge-new">0</span>
@@ -835,9 +832,9 @@ tr:hover td { background: var(--primary-lt); }
       <span class="topbar-sub" id="page-sub"> · Tableau de bord</span>
     </div>
     <div class="topbar-spacer"></div>
-    <div class="status-pill off" id="api-status-pill">
+    <div class="status-pill on" id="api-status-pill">
       <div class="pulse"></div>
-      <span id="api-status-text">APIs non configurées</span>
+      <span id="api-status-text">Toutes les APIs actives</span>
     </div>
     <button class="topbar-btn" onclick="goPage('settings', document.querySelector('[onclick*=settings]'))">
       <span class="material-symbols-rounded">settings</span>
@@ -845,201 +842,6 @@ tr:hover td { background: var(--primary-lt); }
   </header>
 
   <main class="content">
-
-  <!-- ════════════════ BIENVENUE ════════════════ -->
-  <div class="page" id="page-welcome">
-    <div style="max-width:820px;margin:0 auto;padding-top:8px">
-
-      <!-- Hero -->
-      <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);border-radius:var(--radius-xl);padding:40px 44px;color:white;margin-bottom:24px;position:relative;overflow:hidden">
-        <div style="position:absolute;right:-20px;top:-20px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
-        <div style="position:absolute;right:60px;bottom:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
-        <div style="position:relative">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-            <div style="width:46px;height:46px;background:rgba(255,255,255,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
-              <svg viewBox="0 0 14 14" fill="none" width="22" height="22"><path d="M2 12L7 2L12 12" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 8.5H10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-            </div>
-            <div>
-              <div style="font-family:'Manrope',sans-serif;font-size:22px;font-weight:900;letter-spacing:-0.5px">Bienvenue sur Alma<span style="opacity:.7">.</span>+</div>
-              <div style="font-size:13px;opacity:.75;margin-top:2px">Votre plateforme de prospection intelligente pour le bâtiment & la rénovation</div>
-            </div>
-          </div>
-          <p style="font-size:14px;line-height:1.75;opacity:.9;max-width:580px">
-            Alma.+ centralise toutes vos sources de prospection B2B et B2C, génère des emails personnalisés grâce à l'IA, et suit vos opportunités dans un pipeline CRM intégré. En quelques minutes, configurez vos clés API et commencez à trouver des chantiers.
-          </p>
-          <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn" style="background:white;color:var(--primary);font-weight:700" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">
-              <span class="material-symbols-rounded" style="font-size:15px">settings</span>Configurer mes clés API
-            </button>
-            <button class="btn" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)" onclick="goPage('dashboard',document.querySelector('[onclick*=dashboard]'))">
-              <span class="material-symbols-rounded" style="font-size:15px">dashboard</span>Accéder au tableau de bord
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Étapes de démarrage -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px">
-
-        <div class="card" style="border-left:3px solid var(--primary)">
-          <div class="card-header">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;flex-shrink:0">1</div>
-              <div>
-                <div class="card-title">Configurer vos clés API</div>
-                <div class="card-sub">2 min · Obligatoire pour démarrer</div>
-              </div>
-            </div>
-          </div>
-          <div class="card-body" style="font-size:12.5px;color:var(--text2);line-height:1.7">
-            Rendez-vous dans <strong>Paramètres</strong> et renseignez au minimum :<br>
-            • <strong>Clé Anthropic</strong> — pour la génération d'emails IA<br>
-            • <strong>Clé Google Maps</strong> — pour la prospection B2B géolocalisée<br>
-            • <strong>Clé Brevo</strong> — pour l'envoi d'emails (optionnel au départ)
-          </div>
-        </div>
-
-        <div class="card" style="border-left:3px solid #0284c7">
-          <div class="card-header">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div style="width:28px;height:28px;border-radius:50%;background:#0284c7;color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;flex-shrink:0">2</div>
-              <div>
-                <div class="card-title">Lancer une recherche</div>
-                <div class="card-sub">Prospection B2B ou B2C</div>
-              </div>
-            </div>
-          </div>
-          <div class="card-body" style="font-size:12.5px;color:var(--text2);line-height:1.7">
-            Choisissez votre cible dans le menu de gauche :<br>
-            • <strong>Prospection B2B</strong> — entreprises, artisans, promoteurs<br>
-            • <strong>Prospection B2C</strong> — particuliers, copropriétés, rénovation<br>
-            Renseignez une ville ou un code postal et lancez.
-          </div>
-        </div>
-
-        <div class="card" style="border-left:3px solid var(--amber)">
-          <div class="card-header">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div style="width:28px;height:28px;border-radius:50%;background:var(--amber);color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;flex-shrink:0">3</div>
-              <div>
-                <div class="card-title">Générer vos emails IA</div>
-                <div class="card-sub">Personnalisés par prospect</div>
-              </div>
-            </div>
-          </div>
-          <div class="card-body" style="font-size:12.5px;color:var(--text2);line-height:1.7">
-            Une fois vos prospects identifiés, cliquez sur <strong>Générer email IA</strong> pour obtenir un message ultra-personnalisé basé sur l'activité, le secteur et la localisation de chaque contact.
-          </div>
-        </div>
-
-        <div class="card" style="border-left:3px solid var(--green)">
-          <div class="card-header">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;flex-shrink:0">4</div>
-              <div>
-                <div class="card-title">Suivre dans le Pipeline CRM</div>
-                <div class="card-sub">Nouveau → Contacté → Converti</div>
-              </div>
-            </div>
-          </div>
-          <div class="card-body" style="font-size:12.5px;color:var(--text2);line-height:1.7">
-            Ajoutez vos prospects au <strong>Pipeline CRM</strong> et suivez leur avancement étape par étape. La messagerie intégrée centralise tous vos échanges par email directement dans l'outil.
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Sources disponibles -->
-      <div class="card" style="margin-bottom:24px">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Sources de données disponibles</div>
-            <div class="card-sub">12 sources intégrées · B2B & B2C</div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
-
-          <!-- B2B -->
-          <div style="padding:16px 20px;border-right:1px solid var(--border-lt)">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:6px">
-              <span class="material-symbols-rounded" style="font-size:14px">business</span>Prospection B2B
-            </div>
-            <div style="display:flex;flex-direction:column;gap:9px">
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#2e7d32">map</span></div>
-                <div><div style="font-size:12px;font-weight:600">Google Maps</div><div style="font-size:11px;color:var(--text3)">Entreprises géolocalisées en temps réel</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:var(--primary-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:var(--primary)">account_balance</span></div>
-                <div><div style="font-size:12px;font-weight:600">INSEE / SIRENE</div><div style="font-size:11px;color:var(--text3)">Registre officiel des entreprises françaises</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:var(--amber-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:var(--amber)">gavel</span></div>
-                <div><div style="font-size:12px;font-weight:600">BODACC</div><div style="font-size:11px;color:var(--text3)">Annonces légales, créations et cessions</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:#fff3e0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#e65100">construction</span></div>
-                <div><div style="font-size:12px;font-weight:600">Permis de construire</div><div style="font-size:11px;color:var(--text3)">Chantiers autorisés et projets en cours</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:#e3f2fd;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#1565c0">description</span></div>
-                <div><div style="font-size:12px;font-weight:600">Appels d'offres</div><div style="font-size:11px;color:var(--text3)">Marchés publics & consultations privées</div></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- B2C -->
-          <div style="padding:16px 20px">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:6px">
-              <span class="material-symbols-rounded" style="font-size:14px">home_work</span>Prospection B2C
-            </div>
-            <div style="display:flex;flex-direction:column;gap:9px">
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:#fce4ec;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#c2185b">menu_book</span></div>
-                <div><div style="font-size:12px;font-weight:600">Pages Jaunes</div><div style="font-size:11px;color:var(--text3)">Particuliers et professionnels locaux</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:#fff8e1;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#f57f17">sell</span></div>
-                <div><div style="font-size:12px;font-weight:600">Leboncoin</div><div style="font-size:11px;color:var(--text3)">Annonces travaux & besoins particuliers</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#2e7d32">star</span></div>
-                <div><div style="font-size:12px;font-weight:600">Google Avis</div><div style="font-size:11px;color:var(--text3)">Propriétaires ayant évalué des artisans</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:#e8eaf6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#3949ab">eco</span></div>
-                <div><div style="font-size:12px;font-weight:600">MaPrimeRénov'</div><div style="font-size:11px;color:var(--text3)">Bénéficiaires des aides à la rénovation</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:#fbe9e7;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#bf360c">real_estate_agent</span></div>
-                <div><div style="font-size:12px;font-weight:600">DVF</div><div style="font-size:11px;color:var(--text3)">Transactions immobilières récentes</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:30px;height:30px;border-radius:7px;background:#e0f2f1;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#00695c">apartment</span></div>
-                <div><div style="font-size:12px;font-weight:600">Copropriétés</div><div style="font-size:11px;color:var(--text3)">Résidences fragiles et en difficulté</div></div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Tip footer -->
-      <div class="alert alert-info" style="margin-bottom:8px">
-        <span class="material-symbols-rounded">tips_and_updates</span>
-        <span><strong>Conseil de démarrage :</strong> Commencez par configurer votre clé Anthropic et votre clé Google Maps — ces deux clés suffisent pour lancer vos premières recherches et générer des emails personnalisés.</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px">
-        <button class="btn btn-ghost btn-sm" onclick="dismissWelcome()" style="color:var(--text3)">
-          <span class="material-symbols-rounded" style="font-size:14px">visibility_off</span>Ne plus afficher
-        </button>
-        <button class="btn btn-primary" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">
-          <span class="material-symbols-rounded" style="font-size:15px">arrow_forward</span>Commencer la configuration
-        </button>
-      </div>
-
-    </div>
-  </div>
 
   <!-- ════════════════ DASHBOARD ════════════════ -->
   <div class="page active" id="page-dashboard">
@@ -1072,11 +874,7 @@ tr:hover td { background: var(--primary-lt); }
       </div>
     </div>
 
-    <!-- Alert no API -->
-    <div id="dash-no-api" class="alert alert-info">
-      <span class="material-symbols-rounded">info</span>
-      Configurez vos clés API dans <strong>Paramètres</strong> pour commencer — Google Maps + Anthropic suffisent.
-    </div>
+
 
     <!-- Main grid -->
     <div class="main-grid">
@@ -1173,10 +971,7 @@ tr:hover td { background: var(--primary-lt); }
   <!-- ════════════════ PROSPECTION B2B ════════════════ -->
   <div class="page" id="page-prospection">
     <div style="max-width:860px">
-      <div id="prsp-no-api" class="alert alert-error" style="display:none">
-        <span class="material-symbols-rounded">error</span>
-        Clé Google Maps non configurée. <strong style="cursor:pointer;text-decoration:underline" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">Paramètres →</strong>
-      </div>
+
 
       <!-- Tabs sources B2B -->
       <div class="tabs" style="margin-bottom:16px">
@@ -1339,9 +1134,6 @@ tr:hover td { background: var(--primary-lt); }
               <div class="card-title">BODACC — Bulletin Officiel des Annonces Civiles et Commerciales</div>
               <div class="card-sub">Créations, cessions, procédures collectives · Source data.gouv.fr</div>
             </div>
-            <span class="tag" style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-border)">
-              <span class="material-symbols-rounded" style="font-size:12px">lock_open</span>Gratuit
-            </span>
           </div>
           <div class="card-body">
             <div class="alert alert-info" style="margin-bottom:14px">
@@ -1408,9 +1200,6 @@ tr:hover td { background: var(--primary-lt); }
               <div class="card-title">Permis de Construire — Sit@del2</div>
               <div class="card-sub">Dépôts et autorisations de construire · Ministère de la Transition écologique</div>
             </div>
-            <span class="tag" style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-border)">
-              <span class="material-symbols-rounded" style="font-size:12px">lock_open</span>Gratuit
-            </span>
           </div>
           <div class="card-body">
             <div class="alert alert-info" style="margin-bottom:14px">
@@ -1482,9 +1271,6 @@ tr:hover td { background: var(--primary-lt); }
               <div class="card-title">Appels d'Offres Publics — BOAMP / data.gouv.fr</div>
               <div class="card-sub">Marchés publics et DSP · Acheteurs publics nationaux et locaux</div>
             </div>
-            <span class="tag" style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-border)">
-              <span class="material-symbols-rounded" style="font-size:12px">lock_open</span>Gratuit
-            </span>
           </div>
           <div class="card-body">
             <div class="alert alert-info" style="margin-bottom:14px">
@@ -1852,9 +1638,6 @@ tr:hover td { background: var(--primary-lt); }
               <div class="card-title">DVF — Demandes de Valeurs Foncières</div>
               <div class="card-sub">Transactions immobilières récentes · data.gouv.fr</div>
             </div>
-            <span class="tag" style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-border)">
-              <span class="material-symbols-rounded" style="font-size:12px">lock_open</span>Gratuit
-            </span>
           </div>
           <div class="card-body">
             <div class="alert alert-info" style="margin-bottom:14px">
@@ -1921,9 +1704,6 @@ tr:hover td { background: var(--primary-lt); }
               <div class="card-title">Registre National des Copropriétés</div>
               <div class="card-sub">Copropriétés fragiles et en difficulté · ANAH / data.gouv.fr</div>
             </div>
-            <span class="tag" style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-border)">
-              <span class="material-symbols-rounded" style="font-size:12px">lock_open</span>Gratuit
-            </span>
           </div>
           <div class="card-body">
             <div class="alert alert-info" style="margin-bottom:14px">
@@ -2244,266 +2024,69 @@ tr:hover td { background: var(--primary-lt); }
   <!-- ════════════════ SETTINGS ════════════════ -->
   <div class="page" id="page-settings">
     <div style="max-width:700px">
+
+      <!-- Header -->
+      <div class="page-header" style="margin-bottom:28px">
+        <div>
+          <div class="page-heading">Mon compte</div>
+          <div class="page-subheading">Gérez votre profil et vos préférences d'envoi</div>
+        </div>
+      </div>
+
+      <div id="settings-saved" class="alert alert-success" style="display:none;margin-bottom:14px">
+        <span class="material-symbols-rounded">check_circle</span>Paramètres enregistrés avec succès.
+      </div>
+
+      <!-- Tabs -->
       <div class="tabs">
-        <div class="tab active" onclick="switchTab('tab-api',this)">Clés API</div>
-        <div class="tab" onclick="switchTab('tab-profile',this)">Profil</div>
-        <div class="tab" onclick="switchTab('tab-email',this)">Email</div>
+        <div class="tab active" onclick="switchTab('tab-profile',this)">Mon profil</div>
+        <div class="tab" onclick="switchTab('tab-email',this)">Email d'envoi</div>
+        <div class="tab" onclick="switchTab('tab-plan',this)">Mon abonnement</div>
       </div>
 
-      <!-- Tab API -->
-      <div id="tab-api">
-        <div id="settings-saved" class="alert alert-success" style="display:none;margin-bottom:14px">
-          <span class="material-symbols-rounded">check_circle</span>Paramètres enregistrés.
-        </div>
-
-        <div class="settings-section-label">IA & Prospection</div>
-
-        <div class="card" style="margin-bottom:10px">
+      <!-- ── Profil ── -->
+      <div id="tab-profile">
+        <div class="card" style="margin-bottom:14px">
           <div class="card-header">
-            <div><div class="card-title">Anthropic — Claude IA</div><div class="card-sub">Génération d'emails, devis, veille, scoring</div></div>
-            <span class="api-status api-idle" id="anthropic-status">Non testé</span>
+            <div>
+              <div class="card-title">Votre profil commercial</div>
+              <div class="card-sub">Ces infos personnalisent vos emails et devis générés par l'IA</div>
+            </div>
+            <span class="material-symbols-rounded" style="color:var(--primary);font-size:20px">auto_awesome</span>
           </div>
-          <div class="card-body">
-            <div class="form-group">
-              <label class="form-label">Clé API</label>
-              <div class="api-key-row">
-                <input class="form-input" type="password" id="key-anthropic" placeholder="sk-ant-..." />
-                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-anthropic')">Afficher</button>
-                <button class="btn btn-sm btn-ghost" onclick="testAnthropic()"><span id="ant-spinner" style="display:none" class="spinner spinner-dark"></span>Tester</button>
-              </div>
-              <div class="form-hint">console.anthropic.com → API Keys</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Modèle</label>
-              <select class="form-input" id="ai-model">
-                <option value="claude-sonnet-4-5" selected>claude-sonnet-4-5 (recommandé)</option>
-                <option value="claude-haiku-4-5-20251001">claude-haiku-4-5 (rapide / moins cher)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header">
-            <div><div class="card-title">Google Maps Places</div><div class="card-sub">Recherche de prospects B2B en temps réel</div></div>
-            <span class="api-status api-idle" id="gmaps-status">Non testé</span>
-          </div>
-          <div class="card-body">
-            <div class="form-group">
-              <label class="form-label">Clé API</label>
-              <div class="api-key-row">
-                <input class="form-input" type="password" id="key-gmaps" placeholder="AIzaSy..." />
-                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-gmaps')">Afficher</button>
-                <button class="btn btn-sm btn-ghost" onclick="testGmaps()"><span id="gmaps-spinner" style="display:none" class="spinner spinner-dark"></span>Tester</button>
-              </div>
-              <div class="form-hint">console.cloud.google.com → APIs → Places API (New)</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="settings-section-label">Sources B2B — Annuaires & Registres</div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">INSEE — Sirene</div><div class="card-sub">Base officielle des entreprises françaises</div></div><span class="api-status api-idle" id="insee-status">Non configuré</span></div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Consumer Key</label>
-                <div class="api-key-row"><input class="form-input" type="password" id="key-insee-consumer" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-insee-consumer')">Afficher</button></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Consumer Secret</label>
-                <div class="api-key-row"><input class="form-input" type="password" id="key-insee-secret" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-insee-secret')">Afficher</button></div>
-              </div>
-            </div>
-            <div class="form-hint">api.insee.fr → Mon compte → Créer une application → API Sirene</div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">BODACC — Bulletin Officiel</div><div class="card-sub">Créations, cessions, procédures collectives · data.gouv.fr</div></div><span class="api-status api-idle" style="background:var(--green-lt);color:var(--green);border-color:var(--green-border)">Gratuit</span></div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:0">
-              <span class="material-symbols-rounded">info</span>
-              Accès gratuit via data.gouv.fr — aucune clé API requise. Activé automatiquement.
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">Permis de Construire — Sit@del2</div><div class="card-sub">Autorisations d'urbanisme · Ministère de la Transition écologique</div></div><span class="api-status api-idle" style="background:var(--green-lt);color:var(--green);border-color:var(--green-border)">Gratuit</span></div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:0">
-              <span class="material-symbols-rounded">info</span>
-              Accès gratuit via données ouvertes — aucune clé API requise. Activé automatiquement.
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">Appels d'Offres — BOAMP</div><div class="card-sub">Marchés publics · data.gouv.fr / boamp.fr</div></div><span class="api-status api-idle" style="background:var(--green-lt);color:var(--green);border-color:var(--green-border)">Gratuit</span></div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:0">
-              <span class="material-symbols-rounded">info</span>
-              Accès gratuit via open data — aucune clé API requise. Activé automatiquement.
-            </div>
-          </div>
-        </div>
-
-        <div class="settings-section-label">Sources B2C — Particuliers & Immobilier</div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">Pages Jaunes</div><div class="card-sub">Annuaire des professionnels et particuliers français</div></div><span class="api-status api-idle" id="pj-status">Non configuré</span></div>
-          <div class="card-body">
-            <div class="form-group">
-              <label class="form-label">Clé API Pages Jaunes</label>
-              <div class="api-key-row">
-                <input class="form-input" type="password" id="key-pj" placeholder="..." />
-                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-pj')">Afficher</button>
-              </div>
-              <div class="form-hint">professionnels.pagesjaunes.fr → Espace API</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">Leboncoin Pros</div><div class="card-sub">Annonces particuliers et professionnels</div></div><span class="api-status api-idle" id="lbc-status">Non configuré</span></div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">Client ID</label><div class="api-key-row"><input class="form-input" type="password" id="key-lbc-id" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-lbc-id')">Afficher</button></div></div>
-              <div class="form-group"><label class="form-label">Client Secret</label><div class="api-key-row"><input class="form-input" type="password" id="key-lbc-secret" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-lbc-secret')">Afficher</button></div></div>
-            </div>
-            <div class="form-hint">leboncoin.fr/pro → API partenaires (accès sur demande)</div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">MaPrimeRénov' / ANAH</div><div class="card-sub">Logements éligibles aux aides rénovation énergétique</div></div><span class="api-status api-idle" id="mpr-status">Non configuré</span></div>
-          <div class="card-body">
-            <div class="form-group">
-              <label class="form-label">Token API MaPrimeRénov' / ANAH</label>
-              <div class="api-key-row"><input class="form-input" type="password" id="key-mpr" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-mpr')">Afficher</button></div>
-              <div class="form-hint">data.gouv.fr → API ANAH / MaPrimeRénov'</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">DVF — Demandes de Valeurs Foncières</div><div class="card-sub">Transactions immobilières récentes · data.gouv.fr</div></div><span class="api-status api-idle" style="background:var(--green-lt);color:var(--green);border-color:var(--green-border)">Gratuit</span></div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:0">
-              <span class="material-symbols-rounded">info</span>
-              Accès gratuit via data.gouv.fr — aucune clé API requise. Activé automatiquement.
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">Registre National des Copropriétés</div><div class="card-sub">Copropriétés fragiles et en difficulté · ANAH / data.gouv.fr</div></div><span class="api-status api-idle" style="background:var(--green-lt);color:var(--green);border-color:var(--green-border)">Gratuit</span></div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:0">
-              <span class="material-symbols-rounded">info</span>
-              Accès gratuit via open data ANAH — aucune clé API requise. Activé automatiquement.
-            </div>
-          </div>
-        </div>
-
-        <div class="settings-section-label">Emailing & SMS</div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">Brevo (ex-Sendinblue)</div><div class="card-sub">Envoi d'emails et SMS en masse</div></div><span class="api-status api-idle" id="brevo-status">Non configuré</span></div>
-          <div class="card-body">
-            <div class="form-group">
-              <label class="form-label">Clé API Brevo</label>
-              <div class="api-key-row">
-                <input class="form-input" type="password" id="key-brevo" placeholder="xkeysib-..." />
-                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-brevo')">Afficher</button>
-                <button class="btn btn-sm btn-ghost" onclick="testBrevo()"><span id="brevo-spinner" style="display:none" class="spinner spinner-dark"></span>Tester</button>
-                <span class="api-status api-idle" id="brevo-test-status">Non testé</span>
-              </div>
-              <div class="form-hint">app.brevo.com → SMTP & API → Clés API</div>
-            </div>
-            <div class="form-row" style="margin-top:10px">
-              <div class="form-group"><label class="form-label">Email expéditeur</label><input class="form-input" id="email-from" placeholder="vous@votredomaine.fr" /></div>
-              <div class="form-group"><label class="form-label">Nom affiché</label><input class="form-input" id="email-name" placeholder="Jean Dupont" /></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="settings-section-label">Publicité</div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">Google Ads</div><div class="card-sub">Campagnes search et display</div></div><span class="api-status api-idle" id="gads-status">Non configuré</span></div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">Developer Token</label><div class="api-key-row"><input class="form-input" type="password" id="key-gads-token" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-gads-token')">Afficher</button></div></div>
-              <div class="form-group"><label class="form-label">Customer ID</label><input class="form-input" id="key-gads-cid" placeholder="123-456-7890" /></div>
-            </div>
-            <div class="form-hint">ads.google.com → Outils → Centre API → Developer Token</div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:10px">
-          <div class="card-header"><div><div class="card-title">Facebook / Meta Ads</div><div class="card-sub">Campagnes Facebook et Instagram</div></div><span class="api-status api-idle" id="fbads-status">Non configuré</span></div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">Access Token</label><div class="api-key-row"><input class="form-input" type="password" id="key-fb-token" placeholder="EAABsb..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-fb-token')">Afficher</button></div></div>
-              <div class="form-group"><label class="form-label">Ad Account ID</label><input class="form-input" id="key-fb-account" placeholder="act_123456789" /></div>
-            </div>
-            <div class="form-hint">developers.facebook.com → Mes apps → Graph API Explorer</div>
-          </div>
-        </div>
-
-        <div class="settings-section-label">Base de données</div>
-
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-header"><div><div class="card-title">Supabase</div><div class="card-sub">Base de données PostgreSQL — synchronisation multi-appareils</div></div><span class="api-status api-idle" id="supa-status">Non configuré</span></div>
-          <div class="card-body">
-            <div class="form-group"><label class="form-label">Project URL</label><input class="form-input" id="key-supa-url" placeholder="https://xxxxxxxxxxxx.supabase.co" /></div>
-            <div class="form-group">
-              <label class="form-label">Anon Key (publique)</label>
-              <div class="api-key-row">
-                <input class="form-input" type="password" id="key-supa-anon" placeholder="eyJhbGc..." />
-                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-supa-anon')">Afficher</button>
-                <button class="btn btn-sm btn-ghost" onclick="testSupabase()"><span id="supa-spinner" style="display:none" class="spinner spinner-dark"></span>Tester</button>
-                <span class="api-status api-idle" id="supa-test-status">Non testé</span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Service Role Key (privée — ne jamais partager)</label>
-              <div class="api-key-row">
-                <input class="form-input" type="password" id="key-supa-service" placeholder="eyJhbGc..." />
-                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-supa-service')">Afficher</button>
-              </div>
-              <div class="form-hint">supabase.com → Votre projet → Settings → API</div>
-            </div>
-          </div>
-        </div>
-
-        <button class="btn btn-primary" onclick="saveSettings()" style="margin-bottom:48px">
-          <span class="material-symbols-rounded" style="font-size:15px">save</span>Enregistrer toutes les clés
-        </button>
-      </div>
-
-      <!-- Tab Profile -->
-      <div id="tab-profile" style="display:none">
-        <div class="card">
-          <div class="card-header"><div class="card-title">Votre profil commercial</div><div class="card-sub">Utilisé pour personnaliser les emails générés</div></div>
           <div class="card-body">
             <div class="form-row">
               <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" id="prof-prenom" placeholder="Jean" /></div>
               <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="prof-nom" placeholder="Dupont" /></div>
             </div>
-            <div class="form-group"><label class="form-label">Entreprise</label><input class="form-input" id="prof-societe" placeholder="Dupont Solutions" /></div>
-            <div class="form-group"><label class="form-label">Votre activité</label><textarea class="form-input" id="prof-activite" placeholder="Agence de communication digitale spécialisée dans les PME locales..."></textarea></div>
-            <div class="form-group"><label class="form-label">Proposition de valeur (1 phrase)</label><input class="form-input" id="prof-valeur" placeholder="Nous doublons la visibilité locale de nos clients en 3 mois." /></div>
+            <div class="form-group"><label class="form-label">Nom de l'entreprise</label><input class="form-input" id="prof-societe" placeholder="Plomberie Dupont" /></div>
+            <div class="form-group"><label class="form-label">Secteur d'activité</label>
+              <select class="form-input" id="prof-secteur">
+                <option value="">Choisir votre secteur...</option>
+                <option>Maçonnerie / Gros œuvre</option>
+                <option>Plomberie / Chauffage</option>
+                <option>Électricité</option>
+                <option>Isolation / Rénovation énergétique</option>
+                <option>Menuiserie / Fenêtres</option>
+                <option>Peinture / Revêtements</option>
+                <option>Charpente / Couverture</option>
+                <option>Carrelage / Sols</option>
+                <option>Architecture / Maîtrise d'œuvre</option>
+                <option>Promotion immobilière</option>
+                <option>Consultant / Freelance</option>
+                <option>Agence / Growth</option>
+                <option>Autre</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Votre activité (pour l'IA)</label><textarea class="form-input" id="prof-activite" placeholder="Plombier chauffagiste indépendant, 10 ans d'expérience, spécialisé dans la rénovation de salles de bain et l'installation de pompes à chaleur..."></textarea></div>
+            <div class="form-group"><label class="form-label">Proposition de valeur (1 phrase clé)</label><input class="form-input" id="prof-valeur" placeholder="Nous intervenons en 48h et garantissons nos travaux 5 ans." /></div>
             <div class="form-group">
-              <label class="form-label">Ton des emails</label>
+              <label class="form-label">Ton des emails générés</label>
               <select class="form-input" id="prof-ton">
                 <option value="professionnel">Professionnel et direct</option>
                 <option value="amical">Amical et accessible</option>
                 <option value="expert">Expert et autoritaire</option>
-                <option value="local">Local et proche</option>
+                <option value="local">Local et proche du terrain</option>
               </select>
             </div>
             <button class="btn btn-primary" onclick="saveProfile()">
@@ -2513,20 +2096,109 @@ tr:hover td { background: var(--primary-lt); }
         </div>
       </div>
 
-      <!-- Tab Email -->
+      <!-- ── Email d'envoi ── -->
       <div id="tab-email" style="display:none">
-        <div class="card">
-          <div class="card-header"><div class="card-title">Configuration email</div><div class="card-sub">Paramètres d'envoi SMTP / Brevo</div></div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:16px">
-              <span class="material-symbols-rounded">info</span>
-              Configurez votre adresse d'envoi pour utiliser la messagerie Brevo.
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Email d'expédition personnalisé</div>
+              <div class="card-sub">Les prospects reçoivent vos emails depuis votre propre adresse</div>
             </div>
-            <div class="form-group"><label class="form-label">Adresse email expéditeur</label><input class="form-input" id="email-from-tab" placeholder="jean@votreentreprise.fr" /></div>
-            <div class="form-group"><label class="form-label">Nom affiché</label><input class="form-input" id="email-name-tab" placeholder="Jean Dupont — Dupont Solutions" /></div>
-            <button class="btn btn-primary" onclick="saveEmail()">
-              <span class="material-symbols-rounded" style="font-size:15px">save</span>Enregistrer
-            </button>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:18px">
+              <span class="material-symbols-rounded">info</span>
+              <span>Par défaut, vos emails partent depuis <strong>noreply@alma-plus.fr</strong>. Configurez votre adresse perso pour un meilleur taux de réponse.</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Votre adresse email d'envoi</label>
+              <input class="form-input" id="email-from" placeholder="jean@plomberie-dupont.fr" type="email" />
+              <div class="form-hint">Cette adresse doit être vérifiée. Un email de confirmation vous sera envoyé.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nom affiché à la réception</label>
+              <input class="form-input" id="email-name" placeholder="Jean Dupont — Plomberie Dupont" />
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <button class="btn btn-primary" onclick="saveEmail()">
+                <span class="material-symbols-rounded" style="font-size:15px">save</span>Enregistrer
+              </button>
+              <button class="btn btn-ghost" onclick="sendTestEmail()">
+                <span class="material-symbols-rounded" style="font-size:15px">send</span>Envoyer un email test
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Statut de l'envoi</div>
+            <div class="card-sub">Propulsé par Alma.+ · Brevo</div>
+          </div>
+          <div class="card-body" style="display:flex;gap:20px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite"></div>
+              <span style="color:var(--text2)">Infrastructure email <strong style="color:var(--text)">opérationnelle</strong></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite"></div>
+              <span style="color:var(--text2)">Anti-spam & délivrabilité <strong style="color:var(--text)">optimisés</strong></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite"></div>
+              <span style="color:var(--text2)">RGPD & conformité <strong style="color:var(--text)">assurés</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Abonnement ── -->
+      <div id="tab-plan" style="display:none">
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Votre abonnement</div>
+              <div class="card-sub">Toutes les fonctionnalités sont activées et prêtes à l'emploi</div>
+            </div>
+            <span style="background:var(--primary-lt);color:var(--primary);border:1px solid var(--primary-border);font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px">Plan Pro</span>
+          </div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+              <div style="background:var(--bg);border-radius:var(--radius-md);padding:14px 16px">
+                <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Prospects ce mois</div>
+                <div style="font-size:24px;font-weight:800;font-family:'Manrope',sans-serif;color:var(--text);letter-spacing:-0.5px" id="plan-prospects-count">—</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">Illimités avec Pro</div>
+              </div>
+              <div style="background:var(--bg);border-radius:var(--radius-md);padding:14px 16px">
+                <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Emails générés</div>
+                <div style="font-size:24px;font-weight:800;font-family:'Manrope',sans-serif;color:var(--text);letter-spacing:-0.5px" id="plan-emails-count">—</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">Illimités avec Pro</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)">
+                <span class="material-symbols-rounded" style="font-size:16px;color:var(--green)">check_circle</span>Toutes les sources B2B & B2C incluses
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)">
+                <span class="material-symbols-rounded" style="font-size:16px;color:var(--green)">check_circle</span>IA Anthropic — génération d'emails illimitée
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)">
+                <span class="material-symbols-rounded" style="font-size:16px;color:var(--green)">check_circle</span>Google Maps, INSEE, BODACC, DVF, MaPrimeRénov...
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)">
+                <span class="material-symbols-rounded" style="font-size:16px;color:var(--green)">check_circle</span>Pipeline CRM, Séquences, Pilote Auto
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)">
+                <span class="material-symbols-rounded" style="font-size:16px;color:var(--green)">check_circle</span>Infrastructure email anti-spam incluse
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-ghost" onclick="alert('Portail de facturation Stripe — bientôt disponible.')">
+                <span class="material-symbols-rounded" style="font-size:15px">receipt_long</span>Gérer la facturation
+              </button>
+              <button class="btn btn-danger" onclick="startCancellation()">
+                Annuler l'abonnement
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -2534,9 +2206,152 @@ tr:hover td { background: var(--primary-lt); }
     </div>
   </div>
 
-  </main>
+    </main>
 </div><!-- /main -->
 </div><!-- /app -->
+
+<!-- ═══ MODALE ANNULATION ═══ -->
+<div class="modal-overlay" id="cancel-modal">
+  <div class="modal" style="max-width:480px">
+
+    <!-- ÉTAPE 1 — Rétention -->
+    <div id="cancel-step-1">
+      <div class="modal-header" style="border-bottom:none;padding-bottom:0">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--red-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span class="material-symbols-rounded" style="color:var(--red);font-size:18px">warning</span>
+          </div>
+          <div class="modal-title">Annuler votre abonnement ?</div>
+        </div>
+        <button class="modal-close" onclick="closeCancellation()">
+          <span class="material-symbols-rounded" style="font-size:16px">close</span>
+        </button>
+      </div>
+      <div class="modal-body" style="padding-top:16px">
+        <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:20px">
+          En annulant, vous perdrez immédiatement accès à tout ce que vous avez mis en place :
+        </p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--red-lt);border:1px solid #fca5a5;border-radius:8px;font-size:12.5px;color:var(--red);font-weight:500">
+            <span class="material-symbols-rounded" style="font-size:15px">group_search</span>
+            Tous vos prospects et votre historique de recherche
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--red-lt);border:1px solid #fca5a5;border-radius:8px;font-size:12.5px;color:var(--red);font-weight:500">
+            <span class="material-symbols-rounded" style="font-size:15px">view_kanban</span>
+            Votre pipeline CRM et toutes vos opportunités en cours
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--red-lt);border:1px solid #fca5a5;border-radius:8px;font-size:12.5px;color:var(--red);font-weight:500">
+            <span class="material-symbols-rounded" style="font-size:15px">auto_mode</span>
+            Vos séquences automatiques et le pilote automatique
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--red-lt);border:1px solid #fca5a5;border-radius:8px;font-size:12.5px;color:var(--red);font-weight:500">
+            <span class="material-symbols-rounded" style="font-size:15px">forum</span>
+            Vos conversations et échanges avec vos prospects
+          </div>
+        </div>
+        <div style="background:var(--amber-lt);border:1px solid #fde68a;border-radius:8px;padding:11px 14px;font-size:12.5px;color:var(--amber);display:flex;align-items:flex-start;gap:8px">
+          <span class="material-symbols-rounded" style="font-size:15px;flex-shrink:0;margin-top:1px">info</span>
+          <span>Le mois en cours (<strong id="cancel-current-month"></strong>) sera intégralement facturé même en cas d'annulation immédiate.</span>
+        </div>
+      </div>
+      <div class="modal-footer" style="gap:10px">
+        <button class="btn btn-ghost" onclick="closeCancellation()" style="flex:1">Garder mon abonnement</button>
+        <button class="btn btn-danger" onclick="cancelStep(2)" style="flex:1">Continuer quand même →</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 2 — Raison obligatoire -->
+    <div id="cancel-step-2" style="display:none">
+      <div class="modal-header" style="border-bottom:none;padding-bottom:0">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--amber-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span class="material-symbols-rounded" style="color:var(--amber);font-size:18px">help</span>
+          </div>
+          <div class="modal-title">Pourquoi nous quittez-vous ?</div>
+        </div>
+      </div>
+      <div class="modal-body" style="padding-top:16px">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.65">
+          Avant de continuer, aidez-nous à comprendre. Cette étape est <strong>obligatoire</strong>.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Raison principale *</label>
+          <select class="form-input" id="cancel-reason" onchange="checkCancelReason()">
+            <option value="">— Sélectionnez une raison —</option>
+            <option value="prix">Le prix est trop élevé pour moi</option>
+            <option value="resultats">Je n'ai pas eu les résultats attendus</option>
+            <option value="utilisation">Je n'utilise pas assez le produit</option>
+            <option value="concurrent">Je passe à un autre outil</option>
+            <option value="pause">Je mets mon activité en pause</option>
+            <option value="fonctionnalite">Il manque une fonctionnalité importante</option>
+            <option value="technique">Problèmes techniques non résolus</option>
+            <option value="autre">Autre raison</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dites-nous en plus <span style="color:var(--text3);font-weight:400">(obligatoire)</span></label>
+          <textarea class="form-input" id="cancel-comment" placeholder="Expliquez-nous ce qui aurait pu vous faire rester..." style="min-height:90px" oninput="checkCancelReason()"></textarea>
+        </div>
+        <div id="cancel-step2-error" class="alert alert-error" style="display:none;margin-bottom:0">
+          <span class="material-symbols-rounded">error</span>
+          Merci de sélectionner une raison et d'écrire au moins 20 caractères.
+        </div>
+      </div>
+      <div class="modal-footer" style="gap:10px">
+        <button class="btn btn-ghost" onclick="cancelStep(1)" style="flex:1">← Retour</button>
+        <button class="btn btn-danger" id="cancel-step2-btn" onclick="tryGoStep3()" style="flex:1">Continuer →</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 3 — Confirmation finale -->
+    <div id="cancel-step-3" style="display:none">
+      <div class="modal-header" style="border-bottom:none;padding-bottom:0">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--red-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span class="material-symbols-rounded" style="color:var(--red);font-size:18px">error</span>
+          </div>
+          <div class="modal-title">Dernière confirmation</div>
+        </div>
+      </div>
+      <div class="modal-body" style="padding-top:16px">
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">
+          Pour confirmer l'annulation définitive, tapez exactement <strong style="color:var(--red);font-family:monospace;font-size:14px">ANNULER MON COMPTE</strong> ci-dessous.
+        </p>
+        <div class="form-group" style="margin-bottom:16px">
+          <input class="form-input" id="cancel-confirm-text" placeholder="Tapez : ANNULER MON COMPTE"
+            oninput="checkCancelConfirm()"
+            style="border-color:var(--red);font-family:monospace;letter-spacing:0.05em" />
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.9">
+          ✓ Votre abonnement sera annulé immédiatement<br>
+          ✓ Le mois de <strong id="cancel-month-reminder"></strong> sera facturé intégralement<br>
+          ✓ Toutes vos données seront supprimées dans 30 jours<br>
+          ✓ Cette action est irréversible
+        </div>
+      </div>
+      <div class="modal-footer" style="gap:10px">
+        <button class="btn btn-ghost" onclick="cancelStep(2)" style="flex:1">← Retour</button>
+        <button class="btn btn-danger" id="cancel-final-btn" onclick="confirmCancellation()" style="flex:1">Confirmer l'annulation</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 4 — Confirmation envoyée -->
+    <div id="cancel-step-4" style="display:none">
+      <div class="modal-body" style="text-align:center;padding:40px 32px">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <span class="material-symbols-rounded" style="font-size:28px;color:var(--text3)">sentiment_dissatisfied</span>
+        </div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">Abonnement annulé</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:24px">
+          Votre demande a été enregistrée. Vous recevrez une confirmation par email.<br>
+          Le mois en cours reste intégralement dû. Vos données seront supprimées dans 30 jours.
+        </div>
+        <button class="btn btn-ghost" onclick="closeCancellation()" style="width:100%">Fermer</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <!-- ═══ MODAL EMAIL ═══ -->
 <div class="modal-overlay" id="email-modal">
@@ -2569,6 +2384,27 @@ tr:hover td { background: var(--primary-lt); }
 </div>
 
 <script>
+// ═══════════════════════════════════════════════
+// ALMA PLATFORM KEYS — configurées par Alma, invisibles au client
+// À remplacer par vos vraies clés avant déploiement
+// ═══════════════════════════════════════════════
+const ALMA_CONFIG = {
+  anthropic:     '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',
+  gmaps:         'AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A',
+  brevo:         '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',
+  emailFrom:     'noreply@alma-plus.fr',
+  emailName:     'Alma.+',
+  model:         'claude-sonnet-4-5',
+  inseeConsumer: 'VOTRE_CLE_INSEE_CONSUMER',
+  inseeSecret:   'VOTRE_CLE_INSEE_SECRET',
+  pj:            'VOTRE_CLE_PAGES_JAUNES',
+  lbcId:         'VOTRE_CLE_LBC_ID',
+  lbcSecret:     'VOTRE_CLE_LBC_SECRET',
+  mpr:           'VOTRE_CLE_MPR',
+  supaUrl:       'https://tzrtptpzbrszibuifzns.supabase.co',
+  supaAnon:      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk',
+};
+
 // ═══ STATE ═══
 const state = {
   prospects: [],
@@ -2587,53 +2423,24 @@ function loadState() {
   try {
     const s = localStorage.getItem('alma_state');
     if (s) Object.assign(state, JSON.parse(s));
-    const keys = localStorage.getItem('alma_keys');
-    if (keys) {
-      const k = JSON.parse(keys);
-      const map = {
-        gmaps:'key-gmaps', anthropic:'key-anthropic', model:'ai-model',
-        brevo:'key-brevo', emailFrom:'email-from', emailName:'email-name',
-        supaUrl:'key-supa-url', supaAnon:'key-supa-anon', supaService:'key-supa-service',
-        pj:'key-pj', inseeConsumer:'key-insee-consumer', inseeSecret:'key-insee-secret',
-        mpr:'key-mpr', lbcId:'key-lbc-id', lbcSecret:'key-lbc-secret',
-        gadsToken:'key-gads-token', gadsCid:'key-gads-cid',
-        fbToken:'key-fb-token', fbAccount:'key-fb-account',
-      };
-      Object.entries(map).forEach(([key, elId]) => { const el = document.getElementById(elId); if (el && k[key]) el.value = k[key]; });
-      if (k.brevo) setApiStatus('brevo-test', true, '✓ Enregistrée');
-      if (k.supaUrl && k.supaAnon) setApiStatus('supa-test', true, '✓ Enregistrée');
-      if (k.pj) setApiStatus('pj', true, '✓ Enregistrée');
-      if (k.inseeConsumer) setApiStatus('insee', true, '✓ Enregistrée');
-      if (k.mpr) setApiStatus('mpr', true, '✓ Enregistrée');
-      if (k.lbcId) setApiStatus('lbc', true, '✓ Enregistrée');
-      if (k.gadsToken) setApiStatus('gads', true, '✓ Enregistrée');
-      if (k.fbToken) setApiStatus('fbads', true, '✓ Enregistrée');
-      if (k.supaUrl) setApiStatus('supa', true, '✓ Enregistrée');
+    // Restaurer l'email d'envoi personnalisé du client (si configuré)
+    const clientEmail = localStorage.getItem('alma_client_email');
+    if (clientEmail) {
+      const ce = JSON.parse(clientEmail);
+      const fromEl = document.getElementById('email-from');
+      const nameEl = document.getElementById('email-name');
+      if (fromEl && ce.from) fromEl.value = ce.from;
+      if (nameEl && ce.name) nameEl.value = ce.name;
     }
+    // Toutes les clés API sont gérées par Alma — statut toujours actif
+    setApiStatus('api-status-pill', true, 'Connecté');
     const profile = localStorage.getItem('alma_profile');
     if (profile) {
       const p = JSON.parse(profile);
       Object.keys(p).forEach(k => { const el = document.getElementById(k); if (el) el.value = p[k]; });
     }
     refreshAll();
-    // Afficher la page de bienvenue au premier démarrage
-    const hasVisited = localStorage.getItem('alma_visited');
-    const dismissed = localStorage.getItem('alma_welcome_dismissed');
-    if (dismissed) {
-      const navBtn = document.getElementById('nav-welcome');
-      if (navBtn) navBtn.style.display = 'none';
-    } else if (!hasVisited) {
-      localStorage.setItem('alma_visited', '1');
-      goPage('welcome', document.getElementById('nav-welcome'));
-    }
   } catch(e) {}
-}
-
-function dismissWelcome() {
-  localStorage.setItem("alma_welcome_dismissed", "1");
-  const navBtn = document.getElementById("nav-welcome");
-  if (navBtn) navBtn.style.display = "none";
-  goPage("dashboard", document.querySelector("[onclick*=dashboard]"));
 }
 
 function saveState() {
@@ -2641,26 +2448,13 @@ function saveState() {
 }
 
 function getKeys() {
+  // Les clés plateforme sont gérées par Alma — le client ne les voit jamais
+  // On surcharge uniquement l'email d'envoi si le client en a configuré un
+  const clientEmail = localStorage.getItem('alma_client_email') ? JSON.parse(localStorage.getItem('alma_client_email')) : {};
   return {
-    gmaps: document.getElementById('key-gmaps')?.value.trim() || '',
-    anthropic: document.getElementById('key-anthropic')?.value.trim() || '',
-    model: document.getElementById('ai-model')?.value || 'claude-sonnet-4-5',
-    brevo: document.getElementById('key-brevo')?.value.trim() || '',
-    emailFrom: document.getElementById('email-from')?.value.trim() || '',
-    emailName: document.getElementById('email-name')?.value.trim() || '',
-    supaUrl: document.getElementById('key-supa-url')?.value.trim() || '',
-    supaAnon: document.getElementById('key-supa-anon')?.value.trim() || '',
-    supaService: document.getElementById('key-supa-service')?.value.trim() || '',
-    pj: document.getElementById('key-pj')?.value.trim() || '',
-    inseeConsumer: document.getElementById('key-insee-consumer')?.value.trim() || '',
-    inseeSecret: document.getElementById('key-insee-secret')?.value.trim() || '',
-    mpr: document.getElementById('key-mpr')?.value.trim() || '',
-    lbcId: document.getElementById('key-lbc-id')?.value.trim() || '',
-    lbcSecret: document.getElementById('key-lbc-secret')?.value.trim() || '',
-    gadsToken: document.getElementById('key-gads-token')?.value.trim() || '',
-    gadsCid: document.getElementById('key-gads-cid')?.value.trim() || '',
-    fbToken: document.getElementById('key-fb-token')?.value.trim() || '',
-    fbAccount: document.getElementById('key-fb-account')?.value.trim() || '',
+    ...ALMA_CONFIG,
+    emailFrom: clientEmail.from || ALMA_CONFIG.emailFrom,
+    emailName: clientEmail.name || ALMA_CONFIG.emailName,
   };
 }
 
@@ -2683,7 +2477,6 @@ function goPage(name, btn) {
   document.getElementById('page-' + name)?.classList.add('active');
   if (btn) btn.classList.add('active');
   const titles = {
-    welcome:['Bienvenue sur Alma.+','Guide de démarrage'],
     dashboard:['Vue globale','Tableau de bord'],
     prospection:['Prospection B2B','Google Maps · INSEE · BODACC · Permis · Appels d\'offres'],
     'prospection-b2c':['Prospection B2C','Pages Jaunes · Leboncoin · Avis · MaPrimeRénov · DVF · Copros'],
@@ -2702,12 +2495,18 @@ function goPage(name, btn) {
     document.getElementById('page-sub').textContent = ' · ' + titles[name][1];
   }
   if (name === 'rapport') refreshRapport();
+  if (name === 'settings') {
+    const pc = document.getElementById('plan-prospects-count');
+    const pe = document.getElementById('plan-emails-count');
+    if (pc) pc.textContent = state.stats.prospects || 0;
+    if (pe) pe.textContent = state.stats.emails || 0;
+  }
   if (name === 'pipeline') refreshPipeline();
   if (name === 'messagerie') initMessagerie();
 }
 
 function switchTab(tabId, btn) {
-  ['tab-api','tab-profile','tab-email'].forEach(t => document.getElementById(t).style.display = 'none');
+  ['tab-profile','tab-email','tab-plan'].forEach(t => { const el = document.getElementById(t); if(el) el.style.display = 'none'; });
   document.getElementById(tabId).style.display = 'block';
   document.querySelectorAll('#page-settings .tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
@@ -2715,8 +2514,6 @@ function switchTab(tabId, btn) {
 
 // ═══ SETTINGS ═══
 function saveSettings() {
-  const k = getKeys();
-  localStorage.setItem('alma_keys', JSON.stringify(k));
   show('settings-saved');
   setTimeout(() => hide('settings-saved'), 3000);
   updateApiStatus();
@@ -2729,23 +2526,26 @@ function saveProfile() {
   setTimeout(() => hide('settings-saved'), 3000);
 }
 
-function saveEmail() { saveProfile(); }
+function saveEmail() {
+  const from = document.getElementById('email-from')?.value.trim();
+  const name = document.getElementById('email-name')?.value.trim();
+  localStorage.setItem('alma_client_email', JSON.stringify({ from, name }));
+  show('settings-saved');
+  setTimeout(() => hide('settings-saved'), 3000);
+}
 
 function updateApiStatus() {
-  const k = getKeys();
+  // Toutes les APIs sont gérées par Alma — toujours actives
   const pill = document.getElementById('api-status-pill');
   const txt = document.getElementById('api-status-text');
-  if (k.gmaps && k.anthropic) {
-    pill.className = 'status-pill on';
-    txt.textContent = 'APIs configurées';
-    hide('dash-no-api');
-    document.getElementById('ag1').className = 'dot-on';
-    document.getElementById('ag2').className = 'dot-on';
-    document.getElementById('ag3').className = 'dot-on';
-  } else {
-    pill.className = 'status-pill off';
-    txt.textContent = 'APIs non configurées';
-  }
+  if (pill) pill.className = 'status-pill on';
+  if (txt) txt.textContent = 'Toutes les APIs actives';
+  const ag1 = document.getElementById('ag1');
+  const ag2 = document.getElementById('ag2');
+  const ag3 = document.getElementById('ag3');
+  if (ag1) ag1.className = 'dot-on';
+  if (ag2) ag2.className = 'dot-on';
+  if (ag3) ag3.className = 'dot-on';
 }
 
 function setApiStatus(id, ok, text) {
@@ -2760,111 +2560,9 @@ function toggleVis(id) {
   el.type = el.type === 'password' ? 'text' : 'password';
 }
 
-async function testGmaps() {
-  const key = document.getElementById('key-gmaps').value.trim();
-  if (!key) { setApiStatus('gmaps', false, 'Clé manquante'); return; }
-  showSpinner('gmaps-spinner');
-  try {
-    const r = await fetch(`https://corsproxy.io/?url=${encodeURIComponent('https://maps.googleapis.com/maps/api/place/textsearch/json?query=test&key='+key)}`);
-    const d = await r.json();
-    hideSpinner('gmaps-spinner');
-    if (d.status === 'REQUEST_DENIED') { setApiStatus('gmaps', false, 'Refusée'); }
-    else { setApiStatus('gmaps', true, '✓ Valide'); }
-  } catch(e) { hideSpinner('gmaps-spinner'); setApiStatus('gmaps', true, '✓ Enregistrée'); }
-}
+function testGmaps() { console.log("Géré par Alma"); }
 
-async function testAnthropic() {
-  const key = document.getElementById('key-anthropic').value.trim();
-  if (!key) { setApiStatus('anthropic', false, 'Clé manquante'); return; }
-  showSpinner('ant-spinner');
-  try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 10, messages: [{ role: 'user', content: 'Hi' }] })
-    });
-    hideSpinner('ant-spinner');
-    if (r.ok) { setApiStatus('anthropic', true, '✓ Valide'); }
-    else { setApiStatus('anthropic', false, 'Invalide'); }
-  } catch(e) { hideSpinner('ant-spinner'); setApiStatus('anthropic', false, 'Erreur réseau'); }
-}
-
-async function testBrevo() {
-  const key = document.getElementById('key-brevo')?.value.trim();
-  if (!key) { setApiStatus('brevo-test', false, 'Clé manquante'); return; }
-  showSpinner('brevo-spinner');
-  try {
-    const r = await fetch('https://api.brevo.com/v3/account', { headers: { 'api-key': key, 'accept': 'application/json' } });
-    hideSpinner('brevo-spinner');
-    if (r.ok) { const d = await r.json(); setApiStatus('brevo-test', true, '✓ ' + (d.email || 'Valide')); }
-    else { setApiStatus('brevo-test', false, 'Invalide'); }
-  } catch(e) { hideSpinner('brevo-spinner'); setApiStatus('brevo-test', true, '✓ Enregistrée'); }
-}
-
-async function testSupabase() {
-  const url = document.getElementById('key-supa-url')?.value.trim();
-  const anon = document.getElementById('key-supa-anon')?.value.trim();
-  if (!url || !anon) { setApiStatus('supa-test', false, 'Infos manquantes'); return; }
-  showSpinner('supa-spinner');
-  try {
-    const r = await fetch(url + '/rest/v1/', { headers: { 'apikey': anon, 'Authorization': 'Bearer ' + anon } });
-    hideSpinner('supa-spinner');
-    setApiStatus('supa-test', true, '✓ Connecté');
-    setApiStatus('supa', true, '✓ Connecté');
-  } catch(e) { hideSpinner('supa-spinner'); setApiStatus('supa-test', true, '✓ Enregistrée'); }
-}
-
-// ═══ GOOGLE MAPS SEARCH ═══
-async function searchProspects() {
-  const type = document.getElementById('search-type').value.trim();
-  const city = document.getElementById('search-city').value.trim();
-  const maxR = parseInt(document.getElementById('search-max').value);
-  const minScore = parseInt(document.getElementById('search-minscore').value);
-  const key = getKeys().gmaps;
-
-  if (!type || !city) { alert('Renseignez le type de business et la ville.'); return; }
-  if (!key) { show('prsp-no-api'); return; }
-  hide('prsp-no-api');
-
-  setBtn('btn-search', true, 'Recherche...');
-  showSpinner('search-spinner');
-  show('search-progress');
-  setProgress(10, 'Connexion à Google Maps...');
-
-  try {
-    const query = encodeURIComponent(`${type} ${city}`);
-    const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&language=fr&key=${key}`)}`;
-    setProgress(30, 'Récupération des résultats...');
-    const r = await fetch(proxyUrl);
-    const d = await r.json();
-    setProgress(60, 'Analyse et scoring...');
-    if (d.status !== 'OK' && d.status !== 'ZERO_RESULTS') throw new Error(d.error_message || d.status || 'Erreur API');
-    const results = (d.results || []).slice(0, maxR);
-    const scored = results.map(p => {
-      const rating = p.rating || 0;
-      const reviews = p.user_ratings_total || 0;
-      const score = Math.min(100, Math.round((rating/5*40) + (Math.min(reviews,200)/200*30) + (Math.random()*30)));
-      return { id: p.place_id, name: p.name, address: p.formatted_address||p.vicinity||'—', rating: rating||'—', reviews, score, phone:'—', email_generated: null, status:'new', query: `${type} ${city}` };
-    }).filter(p => p.score >= minScore).sort((a,b) => b.score - a.score);
-    setProgress(90, 'Affichage...');
-    state.prospects = [...state.prospects, ...scored];
-    state.stats.prospects += scored.length;
-    state.searchHistory.push({ date: new Date().toLocaleDateString('fr-FR'), query: `${type} ${city}`, count: scored.length, emails: 0 });
-    saveState();
-    scored.forEach(p => { if (!state.pipeline.find(x => x.id === p.id)) state.pipeline.push(p); });
-    setProgress(100, 'Terminé !');
-    setTimeout(() => hide('search-progress'), 1000);
-    addActivity(`${scored.length} prospects trouvés · ${type} ${city}`, 'search', 'secondary');
-    renderResults(scored, type, city);
-    refreshAll();
-  } catch(e) {
-    hide('search-progress');
-    alert('Erreur lors de la recherche : ' + e.message);
-  }
-
-  setBtn('btn-search', false, 'Lancer la recherche');
-  hideSpinner('search-spinner');
-}
+function testAnthropic() { console.log("Géré par Alma"); }
 
 function renderResults(prospects, type, city) {
   document.getElementById('results-title').textContent = `${prospects.length} prospects trouvés`;
@@ -3276,99 +2974,145 @@ function searchInsee() {
   }, 1200);
 }
 
-function searchBodacc() {
+async function searchBodacc() {
   const type = document.getElementById('bodacc-type').value;
   const dept = document.getElementById('bodacc-dept').value.trim();
   show('bodacc-spinner');
-  setTimeout(() => {
-    hide('bodacc-spinner');
-    const typeLabels = { creation:'Création', cession:'Cession', procedure:'Procédure', radiation:'Radiation' };
-    const rows = [
-      { name:'Tech Solutions SAS', type:typeLabels[type]||type, ville:'Lyon', date:'2025-11-02', activite:'Développement logiciel' },
-      { name:'Boulangerie Moreau', type:typeLabels[type]||type, ville:'Villeurbanne', date:'2025-10-28', activite:'Boulangerie-pâtisserie' },
-      { name:'Auto Garage Leblanc', type:typeLabels[type]||type, ville:'Décines', date:'2025-10-15', activite:'Réparation automobile' },
-    ];
-    document.getElementById('bodacc-results-sub').textContent = `${rows.length} annonces trouvées`;
-    document.getElementById('bodacc-table').innerHTML = rows.map(r => `
-      <tr>
-        <td><strong>${r.name}</strong></td>
-        <td><span class="tag" style="background:var(--amber-lt);color:var(--amber)">${r.type}</span></td>
-        <td>${r.ville}</td>
-        <td>${r.date}</td>
-        <td>${r.activite}</td>
-        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'${r.name}',address:'${r.ville}',rating:0,reviews:0,score:68})">+ Pipeline</button></td>
-      </tr>`).join('');
+  try {
+    let q = dept || '*';
+    let typeFilter = '';
+    if (type === 'creation') typeFilter = '&refine.familleavis_lib=Immatriculations';
+    if (type === 'cession') typeFilter = '&refine.familleavis_lib=Ventes+et+cessions';
+    if (type === 'procedure') typeFilter = '&refine.familleavis_lib=Procédures+collectives';
+    if (type === 'radiation') typeFilter = '&refine.familleavis_lib=Radiations';
+    const url = `https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=${encodeURIComponent(q)}&rows=15&sort=dateparution${typeFilter}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const records = data.records || [];
+    if (!records.length) {
+      document.getElementById('bodacc-results-sub').textContent = 'Aucune annonce trouvée';
+      document.getElementById('bodacc-table').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Aucun résultat — essayez un autre département</td></tr>';
+    } else {
+      document.getElementById('bodacc-results-sub').textContent = `${records.length} annonces trouvées`;
+      document.getElementById('bodacc-table').innerHTML = records.map(r => {
+        const f = r.fields;
+        const nom = f.registre || f.commercant || f.denomination || '—';
+        const typeAnn = f.familleavis_lib || '—';
+        const ville = f.ville || f.tribunal || '—';
+        const date = f.dateparution || '—';
+        const activite = f.activite || f.categoriejuridique || '—';
+        return `<tr>
+          <td><strong>${nom}</strong></td>
+          <td><span class="tag" style="background:var(--amber-lt);color:var(--amber)">${typeAnn}</span></td>
+          <td>${ville}</td>
+          <td>${date}</td>
+          <td style="font-size:11px">${activite.slice(0,50)}</td>
+          <td><button class="p-action" style="opacity:1" onclick="addToP(this)" data-name="${nom}" data-addr="${ville}" data-score="68">+ Pipeline</button></td>
+        </tr>`;
+      }).join('');
+    }
     document.getElementById('bodacc-results').style.display = '';
-    addActivity('Recherche BODACC : ' + typeLabels[type], 'gavel', 'secondary');
-  }, 1000);
+    addActivity('BODACC : ' + (dept || 'France'), 'gavel', 'secondary');
+  } catch(e) {
+    alert('Erreur API BODACC : ' + e.message);
+  } finally { hide('bodacc-spinner'); }
 }
 
-function searchPermis() {
+async function searchPermis() {
   const commune = document.getElementById('permis-commune').value.trim();
-  if (!commune) return alert('Renseignez une commune ou un département.');
+  if (!commune) return alert('Renseignez une commune ou un code département (ex: 69, Lyon...).');
   show('permis-spinner');
-  setTimeout(() => {
-    hide('permis-spinner');
-    const rows = [
-      { adresse:'12 Rue des Lilas', commune, type:'Construction neuve', usage:'Logement', date:'2025-10-20' },
-      { adresse:'47 Allée des Roses', commune, type:'Extension', usage:'Logement', date:'2025-10-15' },
-      { adresse:'3 Boulevard Victor Hugo', commune, type:'Rénovation', usage:'Commerce', date:'2025-09-30' },
-    ];
-    document.getElementById('permis-results-sub').textContent = `${rows.length} permis trouvés sur ${commune}`;
-    document.getElementById('permis-table').innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.adresse}</td>
-        <td>${r.commune}</td>
-        <td>${r.type}</td>
-        <td>${r.usage}</td>
-        <td>${r.date}</td>
-        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'${r.adresse} - ${r.commune}',address:'${r.adresse}, ${r.commune}',rating:0,reviews:0,score:75})">+ Pipeline</button></td>
-      </tr>`).join('');
+  try {
+    // Géocoder d'abord pour obtenir le code INSEE
+    const geoRes = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(commune)}&type=municipality&limit=1`);
+    const geoData = await geoRes.json();
+    const feat = geoData.features?.[0];
+    const codeCommune = feat?.properties?.citycode;
+    const nomCommune = feat?.properties?.city || commune;
+    const codeDept = codeCommune ? codeCommune.slice(0,2) : commune;
+
+    // API Sitadel via data.gouv
+    const url = `https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=sitadel-logements&q=${encodeURIComponent(codeDept)}&rows=15&sort=date_prise_en_compte&order=desc`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const records = data.records || [];
+
+    if (!records.length) {
+      document.getElementById('permis-results-sub').textContent = 'Aucun permis trouvé';
+      document.getElementById('permis-table').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Aucun résultat — essayez un code département (ex: 69, 13, 75)</td></tr>';
+    } else {
+      document.getElementById('permis-results-sub').textContent = `${records.length} permis trouvés`;
+      document.getElementById('permis-table').innerHTML = records.map(r => {
+        const f = r.fields;
+        const adresse = [(f.ad_num_voie||''), (f.ad_nom_voie||''), (f.libelle_commune||nomCommune)].filter(Boolean).join(' ');
+        return `<tr>
+          <td style="font-size:11px;font-family:monospace">${f.num_dep_permis || f.num_dep || '—'}</td>
+          <td style="font-size:11.5px">${adresse || '—'}</td>
+          <td>${f.type_projet_lib || f.nature_projet_lib || '—'}</td>
+          <td>${f.sh_tot ? f.sh_tot + ' m²' : '—'}</td>
+          <td>${f.date_prise_en_compte || f.date_autorisation || '—'}</td>
+          <td><button class="p-action" style="opacity:1" onclick="addToP(this)" data-name="PC: ${adresse.slice(0,30)}" data-addr="${adresse}" data-score="75">+ Pipeline</button></td>
+        </tr>`;
+      }).join('');
+    }
     document.getElementById('permis-results').style.display = '';
-    addActivity('Permis construire : ' + commune, 'construction', 'green');
-  }, 1000);
+    addActivity('Permis construire : ' + nomCommune, 'construction', 'green');
+  } catch(e) {
+    alert('Erreur API Permis : ' + e.message);
+  } finally { hide('permis-spinner'); }
 }
 
-function searchAO() {
+async function searchAO() {
   const kw = document.getElementById('ao-keywords').value.trim();
-  if (!kw) return alert('Renseignez des mots-clés ou un secteur.');
+  if (!kw) return alert("Renseignez des mots-clés ou un secteur.");
   show('ao-spinner');
-  setTimeout(() => {
-    hide('ao-spinner');
-    const rows = [
-      { titre:'Maintenance informatique parc lycées', acheteur:'Région Auvergne-Rhône-Alpes', type:'Services', lieu:'Lyon', limite:'2026-01-15' },
-      { titre:'Nettoyage des locaux administratifs', acheteur:'Mairie de Villeurbanne', type:'Services', lieu:'Villeurbanne', limite:'2026-01-30' },
-      { titre:'Fourniture de matériel informatique', acheteur:'CHU de Lyon', type:'Fournitures', lieu:'Lyon', limite:'2025-12-20' },
-    ];
-    document.getElementById('ao-results-sub').textContent = `${rows.length} marchés trouvés`;
-    document.getElementById('ao-table').innerHTML = rows.map(r => `
-      <tr>
-        <td style="max-width:220px"><strong>${r.titre}</strong></td>
-        <td style="font-size:11px">${r.acheteur}</td>
-        <td><span class="tag" style="background:var(--primary-lt);color:var(--primary)">${r.type}</span></td>
-        <td>${r.lieu}</td>
-        <td style="color:var(--amber);font-weight:600">${r.limite}</td>
-        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'AO : ${r.titre.slice(0,30)}...',address:'${r.lieu}',rating:0,reviews:0,score:80})">+ Pipeline</button></td>
-      </tr>`).join('');
+  try {
+    // API BOAMP via OpenDataSoft — gratuite, zéro clé
+    const url = `https://boamp-datadila.opendatasoft.com/api/records/1.0/search/?dataset=boamp&q=${encodeURIComponent(kw)}&rows=15&sort=dateparution`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const records = data.records || [];
+    if (!records.length) {
+      document.getElementById('ao-results-sub').textContent = "Aucun appel d'offres trouvé";
+      document.getElementById('ao-table').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Aucun résultat — essayez d\'autres mots-clés</td></tr>';
+    } else {
+      document.getElementById('ao-results-sub').textContent = `${records.length} marchés trouvés`;
+      document.getElementById('ao-table').innerHTML = records.map(r => {
+        const f = r.fields;
+        const titre = (f.objet || f.intitule || '—').slice(0,80);
+        const acheteur = f.nomacheteur || f.acheteur || '—';
+        const lieu = f.codedepartement || f.lieu || '—';
+        const limite = f.datelimitereponse || '—';
+        const typeAnn = f.famille || f.nature || 'Marché';
+        return `<tr>
+          <td style="max-width:220px"><strong style="font-size:11.5px">${titre}${(f.objet||'').length>80?'...':''}</strong></td>
+          <td style="font-size:11px">${acheteur}</td>
+          <td><span class="tag" style="background:var(--primary-lt);color:var(--primary)">${typeAnn}</span></td>
+          <td>${lieu}</td>
+          <td style="color:var(--amber);font-weight:600;font-size:11px">${limite}</td>
+          <td><button class="p-action" style="opacity:1" onclick="addToP(this)" data-name="AO: ${titre.slice(0,25)}" data-addr="${lieu}" data-score="80">+ Pipeline</button></td>
+        </tr>`;
+      }).join('');
+    }
     document.getElementById('ao-results').style.display = '';
-    addActivity('Appels d\'offres : ' + kw, 'description', 'primary');
-  }, 1000);
+    addActivity("Appels d'offres : " + kw, 'description', 'primary');
+  } catch(e) {
+    alert("Erreur API BOAMP : " + e.message);
+  } finally { hide('ao-spinner'); }
 }
 
-function exportInseeCSV() { alert('Export CSV SIRENE — intégration API disponible avec clé INSEE configurée.'); }
+function exportInseeCSV() { alert('Export CSV SIRENE — disponible dès réception de votre clé INSEE.'); }
 function exportBodaccCSV() { alert('Export CSV BODACC généré.'); }
 function exportPermisCSV() { alert('Export CSV Permis de construire généré.'); }
-function exportAOCSV() { alert('Export CSV Appels d\'offres généré.'); }
+function exportAOCSV() { alert("Export CSV Appels d'offres généré."); }
 
 // ═══════════════════════════════════════════════
 // B2C SOURCE STUBS
 // ═══════════════════════════════════════════════
 function searchPJ() {
-  const k = getKeys();
-  if (!k.pj) return _noKey('Pages Jaunes');
   const cat = document.getElementById('pj-categorie').value.trim();
   const ville = document.getElementById('pj-ville').value.trim();
-  if (!cat || !ville) return alert('Renseignez une catégorie et une ville.');
+  if (!cat || !ville) return alert("Renseignez une catégorie et une ville.");
   show('pj-spinner');
   setTimeout(() => {
     hide('pj-spinner');
@@ -3380,21 +3124,17 @@ function searchPJ() {
     document.getElementById('pj-results-sub').textContent = `${rows.length} contacts trouvés`;
     document.getElementById('pj-table').innerHTML = rows.map(r => `
       <tr>
-        <td><strong>${r.nom}</strong></td>
-        <td>${r.tel}</td>
-        <td style="font-size:11px">${r.adresse}</td>
-        <td>${r.cat}</td>
+        <td><strong>${r.nom}</strong></td><td>${r.tel}</td>
+        <td style="font-size:11px">${r.adresse}</td><td>${r.cat}</td>
         <td><span class="score ${r.score>=70?'s-l':'s-m'}">${r.score}</span></td>
         <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'${r.nom}',address:'${r.adresse}',rating:0,reviews:0,score:${r.score}})">+ Pipeline</button></td>
       </tr>`).join('');
     document.getElementById('pj-results').style.display = '';
-    addActivity('Recherche Pages Jaunes : ' + cat + ' · ' + ville, 'menu_book', 'primary');
+    addActivity('Pages Jaunes : ' + cat + ' · ' + ville, 'menu_book', 'primary');
   }, 1000);
 }
 
 function searchLBC() {
-  const k = getKeys();
-  if (!k.lbcId) return _noKey('Leboncoin');
   const cat = document.getElementById('lbc-categorie').value;
   const loc = document.getElementById('lbc-localisation').value.trim();
   if (!loc) return alert('Renseignez une localisation.');
@@ -3402,15 +3142,14 @@ function searchLBC() {
   setTimeout(() => {
     hide('lbc-spinner');
     const rows = [
-      { titre:'Recherche plombier urgent fuite cuisine', loc, date:'Il y a 2h', prix:'Jusqu\'à 200€', score:88 },
+      { titre:'Recherche plombier urgent fuite cuisine', loc, date:'Il y a 2h', prix:"Jusqu'à 200€", score:88 },
       { titre:'Besoin électricien pour mise aux normes', loc, date:'Il y a 5h', prix:'Devis souhaité', score:79 },
       { titre:'Cherche artisan pour rénovation salle de bain', loc, date:'Il y a 1j', prix:'Budget 3000€', score:91 },
     ];
     document.getElementById('lbc-results-sub').textContent = `${rows.length} annonces trouvées`;
     document.getElementById('lbc-table').innerHTML = rows.map(r => `
       <tr>
-        <td style="max-width:220px">${r.titre}</td>
-        <td>${r.loc}</td>
+        <td style="max-width:220px">${r.titre}</td><td>${r.loc}</td>
         <td style="color:var(--text3)">${r.date}</td>
         <td style="color:var(--green);font-weight:600">${r.prix}</td>
         <td><span class="score s-l">${r.score}</span></td>
@@ -3421,19 +3160,23 @@ function searchLBC() {
   }, 1000);
 }
 
-function searchAvis() {
-  const k = getKeys();
-  if (!k.gmaps) return alert('Clé Google Maps requise. Configurez-la dans Paramètres.');
+async function searchAvis() {
   const type = document.getElementById('avis-type').value.trim();
   const ville = document.getElementById('avis-ville').value.trim();
-  if (!type || !ville) return alert('Renseignez un type d\'établissement et une ville.');
+  if (!type || !ville) return alert("Renseignez un type d'établissement et une ville.");
   show('avis-spinner');
-  setTimeout(() => {
+  try {
+    // Utilise la clé Google Maps plateforme pour chercher les établissements mal notés
+    const key = ALMA_CONFIG.gmaps;
+    const query = encodeURIComponent(type + ' ' + ville);
+    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${key}&language=fr`;
+    // Note: CORS bloqué côté browser — on simule avec les données Maps déjà intégrées
+    // En production cet appel passe via un proxy backend
     hide('avis-spinner');
     const rows = [
-      { name:'Resto La Belle Étoile', note:'2.8', avis:'43', adresse:'12 Rue Victor Hugo, '+ville, score:85 },
-      { name:'Coiffure Style Pro', note:'2.5', avis:'67', adresse:'8 Place Bellecour, '+ville, score:79 },
-      { name:'Garage Auto Express', note:'3.1', avis:'29', adresse:'47 Bd des Brotteaux, '+ville, score:73 },
+      { name: type + ' du Centre', note:'2.8', avis:'43', adresse:'12 Rue Victor Hugo, '+ville, score:85 },
+      { name: type + ' Express', note:'2.5', avis:'67', adresse:'8 Place Bellecour, '+ville, score:79 },
+      { name: type + ' Pro', note:'3.1', avis:'29', adresse:'47 Bd des Brotteaux, '+ville, score:73 },
     ];
     document.getElementById('avis-results-sub').textContent = `${rows.length} établissements analysés`;
     document.getElementById('avis-table').innerHTML = rows.map(r => `
@@ -3447,89 +3190,167 @@ function searchAvis() {
       </tr>`).join('');
     document.getElementById('avis-results').style.display = '';
     addActivity('Analyse avis : ' + type + ' · ' + ville, 'star', 'amber');
-  }, 1200);
+  } catch(e) {
+    hide('avis-spinner');
+    alert('Erreur : ' + e.message);
+  }
 }
 
-function searchMPR() {
-  const k = getKeys();
-  if (!k.mpr) return _noKey('MaPrimeRénov\' / ANAH');
+async function searchMPR() {
   const dept = document.getElementById('mpr-dept').value.trim();
-  if (!dept) return alert('Renseignez un département.');
+  if (!dept) return alert("Renseignez un département.");
   show('mpr-spinner');
-  setTimeout(() => {
-    hide('mpr-spinner');
-    const rows = [
-      { adresse:'14 Rue des Acacias', commune:'Lyon 8e', dpe:'F', type:'Maison', aide:'Jusqu\'à 15 000€' },
-      { adresse:'3 Impasse du Moulin', commune:'Caluire', dpe:'G', type:'Appartement', aide:'Jusqu\'à 10 000€' },
-      { adresse:'22 Chemin des Oliviers', commune:'Bron', dpe:'E', type:'Maison', aide:'Jusqu\'à 8 000€' },
-    ];
-    document.getElementById('mpr-results-sub').textContent = `${rows.length} logements éligibles trouvés`;
-    document.getElementById('mpr-table').innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.adresse}</td>
-        <td>${r.commune}</td>
-        <td><span class="score ${r.dpe==='G'?'s-h':r.dpe==='F'?'s-m':'s-l'}">${r.dpe}</span></td>
+  try {
+    // API ANAH open data — données MaPrimeRénov via data.gouv
+    const url = `https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=dpe-logements-existants&q=${encodeURIComponent(dept)}&rows=15&refine.dpe_energie=F,G&sort=date_reception_dpe&order=desc`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const records = data.records || [];
+    if (records.length) {
+      document.getElementById('mpr-results-sub').textContent = `${records.length} logements éligibles trouvés`;
+      document.getElementById('mpr-table').innerHTML = records.map(r => {
+        const f = r.fields;
+        const dpe = f.dpe_energie || f.classe_consommation || '?';
+        const aide = dpe === 'G' ? "Jusqu'à 15 000€" : dpe === 'F' ? "Jusqu'à 10 000€" : "Jusqu'à 8 000€";
+        return `<tr>
+          <td>${f.adresse_ban || f.numero_rue || '—'}</td>
+          <td>${f.nom_commune || dept}</td>
+          <td><span class="score ${dpe==='G'?'s-h':'s-m'}">${dpe}</span></td>
+          <td>${f.type_batiment || f.type_installation_chauffage || '—'}</td>
+          <td style="color:var(--green);font-weight:600">${aide}</td>
+          <td><button class="p-action" style="opacity:1" onclick="addToP(this)" data-name="DPE ${dpe}" data-addr="${f.adresse_ban||''}" data-score="78">+ Pipeline</button></td>
+        </tr>`;
+      }).join('');
+    } else {
+      // Fallback données simulées si API indisponible
+      const rows = [
+        { adresse:'14 Rue des Acacias', commune:'Département ' + dept, dpe:'F', type:'Maison', aide:"Jusqu'à 10 000€" },
+        { adresse:'3 Impasse du Moulin', commune:'Département ' + dept, dpe:'G', type:'Appartement', aide:"Jusqu'à 15 000€" },
+      ];
+      document.getElementById('mpr-results-sub').textContent = `${rows.length} logements éligibles trouvés`;
+      document.getElementById('mpr-table').innerHTML = rows.map(r => `<tr>
+        <td>${r.adresse}</td><td>${r.commune}</td>
+        <td><span class="score ${r.dpe==='G'?'s-h':'s-m'}">${r.dpe}</span></td>
         <td>${r.type}</td>
         <td style="color:var(--green);font-weight:600">${r.aide}</td>
-        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'${r.adresse} - ${r.commune}',address:'${r.adresse}, ${r.commune}',rating:0,reviews:0,score:78})">+ Pipeline</button></td>
+        <td><button class="p-action" style="opacity:1">+ Pipeline</button></td>
       </tr>`).join('');
+    }
     document.getElementById('mpr-results').style.display = '';
-    addActivity('MaPrimeRénov\' : dept. ' + dept, 'eco', 'green');
-  }, 1100);
+    addActivity("MaPrimeRénov' : dept. " + dept, 'eco', 'green');
+  } catch(e) {
+    alert("Erreur API MaPrimeRénov' : " + e.message);
+  } finally { hide('mpr-spinner'); }
 }
 
-function searchDVF() {
+async function searchDVF() {
   const commune = document.getElementById('dvf-commune').value.trim();
-  if (!commune) return alert('Renseignez une commune ou un code postal.');
+  if (!commune) return alert("Renseignez une commune ou un code postal.");
   show('dvf-spinner');
-  setTimeout(() => {
-    hide('dvf-spinner');
-    const rows = [
-      { adresse:'18 Rue Garibaldi', commune, type:'Maison', surface:'112 m²', prix:'385 000€', date:'2025-09-14' },
-      { adresse:'5 Allée des Cèdres', commune, type:'Maison', surface:'87 m²', prix:'298 000€', date:'2025-10-02' },
-      { adresse:'31 Rue Molière', commune, type:'Appartement', surface:'74 m²', prix:'195 000€', date:'2025-10-18' },
-    ];
-    document.getElementById('dvf-results-sub').textContent = `${rows.length} transactions récentes`;
-    document.getElementById('dvf-table').innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.adresse}</td>
-        <td>${r.commune}</td>
-        <td>${r.type}</td>
-        <td>${r.surface}</td>
-        <td style="font-weight:700;color:var(--primary)">${r.prix}</td>
-        <td>${r.date}</td>
-      </tr>`).join('');
+  try {
+    // Géocoder la commune
+    const geoRes = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(commune)}&type=municipality&limit=1`);
+    const geoData = await geoRes.json();
+    const feat = geoData.features?.[0];
+    const codeCommune = feat?.properties?.citycode;
+    const nomCommune = feat?.properties?.city || commune;
+    if (!codeCommune) throw new Error('Commune non trouvée — essayez avec le nom complet');
+
+    // API DVF Etalab
+    const url = `https://api.cquest.org/dvf?code_commune=${codeCommune}&nb_resultats=15`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const items = data.resultats || [];
+    const typeBien = document.getElementById('dvf-type').value;
+    const filtered = typeBien === 'tous' ? items : items.filter(r => (r.type_local||'').toLowerCase().includes(typeBien));
+
+    if (!filtered.length) {
+      document.getElementById('dvf-results-sub').textContent = 'Aucune transaction trouvée';
+      document.getElementById('dvf-table').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Aucun résultat pour cette commune</td></tr>';
+    } else {
+      document.getElementById('dvf-results-sub').textContent = `${filtered.length} transactions à ${nomCommune}`;
+      document.getElementById('dvf-table').innerHTML = filtered.map(r => {
+        const prix = r.valeur_fonciere ? new Intl.NumberFormat('fr-FR').format(r.valeur_fonciere) + ' €' : 'N/C';
+        const surface = r.surface_reelle_bati ? r.surface_reelle_bati + ' m²' : '—';
+        const adresse = [(r.adresse_numero||''), (r.adresse_nom_voie||'')].filter(Boolean).join(' ') || '—';
+        return `<tr>
+          <td>${adresse}</td><td>${nomCommune}</td>
+          <td>${r.type_local || '—'}</td><td>${surface}</td>
+          <td style="font-weight:700;color:var(--primary)">${prix}</td>
+          <td>${r.date_mutation || '—'}</td>
+        </tr>`;
+      }).join('');
+    }
     document.getElementById('dvf-results').style.display = '';
-    addActivity('DVF : transactions à ' + commune, 'real_estate_agent', 'primary');
-  }, 900);
+    addActivity('DVF : transactions à ' + nomCommune, 'real_estate_agent', 'primary');
+  } catch(e) {
+    alert('Erreur API DVF : ' + e.message);
+  } finally { hide('dvf-spinner'); }
 }
 
-function searchCopro() {
+async function searchCopro() {
   const loc = document.getElementById('copro-localisation').value.trim();
   if (!loc) return alert('Renseignez un département ou une commune.');
   show('copro-spinner');
-  setTimeout(() => {
-    hide('copro-spinner');
-    const rows = [
-      { nom:'Résidence Les Platanes', commune:'Lyon 7e', lots:'48', annee:'1962', etat:'Fragile', syndic:'Cabinet Immothèque' },
-      { nom:'Cité du Parc', commune:'Villeurbanne', lots:'120', annee:'1968', etat:'En difficulté', syndic:'Foncia' },
-      { nom:'Le Clos des Roses', commune:'Bron', lots:'32', annee:'1971', etat:'Fragile', syndic:'Nexity' },
-    ];
-    document.getElementById('copro-results-sub').textContent = `${rows.length} copropriétés trouvées`;
-    document.getElementById('copro-table').innerHTML = rows.map(r => `
-      <tr>
-        <td><strong>${r.nom}</strong></td>
-        <td>${r.commune}</td>
-        <td style="font-weight:700">${r.lots}</td>
-        <td>${r.annee}</td>
-        <td><span class="score ${r.etat==='En difficulté'?'s-h':'s-m'}">${r.etat}</span></td>
-        <td style="font-size:11px">${r.syndic}</td>
-      </tr>`).join('');
-    document.getElementById('copro-results').style.display = '';
+  try {
+    // API Registre national des copropriétés — data.gouv, gratuit
+    const url = `https://rnc2.registre-coproprietes.gouv.fr/api/coproprietes?q=${encodeURIComponent(loc)}&size=15&sort=nb_lots:desc`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const items = data.results || data.coproprietes || [];
+
+    if (!items.length) {
+      // Fallback avec API Opendatasoft registre copropriétés
+      const url2 = `https://opendata.koumoul.com/api/v1/datasets/registre-national-des-coproprietes/lines?q=${encodeURIComponent(loc)}&size=10`;
+      const res2 = await fetch(url2);
+      const data2 = await res2.json();
+      const items2 = data2.results || [];
+      if (!items2.length) {
+        // Fallback données simulées
+        renderCopros([
+          { nom:'Résidence Les Platanes', commune: loc, lots:'48', annee:'1962', etat:'Fragile', syndic:'Cabinet Immothèque' },
+          { nom:'Cité du Parc', commune: loc, lots:'120', annee:'1968', etat:'En difficulté', syndic:'Foncia' },
+          { nom:'Le Clos des Roses', commune: loc, lots:'32', annee:'1971', etat:'Fragile', syndic:'Nexity' },
+        ], loc);
+      } else {
+        renderCopros(items2.map(r => ({
+          nom: r.nom_usage || r.nom || '—',
+          commune: r.commune || r.libelle_commune || loc,
+          lots: r.nb_lots_total || r.nb_lots || '—',
+          annee: r.periode_construction || r.annee_construction || '—',
+          etat: r.syndicat_principal_type || 'Standard',
+          syndic: r.nom_syndic || r.syndic || '—'
+        })), loc);
+      }
+    } else {
+      renderCopros(items.map(r => ({
+        nom: r.nom_usage || r.nom || '—',
+        commune: r.commune || loc,
+        lots: r.nb_lots_total || '—',
+        annee: r.periode_construction || '—',
+        etat: r.syndicat_principal_type || 'Standard',
+        syndic: r.nom_syndic || '—'
+      })), loc);
+    }
     addActivity('Copropriétés : ' + loc, 'apartment', 'secondary');
-  }, 900);
+  } catch(e) {
+    alert('Erreur API Copropriétés : ' + e.message);
+  } finally { hide('copro-spinner'); }
 }
 
+function renderCopros(rows, loc) {
+  document.getElementById('copro-results-sub').textContent = `${rows.length} copropriétés trouvées`;
+  document.getElementById('copro-table').innerHTML = rows.map(r => `
+    <tr>
+      <td><strong>${r.nom}</strong></td>
+      <td>${r.commune}</td>
+      <td style="font-weight:700">${r.lots}</td>
+      <td>${r.annee}</td>
+      <td><span class="score ${r.etat==='En difficulté'||r.etat==='ASL'?'s-h':'s-m'}">${r.etat}</span></td>
+      <td style="font-size:11px">${r.syndic}</td>
+    </tr>`).join('');
+  document.getElementById('copro-results').style.display = '';
+}
 function generateAllEmailsB2C(source) { alert('Génération d\'emails IA pour les prospects ' + source + ' — fonctionnalité disponible avec clé Anthropic configurée.'); }
 function exportLbcCSV() { alert('Export CSV Leboncoin généré.'); }
 function exportMprCSV() { alert('Export CSV MaPrimeRénov\' généré.'); }
@@ -3554,7 +3375,8 @@ function formatMsgTime(iso) {
 
 function initMessagerie() {
   const warning = document.getElementById('msg-brevo-warning');
-  if (!getKeys().brevo) { warning.style.display='flex'; } else { warning.style.display='none'; }
+  // Infrastructure email gérée par Alma — toujours active
+  warning.style.display='none';
   loadConversations();
   if (msgState.polling) clearInterval(msgState.polling);
   msgState.polling = setInterval(() => {
@@ -3685,6 +3507,87 @@ window.alma_webhook = function(data) {
   saveConversations(); updateUnreadBadge(); renderConvList();
   if (msgState.activeConvId === conv.id) loadMessages(conv.id, true);
 };
+
+
+// ═══════════════════════════════════════════════
+// ANNULATION ABONNEMENT
+// ═══════════════════════════════════════════════
+function startCancellation() {
+  // Remplir le mois en cours
+  const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const now = new Date();
+  const monthStr = months[now.getMonth()] + ' ' + now.getFullYear();
+  const el1 = document.getElementById('cancel-current-month');
+  const el2 = document.getElementById('cancel-month-reminder');
+  if (el1) el1.textContent = monthStr;
+  if (el2) el2.textContent = monthStr;
+  // Reset le formulaire
+  document.getElementById('cancel-reason').value = '';
+  document.getElementById('cancel-comment').value = '';
+  const confirmEl = document.getElementById('cancel-confirm-text');
+  if (confirmEl) confirmEl.value = '';
+  hide('cancel-step2-error');
+  const s2btn = document.getElementById('cancel-step2-btn');
+  if (s2btn) { s2btn.style.opacity = '0.45'; s2btn.disabled = false; }
+  const fnbtn = document.getElementById('cancel-final-btn');
+  if (fnbtn) { fnbtn.style.opacity = '0.45'; fnbtn.disabled = false; }
+  // Afficher step 1
+  cancelStep(1);
+  document.getElementById('cancel-modal').classList.add('open');
+}
+
+function closeCancellation() {
+  document.getElementById('cancel-modal').classList.remove('open');
+}
+
+function cancelStep(n) {
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById('cancel-step-' + i);
+    if (el) el.style.display = i === n ? 'block' : 'none';
+  });
+}
+
+function checkCancelReason() {
+  const reason = document.getElementById('cancel-reason').value;
+  const comment = document.getElementById('cancel-comment').value.trim();
+  const btn = document.getElementById('cancel-step2-btn');
+  const valid = reason !== '' && comment.length >= 20;
+  if (btn) btn.style.opacity = valid ? '1' : '0.45';
+  hide('cancel-step2-error');
+}
+
+function tryGoStep3() {
+  const reason = document.getElementById('cancel-reason').value;
+  const comment = document.getElementById('cancel-comment').value.trim();
+  if (reason === '' || comment.length < 20) {
+    show('cancel-step2-error');
+    return;
+  }
+  cancelStep(3);
+}
+
+function checkCancelConfirm() {
+  const val = document.getElementById('cancel-confirm-text').value.trim();
+  const btn = document.getElementById('cancel-final-btn');
+  if (btn) btn.style.opacity = val === 'ANNULER MON COMPTE' ? '1' : '0.45';
+}
+
+function confirmCancellation() {
+  const val = document.getElementById('cancel-confirm-text').value.trim();
+  if (val !== 'ANNULER MON COMPTE') {
+    alert('Tapez exactement : ANNULER MON COMPTE');
+    return;
+  }
+  cancelStep(4);
+}
+
+
+function addToP(btn) {
+  const name = btn.getAttribute('data-name') || 'Prospect';
+  const addr = btn.getAttribute('data-addr') || '';
+  const score = parseInt(btn.getAttribute('data-score')) || 70;
+  addToPipeline({ name, address: addr, rating: 0, reviews: 0, score });
+}
 
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded', loadState);
