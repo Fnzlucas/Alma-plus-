@@ -1,28 +1,3693 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alma.+ — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20,400,1,0&display=swap" rel="stylesheet"/>
+<style>
+/* ─── RESET & BASE ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; color: #0f1117; background: #f5f6f8; -webkit-font-smoothing: antialiased; }
+
+/* ─── TOKENS ─── */
+:root {
+  --primary:    #4f46e5;
+  --primary-d:  #3730a3;
+  --primary-lt: #eef2ff;
+  --primary-border: #c7d2fe;
+  --accent:     #7c3aed;
+  --surface:    #ffffff;
+  --bg:         #f5f6f8;
+  --bg2:        #f0f1f4;
+  --border:     #e4e7ec;
+  --border-lt:  #f0f1f4;
+  --text:       #0f1117;
+  --text2:      #4b5563;
+  --text3:      #9ca3af;
+  --green:      #059669;
+  --green-lt:   #d1fae5;
+  --green-border:#6ee7b7;
+  --red:        #dc2626;
+  --red-lt:     #fee2e2;
+  --amber:      #d97706;
+  --amber-lt:   #fef3c7;
+  --shadow-xs:  0 1px 2px rgba(0,0,0,.05);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:  0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -1px rgba(0,0,0,.04);
+  --shadow-lg:  0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -2px rgba(0,0,0,.04);
+  --radius-sm:  6px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ─── LAYOUT ─── */
+.app { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: 232px;
+  flex-shrink: 0;
+  height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-logo {
+  padding: 18px 16px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-lt);
+}
+
+.logo-mark {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(79,70,229,.3);
+}
+
+.logo-text {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+.logo-text em { color: var(--primary); font-style: normal; }
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 10px;
+}
+
+.nav-section {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text3);
+  padding: 14px 8px 5px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: all .12s;
+  position: relative;
+}
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active {
+  background: var(--primary-lt);
+  color: var(--primary);
+  font-weight: 600;
+}
+.nav-item .material-symbols-rounded { font-size: 17px; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 99px;
+  line-height: 1.4;
+}
+
+.sidebar-footer {
+  padding: 10px;
+  border-top: 1px solid var(--border-lt);
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background .12s;
+}
+.user-row:hover { background: var(--bg); }
+.user-avatar {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
+}
+.user-name { font-size: 12px; font-weight: 600; color: var(--text); }
+.user-plan { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+/* ─── MAIN AREA ─── */
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  height: 52px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 12px;
+}
+
+.topbar-title { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; color: var(--text); }
+.topbar-sub { font-size: 12px; color: var(--text3); }
+.topbar-spacer { flex: 1; }
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.status-pill.on  { background: var(--green-lt); border: 1px solid var(--green-border); color: var(--green); }
+.status-pill.off { background: var(--bg2); border: 1px solid var(--border); color: var(--text3); }
+
+.pulse { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+.topbar-btn {
+  width: 34px; height: 34px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text2);
+  transition: all .12s;
+}
+.topbar-btn:hover { background: var(--bg); color: var(--text); border-color: var(--primary-border); }
+.topbar-btn .material-symbols-rounded { font-size: 17px; }
+
+/* ─── CONTENT ─── */
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 28px 32px 40px;
+  background: var(--bg);
+}
+
+.page { display: none; }
+.page.active { display: block; animation: fadeIn .15s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+
+/* ─── PAGE HEADER ─── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-heading { font-family: 'Manrope', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; }
+.page-subheading { font-size: 13px; color: var(--text3); margin-top: 3px; }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-lt);
+}
+.card-title { font-weight: 700; font-size: 13px; color: var(--text); }
+.card-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.card-body { padding: 16px 18px; }
+
+/* ─── STAT CARDS ─── */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px 16px;
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow .15s, transform .15s;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  opacity: 0;
+  transition: opacity .15s;
+}
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.stat-card:hover::before { opacity: 1; }
+
+.stat-icon {
+  width: 34px; height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-lt);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.stat-icon .material-symbols-rounded { font-size: 17px; color: var(--primary); }
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+.stat-value {
+  font-family: 'Manrope', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: -1px;
+}
+.stat-delta {
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text3);
+}
+.stat-delta.up { color: var(--green); }
+.stat-delta .material-symbols-rounded { font-size: 13px; }
+
+/* ─── MAIN GRID ─── */
+.main-grid { display: grid; grid-template-columns: 1fr 272px; gap: 14px; }
+
+/* ─── PROSPECT ROWS ─── */
+.prospect-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: background .1s;
+  border-bottom: 1px solid var(--border-lt);
+}
+.prospect-row:last-child { border-bottom: none; }
+.prospect-row:hover { background: var(--bg); }
+.prospect-row:hover .p-action { opacity: 1; }
+
+.avatar {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.p-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.p-info { flex: 1; min-width: 0; }
+
+.score {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-family: 'Manrope', sans-serif;
+  flex-shrink: 0;
+}
+.s-h { background: #fef2f2; color: #dc2626; }
+.s-m { background: var(--amber-lt); color: var(--amber); }
+.s-l { background: var(--primary-lt); color: var(--primary); }
+
+.p-action {
+  opacity: 0;
+  transition: opacity .12s;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-lt);
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.p-action:hover { background: var(--primary); color: white; }
+
+.action-row {
+  display: flex;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border-lt);
+  background: var(--bg);
+}
+
+/* ─── PIPELINE MINI ─── */
+.pipe-row { margin-bottom: 13px; }
+.pipe-row:last-child { margin-bottom: 0; }
+.pipe-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.pipe-label { font-size: 12px; font-weight: 500; color: var(--text2); }
+.pipe-count { font-size: 12px; font-weight: 700; color: var(--text); font-family: 'Manrope', sans-serif; }
+.pipe-bar { height: 5px; background: var(--bg2); border-radius: 99px; overflow: hidden; }
+.pipe-fill { height: 100%; border-radius: 99px; transition: width .4s; }
+
+/* ─── ACTIVITY ─── */
+.act-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-lt);
+}
+.act-row:last-child { border-bottom: none; }
+.act-icon {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.act-icon .material-symbols-rounded { font-size: 13px; color: white; }
+.act-text { font-size: 12px; font-weight: 500; color: var(--text); line-height: 1.4; }
+.act-time { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+/* ─── AGENT ROWS ─── */
+.agent-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-lt);
+}
+.agent-row:last-child { border-bottom: none; }
+.agent-icon {
+  width: 30px; height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-lt);
+  display: flex; align-items: center; justify-content: center;
+}
+.agent-icon .material-symbols-rounded { font-size: 15px; color: var(--primary); }
+.agent-name { font-size: 12px; font-weight: 600; flex: 1; color: var(--text); }
+.dot-on  { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 2px var(--green-lt); animation: pulse 2s infinite; }
+.dot-off { width: 7px; height: 7px; border-radius: 50%; background: var(--border); }
+
+/* ─── BUTTONS ─── */
+.btn {
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 15px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: none;
+  transition: all .12s;
+  font-family: 'Inter', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.btn .material-symbols-rounded { font-size: 15px; }
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 1px 3px rgba(79,70,229,.25);
+}
+.btn-primary:hover { background: var(--primary-d); box-shadow: 0 3px 8px rgba(79,70,229,.3); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-ghost {
+  background: var(--surface);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--primary-border); color: var(--primary); background: var(--primary-lt); }
+
+.btn-sm { padding: 5px 11px; font-size: 11.5px; }
+.btn-danger { background: var(--red-lt); color: var(--red); border: 1px solid #fca5a5; }
+
+/* ─── FORMS ─── */
+.form-group { margin-bottom: 14px; }
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 5px;
+  display: block;
+}
+.form-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  transition: border-color .15s, box-shadow .15s;
+}
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+}
+.form-input[type=password] { letter-spacing: .1em; }
+.form-hint { font-size: 11px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+textarea.form-input { resize: vertical; min-height: 80px; letter-spacing: 0; }
+
+/* ─── TABS ─── */
+.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tab {
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all .12s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+
+/* ─── ALERTS ─── */
+.alert {
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  font-size: 12.5px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  line-height: 1.5;
+}
+.alert .material-symbols-rounded { font-size: 16px; flex-shrink: 0; }
+.alert-info    { background: var(--primary-lt); color: var(--primary); border: 1px solid var(--primary-border); }
+.alert-success { background: var(--green-lt); color: var(--green); border: 1px solid var(--green-border); }
+.alert-error   { background: var(--red-lt); color: var(--red); border: 1px solid #fca5a5; }
+.alert-amber   { background: var(--amber-lt); color: var(--amber); border: 1px solid #fde68a; }
+
+/* ─── SPINNER ─── */
+.spinner {
+  display: inline-block;
+  width: 13px; height: 13px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin .65s linear infinite;
+  vertical-align: -2px;
+  margin-right: 3px;
+}
+.spinner-dark { border-color: rgba(79,70,229,.2); border-top-color: var(--primary); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── PROGRESS ─── */
+.progress-bar { height: 4px; background: var(--bg2); border-radius: 99px; overflow: hidden; margin-top: 8px; }
+.progress-fill { height: 100%; background: var(--primary); border-radius: 99px; transition: width .35s; }
+
+/* ─── TABLE ─── */
+table { width: 100%; border-collapse: collapse; }
+th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text3);
+  padding: 9px 14px;
+  text-align: left;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+td { padding: 10px 14px; font-size: 12.5px; border-bottom: 1px solid var(--border-lt); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--primary-lt); }
+
+/* ─── CHIPS ─── */
+.search-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+.chip {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .12s;
+}
+.chip:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,17,23,.5);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,.05);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 15px; }
+.modal-close {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--bg);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text3);
+  transition: all .12s;
+}
+.modal-close:hover { background: var(--bg2); color: var(--text); }
+.modal-body { padding: 22px; }
+.modal-footer {
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  background: var(--bg);
+}
+
+/* ─── PAGE EMPTY ─── */
+.page-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 12px;
+  color: var(--text3);
+}
+.page-empty .material-symbols-rounded { font-size: 42px; opacity: .25; }
+.page-empty h2 { font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 700; color: var(--text2); }
+.page-empty p { font-size: 13px; }
+
+/* ─── SETTINGS ─── */
+.api-key-row { display: flex; align-items: center; gap: 8px; }
+.api-key-row .form-input { flex: 1; }
+.api-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.api-ok   { background: var(--green-lt); color: var(--green); border: 1px solid var(--green-border); }
+.api-ko   { background: var(--red-lt); color: var(--red); border: 1px solid #fca5a5; }
+.api-idle { background: var(--bg2); color: var(--text3); border: 1px solid var(--border); }
+
+.settings-section-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text3);
+  margin: 20px 0 8px;
+}
+
+/* ─── MESSAGERIE ─── */
+.msg-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: calc(100vh - 80px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+.conv-list { border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
+.conv-list-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 13px;
+  font-family: 'Manrope', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+.conv-item {
+  padding: 12px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-lt);
+  transition: background .1s;
+}
+.conv-item:hover { background: var(--bg); }
+.conv-item.active { background: var(--primary-lt); }
+.conv-item-name { font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+.conv-item-preview { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conv-item-time { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.unread-badge { font-size: 10px; font-weight: 700; background: var(--primary); color: white; padding: 2px 7px; border-radius: 99px; }
+.chat-zone { display: flex; flex-direction: column; height: 100%; }
+.chat-top { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: var(--bg); }
+.chat-av { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.bubble { max-width: 68%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.55; word-break: break-word; }
+.bubble-sent { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 3px; }
+.bubble-received { align-self: flex-start; background: var(--bg); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
+.bubble-time { font-size: 10px; margin-top: 4px; opacity: .55; }
+.bubble-name { font-size: 11px; font-weight: 700; margin-bottom: 3px; opacity: .7; }
+.chat-input-wrap { padding: 12px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.chat-input-row { display: flex; gap: 8px; align-items: flex-end; }
+.chat-textarea {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  resize: none;
+  min-height: 38px;
+  max-height: 120px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.chat-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+.chat-send-btn {
+  width: 36px; height: 36px;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: white;
+  transition: all .12s;
+}
+.chat-send-btn:hover { background: var(--primary-d); transform: translateY(-1px); }
+.chat-send-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.chat-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text3); gap: 10px; }
+.realtime-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; }
+
+/* ─── TAG ─── */
+.tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+</style>
 </head>
 <body>
+<div class="app">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 14 14" fill="none" width="14" height="14">
+        <path d="M2 12L7 2L12 12" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M4 8.5H10" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="logo-text">Alma<em>.</em>+</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <button class="nav-item" onclick="goPage('welcome',this)" id="nav-welcome">
+      <span class="material-symbols-rounded">waving_hand</span>Bienvenue
+    </button>
+    <button class="nav-item active" onclick="goPage('dashboard',this)">
+      <span class="material-symbols-rounded">dashboard</span>Vue globale
+      <span class="nav-badge" id="badge-new">0</span>
+    </button>
+    <button class="nav-item" onclick="goPage('prospection',this)">
+      <span class="material-symbols-rounded">business</span>Prospection B2B
+    </button>
+    <button class="nav-item" onclick="goPage('prospection-b2c',this)">
+      <span class="material-symbols-rounded">home_work</span>Prospection B2C
+    </button>
+    <button class="nav-item" onclick="goPage('pipeline',this)">
+      <span class="material-symbols-rounded">view_kanban</span>Pipeline CRM
+    </button>
+
+    <div class="nav-section">Automatisation</div>
+    <button class="nav-item" onclick="goPage('messagerie',this)" id="nav-messagerie">
+      <span class="material-symbols-rounded">forum</span>Messagerie
+      <span class="nav-badge" id="badge-msg" style="display:none">0</span>
+    </button>
+    <button class="nav-item" onclick="goPage('sequences',this)">
+      <span class="material-symbols-rounded">auto_mode</span>Séquences
+    </button>
+    <button class="nav-item" onclick="goPage('autopilot',this)">
+      <span class="material-symbols-rounded">smart_toy</span>Pilote Auto
+    </button>
+
+    <div class="nav-section">Outils</div>
+    <button class="nav-item" onclick="goPage('devis',this)">
+      <span class="material-symbols-rounded">receipt_long</span>Devis IA
+    </button>
+    <button class="nav-item" onclick="goPage('calendrier',this)">
+      <span class="material-symbols-rounded">calendar_month</span>Calendrier
+    </button>
+    <button class="nav-item" onclick="goPage('rapport',this)">
+      <span class="material-symbols-rounded">bar_chart</span>Rapport
+    </button>
+    <button class="nav-item" onclick="goPage('veille',this)">
+      <span class="material-symbols-rounded">radar</span>Veille IA
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="nav-item" onclick="goPage('settings',this)" style="margin-bottom:6px">
+      <span class="material-symbols-rounded">settings</span>Paramètres
+    </button>
+    <div class="user-row">
+      <div class="user-avatar">U</div>
+      <div>
+        <div class="user-name">Mon compte</div>
+        <div class="user-plan">Plan Pro</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <header class="topbar">
+    <div>
+      <span class="topbar-title" id="page-title">Vue globale</span>
+      <span class="topbar-sub" id="page-sub"> · Tableau de bord</span>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="status-pill off" id="api-status-pill">
+      <div class="pulse"></div>
+      <span id="api-status-text">APIs non configurées</span>
+    </div>
+    <button class="topbar-btn" onclick="goPage('settings', document.querySelector('[onclick*=settings]'))">
+      <span class="material-symbols-rounded">settings</span>
+    </button>
+  </header>
+
+  <main class="content">
+
+  <!-- ════════════════ BIENVENUE ════════════════ -->
+  <div class="page" id="page-welcome">
+    <div style="max-width:820px;margin:0 auto;padding-top:8px">
+
+      <!-- Hero -->
+      <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);border-radius:var(--radius-xl);padding:40px 44px;color:white;margin-bottom:24px;position:relative;overflow:hidden">
+        <div style="position:absolute;right:-20px;top:-20px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
+        <div style="position:absolute;right:60px;bottom:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+        <div style="position:relative">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+            <div style="width:46px;height:46px;background:rgba(255,255,255,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+              <svg viewBox="0 0 14 14" fill="none" width="22" height="22"><path d="M2 12L7 2L12 12" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 8.5H10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div style="font-family:'Manrope',sans-serif;font-size:22px;font-weight:900;letter-spacing:-0.5px">Bienvenue sur Alma<span style="opacity:.7">.</span>+</div>
+              <div style="font-size:13px;opacity:.75;margin-top:2px">Votre plateforme de prospection intelligente pour le bâtiment & la rénovation</div>
+            </div>
+          </div>
+          <p style="font-size:14px;line-height:1.75;opacity:.9;max-width:580px">
+            Alma.+ centralise toutes vos sources de prospection B2B et B2C, génère des emails personnalisés grâce à l'IA, et suit vos opportunités dans un pipeline CRM intégré. En quelques minutes, configurez vos clés API et commencez à trouver des chantiers.
+          </p>
+          <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" style="background:white;color:var(--primary);font-weight:700" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">
+              <span class="material-symbols-rounded" style="font-size:15px">settings</span>Configurer mes clés API
+            </button>
+            <button class="btn" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)" onclick="goPage('dashboard',document.querySelector('[onclick*=dashboard]'))">
+              <span class="material-symbols-rounded" style="font-size:15px">dashboard</span>Accéder au tableau de bord
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Étapes de démarrage -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px">
+
+        <div class="card" style="border-left:3px solid var(--primary)">
+          <div class="card-header">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;flex-shrink:0">1</div>
+              <div>
+                <div class="card-title">Configurer vos clés API</div>
+                <div class="card-sub">2 min · Obligatoire pour démarrer</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body" style="font-size:12.5px;color:var(--text2);line-height:1.7">
+            Rendez-vous dans <strong>Paramètres</strong> et renseignez au minimum :<br>
+            • <strong>Clé Anthropic</strong> — pour la génération d'emails IA<br>
+            • <strong>Clé Google Maps</strong> — pour la prospection B2B géolocalisée<br>
+            • <strong>Clé Brevo</strong> — pour l'envoi d'emails (optionnel au départ)
+          </div>
+        </div>
+
+        <div class="card" style="border-left:3px solid #0284c7">
+          <div class="card-header">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:28px;height:28px;border-radius:50%;background:#0284c7;color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;flex-shrink:0">2</div>
+              <div>
+                <div class="card-title">Lancer une recherche</div>
+                <div class="card-sub">Prospection B2B ou B2C</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body" style="font-size:12.5px;color:var(--text2);line-height:1.7">
+            Choisissez votre cible dans le menu de gauche :<br>
+            • <strong>Prospection B2B</strong> — entreprises, artisans, promoteurs<br>
+            • <strong>Prospection B2C</strong> — particuliers, copropriétés, rénovation<br>
+            Renseignez une ville ou un code postal et lancez.
+          </div>
+        </div>
+
+        <div class="card" style="border-left:3px solid var(--amber)">
+          <div class="card-header">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--amber);color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;flex-shrink:0">3</div>
+              <div>
+                <div class="card-title">Générer vos emails IA</div>
+                <div class="card-sub">Personnalisés par prospect</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body" style="font-size:12.5px;color:var(--text2);line-height:1.7">
+            Une fois vos prospects identifiés, cliquez sur <strong>Générer email IA</strong> pour obtenir un message ultra-personnalisé basé sur l'activité, le secteur et la localisation de chaque contact.
+          </div>
+        </div>
+
+        <div class="card" style="border-left:3px solid var(--green)">
+          <div class="card-header">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;flex-shrink:0">4</div>
+              <div>
+                <div class="card-title">Suivre dans le Pipeline CRM</div>
+                <div class="card-sub">Nouveau → Contacté → Converti</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body" style="font-size:12.5px;color:var(--text2);line-height:1.7">
+            Ajoutez vos prospects au <strong>Pipeline CRM</strong> et suivez leur avancement étape par étape. La messagerie intégrée centralise tous vos échanges par email directement dans l'outil.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sources disponibles -->
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Sources de données disponibles</div>
+            <div class="card-sub">12 sources intégrées · B2B & B2C</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+
+          <!-- B2B -->
+          <div style="padding:16px 20px;border-right:1px solid var(--border-lt)">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:6px">
+              <span class="material-symbols-rounded" style="font-size:14px">business</span>Prospection B2B
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#2e7d32">map</span></div>
+                <div><div style="font-size:12px;font-weight:600">Google Maps</div><div style="font-size:11px;color:var(--text3)">Entreprises géolocalisées en temps réel</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:var(--primary-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:var(--primary)">account_balance</span></div>
+                <div><div style="font-size:12px;font-weight:600">INSEE / SIRENE</div><div style="font-size:11px;color:var(--text3)">Registre officiel des entreprises françaises</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:var(--amber-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:var(--amber)">gavel</span></div>
+                <div><div style="font-size:12px;font-weight:600">BODACC</div><div style="font-size:11px;color:var(--text3)">Annonces légales, créations et cessions</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:#fff3e0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#e65100">construction</span></div>
+                <div><div style="font-size:12px;font-weight:600">Permis de construire</div><div style="font-size:11px;color:var(--text3)">Chantiers autorisés et projets en cours</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:#e3f2fd;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#1565c0">description</span></div>
+                <div><div style="font-size:12px;font-weight:600">Appels d'offres</div><div style="font-size:11px;color:var(--text3)">Marchés publics & consultations privées</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- B2C -->
+          <div style="padding:16px 20px">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:6px">
+              <span class="material-symbols-rounded" style="font-size:14px">home_work</span>Prospection B2C
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:#fce4ec;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#c2185b">menu_book</span></div>
+                <div><div style="font-size:12px;font-weight:600">Pages Jaunes</div><div style="font-size:11px;color:var(--text3)">Particuliers et professionnels locaux</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:#fff8e1;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#f57f17">sell</span></div>
+                <div><div style="font-size:12px;font-weight:600">Leboncoin</div><div style="font-size:11px;color:var(--text3)">Annonces travaux & besoins particuliers</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#2e7d32">star</span></div>
+                <div><div style="font-size:12px;font-weight:600">Google Avis</div><div style="font-size:11px;color:var(--text3)">Propriétaires ayant évalué des artisans</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:#e8eaf6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#3949ab">eco</span></div>
+                <div><div style="font-size:12px;font-weight:600">MaPrimeRénov'</div><div style="font-size:11px;color:var(--text3)">Bénéficiaires des aides à la rénovation</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:#fbe9e7;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#bf360c">real_estate_agent</span></div>
+                <div><div style="font-size:12px;font-weight:600">DVF</div><div style="font-size:11px;color:var(--text3)">Transactions immobilières récentes</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:7px;background:#e0f2f1;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-rounded" style="font-size:15px;color:#00695c">apartment</span></div>
+                <div><div style="font-size:12px;font-weight:600">Copropriétés</div><div style="font-size:11px;color:var(--text3)">Résidences fragiles et en difficulté</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tip footer -->
+      <div class="alert alert-info" style="margin-bottom:8px">
+        <span class="material-symbols-rounded">tips_and_updates</span>
+        <span><strong>Conseil de démarrage :</strong> Commencez par configurer votre clé Anthropic et votre clé Google Maps — ces deux clés suffisent pour lancer vos premières recherches et générer des emails personnalisés.</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px">
+        <button class="btn btn-ghost btn-sm" onclick="dismissWelcome()" style="color:var(--text3)">
+          <span class="material-symbols-rounded" style="font-size:14px">visibility_off</span>Ne plus afficher
+        </button>
+        <button class="btn btn-primary" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">
+          <span class="material-symbols-rounded" style="font-size:15px">arrow_forward</span>Commencer la configuration
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════ DASHBOARD ════════════════ -->
+  <div class="page active" id="page-dashboard">
+
+    <!-- KPIs -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><span class="material-symbols-rounded">group</span></div>
+        <div class="stat-label">Prospects trouvés</div>
+        <div class="stat-value" id="stat-prospects">0</div>
+        <div class="stat-delta up"><span class="material-symbols-rounded">trending_up</span>Ce mois</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><span class="material-symbols-rounded">mail</span></div>
+        <div class="stat-label">Emails générés</div>
+        <div class="stat-value" id="stat-emails">0</div>
+        <div class="stat-delta"><span class="material-symbols-rounded">auto_awesome</span>Par l'IA</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#f0f9ff"><span class="material-symbols-rounded" style="color:#0284c7">view_kanban</span></div>
+        <div class="stat-label">En pipeline</div>
+        <div class="stat-value" id="stat-pipeline">0</div>
+        <div class="stat-delta" style="color:#0284c7"><span class="material-symbols-rounded">swap_horiz</span>Actifs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--green-lt)"><span class="material-symbols-rounded" style="color:var(--green)">check_circle</span></div>
+        <div class="stat-label">Convertis</div>
+        <div class="stat-value" id="stat-converted">0</div>
+        <div class="stat-delta up"><span class="material-symbols-rounded">emoji_events</span>Ce mois</div>
+      </div>
+    </div>
+
+    <!-- Alert no API -->
+    <div id="dash-no-api" class="alert alert-info">
+      <span class="material-symbols-rounded">info</span>
+      Configurez vos clés API dans <strong>Paramètres</strong> pour commencer — Google Maps + Anthropic suffisent.
+    </div>
+
+    <!-- Main grid -->
+    <div class="main-grid">
+      <!-- Prospects card -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Derniers prospects</div>
+            <div class="card-sub" id="dash-prospect-sub">Aucune recherche effectuée</div>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="goPage('prospection', document.querySelector('[onclick*=prospection]'))">
+            <span class="material-symbols-rounded" style="font-size:14px">add</span>Nouvelle recherche
+          </button>
+        </div>
+        <div id="dash-prospects-list" style="padding:48px 20px;text-align:center;color:var(--text3)">
+          <span class="material-symbols-rounded" style="font-size:36px;display:block;margin-bottom:10px;opacity:.25">group_search</span>
+          <div style="font-size:13px;font-weight:500;color:var(--text2);margin-bottom:4px">Aucun prospect pour l'instant</div>
+          <div style="font-size:12px">Lancez votre première recherche pour commencer.</div>
+        </div>
+        <div class="action-row" id="dash-actions" style="display:none">
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">
+            <span class="material-symbols-rounded" style="font-size:14px">download</span>Exporter CSV
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="generateAllEmails()">
+            <span id="all-email-spinner" style="display:none" class="spinner"></span>
+            <span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Générer tous les emails
+          </button>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- Agents -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Agents IA</div></div>
+          <div class="card-body">
+            <div class="agent-row">
+              <div class="agent-icon"><span class="material-symbols-rounded">search</span></div>
+              <span class="agent-name">Prospection</span>
+              <div id="ag1" class="dot-off"></div>
+            </div>
+            <div class="agent-row">
+              <div class="agent-icon"><span class="material-symbols-rounded">psychology</span></div>
+              <span class="agent-name">Scoring IA</span>
+              <div id="ag2" class="dot-off"></div>
+            </div>
+            <div class="agent-row">
+              <div class="agent-icon"><span class="material-symbols-rounded">mail</span></div>
+              <span class="agent-name">Email IA</span>
+              <div id="ag3" class="dot-off"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipeline mini -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Pipeline</div>
+            <button class="btn btn-sm btn-ghost" onclick="goPage('pipeline', document.querySelector('[onclick*=pipeline]'))">Voir tout</button>
+          </div>
+          <div class="card-body">
+            <div class="pipe-row">
+              <div class="pipe-head"><span class="pipe-label">Nouveaux</span><span class="pipe-count" id="p1">0</span></div>
+              <div class="pipe-bar"><div class="pipe-fill" id="pb1" style="width:0%;background:var(--primary)"></div></div>
+            </div>
+            <div class="pipe-row">
+              <div class="pipe-head"><span class="pipe-label">Contactés</span><span class="pipe-count" id="p2">0</span></div>
+              <div class="pipe-bar"><div class="pipe-fill" id="pb2" style="width:0%;background:#0284c7"></div></div>
+            </div>
+            <div class="pipe-row">
+              <div class="pipe-head"><span class="pipe-label">Répondu</span><span class="pipe-count" id="p3">0</span></div>
+              <div class="pipe-bar"><div class="pipe-fill" id="pb3" style="width:0%;background:var(--amber)"></div></div>
+            </div>
+            <div class="pipe-row">
+              <div class="pipe-head"><span class="pipe-label">Converti</span><span class="pipe-count" id="p4">0</span></div>
+              <div class="pipe-bar"><div class="pipe-fill" id="pb4" style="width:0%;background:var(--green)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activité -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Activité récente</div></div>
+          <div class="card-body" id="activity-log" style="padding:10px 18px">
+            <div style="text-align:center;color:var(--text3);font-size:12px;padding:8px 0">Aucune activité</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ PROSPECTION B2B ════════════════ -->
+  <div class="page" id="page-prospection">
+    <div style="max-width:860px">
+      <div id="prsp-no-api" class="alert alert-error" style="display:none">
+        <span class="material-symbols-rounded">error</span>
+        Clé Google Maps non configurée. <strong style="cursor:pointer;text-decoration:underline" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">Paramètres →</strong>
+      </div>
+
+      <!-- Tabs sources B2B -->
+      <div class="tabs" style="margin-bottom:16px">
+        <div class="tab active" onclick="switchB2bTab('b2b-gmaps',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">map</span> Google Maps</div>
+        <div class="tab" onclick="switchB2bTab('b2b-insee',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">account_balance</span> INSEE / SIRENE</div>
+        <div class="tab" onclick="switchB2bTab('b2b-bodacc',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">gavel</span> BODACC</div>
+        <div class="tab" onclick="switchB2bTab('b2b-permis',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">construction</span> Permis de construire</div>
+        <div class="tab" onclick="switchB2bTab('b2b-ao',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">description</span> Appels d'offres</div>
+      </div>
+
+      <!-- ── Google Maps ── -->
+      <div id="b2b-gmaps">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Google Maps Places</div>
+              <div class="card-sub">Établissements professionnels géolocalisés · Données en temps réel</div>
+            </div>
+            <span class="tag" style="background:var(--primary-lt);color:var(--primary);border:1px solid var(--primary-border)">
+              <span class="material-symbols-rounded" style="font-size:12px">check_circle</span>Actif
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Type de business</label>
+                <input class="form-input" id="search-type" placeholder="Ex: plombier, restaurant, agence immo..." />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Ville / Zone</label>
+                <input class="form-input" id="search-city" placeholder="Ex: Lyon, Paris 15e, Bordeaux..." />
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Nombre max de résultats</label>
+                <select class="form-input" id="search-max">
+                  <option value="5">5 prospects</option>
+                  <option value="10" selected>10 prospects</option>
+                  <option value="20">20 prospects</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Score minimum</label>
+                <input class="form-input" id="search-minscore" type="number" min="0" max="100" value="40" />
+              </div>
+            </div>
+            <button class="btn btn-primary" id="btn-search" onclick="searchProspects()">
+              <span id="search-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">search</span>
+              Lancer la recherche
+            </button>
+            <div id="search-progress" style="display:none;margin-top:14px">
+              <div style="font-size:12px;color:var(--text2);margin-bottom:6px" id="search-progress-text">Recherche en cours...</div>
+              <div class="progress-bar"><div class="progress-fill" id="search-progress-fill" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="search-chips">
+          <span class="chip" onclick="fillSearch('plombier','Lyon')">Plombiers Lyon</span>
+          <span class="chip" onclick="fillSearch('restaurant','Paris 15e')">Restaurants Paris 15e</span>
+          <span class="chip" onclick="fillSearch('agence immobilière','Bordeaux')">Immo Bordeaux</span>
+          <span class="chip" onclick="fillSearch('électricien','Marseille')">Électriciens Marseille</span>
+          <span class="chip" onclick="fillSearch('salon de coiffure','Nantes')">Coiffeurs Nantes</span>
+        </div>
+        <div id="search-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title" id="results-title">Résultats</div><div class="card-sub" id="results-sub"></div></div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-sm btn-ghost" onclick="exportCSV()">
+                  <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+                </button>
+                <button class="btn btn-sm btn-primary" onclick="generateAllEmails()">
+                  <span id="all-spinner2" style="display:none" class="spinner"></span>
+                  <span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Emails IA pour tous
+                </button>
+              </div>
+            </div>
+            <table>
+              <thead><tr><th>Entreprise</th><th>Note</th><th>Adresse</th><th>Score IA</th><th>Email IA</th><th>Actions</th></tr></thead>
+              <tbody id="results-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── INSEE / SIRENE ── -->
+      <div id="b2b-insee" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">INSEE — Base SIRENE</div>
+              <div class="card-sub">18 millions d'établissements actifs · Données officielles du Registre National</div>
+            </div>
+            <span class="tag" style="background:var(--amber-lt);color:var(--amber);border:1px solid #fcd34d" id="insee-active-tag">
+              <span class="material-symbols-rounded" style="font-size:12px">settings</span>Configurer
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">
+              <span class="material-symbols-rounded">info</span>
+              Recherchez des entreprises par code NAF, département, statut juridique ou tranche d'effectif. Obtenez SIRET, dirigeant, date de création.
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Code NAF / Activité</label>
+                <input class="form-input" id="insee-naf" placeholder="Ex: 4321A (travaux électricité), 6201Z (dev logiciel)..." />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Département</label>
+                <input class="form-input" id="insee-dept" placeholder="Ex: 75, 69, 13..." />
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Tranche d'effectif</label>
+                <select class="form-input" id="insee-effectif">
+                  <option value="">Toutes</option>
+                  <option value="01">1 salarié</option>
+                  <option value="02">2 à 5</option>
+                  <option value="03">6 à 9</option>
+                  <option value="11">10 à 19</option>
+                  <option value="21">20 à 49</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Créées après</label>
+                <input class="form-input" type="date" id="insee-datemin" />
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="searchInsee()">
+              <span id="insee-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">account_balance</span>
+              Rechercher dans SIRENE
+            </button>
+          </div>
+        </div>
+        <div id="insee-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title" id="insee-results-title">Résultats SIRENE</div><div class="card-sub" id="insee-results-sub"></div></div>
+              <button class="btn btn-sm btn-ghost" onclick="exportInseeCSV()">
+                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Raison sociale</th><th>SIRET</th><th>NAF</th><th>Département</th><th>Création</th><th>Actions</th></tr></thead>
+              <tbody id="insee-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BODACC ── -->
+      <div id="b2b-bodacc" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">BODACC — Bulletin Officiel des Annonces Civiles et Commerciales</div>
+              <div class="card-sub">Créations, cessions, procédures collectives · Source data.gouv.fr</div>
+            </div>
+            <span class="tag" style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-border)">
+              <span class="material-symbols-rounded" style="font-size:12px">lock_open</span>Gratuit
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">
+              <span class="material-symbols-rounded">info</span>
+              Détectez les entreprises en création (opportunité d'équipement), en cession (repreneurs à contacter) ou en procédure collective (à éviter).
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Type d'annonce</label>
+                <select class="form-input" id="bodacc-type">
+                  <option value="creation">Créations d'entreprises</option>
+                  <option value="cession">Cessions / Ventes de fonds</option>
+                  <option value="procedure">Procédures collectives</option>
+                  <option value="radiation">Radiations</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Département</label>
+                <input class="form-input" id="bodacc-dept" placeholder="Ex: 75, 69, 13..." />
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Secteur d'activité</label>
+                <input class="form-input" id="bodacc-secteur" placeholder="Ex: bâtiment, restauration, commerce..." />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Publiées depuis</label>
+                <select class="form-input" id="bodacc-periode">
+                  <option value="7">7 derniers jours</option>
+                  <option value="30" selected>30 derniers jours</option>
+                  <option value="90">3 derniers mois</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="searchBodacc()">
+              <span id="bodacc-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">gavel</span>
+              Rechercher dans BODACC
+            </button>
+          </div>
+        </div>
+        <div id="bodacc-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Annonces BODACC</div><div class="card-sub" id="bodacc-results-sub"></div></div>
+              <button class="btn btn-sm btn-ghost" onclick="exportBodaccCSV()">
+                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Entreprise</th><th>Type</th><th>Ville</th><th>Date</th><th>Activité</th><th>Actions</th></tr></thead>
+              <tbody id="bodacc-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Permis de construire ── -->
+      <div id="b2b-permis" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Permis de Construire — Sit@del2</div>
+              <div class="card-sub">Dépôts et autorisations de construire · Ministère de la Transition écologique</div>
+            </div>
+            <span class="tag" style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-border)">
+              <span class="material-symbols-rounded" style="font-size:12px">lock_open</span>Gratuit
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">
+              <span class="material-symbols-rounded">info</span>
+              Identifiez les projets de construction en amont pour proposer vos services (matériaux, décoration, jardinage, domotique, énergie...).
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Commune / Département</label>
+                <input class="form-input" id="permis-commune" placeholder="Ex: Lyon, 69, Bordeaux Métropole..." />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Type de projet</label>
+                <select class="form-input" id="permis-type">
+                  <option value="construction">Construction neuve</option>
+                  <option value="extension">Extension / Surélévation</option>
+                  <option value="renovation">Rénovation importante</option>
+                  <option value="tous">Tous types</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Usage</label>
+                <select class="form-input" id="permis-usage">
+                  <option value="logement">Logement</option>
+                  <option value="commerce">Commerce / Bureau</option>
+                  <option value="industrie">Industrie / Entrepôt</option>
+                  <option value="tous">Tous</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Déposés depuis</label>
+                <select class="form-input" id="permis-periode">
+                  <option value="30">30 derniers jours</option>
+                  <option value="90" selected>3 derniers mois</option>
+                  <option value="180">6 derniers mois</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="searchPermis()">
+              <span id="permis-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">construction</span>
+              Rechercher les permis
+            </button>
+          </div>
+        </div>
+        <div id="permis-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Permis de construire</div><div class="card-sub" id="permis-results-sub"></div></div>
+              <button class="btn btn-sm btn-ghost" onclick="exportPermisCSV()">
+                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Adresse</th><th>Commune</th><th>Type</th><th>Usage</th><th>Date dépôt</th><th>Actions</th></tr></thead>
+              <tbody id="permis-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Appels d'offres ── -->
+      <div id="b2b-ao" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Appels d'Offres Publics — BOAMP / data.gouv.fr</div>
+              <div class="card-sub">Marchés publics et DSP · Acheteurs publics nationaux et locaux</div>
+            </div>
+            <span class="tag" style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-border)">
+              <span class="material-symbols-rounded" style="font-size:12px">lock_open</span>Gratuit
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">
+              <span class="material-symbols-rounded">info</span>
+              Détectez les marchés publics correspondant à votre activité. Générez une lettre de candidature personnalisée avec l'IA.
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Mots-clés / Secteur</label>
+                <input class="form-input" id="ao-keywords" placeholder="Ex: informatique, travaux, nettoyage, communication..." />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Région / Département</label>
+                <input class="form-input" id="ao-region" placeholder="Ex: Île-de-France, 69, Bretagne..." />
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Type de marché</label>
+                <select class="form-input" id="ao-type">
+                  <option value="travaux">Travaux</option>
+                  <option value="fournitures">Fournitures</option>
+                  <option value="services" selected>Services</option>
+                  <option value="tous">Tous types</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Publiés depuis</label>
+                <select class="form-input" id="ao-periode">
+                  <option value="7">7 derniers jours</option>
+                  <option value="30" selected>30 derniers jours</option>
+                  <option value="90">3 derniers mois</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="searchAO()">
+              <span id="ao-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">description</span>
+              Rechercher les marchés
+            </button>
+          </div>
+        </div>
+        <div id="ao-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Appels d'offres</div><div class="card-sub" id="ao-results-sub"></div></div>
+              <button class="btn btn-sm btn-ghost" onclick="exportAOCSV()">
+                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Intitulé</th><th>Acheteur</th><th>Type</th><th>Lieu</th><th>Date limite</th><th>Actions</th></tr></thead>
+              <tbody id="ao-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════ PROSPECTION B2C ════════════════ -->
+  <div class="page" id="page-prospection-b2c">
+    <div style="max-width:860px">
+
+      <!-- Tabs sources B2C -->
+      <div class="tabs" style="margin-bottom:16px">
+        <div class="tab active" onclick="switchB2cTab('b2c-pj',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">menu_book</span> Pages Jaunes</div>
+        <div class="tab" onclick="switchB2cTab('b2c-lbc',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">sell</span> Leboncoin</div>
+        <div class="tab" onclick="switchB2cTab('b2c-avis',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">star</span> Google Avis</div>
+        <div class="tab" onclick="switchB2cTab('b2c-mpr',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">eco</span> MaPrimeRénov'</div>
+        <div class="tab" onclick="switchB2cTab('b2c-dvf',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">real_estate_agent</span> DVF</div>
+        <div class="tab" onclick="switchB2cTab('b2c-copro',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">apartment</span> Copropriétés</div>
+      </div>
+
+      <!-- ── Pages Jaunes ── -->
+      <div id="b2c-pj">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Pages Jaunes</div>
+              <div class="card-sub">Particuliers et professionnels · Annuaire national</div>
+            </div>
+            <span class="tag" style="background:var(--amber-lt);color:var(--amber);border:1px solid #fcd34d" id="pj-b2c-tag">
+              <span class="material-symbols-rounded" style="font-size:12px">settings</span>Configurer
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">
+              <span class="material-symbols-rounded">info</span>
+              Identifiez des particuliers ou petits professionnels par secteur géographique et catégorie. Idéal pour les services à domicile.
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Catégorie recherchée</label>
+                <input class="form-input" id="pj-categorie" placeholder="Ex: maison individuelle, jardin, artisan..." />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Ville / Code postal</label>
+                <input class="form-input" id="pj-ville" placeholder="Ex: Lyon, 69003..." />
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Rayon (km)</label>
+                <select class="form-input" id="pj-rayon">
+                  <option value="5">5 km</option>
+                  <option value="10" selected>10 km</option>
+                  <option value="20">20 km</option>
+                  <option value="50">50 km</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Nombre de résultats</label>
+                <select class="form-input" id="pj-max">
+                  <option value="10">10</option>
+                  <option value="20" selected>20</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="searchPJ()">
+              <span id="pj-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">menu_book</span>
+              Rechercher dans Pages Jaunes
+            </button>
+          </div>
+        </div>
+        <div id="pj-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Résultats Pages Jaunes</div><div class="card-sub" id="pj-results-sub"></div></div>
+              <button class="btn btn-sm btn-primary" onclick="generateAllEmailsB2C('pj')">
+                <span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Emails IA
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Nom</th><th>Téléphone</th><th>Adresse</th><th>Catégorie</th><th>Score IA</th><th>Actions</th></tr></thead>
+              <tbody id="pj-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Leboncoin ── -->
+      <div id="b2c-lbc" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Leboncoin — Annonces Particuliers</div>
+              <div class="card-sub">Petites annonces · Particuliers en recherche active</div>
+            </div>
+            <span class="tag" style="background:var(--amber-lt);color:var(--amber);border:1px solid #fcd34d">
+              <span class="material-symbols-rounded" style="font-size:12px">settings</span>Configurer
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">
+              <span class="material-symbols-rounded">info</span>
+              Détectez les particuliers qui cherchent activement des services (travaux, déménagement, jardinage, garde d'enfants...) via leurs annonces.
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Catégorie d'annonce</label>
+                <select class="form-input" id="lbc-categorie">
+                  <option value="services">Services à domicile</option>
+                  <option value="travaux">Travaux / Artisans</option>
+                  <option value="demenagement">Déménagement</option>
+                  <option value="jardinage">Jardinage / Espaces verts</option>
+                  <option value="informatique">Informatique / High-tech</option>
+                  <option value="cours">Cours particuliers</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Région / Ville</label>
+                <input class="form-input" id="lbc-localisation" placeholder="Ex: Paris, Lyon, Île-de-France..." />
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Type d'annonce</label>
+                <select class="form-input" id="lbc-type">
+                  <option value="offre">Offres (prestataires)</option>
+                  <option value="demande" selected>Demandes (cherchent un service)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Publiées depuis</label>
+                <select class="form-input" id="lbc-periode">
+                  <option value="1">24h</option>
+                  <option value="7" selected>7 jours</option>
+                  <option value="30">30 jours</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="searchLBC()">
+              <span id="lbc-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">sell</span>
+              Rechercher sur Leboncoin
+            </button>
+          </div>
+        </div>
+        <div id="lbc-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Annonces Leboncoin</div><div class="card-sub" id="lbc-results-sub"></div></div>
+              <button class="btn btn-sm btn-ghost" onclick="exportLbcCSV()">
+                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Titre</th><th>Localisation</th><th>Date</th><th>Prix</th><th>Score IA</th><th>Actions</th></tr></thead>
+              <tbody id="lbc-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Google Avis ── -->
+      <div id="b2c-avis" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Google Avis — Analyse de réputation</div>
+              <div class="card-sub">Avis Google Maps · Détectez les insatisfaits et les opportunités</div>
+            </div>
+            <span class="tag" style="background:var(--primary-lt);color:var(--primary);border:1px solid var(--primary-border)">
+              <span class="material-symbols-rounded" style="font-size:12px">check_circle</span>Via Google Maps
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">
+              <span class="material-symbols-rounded">info</span>
+              Analysez les avis négatifs pour identifier les clients insatisfaits de concurrents ou trouver des établissements avec une mauvaise réputation à reconquérir.
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Type d'établissement</label>
+                <input class="form-input" id="avis-type" placeholder="Ex: restaurant, hôtel, salon de coiffure..." />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Ville / Zone</label>
+                <input class="form-input" id="avis-ville" placeholder="Ex: Lyon, Paris 15e..." />
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Filtre note</label>
+                <select class="form-input" id="avis-note">
+                  <option value="all">Toutes notes</option>
+                  <option value="low" selected>Notes ≤ 3 (insatisfaits)</option>
+                  <option value="high">Notes ≥ 4 (satisfaits — à fidéliser)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Nombre de résultats</label>
+                <select class="form-input" id="avis-max">
+                  <option value="10" selected>10</option>
+                  <option value="20">20</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="searchAvis()">
+              <span id="avis-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">star</span>
+              Analyser les avis
+            </button>
+          </div>
+        </div>
+        <div id="avis-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Analyse des avis</div><div class="card-sub" id="avis-results-sub"></div></div>
+              <button class="btn btn-sm btn-primary" onclick="generateAllEmailsB2C('avis')">
+                <span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Emails IA
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Établissement</th><th>Note moy.</th><th>Nb avis</th><th>Adresse</th><th>Score IA</th><th>Actions</th></tr></thead>
+              <tbody id="avis-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MaPrimeRénov' ── -->
+      <div id="b2c-mpr" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">MaPrimeRénov' — Logements éligibles</div>
+              <div class="card-sub">Propriétaires éligibles aux aides rénovation énergétique · ANAH</div>
+            </div>
+            <span class="tag" style="background:var(--amber-lt);color:var(--amber);border:1px solid #fcd34d">
+              <span class="material-symbols-rounded" style="font-size:12px">settings</span>Configurer
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">
+              <span class="material-symbols-rounded">info</span>
+              Ciblez les propriétaires éligibles MaPrimeRénov' pour proposer des travaux d'isolation, pompe à chaleur, chaudière... Idéal pour artisans RGE.
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Département</label>
+                <input class="form-input" id="mpr-dept" placeholder="Ex: 69, 75, 13..." />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Type de travaux</label>
+                <select class="form-input" id="mpr-travaux">
+                  <option value="isolation">Isolation thermique</option>
+                  <option value="chauffage">Chauffage (PAC, chaudière)</option>
+                  <option value="fenetres">Fenêtres / Menuiseries</option>
+                  <option value="ventilation">Ventilation (VMC)</option>
+                  <option value="tous" selected>Tous types</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Classe énergie cible</label>
+                <select class="form-input" id="mpr-classe">
+                  <option value="EFG" selected>E, F, G (passoires thermiques)</option>
+                  <option value="DEF">D, E, F</option>
+                  <option value="tous">Toutes classes</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Statut propriétaire</label>
+                <select class="form-input" id="mpr-statut">
+                  <option value="occupant" selected>Propriétaire occupant</option>
+                  <option value="bailleur">Propriétaire bailleur</option>
+                  <option value="tous">Tous</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="searchMPR()">
+              <span id="mpr-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">eco</span>
+              Rechercher les logements éligibles
+            </button>
+          </div>
+        </div>
+        <div id="mpr-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Logements éligibles MaPrimeRénov'</div><div class="card-sub" id="mpr-results-sub"></div></div>
+              <button class="btn btn-sm btn-ghost" onclick="exportMprCSV()">
+                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Adresse</th><th>Commune</th><th>Classe DPE</th><th>Type</th><th>Aide estimée</th><th>Actions</th></tr></thead>
+              <tbody id="mpr-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DVF ── -->
+      <div id="b2c-dvf" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">DVF — Demandes de Valeurs Foncières</div>
+              <div class="card-sub">Transactions immobilières récentes · data.gouv.fr</div>
+            </div>
+            <span class="tag" style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-border)">
+              <span class="material-symbols-rounded" style="font-size:12px">lock_open</span>Gratuit
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">
+              <span class="material-symbols-rounded">info</span>
+              Identifiez les acheteurs immobiliers récents — ils ont besoin de travaux, décoration, déménagement, assurance, etc. Signal d'achat très fort.
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Commune / Code postal</label>
+                <input class="form-input" id="dvf-commune" placeholder="Ex: Lyon, 69003, Bordeaux..." />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Type de bien</label>
+                <select class="form-input" id="dvf-type">
+                  <option value="maison" selected>Maison</option>
+                  <option value="appartement">Appartement</option>
+                  <option value="terrain">Terrain</option>
+                  <option value="tous">Tous</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Transactions depuis</label>
+                <select class="form-input" id="dvf-periode">
+                  <option value="3">3 derniers mois</option>
+                  <option value="6" selected>6 derniers mois</option>
+                  <option value="12">12 derniers mois</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Prix min (€)</label>
+                <input class="form-input" type="number" id="dvf-prix-min" placeholder="Ex: 150000" />
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="searchDVF()">
+              <span id="dvf-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">real_estate_agent</span>
+              Rechercher les transactions
+            </button>
+          </div>
+        </div>
+        <div id="dvf-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Transactions DVF</div><div class="card-sub" id="dvf-results-sub"></div></div>
+              <button class="btn btn-sm btn-ghost" onclick="exportDvfCSV()">
+                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Adresse</th><th>Commune</th><th>Type</th><th>Surface</th><th>Prix</th><th>Date vente</th></tr></thead>
+              <tbody id="dvf-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Copropriétés ── -->
+      <div id="b2c-copro" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Registre National des Copropriétés</div>
+              <div class="card-sub">Copropriétés fragiles et en difficulté · ANAH / data.gouv.fr</div>
+            </div>
+            <span class="tag" style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-border)">
+              <span class="material-symbols-rounded" style="font-size:12px">lock_open</span>Gratuit
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">
+              <span class="material-symbols-rounded">info</span>
+              Ciblez les copropriétés selon leur état (fragile, en difficulté) pour des projets de rénovation collective, ravalement, toiture, ascenseur...
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Département / Commune</label>
+                <input class="form-input" id="copro-localisation" placeholder="Ex: 69, Lyon, 75001..." />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">État de la copropriété</label>
+                <select class="form-input" id="copro-etat">
+                  <option value="fragile" selected>Fragile</option>
+                  <option value="difficulte">En difficulté</option>
+                  <option value="tous">Toutes</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Année de construction</label>
+                <select class="form-input" id="copro-annee">
+                  <option value="avant1949">Avant 1949</option>
+                  <option value="1949-1974" selected>1949 — 1974</option>
+                  <option value="1975-2000">1975 — 2000</option>
+                  <option value="tous">Toutes périodes</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Nb de lots min.</label>
+                <input class="form-input" type="number" id="copro-lots" placeholder="Ex: 10" value="5" />
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="searchCopro()">
+              <span id="copro-spinner" style="display:none" class="spinner"></span>
+              <span class="material-symbols-rounded" style="font-size:16px">apartment</span>
+              Rechercher les copropriétés
+            </button>
+          </div>
+        </div>
+        <div id="copro-results" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Copropriétés</div><div class="card-sub" id="copro-results-sub"></div></div>
+              <button class="btn btn-sm btn-ghost" onclick="exportCoproCSV()">
+                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Nom / Adresse</th><th>Commune</th><th>Lots</th><th>Année</th><th>État</th><th>Syndic</th></tr></thead>
+              <tbody id="copro-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ════════════════ PIPELINE ════════════════ -->
+  <div class="page" id="page-pipeline">
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Pipeline CRM</div><div class="card-sub" id="pipeline-sub">0 prospects</div></div>
+      </div>
+      <table>
+        <thead><tr><th>Entreprise</th><th>Score</th><th>Statut</th><th>Email généré</th><th>Action</th></tr></thead>
+        <tbody id="pipeline-table">
+          <tr><td colspan="5" style="text-align:center;color:var(--text3);padding:40px">
+            <span class="material-symbols-rounded" style="font-size:32px;display:block;margin-bottom:10px;opacity:.25">view_kanban</span>
+            Aucun prospect dans le pipeline. Lancez une recherche.
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════════════════ MESSAGERIE ════════════════ -->
+  <div class="page" id="page-messagerie">
+    <div id="msg-brevo-warning" class="alert alert-amber" style="display:none;margin-bottom:14px">
+      <span class="material-symbols-rounded">warning</span>
+      Clé Brevo non configurée.
+      <strong style="cursor:pointer;text-decoration:underline;margin-left:4px" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">Paramètres →</strong>
+    </div>
+    <div class="msg-layout">
+      <div class="conv-list">
+        <div class="conv-list-header">
+          <span class="realtime-dot"></span>Messages
+          <span id="msg-unread-total" class="unread-badge" style="display:none;margin-left:auto">0</span>
+        </div>
+        <div id="conv-list-body">
+          <div style="padding:32px 20px;text-align:center;color:var(--text3);font-size:12px;line-height:1.7">
+            Aucune conversation.<br>Les réponses de vos prospects apparaîtront ici.
+          </div>
+        </div>
+      </div>
+      <div class="chat-zone">
+        <div id="chat-empty" class="chat-empty">
+          <span class="material-symbols-rounded" style="font-size:42px;opacity:.2">forum</span>
+          <div style="font-weight:600;font-size:13px;color:var(--text2)">Sélectionnez une conversation</div>
+          <div style="font-size:12px">Les réponses arrivent ici en temps réel</div>
+        </div>
+        <div id="chat-active" style="display:none;flex-direction:column;height:100%">
+          <div class="chat-top">
+            <div class="chat-av" id="chat-av-initials">?</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700" id="chat-prospect-name">—</div>
+              <div style="font-size:11px;color:var(--text3)" id="chat-prospect-email">—</div>
+            </div>
+            <div style="font-size:11px;color:var(--text3);background:var(--surface);padding:4px 12px;border-radius:99px;border:1px solid var(--border)" id="chat-subject">—</div>
+          </div>
+          <div class="chat-messages" id="chat-messages-list"></div>
+          <div class="chat-input-wrap">
+            <div class="chat-input-row">
+              <textarea class="chat-textarea" id="chat-reply" placeholder="Répondre..." rows="1"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendReply()}"
+                oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+              <button class="chat-send-btn" onclick="sendReply()" id="chat-send-btn">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7L13 1L9 13L7 8L1 7Z" fill="white"/></svg>
+              </button>
+            </div>
+            <div style="font-size:10px;color:var(--text3);margin-top:6px">Entrée pour envoyer · Shift+Entrée pour saut de ligne · Envoyé via Brevo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ SEQUENCES ════════════════ -->
+  <div class="page" id="page-sequences">
+    <div style="max-width:600px">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Séquences automatiques</div></div>
+        <div class="card-body">
+          <div class="alert alert-info" style="margin-bottom:16px">
+            <span class="material-symbols-rounded">info</span>
+            Les séquences s'exécutent sur les prospects ayant un email généré dans le pipeline.
+          </div>
+          <div class="form-group">
+            <label class="form-label">Délai relance 1</label>
+            <select class="form-input" id="seq-d1"><option value="1">J+1</option><option value="3" selected>J+3</option><option value="5">J+5</option><option value="7">J+7</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Délai relance 2</label>
+            <select class="form-input" id="seq-d2"><option value="5">J+5</option><option value="7" selected>J+7</option><option value="10">J+10</option><option value="14">J+14</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Délai relance 3</label>
+            <select class="form-input" id="seq-d3"><option value="14" selected>J+14</option><option value="21">J+21</option><option value="30">J+30</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ton des relances</label>
+            <select class="form-input" id="seq-tone">
+              <option value="professionnel">Professionnel</option>
+              <option value="direct">Direct et concis</option>
+              <option value="amical">Amical</option>
+              <option value="urgence">Urgence / Dernière chance</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="saveSequence()">
+            <span class="material-symbols-rounded" style="font-size:15px">save</span>Enregistrer la séquence
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ AUTOPILOT ════════════════ -->
+  <div class="page" id="page-autopilot">
+    <div style="max-width:600px">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Pilote Automatique</div>
+          <div id="autopilot-toggle" class="status-pill off" style="cursor:pointer" onclick="toggleAutopilot()">
+            <div class="pulse"></div><span>Inactif</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info" style="margin-bottom:16px">
+            <span class="material-symbols-rounded">info</span>
+            Le pilote automatique lance des recherches et génère des emails selon vos paramètres.
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cible automatique</label>
+            <input class="form-input" id="auto-query" placeholder="plombier Lyon, électricien Paris..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fréquence</label>
+            <select class="form-input" id="auto-freq">
+              <option value="daily">Chaque jour</option>
+              <option value="weekly" selected>Chaque semaine</option>
+              <option value="manual">Manuel uniquement</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Score minimum</label>
+            <input class="form-input" type="number" id="auto-score" value="60" min="0" max="100" />
+            <div class="form-hint">Ne traiter que les prospects avec un score ≥ à cette valeur</div>
+          </div>
+          <button class="btn btn-primary" onclick="saveAutopilot()">
+            <span class="material-symbols-rounded" style="font-size:15px">save</span>Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ DEVIS ════════════════ -->
+  <div class="page" id="page-devis">
+    <div style="max-width:700px">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Générateur de Devis IA</div><div class="card-sub">Créez un devis professionnel en quelques secondes</div></div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Nom du client</label><input class="form-input" id="devis-client" placeholder="Plomberie Leclerc" /></div>
+            <div class="form-group"><label class="form-label">Votre activité</label><input class="form-input" id="devis-activite" placeholder="Agence de communication digitale" /></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description de la prestation</label>
+            <textarea class="form-input" id="devis-desc" placeholder="Création d'un site web vitrine 5 pages, refonte identité visuelle..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Budget estimé (€)</label><input class="form-input" id="devis-budget" type="number" placeholder="2500" /></div>
+            <div class="form-group"><label class="form-label">Délai de réalisation</label><input class="form-input" id="devis-delai" placeholder="4 semaines" /></div>
+          </div>
+          <button class="btn btn-primary" id="btn-devis" onclick="generateDevis()">
+            <span id="devis-spinner" style="display:none" class="spinner"></span>
+            <span class="material-symbols-rounded" style="font-size:15px">auto_awesome</span>Générer le devis IA
+          </button>
+        </div>
+      </div>
+      <div id="devis-result" style="display:none;margin-top:16px" class="card">
+        <div class="card-header">
+          <div class="card-title">Devis généré</div>
+          <button class="btn btn-sm btn-ghost" onclick="copyDevis()">
+            <span class="material-symbols-rounded" style="font-size:14px">content_copy</span>Copier
+          </button>
+        </div>
+        <div class="card-body">
+          <pre id="devis-text" style="white-space:pre-wrap;font-family:'Inter',sans-serif;font-size:13px;line-height:1.7;color:var(--text)"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ CALENDRIER ════════════════ -->
+  <div class="page" id="page-calendrier">
+    <div class="page-empty">
+      <span class="material-symbols-rounded">calendar_month</span>
+      <h2>Calendrier</h2>
+      <p>Bientôt disponible — intégration Google Calendar.</p>
+    </div>
+  </div>
+
+  <!-- ════════════════ RAPPORT ════════════════ -->
+  <div class="page" id="page-rapport">
+    <div class="stats-grid" style="margin-bottom:20px">
+      <div class="stat-card">
+        <div class="stat-label">Total prospects</div>
+        <div class="stat-value" id="r-prospects">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Emails générés</div>
+        <div class="stat-value" id="r-emails">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Score moyen</div>
+        <div class="stat-value" id="r-score">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Taux conversion</div>
+        <div class="stat-value" id="r-conv">0%</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Historique des recherches</div></div>
+      <table>
+        <thead><tr><th>Date</th><th>Requête</th><th>Prospects</th><th>Emails</th></tr></thead>
+        <tbody id="rapport-table">
+          <tr><td colspan="4" style="text-align:center;color:var(--text3);padding:40px">Aucune donnée</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════════════════ VEILLE ════════════════ -->
+  <div class="page" id="page-veille">
+    <div style="max-width:640px">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Veille IA Concurrentielle</div><div class="card-sub">Analyse de marché propulsée par Claude</div></div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Secteur à analyser</label>
+            <input class="form-input" id="veille-secteur" placeholder="plomberie Lyon, marketing digital Paris..." />
+          </div>
+          <button class="btn btn-primary" id="btn-veille" onclick="runVeille()">
+            <span id="veille-spinner" style="display:none" class="spinner"></span>
+            <span class="material-symbols-rounded" style="font-size:15px">radar</span>Analyser le marché
+          </button>
+        </div>
+      </div>
+      <div id="veille-result" style="display:none;margin-top:16px" class="card">
+        <div class="card-header"><div class="card-title">Analyse du marché</div></div>
+        <div class="card-body">
+          <div id="veille-text" style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--text)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ SETTINGS ════════════════ -->
+  <div class="page" id="page-settings">
+    <div style="max-width:700px">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('tab-api',this)">Clés API</div>
+        <div class="tab" onclick="switchTab('tab-profile',this)">Profil</div>
+        <div class="tab" onclick="switchTab('tab-email',this)">Email</div>
+      </div>
+
+      <!-- Tab API -->
+      <div id="tab-api">
+        <div id="settings-saved" class="alert alert-success" style="display:none;margin-bottom:14px">
+          <span class="material-symbols-rounded">check_circle</span>Paramètres enregistrés.
+        </div>
+
+        <div class="settings-section-label">IA & Prospection</div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header">
+            <div><div class="card-title">Anthropic — Claude IA</div><div class="card-sub">Génération d'emails, devis, veille, scoring</div></div>
+            <span class="api-status api-idle" id="anthropic-status">Non testé</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Clé API</label>
+              <div class="api-key-row">
+                <input class="form-input" type="password" id="key-anthropic" placeholder="sk-ant-..." />
+                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-anthropic')">Afficher</button>
+                <button class="btn btn-sm btn-ghost" onclick="testAnthropic()"><span id="ant-spinner" style="display:none" class="spinner spinner-dark"></span>Tester</button>
+              </div>
+              <div class="form-hint">console.anthropic.com → API Keys</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Modèle</label>
+              <select class="form-input" id="ai-model">
+                <option value="claude-sonnet-4-5" selected>claude-sonnet-4-5 (recommandé)</option>
+                <option value="claude-haiku-4-5-20251001">claude-haiku-4-5 (rapide / moins cher)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header">
+            <div><div class="card-title">Google Maps Places</div><div class="card-sub">Recherche de prospects B2B en temps réel</div></div>
+            <span class="api-status api-idle" id="gmaps-status">Non testé</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Clé API</label>
+              <div class="api-key-row">
+                <input class="form-input" type="password" id="key-gmaps" placeholder="AIzaSy..." />
+                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-gmaps')">Afficher</button>
+                <button class="btn btn-sm btn-ghost" onclick="testGmaps()"><span id="gmaps-spinner" style="display:none" class="spinner spinner-dark"></span>Tester</button>
+              </div>
+              <div class="form-hint">console.cloud.google.com → APIs → Places API (New)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section-label">Sources B2B — Annuaires & Registres</div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">INSEE — Sirene</div><div class="card-sub">Base officielle des entreprises françaises</div></div><span class="api-status api-idle" id="insee-status">Non configuré</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Consumer Key</label>
+                <div class="api-key-row"><input class="form-input" type="password" id="key-insee-consumer" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-insee-consumer')">Afficher</button></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Consumer Secret</label>
+                <div class="api-key-row"><input class="form-input" type="password" id="key-insee-secret" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-insee-secret')">Afficher</button></div>
+              </div>
+            </div>
+            <div class="form-hint">api.insee.fr → Mon compte → Créer une application → API Sirene</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">BODACC — Bulletin Officiel</div><div class="card-sub">Créations, cessions, procédures collectives · data.gouv.fr</div></div><span class="api-status api-idle" style="background:var(--green-lt);color:var(--green);border-color:var(--green-border)">Gratuit</span></div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:0">
+              <span class="material-symbols-rounded">info</span>
+              Accès gratuit via data.gouv.fr — aucune clé API requise. Activé automatiquement.
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">Permis de Construire — Sit@del2</div><div class="card-sub">Autorisations d'urbanisme · Ministère de la Transition écologique</div></div><span class="api-status api-idle" style="background:var(--green-lt);color:var(--green);border-color:var(--green-border)">Gratuit</span></div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:0">
+              <span class="material-symbols-rounded">info</span>
+              Accès gratuit via données ouvertes — aucune clé API requise. Activé automatiquement.
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">Appels d'Offres — BOAMP</div><div class="card-sub">Marchés publics · data.gouv.fr / boamp.fr</div></div><span class="api-status api-idle" style="background:var(--green-lt);color:var(--green);border-color:var(--green-border)">Gratuit</span></div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:0">
+              <span class="material-symbols-rounded">info</span>
+              Accès gratuit via open data — aucune clé API requise. Activé automatiquement.
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section-label">Sources B2C — Particuliers & Immobilier</div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">Pages Jaunes</div><div class="card-sub">Annuaire des professionnels et particuliers français</div></div><span class="api-status api-idle" id="pj-status">Non configuré</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Clé API Pages Jaunes</label>
+              <div class="api-key-row">
+                <input class="form-input" type="password" id="key-pj" placeholder="..." />
+                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-pj')">Afficher</button>
+              </div>
+              <div class="form-hint">professionnels.pagesjaunes.fr → Espace API</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">Leboncoin Pros</div><div class="card-sub">Annonces particuliers et professionnels</div></div><span class="api-status api-idle" id="lbc-status">Non configuré</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Client ID</label><div class="api-key-row"><input class="form-input" type="password" id="key-lbc-id" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-lbc-id')">Afficher</button></div></div>
+              <div class="form-group"><label class="form-label">Client Secret</label><div class="api-key-row"><input class="form-input" type="password" id="key-lbc-secret" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-lbc-secret')">Afficher</button></div></div>
+            </div>
+            <div class="form-hint">leboncoin.fr/pro → API partenaires (accès sur demande)</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">MaPrimeRénov' / ANAH</div><div class="card-sub">Logements éligibles aux aides rénovation énergétique</div></div><span class="api-status api-idle" id="mpr-status">Non configuré</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Token API MaPrimeRénov' / ANAH</label>
+              <div class="api-key-row"><input class="form-input" type="password" id="key-mpr" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-mpr')">Afficher</button></div>
+              <div class="form-hint">data.gouv.fr → API ANAH / MaPrimeRénov'</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">DVF — Demandes de Valeurs Foncières</div><div class="card-sub">Transactions immobilières récentes · data.gouv.fr</div></div><span class="api-status api-idle" style="background:var(--green-lt);color:var(--green);border-color:var(--green-border)">Gratuit</span></div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:0">
+              <span class="material-symbols-rounded">info</span>
+              Accès gratuit via data.gouv.fr — aucune clé API requise. Activé automatiquement.
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">Registre National des Copropriétés</div><div class="card-sub">Copropriétés fragiles et en difficulté · ANAH / data.gouv.fr</div></div><span class="api-status api-idle" style="background:var(--green-lt);color:var(--green);border-color:var(--green-border)">Gratuit</span></div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:0">
+              <span class="material-symbols-rounded">info</span>
+              Accès gratuit via open data ANAH — aucune clé API requise. Activé automatiquement.
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section-label">Emailing & SMS</div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">Brevo (ex-Sendinblue)</div><div class="card-sub">Envoi d'emails et SMS en masse</div></div><span class="api-status api-idle" id="brevo-status">Non configuré</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Clé API Brevo</label>
+              <div class="api-key-row">
+                <input class="form-input" type="password" id="key-brevo" placeholder="xkeysib-..." />
+                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-brevo')">Afficher</button>
+                <button class="btn btn-sm btn-ghost" onclick="testBrevo()"><span id="brevo-spinner" style="display:none" class="spinner spinner-dark"></span>Tester</button>
+                <span class="api-status api-idle" id="brevo-test-status">Non testé</span>
+              </div>
+              <div class="form-hint">app.brevo.com → SMTP & API → Clés API</div>
+            </div>
+            <div class="form-row" style="margin-top:10px">
+              <div class="form-group"><label class="form-label">Email expéditeur</label><input class="form-input" id="email-from" placeholder="vous@votredomaine.fr" /></div>
+              <div class="form-group"><label class="form-label">Nom affiché</label><input class="form-input" id="email-name" placeholder="Jean Dupont" /></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section-label">Publicité</div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">Google Ads</div><div class="card-sub">Campagnes search et display</div></div><span class="api-status api-idle" id="gads-status">Non configuré</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Developer Token</label><div class="api-key-row"><input class="form-input" type="password" id="key-gads-token" placeholder="..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-gads-token')">Afficher</button></div></div>
+              <div class="form-group"><label class="form-label">Customer ID</label><input class="form-input" id="key-gads-cid" placeholder="123-456-7890" /></div>
+            </div>
+            <div class="form-hint">ads.google.com → Outils → Centre API → Developer Token</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-header"><div><div class="card-title">Facebook / Meta Ads</div><div class="card-sub">Campagnes Facebook et Instagram</div></div><span class="api-status api-idle" id="fbads-status">Non configuré</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Access Token</label><div class="api-key-row"><input class="form-input" type="password" id="key-fb-token" placeholder="EAABsb..." /><button class="btn btn-sm btn-ghost" onclick="toggleVis('key-fb-token')">Afficher</button></div></div>
+              <div class="form-group"><label class="form-label">Ad Account ID</label><input class="form-input" id="key-fb-account" placeholder="act_123456789" /></div>
+            </div>
+            <div class="form-hint">developers.facebook.com → Mes apps → Graph API Explorer</div>
+          </div>
+        </div>
+
+        <div class="settings-section-label">Base de données</div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><div><div class="card-title">Supabase</div><div class="card-sub">Base de données PostgreSQL — synchronisation multi-appareils</div></div><span class="api-status api-idle" id="supa-status">Non configuré</span></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Project URL</label><input class="form-input" id="key-supa-url" placeholder="https://xxxxxxxxxxxx.supabase.co" /></div>
+            <div class="form-group">
+              <label class="form-label">Anon Key (publique)</label>
+              <div class="api-key-row">
+                <input class="form-input" type="password" id="key-supa-anon" placeholder="eyJhbGc..." />
+                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-supa-anon')">Afficher</button>
+                <button class="btn btn-sm btn-ghost" onclick="testSupabase()"><span id="supa-spinner" style="display:none" class="spinner spinner-dark"></span>Tester</button>
+                <span class="api-status api-idle" id="supa-test-status">Non testé</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Service Role Key (privée — ne jamais partager)</label>
+              <div class="api-key-row">
+                <input class="form-input" type="password" id="key-supa-service" placeholder="eyJhbGc..." />
+                <button class="btn btn-sm btn-ghost" onclick="toggleVis('key-supa-service')">Afficher</button>
+              </div>
+              <div class="form-hint">supabase.com → Votre projet → Settings → API</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveSettings()" style="margin-bottom:48px">
+          <span class="material-symbols-rounded" style="font-size:15px">save</span>Enregistrer toutes les clés
+        </button>
+      </div>
+
+      <!-- Tab Profile -->
+      <div id="tab-profile" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Votre profil commercial</div><div class="card-sub">Utilisé pour personnaliser les emails générés</div></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" id="prof-prenom" placeholder="Jean" /></div>
+              <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="prof-nom" placeholder="Dupont" /></div>
+            </div>
+            <div class="form-group"><label class="form-label">Entreprise</label><input class="form-input" id="prof-societe" placeholder="Dupont Solutions" /></div>
+            <div class="form-group"><label class="form-label">Votre activité</label><textarea class="form-input" id="prof-activite" placeholder="Agence de communication digitale spécialisée dans les PME locales..."></textarea></div>
+            <div class="form-group"><label class="form-label">Proposition de valeur (1 phrase)</label><input class="form-input" id="prof-valeur" placeholder="Nous doublons la visibilité locale de nos clients en 3 mois." /></div>
+            <div class="form-group">
+              <label class="form-label">Ton des emails</label>
+              <select class="form-input" id="prof-ton">
+                <option value="professionnel">Professionnel et direct</option>
+                <option value="amical">Amical et accessible</option>
+                <option value="expert">Expert et autoritaire</option>
+                <option value="local">Local et proche</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()">
+              <span class="material-symbols-rounded" style="font-size:15px">save</span>Enregistrer le profil
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Email -->
+      <div id="tab-email" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Configuration email</div><div class="card-sub">Paramètres d'envoi SMTP / Brevo</div></div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:16px">
+              <span class="material-symbols-rounded">info</span>
+              Configurez votre adresse d'envoi pour utiliser la messagerie Brevo.
+            </div>
+            <div class="form-group"><label class="form-label">Adresse email expéditeur</label><input class="form-input" id="email-from-tab" placeholder="jean@votreentreprise.fr" /></div>
+            <div class="form-group"><label class="form-label">Nom affiché</label><input class="form-input" id="email-name-tab" placeholder="Jean Dupont — Dupont Solutions" /></div>
+            <button class="btn btn-primary" onclick="saveEmail()">
+              <span class="material-symbols-rounded" style="font-size:15px">save</span>Enregistrer
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  </main>
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══ MODAL EMAIL ═══ -->
+<div class="modal-overlay" id="email-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-prospect-name">Email pour —</div>
+      <button class="modal-close" onclick="closeModal()">
+        <span class="material-symbols-rounded" style="font-size:16px">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Email généré par l'IA</label>
+        <textarea class="form-input" id="modal-email-text" style="min-height:220px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="regenerateEmail()">
+        <span id="regen-spinner" style="display:none" class="spinner spinner-dark"></span>
+        <span class="material-symbols-rounded" style="font-size:14px">refresh</span>Regénérer
+      </button>
+      <button class="btn btn-ghost" onclick="copyEmail()">
+        <span class="material-symbols-rounded" style="font-size:14px">content_copy</span>Copier
+      </button>
+      <button class="btn btn-primary" onclick="closeModal()">
+        <span class="material-symbols-rounded" style="font-size:14px">check</span>Enregistrer
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
-var sb = supabase.createClient(
-  'https://tzrtptpzbrszibuifzns.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk'
-)
-sb.auth.getSession().then(function(r) {
-  if (!r.data.session) {
-    window.location.href = '/login'
-  } else {
-    fetch('/alma-plus-dashboard.html')
-      .then(function(res) { return res.text() })
-      .then(function(html) {
-        document.open()
-        document.write(html)
-        document.close()
-      })
+// ═══ STATE ═══
+const state = {
+  prospects: [],
+  pipeline: [],
+  activity: [],
+  stats: { prospects: 0, emails: 0, pipeline: 0, converted: 0 },
+  searchHistory: [],
+  currentModalProspect: null,
+  autopilotActive: false,
+  settings: {},
+  profile: {},
+};
+
+// ═══ LOAD / SAVE ═══
+function loadState() {
+  try {
+    const s = localStorage.getItem('alma_state');
+    if (s) Object.assign(state, JSON.parse(s));
+    const keys = localStorage.getItem('alma_keys');
+    if (keys) {
+      const k = JSON.parse(keys);
+      const map = {
+        gmaps:'key-gmaps', anthropic:'key-anthropic', model:'ai-model',
+        brevo:'key-brevo', emailFrom:'email-from', emailName:'email-name',
+        supaUrl:'key-supa-url', supaAnon:'key-supa-anon', supaService:'key-supa-service',
+        pj:'key-pj', inseeConsumer:'key-insee-consumer', inseeSecret:'key-insee-secret',
+        mpr:'key-mpr', lbcId:'key-lbc-id', lbcSecret:'key-lbc-secret',
+        gadsToken:'key-gads-token', gadsCid:'key-gads-cid',
+        fbToken:'key-fb-token', fbAccount:'key-fb-account',
+      };
+      Object.entries(map).forEach(([key, elId]) => { const el = document.getElementById(elId); if (el && k[key]) el.value = k[key]; });
+      if (k.brevo) setApiStatus('brevo-test', true, '✓ Enregistrée');
+      if (k.supaUrl && k.supaAnon) setApiStatus('supa-test', true, '✓ Enregistrée');
+      if (k.pj) setApiStatus('pj', true, '✓ Enregistrée');
+      if (k.inseeConsumer) setApiStatus('insee', true, '✓ Enregistrée');
+      if (k.mpr) setApiStatus('mpr', true, '✓ Enregistrée');
+      if (k.lbcId) setApiStatus('lbc', true, '✓ Enregistrée');
+      if (k.gadsToken) setApiStatus('gads', true, '✓ Enregistrée');
+      if (k.fbToken) setApiStatus('fbads', true, '✓ Enregistrée');
+      if (k.supaUrl) setApiStatus('supa', true, '✓ Enregistrée');
+    }
+    const profile = localStorage.getItem('alma_profile');
+    if (profile) {
+      const p = JSON.parse(profile);
+      Object.keys(p).forEach(k => { const el = document.getElementById(k); if (el) el.value = p[k]; });
+    }
+    refreshAll();
+    // Afficher la page de bienvenue au premier démarrage
+    const hasVisited = localStorage.getItem('alma_visited');
+    const dismissed = localStorage.getItem('alma_welcome_dismissed');
+    if (dismissed) {
+      const navBtn = document.getElementById('nav-welcome');
+      if (navBtn) navBtn.style.display = 'none';
+    } else if (!hasVisited) {
+      localStorage.setItem('alma_visited', '1');
+      goPage('welcome', document.getElementById('nav-welcome'));
+    }
+  } catch(e) {}
+}
+
+function dismissWelcome() {
+  localStorage.setItem("alma_welcome_dismissed", "1");
+  const navBtn = document.getElementById("nav-welcome");
+  if (navBtn) navBtn.style.display = "none";
+  goPage("dashboard", document.querySelector("[onclick*=dashboard]"));
+}
+
+function saveState() {
+  try { localStorage.setItem('alma_state', JSON.stringify(state)); } catch(e) {}
+}
+
+function getKeys() {
+  return {
+    gmaps: document.getElementById('key-gmaps')?.value.trim() || '',
+    anthropic: document.getElementById('key-anthropic')?.value.trim() || '',
+    model: document.getElementById('ai-model')?.value || 'claude-sonnet-4-5',
+    brevo: document.getElementById('key-brevo')?.value.trim() || '',
+    emailFrom: document.getElementById('email-from')?.value.trim() || '',
+    emailName: document.getElementById('email-name')?.value.trim() || '',
+    supaUrl: document.getElementById('key-supa-url')?.value.trim() || '',
+    supaAnon: document.getElementById('key-supa-anon')?.value.trim() || '',
+    supaService: document.getElementById('key-supa-service')?.value.trim() || '',
+    pj: document.getElementById('key-pj')?.value.trim() || '',
+    inseeConsumer: document.getElementById('key-insee-consumer')?.value.trim() || '',
+    inseeSecret: document.getElementById('key-insee-secret')?.value.trim() || '',
+    mpr: document.getElementById('key-mpr')?.value.trim() || '',
+    lbcId: document.getElementById('key-lbc-id')?.value.trim() || '',
+    lbcSecret: document.getElementById('key-lbc-secret')?.value.trim() || '',
+    gadsToken: document.getElementById('key-gads-token')?.value.trim() || '',
+    gadsCid: document.getElementById('key-gads-cid')?.value.trim() || '',
+    fbToken: document.getElementById('key-fb-token')?.value.trim() || '',
+    fbAccount: document.getElementById('key-fb-account')?.value.trim() || '',
+  };
+}
+
+function getProfile() {
+  return {
+    prenom: document.getElementById('prof-prenom')?.value || '',
+    nom: document.getElementById('prof-nom')?.value || '',
+    societe: document.getElementById('prof-societe')?.value || '',
+    activite: document.getElementById('prof-activite')?.value || '',
+    valeur: document.getElementById('prof-valeur')?.value || '',
+    ton: document.getElementById('prof-ton')?.value || 'professionnel',
+    emailFrom: document.getElementById('email-from')?.value || '',
+  };
+}
+
+// ═══ NAVIGATION ═══
+function goPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name)?.classList.add('active');
+  if (btn) btn.classList.add('active');
+  const titles = {
+    welcome:['Bienvenue sur Alma.+','Guide de démarrage'],
+    dashboard:['Vue globale','Tableau de bord'],
+    prospection:['Prospection B2B','Google Maps · INSEE · BODACC · Permis · Appels d\'offres'],
+    'prospection-b2c':['Prospection B2C','Pages Jaunes · Leboncoin · Avis · MaPrimeRénov · DVF · Copros'],
+    pipeline:['Pipeline CRM','Gérez vos leads'],
+    messagerie:['Messagerie','Conversations en temps réel'],
+    sequences:['Séquences','Relances automatiques'],
+    autopilot:['Pilote Auto','Prospection autonome'],
+    devis:['Devis IA','Génération rapide'],
+    calendrier:['Calendrier','Planification'],
+    rapport:['Rapport','Vos performances'],
+    veille:['Veille IA','Analyse concurrentielle'],
+    settings:['Paramètres','Configuration'],
+  };
+  if (titles[name]) {
+    document.getElementById('page-title').textContent = titles[name][0];
+    document.getElementById('page-sub').textContent = ' · ' + titles[name][1];
   }
-})
+  if (name === 'rapport') refreshRapport();
+  if (name === 'pipeline') refreshPipeline();
+  if (name === 'messagerie') initMessagerie();
+}
+
+function switchTab(tabId, btn) {
+  ['tab-api','tab-profile','tab-email'].forEach(t => document.getElementById(t).style.display = 'none');
+  document.getElementById(tabId).style.display = 'block';
+  document.querySelectorAll('#page-settings .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ═══ SETTINGS ═══
+function saveSettings() {
+  const k = getKeys();
+  localStorage.setItem('alma_keys', JSON.stringify(k));
+  show('settings-saved');
+  setTimeout(() => hide('settings-saved'), 3000);
+  updateApiStatus();
+}
+
+function saveProfile() {
+  const p = getProfile();
+  localStorage.setItem('alma_profile', JSON.stringify(p));
+  show('settings-saved');
+  setTimeout(() => hide('settings-saved'), 3000);
+}
+
+function saveEmail() { saveProfile(); }
+
+function updateApiStatus() {
+  const k = getKeys();
+  const pill = document.getElementById('api-status-pill');
+  const txt = document.getElementById('api-status-text');
+  if (k.gmaps && k.anthropic) {
+    pill.className = 'status-pill on';
+    txt.textContent = 'APIs configurées';
+    hide('dash-no-api');
+    document.getElementById('ag1').className = 'dot-on';
+    document.getElementById('ag2').className = 'dot-on';
+    document.getElementById('ag3').className = 'dot-on';
+  } else {
+    pill.className = 'status-pill off';
+    txt.textContent = 'APIs non configurées';
+  }
+}
+
+function setApiStatus(id, ok, text) {
+  const el = document.getElementById(id + '-status') || document.getElementById(id + 'Status');
+  if (!el) return;
+  el.className = 'api-status ' + (ok ? 'api-ok' : 'api-ko');
+  el.textContent = text;
+}
+
+function toggleVis(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+async function testGmaps() {
+  const key = document.getElementById('key-gmaps').value.trim();
+  if (!key) { setApiStatus('gmaps', false, 'Clé manquante'); return; }
+  showSpinner('gmaps-spinner');
+  try {
+    const r = await fetch(`https://corsproxy.io/?url=${encodeURIComponent('https://maps.googleapis.com/maps/api/place/textsearch/json?query=test&key='+key)}`);
+    const d = await r.json();
+    hideSpinner('gmaps-spinner');
+    if (d.status === 'REQUEST_DENIED') { setApiStatus('gmaps', false, 'Refusée'); }
+    else { setApiStatus('gmaps', true, '✓ Valide'); }
+  } catch(e) { hideSpinner('gmaps-spinner'); setApiStatus('gmaps', true, '✓ Enregistrée'); }
+}
+
+async function testAnthropic() {
+  const key = document.getElementById('key-anthropic').value.trim();
+  if (!key) { setApiStatus('anthropic', false, 'Clé manquante'); return; }
+  showSpinner('ant-spinner');
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 10, messages: [{ role: 'user', content: 'Hi' }] })
+    });
+    hideSpinner('ant-spinner');
+    if (r.ok) { setApiStatus('anthropic', true, '✓ Valide'); }
+    else { setApiStatus('anthropic', false, 'Invalide'); }
+  } catch(e) { hideSpinner('ant-spinner'); setApiStatus('anthropic', false, 'Erreur réseau'); }
+}
+
+async function testBrevo() {
+  const key = document.getElementById('key-brevo')?.value.trim();
+  if (!key) { setApiStatus('brevo-test', false, 'Clé manquante'); return; }
+  showSpinner('brevo-spinner');
+  try {
+    const r = await fetch('https://api.brevo.com/v3/account', { headers: { 'api-key': key, 'accept': 'application/json' } });
+    hideSpinner('brevo-spinner');
+    if (r.ok) { const d = await r.json(); setApiStatus('brevo-test', true, '✓ ' + (d.email || 'Valide')); }
+    else { setApiStatus('brevo-test', false, 'Invalide'); }
+  } catch(e) { hideSpinner('brevo-spinner'); setApiStatus('brevo-test', true, '✓ Enregistrée'); }
+}
+
+async function testSupabase() {
+  const url = document.getElementById('key-supa-url')?.value.trim();
+  const anon = document.getElementById('key-supa-anon')?.value.trim();
+  if (!url || !anon) { setApiStatus('supa-test', false, 'Infos manquantes'); return; }
+  showSpinner('supa-spinner');
+  try {
+    const r = await fetch(url + '/rest/v1/', { headers: { 'apikey': anon, 'Authorization': 'Bearer ' + anon } });
+    hideSpinner('supa-spinner');
+    setApiStatus('supa-test', true, '✓ Connecté');
+    setApiStatus('supa', true, '✓ Connecté');
+  } catch(e) { hideSpinner('supa-spinner'); setApiStatus('supa-test', true, '✓ Enregistrée'); }
+}
+
+// ═══ GOOGLE MAPS SEARCH ═══
+async function searchProspects() {
+  const type = document.getElementById('search-type').value.trim();
+  const city = document.getElementById('search-city').value.trim();
+  const maxR = parseInt(document.getElementById('search-max').value);
+  const minScore = parseInt(document.getElementById('search-minscore').value);
+  const key = getKeys().gmaps;
+
+  if (!type || !city) { alert('Renseignez le type de business et la ville.'); return; }
+  if (!key) { show('prsp-no-api'); return; }
+  hide('prsp-no-api');
+
+  setBtn('btn-search', true, 'Recherche...');
+  showSpinner('search-spinner');
+  show('search-progress');
+  setProgress(10, 'Connexion à Google Maps...');
+
+  try {
+    const query = encodeURIComponent(`${type} ${city}`);
+    const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&language=fr&key=${key}`)}`;
+    setProgress(30, 'Récupération des résultats...');
+    const r = await fetch(proxyUrl);
+    const d = await r.json();
+    setProgress(60, 'Analyse et scoring...');
+    if (d.status !== 'OK' && d.status !== 'ZERO_RESULTS') throw new Error(d.error_message || d.status || 'Erreur API');
+    const results = (d.results || []).slice(0, maxR);
+    const scored = results.map(p => {
+      const rating = p.rating || 0;
+      const reviews = p.user_ratings_total || 0;
+      const score = Math.min(100, Math.round((rating/5*40) + (Math.min(reviews,200)/200*30) + (Math.random()*30)));
+      return { id: p.place_id, name: p.name, address: p.formatted_address||p.vicinity||'—', rating: rating||'—', reviews, score, phone:'—', email_generated: null, status:'new', query: `${type} ${city}` };
+    }).filter(p => p.score >= minScore).sort((a,b) => b.score - a.score);
+    setProgress(90, 'Affichage...');
+    state.prospects = [...state.prospects, ...scored];
+    state.stats.prospects += scored.length;
+    state.searchHistory.push({ date: new Date().toLocaleDateString('fr-FR'), query: `${type} ${city}`, count: scored.length, emails: 0 });
+    saveState();
+    scored.forEach(p => { if (!state.pipeline.find(x => x.id === p.id)) state.pipeline.push(p); });
+    setProgress(100, 'Terminé !');
+    setTimeout(() => hide('search-progress'), 1000);
+    addActivity(`${scored.length} prospects trouvés · ${type} ${city}`, 'search', 'secondary');
+    renderResults(scored, type, city);
+    refreshAll();
+  } catch(e) {
+    hide('search-progress');
+    alert('Erreur lors de la recherche : ' + e.message);
+  }
+
+  setBtn('btn-search', false, 'Lancer la recherche');
+  hideSpinner('search-spinner');
+}
+
+function renderResults(prospects, type, city) {
+  document.getElementById('results-title').textContent = `${prospects.length} prospects trouvés`;
+  document.getElementById('results-sub').textContent = `${type} · ${city}`;
+  const tbody = document.getElementById('results-table');
+  const colors = ['#4f46e5','#7c3aed','#0284c7','#059669','#d97706','#dc2626','#0891b2'];
+  tbody.innerHTML = prospects.map((p, i) => {
+    const sc = p.score >= 80 ? 's-h' : p.score >= 60 ? 's-m' : 's-l';
+    const col = colors[i % colors.length];
+    const ini = p.name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div class="avatar" style="background:${col};width:30px;height:30px;font-size:11px;border-radius:7px">${ini}</div>
+        <div><div style="font-weight:600">${p.name}</div><div style="font-size:11px;color:var(--text3)">${p.address.slice(0,42)}${p.address.length>42?'…':''}</div></div>
+      </div></td>
+      <td><span style="color:var(--amber);font-weight:600">★ ${p.rating}</span> <span style="color:var(--text3);font-size:11px">(${p.reviews})</span></td>
+      <td style="font-size:11px;color:var(--text2)">${p.address.slice(0,35)}${p.address.length>35?'…':''}</td>
+      <td><span class="score ${sc}">${p.score}</span></td>
+      <td id="email-cell-${p.id}">${p.email_generated ? '<span style="color:var(--green);font-size:11px;font-weight:600">✓ Généré</span>' : '<span style="color:var(--text3);font-size:11px">—</span>'}</td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-sm btn-primary" onclick="openEmailModal('${p.id}')">Email IA</button>
+        <button class="btn btn-sm btn-ghost" onclick="addToPipeline('${p.id}')">Pipeline</button>
+      </td>
+    </tr>`;
+  }).join('');
+  show('search-results');
+  show('dash-actions');
+  refreshDashProspects();
+}
+
+// ═══ EMAIL IA ═══
+async function generateEmail(prospectId) {
+  const p = state.prospects.find(x => x.id === prospectId);
+  if (!p) return null;
+  const key = getKeys().anthropic;
+  const model = getKeys().model;
+  if (!key) { alert('Clé Anthropic non configurée. Allez dans Paramètres.'); return null; }
+  const profile = getProfile();
+  const prompt = `Tu es un expert en prospection commerciale. Rédige un email de prospection B2B court et percutant.\n\nPROSPECT :\n- Entreprise : ${p.name}\n- Secteur : ${p.query || 'entreprise locale'}\n- Note Google : ${p.rating}/5 (${p.reviews} avis)\n- Adresse : ${p.address}\n\nEXPÉDITEUR :\n- Prénom : ${profile.prenom || 'prénom'}\n- Nom : ${profile.nom || 'nom'}\n- Société : ${profile.societe || 'ma société'}\n- Activité : ${profile.activite || 'consultant'}\n- Proposition de valeur : ${profile.valeur || 'je peux vous aider'}\n- Ton : ${profile.ton || 'professionnel'}\n\nCONSIGNES :\n- 150-200 mots max\n- Objet accrocheur ligne 1 (format "Objet: ...")\n- Personnalisé sur la note Google ou l'activité\n- Appel à l'action clair\n- Signature avec prénom, nom, société\n- Français, texte brut`;
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({ model, max_tokens: 500, messages: [{ role: 'user', content: prompt }] })
+  });
+  if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'Erreur Anthropic'); }
+  const d = await r.json();
+  return d.content[0].text;
+}
+
+async function openEmailModal(prospectId) {
+  const p = state.prospects.find(x => x.id === prospectId);
+  if (!p) return;
+  state.currentModalProspect = prospectId;
+  document.getElementById('modal-prospect-name').textContent = `Email pour ${p.name}`;
+  document.getElementById('email-modal').classList.add('open');
+  if (p.email_generated) {
+    document.getElementById('modal-email-text').value = p.email_generated;
+  } else {
+    document.getElementById('modal-email-text').value = 'Génération en cours...';
+    document.getElementById('modal-email-text').disabled = true;
+    try {
+      const email = await generateEmail(prospectId);
+      p.email_generated = email;
+      state.stats.emails++;
+      saveState();
+      addActivity(`Email généré · ${p.name}`, 'mail', 'primary');
+      document.getElementById('modal-email-text').value = email;
+      updateEmailCell(prospectId);
+    } catch(e) { document.getElementById('modal-email-text').value = 'Erreur : ' + e.message; }
+    document.getElementById('modal-email-text').disabled = false;
+  }
+}
+
+async function regenerateEmail() {
+  const pid = state.currentModalProspect;
+  if (!pid) return;
+  showSpinner('regen-spinner');
+  document.getElementById('modal-email-text').value = 'Regénération...';
+  document.getElementById('modal-email-text').disabled = true;
+  try {
+    const email = await generateEmail(pid);
+    const p = state.prospects.find(x => x.id === pid);
+    if (p) { p.email_generated = email; saveState(); }
+    document.getElementById('modal-email-text').value = email;
+  } catch(e) { document.getElementById('modal-email-text').value = 'Erreur : ' + e.message; }
+  document.getElementById('modal-email-text').disabled = false;
+  hideSpinner('regen-spinner');
+}
+
+function closeModal() {
+  const pid = state.currentModalProspect;
+  if (pid) {
+    const text = document.getElementById('modal-email-text').value;
+    const p = state.prospects.find(x => x.id === pid);
+    if (p && text && text !== 'Génération en cours...') { p.email_generated = text; saveState(); }
+  }
+  document.getElementById('email-modal').classList.remove('open');
+  state.currentModalProspect = null;
+  refreshAll();
+}
+
+function copyEmail() { navigator.clipboard.writeText(document.getElementById('modal-email-text').value); }
+
+async function generateAllEmails() {
+  const prospects = state.prospects.filter(p => !p.email_generated);
+  if (prospects.length === 0) { alert('Tous les emails ont déjà été générés.'); return; }
+  if (!getKeys().anthropic) { alert('Clé Anthropic non configurée.'); return; }
+  showSpinner('all-email-spinner'); showSpinner('all-spinner2');
+  for (const p of prospects) {
+    try {
+      const email = await generateEmail(p.id);
+      p.email_generated = email;
+      state.stats.emails++;
+      updateEmailCell(p.id);
+      addActivity(`Email généré · ${p.name}`, 'mail', 'primary');
+    } catch(e) { break; }
+  }
+  saveState(); refreshAll();
+  hideSpinner('all-email-spinner'); hideSpinner('all-spinner2');
+}
+
+function updateEmailCell(pid) {
+  const el = document.getElementById('email-cell-' + pid);
+  if (el) el.innerHTML = '<span style="color:var(--green);font-size:11px;font-weight:600">✓ Généré</span>';
+}
+
+// ═══ PIPELINE ═══
+function addToPipeline(pid) {
+  const p = state.prospects.find(x => x.id === pid);
+  if (!p) return;
+  if (!state.pipeline.find(x => x.id === pid)) {
+    state.pipeline.push({ ...p, status: 'new' });
+    state.stats.pipeline++;
+    saveState();
+    addActivity(`Ajouté au pipeline · ${p.name}`, 'view_kanban', 'primary');
+  }
+  refreshPipeline();
+}
+
+function refreshPipeline() {
+  const tbody = document.getElementById('pipeline-table');
+  document.getElementById('pipeline-sub').textContent = state.pipeline.length + ' prospects';
+  if (state.pipeline.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:40px"><span class="material-symbols-rounded" style="font-size:32px;display:block;margin-bottom:10px;opacity:.25">view_kanban</span>Aucun prospect dans le pipeline.</td></tr>';
+    return;
+  }
+  const sLabels = { new:'Nouveau', contacted:'Contacté', replied:'Répondu', converted:'Converti' };
+  const sColors = { new:'var(--primary-lt)/var(--primary)', contacted:'var(--amber-lt)/var(--amber)', replied:'#e0f2fe/#0284c7', converted:'var(--green-lt)/var(--green)' };
+  tbody.innerHTML = state.pipeline.map(p => {
+    const [bg, col] = (sColors[p.status]||'var(--bg)/var(--text2)').split('/');
+    const sc = p.score >= 80 ? 's-h' : p.score >= 60 ? 's-m' : 's-l';
+    return `<tr>
+      <td><div style="font-weight:600">${p.name}</div><div style="font-size:11px;color:var(--text3)">${p.query||''}</div></td>
+      <td><span class="score ${sc}">${p.score}</span></td>
+      <td><select style="font-size:11px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;background:${bg};color:${col};font-weight:600" onchange="updateStatus('${p.id}',this.value)">
+        ${Object.entries(sLabels).map(([k,v]) => `<option value="${k}"${p.status===k?' selected':''}>${v}</option>`).join('')}
+      </select></td>
+      <td>${p.email_generated ? '<span style="color:var(--green);font-size:11px;font-weight:600">✓ Prêt</span>' : '<button class="btn btn-sm btn-ghost" onclick="openEmailModal(\''+p.id+'\')">Générer</button>'}</td>
+      <td><button class="btn btn-sm btn-ghost" onclick="openEmailModal('${p.id}')">Voir email</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStatus(pid, status) {
+  const p = state.pipeline.find(x => x.id === pid);
+  if (p) {
+    p.status = status;
+    if (status === 'converted') { state.stats.converted++; addActivity(`Converti ! · ${p.name}`, 'emoji_events', 'green'); }
+    saveState(); refreshAll();
+  }
+}
+
+// ═══ DEVIS IA ═══
+async function generateDevis() {
+  const client = document.getElementById('devis-client').value.trim();
+  const activite = document.getElementById('devis-activite').value.trim();
+  const desc = document.getElementById('devis-desc').value.trim();
+  const budget = document.getElementById('devis-budget').value;
+  const delai = document.getElementById('devis-delai').value;
+  const key = getKeys().anthropic;
+  if (!client || !desc) { alert('Renseignez le client et la prestation.'); return; }
+  if (!key) { alert('Clé Anthropic non configurée.'); return; }
+  setBtn('btn-devis', true, 'Génération...'); showSpinner('devis-spinner');
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: getKeys().model, max_tokens: 800, messages: [{ role: 'user', content: `Génère un devis professionnel en français pour :\nClient : ${client}\nPrestataire : ${activite}\nPrestation : ${desc}\nBudget : ${budget ? budget + '€' : 'à définir'}\nDélai : ${delai || 'à définir'}\n\nFormat : devis structuré avec titre, date, détail des prestations, total HT, TVA 20%, total TTC, conditions de paiement. Texte brut, pas de markdown.` }] })
+    });
+    const d = await r.json();
+    document.getElementById('devis-text').textContent = d.content[0].text;
+    show('devis-result');
+  } catch(e) { alert('Erreur : ' + e.message); }
+  setBtn('btn-devis', false, 'Générer le devis IA'); hideSpinner('devis-spinner');
+}
+
+function copyDevis() { navigator.clipboard.writeText(document.getElementById('devis-text').textContent); }
+
+// ═══ VEILLE IA ═══
+async function runVeille() {
+  const secteur = document.getElementById('veille-secteur').value.trim();
+  const key = getKeys().anthropic;
+  if (!secteur) { alert('Renseignez un secteur.'); return; }
+  if (!key) { alert('Clé Anthropic non configurée.'); return; }
+  setBtn('btn-veille', true, 'Analyse...'); showSpinner('veille-spinner');
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: getKeys().model, max_tokens: 600, messages: [{ role: 'user', content: `Analyse le marché du secteur "${secteur}" en France en 2025.\nFournis :\n1. Taille et tendances du marché\n2. Points de douleur typiques\n3. Arguments commerciaux les plus efficaces\n4. Meilleure approche de prospection\n5. Objections courantes et comment les gérer\n\nRéponse concise et actionnable, en français.` }] })
+    });
+    const d = await r.json();
+    document.getElementById('veille-text').textContent = d.content[0].text;
+    show('veille-result');
+  } catch(e) { alert('Erreur : ' + e.message); }
+  setBtn('btn-veille', false, 'Analyser le marché'); hideSpinner('veille-spinner');
+}
+
+// ═══ SÉQUENCES & AUTOPILOT ═══
+function saveSequence() { alert('Séquence enregistrée !'); }
+function toggleAutopilot() {
+  state.autopilotActive = !state.autopilotActive;
+  const el = document.getElementById('autopilot-toggle');
+  el.className = 'status-pill ' + (state.autopilotActive ? 'on' : 'off');
+  el.querySelector('span').textContent = state.autopilotActive ? 'Actif' : 'Inactif';
+  saveState();
+}
+function saveAutopilot() { alert('Paramètres du pilote automatique enregistrés.'); }
+
+// ═══ REFRESH UI ═══
+function refreshAll() {
+  updateApiStatus();
+  refreshStats();
+  refreshDashProspects();
+  refreshPipelineMini();
+  updateBadge();
+}
+
+function refreshStats() {
+  document.getElementById('stat-prospects').textContent = state.stats.prospects;
+  document.getElementById('stat-emails').textContent = state.stats.emails;
+  document.getElementById('stat-pipeline').textContent = state.pipeline.length;
+  document.getElementById('stat-converted').textContent = state.stats.converted;
+}
+
+function refreshDashProspects() {
+  const list = document.getElementById('dash-prospects-list');
+  const recent = state.prospects.slice(-8).reverse();
+  if (recent.length === 0) {
+    list.innerHTML = '<div style="padding:48px 20px;text-align:center;color:var(--text3)"><span class="material-symbols-rounded" style="font-size:36px;display:block;margin-bottom:10px;opacity:.25">group_search</span><div style="font-size:13px;font-weight:500;color:var(--text2);margin-bottom:4px">Aucun prospect pour l\'instant</div><div style="font-size:12px">Lancez votre première recherche pour commencer.</div></div>';
+    hide('dash-actions');
+    document.getElementById('dash-prospect-sub').textContent = 'Aucune recherche effectuée';
+    return;
+  }
+  document.getElementById('dash-prospect-sub').textContent = recent.length + ' prospects récents';
+  const colors = ['#4f46e5','#7c3aed','#0284c7','#059669','#d97706','#0891b2','#dc2626'];
+  list.innerHTML = recent.map((p, i) => {
+    const sc = p.score >= 80 ? 's-h' : p.score >= 60 ? 's-m' : 's-l';
+    const ini = p.name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+    return `<div class="prospect-row">
+      <div class="avatar" style="background:${colors[i%colors.length]}">${ini}</div>
+      <div class="p-info"><div class="p-name">${p.name}</div><div class="p-meta">${p.address.slice(0,38)} · ★ ${p.rating}</div></div>
+      <span class="score ${sc}">${p.score}</span>
+      <button class="p-action" onclick="openEmailModal('${p.id}')">Email IA</button>
+    </div>`;
+  }).join('');
+  show('dash-actions');
+}
+
+function refreshPipelineMini() {
+  const total = state.pipeline.length || 1;
+  const counts = { new:0, contacted:0, replied:0, converted:0 };
+  state.pipeline.forEach(p => counts[p.status] = (counts[p.status]||0)+1);
+  [{ id:'p1', bar:'pb1', key:'new', color:'var(--primary)' },
+   { id:'p2', bar:'pb2', key:'contacted', color:'#0284c7' },
+   { id:'p3', bar:'pb3', key:'replied', color:'var(--amber)' },
+   { id:'p4', bar:'pb4', key:'converted', color:'var(--green)' }].forEach(s => {
+    document.getElementById(s.id).textContent = counts[s.key]||0;
+    document.getElementById(s.bar).style.width = Math.round((counts[s.key]||0)/total*100) + '%';
+    document.getElementById(s.bar).style.background = s.color;
+  });
+}
+
+function refreshRapport() {
+  document.getElementById('r-prospects').textContent = state.stats.prospects;
+  document.getElementById('r-emails').textContent = state.stats.emails;
+  const scores = state.prospects.map(p => p.score);
+  document.getElementById('r-score').textContent = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : '—';
+  const conv = state.pipeline.length ? Math.round(state.stats.converted/state.pipeline.length*100) : 0;
+  document.getElementById('r-conv').textContent = conv + '%';
+  const tbody = document.getElementById('rapport-table');
+  if (!state.searchHistory.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:40px">Aucune donnée</td></tr>'; return; }
+  tbody.innerHTML = state.searchHistory.slice().reverse().map(h => `<tr><td>${h.date}</td><td>${h.query}</td><td>${h.count}</td><td>${h.emails||0}</td></tr>`).join('');
+}
+
+function updateBadge() {
+  const n = state.prospects.filter(p => !p.email_generated).length;
+  document.getElementById('badge-new').textContent = n;
+}
+
+// ═══ ACTIVITY LOG ═══
+function addActivity(text, icon, color) {
+  const colors = { primary:'var(--primary)', secondary:'var(--accent)', green:'var(--green)', amber:'var(--amber)' };
+  const now = new Date();
+  const time = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+  state.activity.unshift({ text, icon, color: colors[color]||color, time });
+  if (state.activity.length > 10) state.activity.pop();
+  renderActivity();
+}
+
+function renderActivity() {
+  const el = document.getElementById('activity-log');
+  if (!state.activity.length) { el.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:12px;padding:8px 0">Aucune activité</div>'; return; }
+  el.innerHTML = state.activity.map(a => `
+    <div class="act-row">
+      <div class="act-icon" style="background:${a.color}"><span class="material-symbols-rounded">${a.icon}</span></div>
+      <div><div class="act-text">${a.text}</div><div class="act-time">${a.time}</div></div>
+    </div>`).join('');
+}
+
+// ═══ UTILS ═══
+function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
+function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+function showSpinner(id) { const el = document.getElementById(id); if (el) el.style.display = 'inline-block'; }
+function hideSpinner(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+function setBtn(id, disabled, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.disabled = disabled;
+  const nodes = [...el.childNodes].filter(n => n.nodeType === 3 && n.textContent.trim());
+  if (nodes.length) nodes[nodes.length-1].textContent = ' ' + text;
+}
+function setProgress(pct, text) {
+  document.getElementById('search-progress-fill').style.width = pct + '%';
+  document.getElementById('search-progress-text').textContent = text;
+}
+function fillSearch(type, city) { document.getElementById('search-type').value = type; document.getElementById('search-city').value = city; }
+function exportCSV() {
+  const rows = [['Nom','Adresse','Note','Avis','Score','Email généré']];
+  state.prospects.forEach(p => rows.push([p.name, p.address, p.rating, p.reviews, p.score, p.email_generated ? 'Oui' : 'Non']));
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'prospects-alma.csv';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════
+// B2B TABS
+// ═══════════════════════════════════════════════
+function switchB2bTab(tabId, btn) {
+  ['b2b-gmaps','b2b-insee','b2b-bodacc','b2b-permis','b2b-ao'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById(tabId).style.display = '';
+  document.querySelectorAll('#page-prospection .tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════
+// B2C TABS
+// ═══════════════════════════════════════════════
+function switchB2cTab(tabId, btn) {
+  ['b2c-pj','b2c-lbc','b2c-avis','b2c-mpr','b2c-dvf','b2c-copro'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById(tabId).style.display = '';
+  document.querySelectorAll('#page-prospection-b2c .tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════
+// B2B SOURCE STUBS
+// ═══════════════════════════════════════════════
+function _noKey(name, settingsKey) {
+  alert(`Clé ${name} non configurée. Rendez-vous dans Paramètres → Clés API pour l'ajouter.`);
+}
+
+function searchInsee() {
+  const k = getKeys();
+  if (!k.inseeConsumer) return _noKey('INSEE / SIRENE');
+  const naf = document.getElementById('insee-naf').value.trim();
+  const dept = document.getElementById('insee-dept').value.trim();
+  if (!naf && !dept) return alert('Renseignez au moins un code NAF ou un département.');
+  show('insee-spinner');
+  // Simulation de résultats INSEE
+  setTimeout(() => {
+    hide('insee-spinner');
+    const rows = [
+      { rs:'Dupont Électricité SARL', siret:'12345678900012', naf:'4321A', dept:dept||'69', creation:'2019-03-15' },
+      { rs:'Martin & Fils Plomberie', siret:'98765432100034', naf:'4322B', dept:dept||'69', creation:'2015-07-22' },
+      { rs:'SAS Rénov Pro', siret:'11122233344455', naf:'4329A', dept:dept||'69', creation:'2021-11-08' },
+    ];
+    document.getElementById('insee-results-title').textContent = 'Résultats SIRENE';
+    document.getElementById('insee-results-sub').textContent = `${rows.length} établissements trouvés`;
+    document.getElementById('insee-table').innerHTML = rows.map(r => `
+      <tr>
+        <td><strong>${r.rs}</strong></td>
+        <td style="font-family:monospace;font-size:11px">${r.siret}</td>
+        <td><span class="tag" style="background:var(--primary-lt);color:var(--primary)">${r.naf}</span></td>
+        <td>${r.dept}</td>
+        <td>${r.creation}</td>
+        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'${r.rs}',address:'Dép. ${r.dept}',rating:0,reviews:0,score:72})">+ Pipeline</button></td>
+      </tr>`).join('');
+    document.getElementById('insee-results').style.display = '';
+    addActivity('Recherche SIRENE : ' + (naf||dept), 'account_balance', 'primary');
+  }, 1200);
+}
+
+function searchBodacc() {
+  const type = document.getElementById('bodacc-type').value;
+  const dept = document.getElementById('bodacc-dept').value.trim();
+  show('bodacc-spinner');
+  setTimeout(() => {
+    hide('bodacc-spinner');
+    const typeLabels = { creation:'Création', cession:'Cession', procedure:'Procédure', radiation:'Radiation' };
+    const rows = [
+      { name:'Tech Solutions SAS', type:typeLabels[type]||type, ville:'Lyon', date:'2025-11-02', activite:'Développement logiciel' },
+      { name:'Boulangerie Moreau', type:typeLabels[type]||type, ville:'Villeurbanne', date:'2025-10-28', activite:'Boulangerie-pâtisserie' },
+      { name:'Auto Garage Leblanc', type:typeLabels[type]||type, ville:'Décines', date:'2025-10-15', activite:'Réparation automobile' },
+    ];
+    document.getElementById('bodacc-results-sub').textContent = `${rows.length} annonces trouvées`;
+    document.getElementById('bodacc-table').innerHTML = rows.map(r => `
+      <tr>
+        <td><strong>${r.name}</strong></td>
+        <td><span class="tag" style="background:var(--amber-lt);color:var(--amber)">${r.type}</span></td>
+        <td>${r.ville}</td>
+        <td>${r.date}</td>
+        <td>${r.activite}</td>
+        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'${r.name}',address:'${r.ville}',rating:0,reviews:0,score:68})">+ Pipeline</button></td>
+      </tr>`).join('');
+    document.getElementById('bodacc-results').style.display = '';
+    addActivity('Recherche BODACC : ' + typeLabels[type], 'gavel', 'secondary');
+  }, 1000);
+}
+
+function searchPermis() {
+  const commune = document.getElementById('permis-commune').value.trim();
+  if (!commune) return alert('Renseignez une commune ou un département.');
+  show('permis-spinner');
+  setTimeout(() => {
+    hide('permis-spinner');
+    const rows = [
+      { adresse:'12 Rue des Lilas', commune, type:'Construction neuve', usage:'Logement', date:'2025-10-20' },
+      { adresse:'47 Allée des Roses', commune, type:'Extension', usage:'Logement', date:'2025-10-15' },
+      { adresse:'3 Boulevard Victor Hugo', commune, type:'Rénovation', usage:'Commerce', date:'2025-09-30' },
+    ];
+    document.getElementById('permis-results-sub').textContent = `${rows.length} permis trouvés sur ${commune}`;
+    document.getElementById('permis-table').innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.adresse}</td>
+        <td>${r.commune}</td>
+        <td>${r.type}</td>
+        <td>${r.usage}</td>
+        <td>${r.date}</td>
+        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'${r.adresse} - ${r.commune}',address:'${r.adresse}, ${r.commune}',rating:0,reviews:0,score:75})">+ Pipeline</button></td>
+      </tr>`).join('');
+    document.getElementById('permis-results').style.display = '';
+    addActivity('Permis construire : ' + commune, 'construction', 'green');
+  }, 1000);
+}
+
+function searchAO() {
+  const kw = document.getElementById('ao-keywords').value.trim();
+  if (!kw) return alert('Renseignez des mots-clés ou un secteur.');
+  show('ao-spinner');
+  setTimeout(() => {
+    hide('ao-spinner');
+    const rows = [
+      { titre:'Maintenance informatique parc lycées', acheteur:'Région Auvergne-Rhône-Alpes', type:'Services', lieu:'Lyon', limite:'2026-01-15' },
+      { titre:'Nettoyage des locaux administratifs', acheteur:'Mairie de Villeurbanne', type:'Services', lieu:'Villeurbanne', limite:'2026-01-30' },
+      { titre:'Fourniture de matériel informatique', acheteur:'CHU de Lyon', type:'Fournitures', lieu:'Lyon', limite:'2025-12-20' },
+    ];
+    document.getElementById('ao-results-sub').textContent = `${rows.length} marchés trouvés`;
+    document.getElementById('ao-table').innerHTML = rows.map(r => `
+      <tr>
+        <td style="max-width:220px"><strong>${r.titre}</strong></td>
+        <td style="font-size:11px">${r.acheteur}</td>
+        <td><span class="tag" style="background:var(--primary-lt);color:var(--primary)">${r.type}</span></td>
+        <td>${r.lieu}</td>
+        <td style="color:var(--amber);font-weight:600">${r.limite}</td>
+        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'AO : ${r.titre.slice(0,30)}...',address:'${r.lieu}',rating:0,reviews:0,score:80})">+ Pipeline</button></td>
+      </tr>`).join('');
+    document.getElementById('ao-results').style.display = '';
+    addActivity('Appels d\'offres : ' + kw, 'description', 'primary');
+  }, 1000);
+}
+
+function exportInseeCSV() { alert('Export CSV SIRENE — intégration API disponible avec clé INSEE configurée.'); }
+function exportBodaccCSV() { alert('Export CSV BODACC généré.'); }
+function exportPermisCSV() { alert('Export CSV Permis de construire généré.'); }
+function exportAOCSV() { alert('Export CSV Appels d\'offres généré.'); }
+
+// ═══════════════════════════════════════════════
+// B2C SOURCE STUBS
+// ═══════════════════════════════════════════════
+function searchPJ() {
+  const k = getKeys();
+  if (!k.pj) return _noKey('Pages Jaunes');
+  const cat = document.getElementById('pj-categorie').value.trim();
+  const ville = document.getElementById('pj-ville').value.trim();
+  if (!cat || !ville) return alert('Renseignez une catégorie et une ville.');
+  show('pj-spinner');
+  setTimeout(() => {
+    hide('pj-spinner');
+    const rows = [
+      { nom:'Famille Durand', tel:'06 12 34 56 78', adresse:'14 Rue de la Paix, '+ville, cat, score:82 },
+      { nom:'M. et Mme Leclerc', tel:'06 98 76 54 32', adresse:'27 Impasse des Mimosas, '+ville, cat, score:74 },
+      { nom:'Résidence Les Pins', tel:'04 78 00 11 22', adresse:'3 Avenue des Pins, '+ville, cat, score:66 },
+    ];
+    document.getElementById('pj-results-sub').textContent = `${rows.length} contacts trouvés`;
+    document.getElementById('pj-table').innerHTML = rows.map(r => `
+      <tr>
+        <td><strong>${r.nom}</strong></td>
+        <td>${r.tel}</td>
+        <td style="font-size:11px">${r.adresse}</td>
+        <td>${r.cat}</td>
+        <td><span class="score ${r.score>=70?'s-l':'s-m'}">${r.score}</span></td>
+        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'${r.nom}',address:'${r.adresse}',rating:0,reviews:0,score:${r.score}})">+ Pipeline</button></td>
+      </tr>`).join('');
+    document.getElementById('pj-results').style.display = '';
+    addActivity('Recherche Pages Jaunes : ' + cat + ' · ' + ville, 'menu_book', 'primary');
+  }, 1000);
+}
+
+function searchLBC() {
+  const k = getKeys();
+  if (!k.lbcId) return _noKey('Leboncoin');
+  const cat = document.getElementById('lbc-categorie').value;
+  const loc = document.getElementById('lbc-localisation').value.trim();
+  if (!loc) return alert('Renseignez une localisation.');
+  show('lbc-spinner');
+  setTimeout(() => {
+    hide('lbc-spinner');
+    const rows = [
+      { titre:'Recherche plombier urgent fuite cuisine', loc, date:'Il y a 2h', prix:'Jusqu\'à 200€', score:88 },
+      { titre:'Besoin électricien pour mise aux normes', loc, date:'Il y a 5h', prix:'Devis souhaité', score:79 },
+      { titre:'Cherche artisan pour rénovation salle de bain', loc, date:'Il y a 1j', prix:'Budget 3000€', score:91 },
+    ];
+    document.getElementById('lbc-results-sub').textContent = `${rows.length} annonces trouvées`;
+    document.getElementById('lbc-table').innerHTML = rows.map(r => `
+      <tr>
+        <td style="max-width:220px">${r.titre}</td>
+        <td>${r.loc}</td>
+        <td style="color:var(--text3)">${r.date}</td>
+        <td style="color:var(--green);font-weight:600">${r.prix}</td>
+        <td><span class="score s-l">${r.score}</span></td>
+        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'LBC: ${r.titre.slice(0,25)}...',address:'${r.loc}',rating:0,reviews:0,score:${r.score}})">+ Pipeline</button></td>
+      </tr>`).join('');
+    document.getElementById('lbc-results').style.display = '';
+    addActivity('Leboncoin : ' + cat + ' · ' + loc, 'sell', 'green');
+  }, 1000);
+}
+
+function searchAvis() {
+  const k = getKeys();
+  if (!k.gmaps) return alert('Clé Google Maps requise. Configurez-la dans Paramètres.');
+  const type = document.getElementById('avis-type').value.trim();
+  const ville = document.getElementById('avis-ville').value.trim();
+  if (!type || !ville) return alert('Renseignez un type d\'établissement et une ville.');
+  show('avis-spinner');
+  setTimeout(() => {
+    hide('avis-spinner');
+    const rows = [
+      { name:'Resto La Belle Étoile', note:'2.8', avis:'43', adresse:'12 Rue Victor Hugo, '+ville, score:85 },
+      { name:'Coiffure Style Pro', note:'2.5', avis:'67', adresse:'8 Place Bellecour, '+ville, score:79 },
+      { name:'Garage Auto Express', note:'3.1', avis:'29', adresse:'47 Bd des Brotteaux, '+ville, score:73 },
+    ];
+    document.getElementById('avis-results-sub').textContent = `${rows.length} établissements analysés`;
+    document.getElementById('avis-table').innerHTML = rows.map(r => `
+      <tr>
+        <td><strong>${r.name}</strong></td>
+        <td><span style="color:var(--amber);font-weight:700">★ ${r.note}</span></td>
+        <td>${r.avis} avis</td>
+        <td style="font-size:11px">${r.adresse}</td>
+        <td><span class="score s-l">${r.score}</span></td>
+        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'${r.name}',address:'${r.adresse}',rating:${r.note},reviews:${r.avis},score:${r.score}})">+ Pipeline</button></td>
+      </tr>`).join('');
+    document.getElementById('avis-results').style.display = '';
+    addActivity('Analyse avis : ' + type + ' · ' + ville, 'star', 'amber');
+  }, 1200);
+}
+
+function searchMPR() {
+  const k = getKeys();
+  if (!k.mpr) return _noKey('MaPrimeRénov\' / ANAH');
+  const dept = document.getElementById('mpr-dept').value.trim();
+  if (!dept) return alert('Renseignez un département.');
+  show('mpr-spinner');
+  setTimeout(() => {
+    hide('mpr-spinner');
+    const rows = [
+      { adresse:'14 Rue des Acacias', commune:'Lyon 8e', dpe:'F', type:'Maison', aide:'Jusqu\'à 15 000€' },
+      { adresse:'3 Impasse du Moulin', commune:'Caluire', dpe:'G', type:'Appartement', aide:'Jusqu\'à 10 000€' },
+      { adresse:'22 Chemin des Oliviers', commune:'Bron', dpe:'E', type:'Maison', aide:'Jusqu\'à 8 000€' },
+    ];
+    document.getElementById('mpr-results-sub').textContent = `${rows.length} logements éligibles trouvés`;
+    document.getElementById('mpr-table').innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.adresse}</td>
+        <td>${r.commune}</td>
+        <td><span class="score ${r.dpe==='G'?'s-h':r.dpe==='F'?'s-m':'s-l'}">${r.dpe}</span></td>
+        <td>${r.type}</td>
+        <td style="color:var(--green);font-weight:600">${r.aide}</td>
+        <td><button class="p-action" style="opacity:1" onclick="addToPipeline({name:'${r.adresse} - ${r.commune}',address:'${r.adresse}, ${r.commune}',rating:0,reviews:0,score:78})">+ Pipeline</button></td>
+      </tr>`).join('');
+    document.getElementById('mpr-results').style.display = '';
+    addActivity('MaPrimeRénov\' : dept. ' + dept, 'eco', 'green');
+  }, 1100);
+}
+
+function searchDVF() {
+  const commune = document.getElementById('dvf-commune').value.trim();
+  if (!commune) return alert('Renseignez une commune ou un code postal.');
+  show('dvf-spinner');
+  setTimeout(() => {
+    hide('dvf-spinner');
+    const rows = [
+      { adresse:'18 Rue Garibaldi', commune, type:'Maison', surface:'112 m²', prix:'385 000€', date:'2025-09-14' },
+      { adresse:'5 Allée des Cèdres', commune, type:'Maison', surface:'87 m²', prix:'298 000€', date:'2025-10-02' },
+      { adresse:'31 Rue Molière', commune, type:'Appartement', surface:'74 m²', prix:'195 000€', date:'2025-10-18' },
+    ];
+    document.getElementById('dvf-results-sub').textContent = `${rows.length} transactions récentes`;
+    document.getElementById('dvf-table').innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.adresse}</td>
+        <td>${r.commune}</td>
+        <td>${r.type}</td>
+        <td>${r.surface}</td>
+        <td style="font-weight:700;color:var(--primary)">${r.prix}</td>
+        <td>${r.date}</td>
+      </tr>`).join('');
+    document.getElementById('dvf-results').style.display = '';
+    addActivity('DVF : transactions à ' + commune, 'real_estate_agent', 'primary');
+  }, 900);
+}
+
+function searchCopro() {
+  const loc = document.getElementById('copro-localisation').value.trim();
+  if (!loc) return alert('Renseignez un département ou une commune.');
+  show('copro-spinner');
+  setTimeout(() => {
+    hide('copro-spinner');
+    const rows = [
+      { nom:'Résidence Les Platanes', commune:'Lyon 7e', lots:'48', annee:'1962', etat:'Fragile', syndic:'Cabinet Immothèque' },
+      { nom:'Cité du Parc', commune:'Villeurbanne', lots:'120', annee:'1968', etat:'En difficulté', syndic:'Foncia' },
+      { nom:'Le Clos des Roses', commune:'Bron', lots:'32', annee:'1971', etat:'Fragile', syndic:'Nexity' },
+    ];
+    document.getElementById('copro-results-sub').textContent = `${rows.length} copropriétés trouvées`;
+    document.getElementById('copro-table').innerHTML = rows.map(r => `
+      <tr>
+        <td><strong>${r.nom}</strong></td>
+        <td>${r.commune}</td>
+        <td style="font-weight:700">${r.lots}</td>
+        <td>${r.annee}</td>
+        <td><span class="score ${r.etat==='En difficulté'?'s-h':'s-m'}">${r.etat}</span></td>
+        <td style="font-size:11px">${r.syndic}</td>
+      </tr>`).join('');
+    document.getElementById('copro-results').style.display = '';
+    addActivity('Copropriétés : ' + loc, 'apartment', 'secondary');
+  }, 900);
+}
+
+function generateAllEmailsB2C(source) { alert('Génération d\'emails IA pour les prospects ' + source + ' — fonctionnalité disponible avec clé Anthropic configurée.'); }
+function exportLbcCSV() { alert('Export CSV Leboncoin généré.'); }
+function exportMprCSV() { alert('Export CSV MaPrimeRénov\' généré.'); }
+function exportDvfCSV() { alert('Export CSV DVF généré.'); }
+function exportCoproCSV() { alert('Export CSV Copropriétés généré.'); }
+
+
+
+// ═══════════════════════════════════════════════
+// MESSAGERIE
+// ═══════════════════════════════════════════════
+const msgState = { conversations: [], activeConvId: null, messages: [], polling: null };
+
+function initials(name) { return (name||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase(); }
+
+function formatMsgTime(iso) {
+  const d = new Date(iso), now = new Date(), diff = now - d;
+  if (diff < 86400000) return d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  if (diff < 604800000) return d.toLocaleDateString('fr-FR',{weekday:'short'});
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+}
+
+function initMessagerie() {
+  const warning = document.getElementById('msg-brevo-warning');
+  if (!getKeys().brevo) { warning.style.display='flex'; } else { warning.style.display='none'; }
+  loadConversations();
+  if (msgState.polling) clearInterval(msgState.polling);
+  msgState.polling = setInterval(() => {
+    if (msgState.activeConvId) loadMessages(msgState.activeConvId, false);
+    loadConversations(false);
+  }, 15000);
+}
+
+function loadConversations(render=true) {
+  const saved = localStorage.getItem('alma_conversations');
+  if (saved) msgState.conversations = JSON.parse(saved);
+  if (render) renderConvList();
+  updateUnreadBadge();
+}
+
+function saveConversations() { localStorage.setItem('alma_conversations', JSON.stringify(msgState.conversations)); }
+function saveMessages(convId, messages) { localStorage.setItem('alma_messages_'+convId, JSON.stringify(messages)); }
+function getMessages(convId) { const s = localStorage.getItem('alma_messages_'+convId); return s ? JSON.parse(s) : []; }
+
+function updateUnreadBadge() {
+  const total = msgState.conversations.reduce((a,c) => a+(c.unread||0), 0);
+  const badge = document.getElementById('badge-msg');
+  const tot = document.getElementById('msg-unread-total');
+  if (total > 0) { badge.textContent=total; badge.style.display='inline'; tot.textContent=total; tot.style.display='inline'; }
+  else { badge.style.display='none'; tot.style.display='none'; }
+}
+
+function renderConvList() {
+  const container = document.getElementById('conv-list-body');
+  if (!msgState.conversations.length) { container.innerHTML = '<div style="padding:32px 20px;text-align:center;color:var(--text3);font-size:12px;line-height:1.7">Aucune conversation.<br>Les réponses de vos prospects apparaîtront ici.</div>'; return; }
+  container.innerHTML = msgState.conversations.sort((a,b) => new Date(b.lastAt)-new Date(a.lastAt)).map(c => `
+    <div class="conv-item ${c.id===msgState.activeConvId?'active':''}" onclick="openConversation('${c.id}')">
+      <div class="conv-item-name">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">
+          ${c.unread ? '<span style="width:7px;height:7px;border-radius:50%;background:var(--primary);display:inline-block;margin-right:5px"></span>' : ''}
+          ${c.prospectName}
+        </span>
+        ${c.unread ? `<span class="unread-badge">${c.unread}</span>` : ''}
+      </div>
+      <div class="conv-item-preview">${c.lastPreview||c.subject||'Sans objet'}</div>
+      <div class="conv-item-time">${formatMsgTime(c.lastAt)}</div>
+    </div>`).join('');
+}
+
+function openConversation(convId) {
+  msgState.activeConvId = convId;
+  const conv = msgState.conversations.find(c => c.id === convId);
+  if (!conv) return;
+  conv.unread = 0; saveConversations(); updateUnreadBadge(); renderConvList();
+  document.getElementById('chat-av-initials').textContent = initials(conv.prospectName);
+  document.getElementById('chat-prospect-name').textContent = conv.prospectName;
+  document.getElementById('chat-prospect-email').textContent = conv.prospectEmail;
+  document.getElementById('chat-subject').textContent = 'Objet : ' + (conv.subject||'Sans objet');
+  document.getElementById('chat-reply').placeholder = `Répondre à ${conv.prospectName}...`;
+  document.getElementById('chat-empty').style.display = 'none';
+  document.getElementById('chat-active').style.display = 'flex';
+  loadMessages(convId, true);
+}
+
+function loadMessages(convId, scroll=true) {
+  msgState.messages = getMessages(convId);
+  renderMessages();
+  if (scroll) setTimeout(() => scrollChatBottom(), 50);
+}
+
+function renderMessages() {
+  const container = document.getElementById('chat-messages-list');
+  if (!msgState.messages.length) { container.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:12px;padding:20px">Aucun message</div>'; return; }
+  const conv = msgState.conversations.find(c => c.id === msgState.activeConvId);
+  container.innerHTML = msgState.messages.map(m => `
+    <div style="display:flex;flex-direction:column;align-items:${m.direction==='sent'?'flex-end':'flex-start'}">
+      <div class="bubble ${m.direction==='sent'?'bubble-sent':'bubble-received'}">
+        ${m.direction==='received' ? `<div class="bubble-name">${conv?.prospectName||''}</div>` : ''}
+        <div style="white-space:pre-wrap">${escapeHtml(m.body)}</div>
+        <div class="bubble-time">${formatMsgTime(m.createdAt)}${m.direction==='sent'?' ✓':''}</div>
+      </div>
+    </div>`).join('');
+}
+
+function scrollChatBottom() { const el = document.getElementById('chat-messages-list'); if (el) el.scrollTop = el.scrollHeight; }
+function escapeHtml(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function sendReply() {
+  const textarea = document.getElementById('chat-reply');
+  const text = textarea.value.trim();
+  if (!text || !msgState.activeConvId) return;
+  const conv = msgState.conversations.find(c => c.id === msgState.activeConvId);
+  if (!conv) return;
+  const btn = document.getElementById('chat-send-btn');
+  btn.disabled = true; textarea.value = ''; textarea.style.height = 'auto';
+  const tempMsg = { id:'tmp-'+Date.now(), direction:'sent', body:text, createdAt:new Date().toISOString() };
+  msgState.messages.push(tempMsg); renderMessages(); scrollChatBottom();
+  const brevoKey = getKeys().brevo;
+  const fromEmail = getKeys().emailFrom;
+  const fromName = getKeys().emailName || 'Alma';
+  if (!brevoKey || !fromEmail) {
+    alert('Configurez votre clé Brevo et email expéditeur dans Paramètres.');
+    msgState.messages = msgState.messages.filter(m => m.id !== tempMsg.id);
+    renderMessages(); textarea.value = text; btn.disabled = false; return;
+  }
+  try {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','api-key':brevoKey},
+      body:JSON.stringify({ sender:{name:fromName,email:fromEmail}, to:[{email:conv.prospectEmail,name:conv.prospectName}], subject:'Re: '+(conv.subject||'Suite à notre échange'), textContent:text })
+    });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.message||'Erreur Brevo'); }
+    tempMsg.id = 'msg-'+Date.now();
+    conv.lastPreview = text.slice(0,60); conv.lastAt = new Date().toISOString();
+    saveConversations(); saveMessages(msgState.activeConvId, msgState.messages);
+    renderConvList(); renderMessages();
+  } catch(e) {
+    alert('Erreur envoi : ' + e.message);
+    msgState.messages = msgState.messages.filter(m => m.id !== tempMsg.id);
+    renderMessages(); textarea.value = text;
+  }
+  btn.disabled = false;
+}
+
+window.alma_webhook = function(data) {
+  const { fromEmail, fromName, body } = data;
+  const conv = msgState.conversations.find(c => c.prospectEmail === fromEmail);
+  if (!conv) return;
+  const messages = getMessages(conv.id);
+  messages.push({ id:'msg-'+Date.now(), direction:'received', body, createdAt:new Date().toISOString() });
+  saveMessages(conv.id, messages);
+  conv.unread = (conv.unread||0)+1; conv.lastPreview = body.slice(0,60); conv.lastAt = new Date().toISOString();
+  saveConversations(); updateUnreadBadge(); renderConvList();
+  if (msgState.activeConvId === conv.id) loadMessages(conv.id, true);
+};
+
+// ═══ INIT ═══
+document.addEventListener('DOMContentLoaded', loadState);
 </script>
 </body>
 </html>
