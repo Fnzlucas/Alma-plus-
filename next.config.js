@@ -1,4 +1,13 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
-  reactStrictMode: true,
+const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/',
+        destination: '/alma-plus-landing.html',
+      },
+    ]
+  },
 }
+
+module.exports = nextConfig
