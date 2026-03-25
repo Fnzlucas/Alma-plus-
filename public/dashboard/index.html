@@ -3788,10 +3788,37 @@ function searchProspects() {
     document.getElementById('results-title').textContent = prospects.length + ' prospects trouvés';
     document.getElementById('results-sub').textContent = type + ' · ' + city + ' · Score min. ' + minScore;
 
-    renderProspectsTable(prospects, type, city, minScore);
+    // Enrichir AVANT d'afficher — récupérer téléphone + site pour toutes les cartes
+    document.getElementById('search-progress-fill').style.width = '90%';
+    document.getElementById('search-progress-text').textContent = 'Récupération des coordonnées...';
 
-    // Enrichir avec les détails (téléphone, site, email) en arrière-plan
-    enrichProspects(prospects, service);
+    let enriched = 0;
+    const enrichAll = prospects.map(p => new Promise(resolve => {
+      service.getDetails({
+        placeId: p.id,
+        fields: ['formatted_phone_number', 'website', 'international_phone_number']
+      }, function(place, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+          p.phone = place.formatted_phone_number || place.international_phone_number || null;
+          p.website = place.website || null;
+        } else {
+          p.phone = null; p.website = null;
+        }
+        enriched++;
+        document.getElementById('search-progress-text').textContent = 'Coordonnées : ' + enriched + '/' + prospects.length;
+        resolve();
+      });
+    }));
+
+    Promise.all(enrichAll).then(() => {
+      prospects.forEach(p => {
+        const sp = state.prospects.find(x => x.id === p.id);
+        if (sp) { sp.phone = p.phone; sp.website = p.website; }
+      });
+      saveState();
+      document.getElementById('search-progress-fill').style.width = '100%';
+      renderProspectsTable(prospects, type, city, minScore);
+    });
   });
 }
 
@@ -3824,7 +3851,9 @@ function renderProspectsTable(prospects, type, city, minScore) {
       </div>
 
       <!-- Site web -->
-      <div id="web-${p.id}" style="font-size:11px;color:var(--primary);min-height:14px"></div>
+      <div id="web-${p.id}" style="font-size:11px;min-height:14px">
+        ${p.website ? '<a href="'+p.website+'" target="_blank" style="font-size:11px;color:var(--primary);text-decoration:none;font-weight:500">🌐 '+p.website.replace(/^https?:\/\//, '').replace(/\/$/, '').slice(0,28)+'</a> <a href="'+p.website+'/contact" target="_blank" style="font-size:10px;font-weight:700;background:var(--primary-lt);color:var(--primary);padding:2px 7px;border-radius:99px;text-decoration:none">✉ Email</a>' : '<span style=\"color:var(--text3)\">Pas de site web</span>'}
+      </div>
 
       <!-- Adresse -->
       <div style="display:flex;align-items:flex-start;gap:6px">
