@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<script>
+var sb = supabase.createClient(
+  'https://tzrtptpzbrszibuifzns.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk'
+)
+sb.auth.getSession().then(function(r) {
+  if (!r.data.session) {
+    window.location.href = '/login'
+  } else {
+    fetch('/alma-plus-dashboard.html')
+      .then(function(res) { return res.text() })
+      .then(function(html) {
+        document.open()
+        document.write(html)
+        document.close()
+      })
+  }
+})
+</script>
+</body>
+</html>
