@@ -8,27 +8,97 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:#f7f8fa;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.card{width:100%;max-width:420px}
-.logo{text-align:center;margin-bottom:32px}
+
+:root{
+  --primary:#4f46e5;
+  --primary-d:#3730a3;
+  --primary-lt:#eef2ff;
+  --primary-border:#c7d2fe;
+  --accent:#7c3aed;
+  --surface:#ffffff;
+  --bg:#f5f6f8;
+  --bg2:#f0f1f4;
+  --border:#e4e7ec;
+  --text:#0f1117;
+  --text2:#4b5563;
+  --text3:#9ca3af;
+  --green:#059669;
+  --green-lt:#d1fae5;
+  --green-border:#6ee7b7;
+  --red:#dc2626;
+  --red-lt:#fee2e2;
+}
+
+body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+
+.card{width:100%;max-width:460px}
+
+.logo{text-align:center;margin-bottom:28px}
 .logo a{text-decoration:none;display:inline-flex;align-items:center;gap:10px}
-.logo-mark{width:32px;height:32px;border-radius:7px;background:#1e3a6e;display:flex;align-items:center;justify-content:center}
-.logo-name{font-family:'Inter Tight',sans-serif;font-weight:800;font-size:17px;color:#0f1729}
-.logo-name span{color:#1e3a6e}
-.box{background:#fff;border-radius:16px;border:1px solid rgba(0,0,0,0.08);padding:36px 40px;box-shadow:0 4px 24px rgba(30,58,110,0.08)}
-.tabs{display:flex;background:#f7f8fa;border-radius:8px;padding:4px;margin-bottom:28px}
-.tab{flex:1;padding:9px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all 0.15s;background:transparent;color:#94a3b8}
-.tab.active{background:#fff;color:#0f1729;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
-label{font-size:12px;font-weight:600;color:#4a5568;display:block;margin-bottom:6px}
-input{width:100%;padding:11px 14px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);font-size:14px;font-family:inherit;outline:none;margin-bottom:14px}
-input:focus{border-color:#1e3a6e}
-.btn-submit{width:100%;background:#1e3a6e;color:#fff;border:none;border-radius:9px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px}
-.btn-submit:hover{background:#152d57}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+.logo-name{font-family:'Inter Tight',sans-serif;font-weight:900;font-size:18px;color:var(--text);letter-spacing:-0.5px}
+.logo-name span{color:var(--primary)}
+
+.box{background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:36px 40px;box-shadow:0 4px 24px rgba(79,70,229,0.10)}
+
+.tabs{display:flex;background:var(--bg);border-radius:8px;padding:4px;margin-bottom:28px}
+.tab{flex:1;padding:9px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all 0.15s;background:transparent;color:var(--text3)}
+.tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+
 .alert{display:none;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px}
-.err{background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.2);color:#dc2626}
-.suc{background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.2);color:#16a34a}
-.btn-forgot{font-size:12px;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline;display:block;margin:12px auto 0}
-.note{text-align:center;margin-top:16px;font-size:12px;color:#94a3b8}
+.err{background:var(--red-lt);border:1px solid #fca5a5;color:var(--red)}
+.suc{background:var(--green-lt);border:1px solid var(--green-border);color:var(--green)}
+
+label{font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px}
+.field{margin-bottom:14px}
+input,select{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);font-size:13px;font-family:inherit;outline:none;background:var(--surface);color:var(--text);transition:border-color 0.15s,box-shadow 0.15s}
+input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,0.10)}
+input::placeholder{color:var(--text3)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.stepper{display:flex;align-items:center;margin-bottom:28px;gap:0}
+.step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;top:15px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+.step:not(:last-child).done::after{background:var(--primary)}
+.step-circle{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text3);z-index:1;position:relative;transition:all 0.2s}
+.step.active .step-circle{border-color:var(--primary);color:var(--primary);background:var(--primary-lt)}
+.step.done .step-circle{border-color:var(--primary);background:var(--primary);color:#fff}
+.step-label{font-size:11px;font-weight:600;color:var(--text3);margin-top:6px;text-align:center;white-space:nowrap}
+.step.active .step-label,.step.done .step-label{color:var(--primary)}
+
+.step-panel{display:none}
+.step-panel.active{display:block;animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.step-title{font-family:'Inter Tight',sans-serif;font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.3px}
+.step-sub{font-size:12px;color:var(--text3);margin-bottom:20px}
+
+.btn-row{display:flex;gap:10px;margin-top:20px}
+.btn-submit{flex:1;background:var(--primary);color:#fff;border:none;border-radius:9px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;box-shadow:0 1px 3px rgba(79,70,229,.25)}
+.btn-submit:hover{background:var(--primary-d);box-shadow:0 3px 8px rgba(79,70,229,.3);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-back{background:var(--surface);color:var(--text2);border:1px solid var(--border);border-radius:9px;padding:13px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.btn-back:hover{border-color:var(--primary-border);color:var(--primary);background:var(--primary-lt)}
+.btn-forgot{font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;text-decoration:underline;display:block;margin:12px auto 0}
+.btn-forgot:hover{color:var(--primary)}
+
+.cgu-row{display:flex;align-items:flex-start;gap:10px;margin-top:4px}
+.cgu-row input[type=checkbox]{width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--primary);cursor:pointer}
+.cgu-row label{font-size:12px;color:var(--text2);font-weight:400;margin:0;cursor:pointer}
+.cgu-row a{color:var(--primary);font-weight:600}
+
+.pwd-strength{height:3px;border-radius:99px;margin-top:6px;background:var(--bg2);overflow:hidden}
+.pwd-strength-fill{height:100%;border-radius:99px;transition:all 0.3s;width:0}
+
+.phone-wrap{display:flex;gap:8px}
+.phone-prefix{width:88px;flex-shrink:0}
+
+.plan-badge{display:flex;align-items:center;gap:10px;background:var(--primary-lt);border:1px solid var(--primary-border);border-radius:10px;padding:11px 14px;margin-bottom:20px}
+.plan-badge-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 6px rgba(79,70,229,.25)}
+.plan-badge-text{font-size:12px;color:var(--text2)}
+.plan-badge-text strong{color:var(--primary);display:block;font-size:13px;font-weight:700}
+
+.note{text-align:center;margin-top:16px;font-size:12px;color:var(--text3)}
 </style>
 </head>
 <body>
@@ -41,70 +111,346 @@ input:focus{border-color:#1e3a6e}
       <span class="logo-name">Alma<span>.</span>+</span>
     </a>
   </div>
+
   <div class="box">
+    <!-- TABS -->
     <div class="tabs">
-      <button class="tab active" id="tab0">Se connecter</button>
-      <button class="tab" id="tab1">Créer un compte</button>
+      <button class="tab active" id="tab0" onclick="setTab(0)">Se connecter</button>
+      <button class="tab" id="tab1" onclick="setTab(1)">Créer un compte</button>
     </div>
+
     <div class="alert err" id="err"></div>
     <div class="alert suc" id="suc"></div>
-    <label>Email</label>
-    <input type="email" id="email" placeholder="votre@email.com">
-    <label>Mot de passe</label>
-    <input type="password" id="pwd" placeholder="••••••••">
-    <button class="btn-submit" id="btn">Se connecter →</button>
-    <button class="btn-forgot" id="forgot">Mot de passe oublié ?</button>
-  </div>
-  <p class="note">7 jours gratuits · CB requise · Annulable à tout moment</p>
+
+    <!-- ═══ CONNEXION ═══ -->
+    <div id="panel-login">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="votre@email.com">
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="pwd" placeholder="••••••••">
+      </div>
+      <button class="btn-submit" id="btn-login" onclick="doLogin()">Se connecter →</button>
+      <button class="btn-forgot" onclick="forgot()">Mot de passe oublié ?</button>
+    </div>
+
+    <!-- ═══ INSCRIPTION MULTI-ÉTAPES ═══ -->
+    <div id="panel-signup" style="display:none">
+
+      <!-- Stepper -->
+      <div class="stepper" id="stepper">
+        <div class="step active" id="s0">
+          <div class="step-circle">1</div>
+          <div class="step-label">Identité</div>
+        </div>
+        <div class="step" id="s1">
+          <div class="step-circle">2</div>
+          <div class="step-label">Entreprise</div>
+        </div>
+        <div class="step" id="s2">
+          <div class="step-circle">3</div>
+          <div class="step-label">Compte</div>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 1 — Identité -->
+      <div class="step-panel active" id="step1">
+        <div class="step-title">Qui êtes-vous ?</div>
+        <div class="step-sub">Vos informations personnelles</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Prénom *</label>
+            <input type="text" id="s-prenom" placeholder="Jean">
+          </div>
+          <div class="field">
+            <label>Nom *</label>
+            <input type="text" id="s-nom" placeholder="Dupont">
+          </div>
+        </div>
+        <div class="field">
+          <label>Téléphone *</label>
+          <div class="phone-wrap">
+            <select class="phone-prefix" id="s-prefix">
+              <option value="+33">🇫🇷 +33</option>
+              <option value="+32">🇧🇪 +32</option>
+              <option value="+41">🇨🇭 +41</option>
+              <option value="+352">🇱🇺 +352</option>
+              <option value="+1">🇺🇸 +1</option>
+            </select>
+            <input type="tel" id="s-tel" placeholder="06 12 34 56 78" style="flex:1">
+          </div>
+        </div>
+        <div class="field">
+          <label>Rôle dans l'entreprise</label>
+          <select id="s-role">
+            <option value="">Sélectionnez votre rôle</option>
+            <option>Gérant / Dirigeant</option>
+            <option>Commercial / Business Developer</option>
+            <option>Responsable marketing</option>
+            <option>Artisan indépendant</option>
+            <option>Chef de projet</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button class="btn-submit" onclick="nextStep(1)">Suivant →</button>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 2 — Entreprise -->
+      <div class="step-panel" id="step2">
+        <div class="step-title">Votre entreprise</div>
+        <div class="step-sub">Ces informations nous permettent de personnaliser votre expérience</div>
+        <div class="field">
+          <label>Nom de l'entreprise *</label>
+          <input type="text" id="s-entreprise" placeholder="Bâti Pro SARL">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Numéro SIRET</label>
+            <input type="text" id="s-siret" placeholder="123 456 789 00012" maxlength="17">
+          </div>
+          <div class="field">
+            <label>Secteur d'activité *</label>
+            <select id="s-secteur">
+              <option value="">Choisir...</option>
+              <option>Maçonnerie / Gros œuvre</option>
+              <option>Charpente / Couverture</option>
+              <option>Électricité</option>
+              <option>Plomberie / Chauffage</option>
+              <option>Isolation / Rénovation énergétique</option>
+              <option>Menuiserie / Fenêtres</option>
+              <option>Peinture / Revêtements</option>
+              <option>Carrelage / Sols</option>
+              <option>Promotion immobilière</option>
+              <option>Architecture / Maîtrise d'œuvre</option>
+              <option>Négoce matériaux</option>
+              <option>Autre</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Adresse de l'entreprise *</label>
+          <input type="text" id="s-rue" placeholder="12 Rue de la République" style="margin-bottom:8px">
+          <div class="field-row" style="margin:0">
+            <input type="text" id="s-cp" placeholder="Code postal" maxlength="5">
+            <input type="text" id="s-ville" placeholder="Ville">
+          </div>
+        </div>
+        <div class="field">
+          <label>Taille de l'entreprise</label>
+          <select id="s-taille">
+            <option value="">Sélectionnez...</option>
+            <option>Indépendant / Auto-entrepreneur</option>
+            <option>TPE (2 à 9 salariés)</option>
+            <option>PME (10 à 49 salariés)</option>
+            <option>ETI (50 à 249 salariés)</option>
+            <option>Grande entreprise (250+)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Chiffre d'affaires annuel</label>
+          <select id="s-ca">
+            <option value="">Sélectionnez...</option>
+            <option>Moins de 50 000 €</option>
+            <option>50 000 € – 200 000 €</option>
+            <option>200 000 € – 500 000 €</option>
+            <option>500 000 € – 1 M€</option>
+            <option>Plus de 1 M€</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevStep(2)">← Retour</button>
+          <button class="btn-submit" onclick="nextStep(2)">Suivant →</button>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 3 — Compte -->
+      <div class="step-panel" id="step3">
+        <div class="plan-badge">
+          <div class="plan-badge-icon">
+            <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M2 12L7 2L12 12" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M4 8.5H10" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div class="plan-badge-text">
+            <strong>Essai gratuit 7 jours</strong>
+            Accès complet · Aucun débit immédiat
+          </div>
+        </div>
+        <div class="step-title">Vos identifiants</div>
+        <div class="step-sub">Vous utiliserez ces informations pour vous connecter</div>
+        <div class="field">
+          <label>Email professionnel *</label>
+          <input type="email" id="s-email" placeholder="jean.dupont@entreprise.fr">
+        </div>
+        <div class="field">
+          <label>Mot de passe *</label>
+          <input type="password" id="s-pwd" placeholder="Minimum 8 caractères" oninput="checkStrength(this.value)">
+          <div class="pwd-strength"><div class="pwd-strength-fill" id="pwd-fill"></div></div>
+        </div>
+        <div class="field">
+          <label>Confirmer le mot de passe *</label>
+          <input type="password" id="s-pwd2" placeholder="••••••••">
+        </div>
+        <div class="field">
+          <label>Comment avez-vous découvert Alma.+ ?</label>
+          <select id="s-source">
+            <option value="">Sélectionnez...</option>
+            <option>Google / Recherche web</option>
+            <option>Recommandation d'un collègue</option>
+            <option>Réseaux sociaux</option>
+            <option>LinkedIn</option>
+            <option>Salon professionnel</option>
+            <option>Publicité en ligne</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="cgu-row">
+          <input type="checkbox" id="s-cgu">
+          <label for="s-cgu">J'accepte les <a href="#">Conditions Générales d'Utilisation</a> et la <a href="#">Politique de confidentialité</a> d'Alma.+</label>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevStep(3)">← Retour</button>
+          <button class="btn-submit" id="btn-signup" onclick="doSignup()">Créer mon compte →</button>
+        </div>
+      </div>
+
+    </div><!-- /panel-signup -->
+  </div><!-- /box -->
+
+  <p class="note" id="note-login">7 jours gratuits · CB requise · Annulable à tout moment</p>
+  <p class="note" id="note-signup" style="display:none">Vos données sont chiffrées et ne sont jamais revendues.</p>
 </div>
 
 <script>
 var SUPABASE_URL = 'https://tzrtptpzbrszibuifzns.supabase.co'
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk'
 var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-var signup = false
-
-document.getElementById('tab0').onclick = function(){ setTab(0) }
-document.getElementById('tab1').onclick = function(){ setTab(1) }
-document.getElementById('btn').onclick = go
-document.getElementById('forgot').onclick = forgot
+var currentStep = 1
 
 function setTab(i) {
-  signup = i===1
   document.getElementById('tab0').className = i===0 ? 'tab active' : 'tab'
   document.getElementById('tab1').className = i===1 ? 'tab active' : 'tab'
-  document.getElementById('btn').textContent = i===0 ? 'Se connecter →' : 'Créer mon compte →'
-  document.getElementById('err').style.display = 'none'
-  document.getElementById('suc').style.display = 'none'
+  document.getElementById('panel-login').style.display = i===0 ? 'block' : 'none'
+  document.getElementById('panel-signup').style.display = i===1 ? 'block' : 'none'
+  document.getElementById('note-login').style.display = i===0 ? 'block' : 'none'
+  document.getElementById('note-signup').style.display = i===1 ? 'block' : 'none'
+  clearAlerts()
+  if (i===1) { currentStep=1; goStep(1); }
 }
 
-async function go() {
-  var email = document.getElementById('email').value
-  var pwd = document.getElementById('pwd').value
-  var err = document.getElementById('err')
-  var suc = document.getElementById('suc')
-  err.style.display = 'none'
-  suc.style.display = 'none'
-  if (!email || !pwd) { err.textContent='Remplissez tous les champs.'; err.style.display='block'; return }
-  if (signup) {
-    var r = await sb.auth.signUp({ email:email, password:pwd })
-    if (r.error) { err.textContent=r.error.message; err.style.display='block' }
-    else { window.location.href='/dashboard' }
-  } else {
-    var r = await sb.auth.signInWithPassword({ email:email, password:pwd })
-    if (r.error) { err.textContent='Email ou mot de passe incorrect.'; err.style.display='block' }
-    else { window.location.href='/dashboard' }
+function clearAlerts() {
+  document.getElementById('err').style.display='none'
+  document.getElementById('suc').style.display='none'
+}
+function showErr(msg){ var e=document.getElementById('err'); e.textContent=msg; e.style.display='block'; }
+function showSuc(msg){ var e=document.getElementById('suc'); e.textContent=msg; e.style.display='block'; }
+
+// ── STEPPER ──
+function goStep(n) {
+  currentStep = n
+  for (var i=1;i<=3;i++) {
+    document.getElementById('step'+i).className = 'step-panel' + (i===n?' active':'')
+    var sc = document.getElementById('s'+(i-1))
+    sc.className = 'step' + (i<n?' done':i===n?' active':'')
   }
+  clearAlerts()
+}
+
+function nextStep(from) {
+  if (!validateStep(from)) return
+  goStep(from+1)
+}
+function prevStep(from) { goStep(from-1) }
+
+function validateStep(n) {
+  if (n===1) {
+    if (!v('s-prenom')) return showErr('Entrez votre prénom.'), false
+    if (!v('s-nom')) return showErr('Entrez votre nom.'), false
+    if (!v('s-tel')) return showErr('Entrez votre numéro de téléphone.'), false
+  }
+  if (n===2) {
+    if (!v('s-entreprise')) return showErr("Entrez le nom de l'entreprise."), false
+    if (!v('s-secteur')) return showErr("Choisissez votre secteur d'activité."), false
+    if (!v('s-rue')) return showErr('Entrez l\'adresse de l\'entreprise.'), false
+    if (!v('s-cp')) return showErr('Entrez le code postal.'), false
+    if (!v('s-ville')) return showErr('Entrez la ville.'), false
+  }
+  return true
+}
+function v(id){ return document.getElementById(id).value.trim() }
+
+function checkStrength(pwd) {
+  var score = 0
+  if (pwd.length >= 8) score++
+  if (/[A-Z]/.test(pwd)) score++
+  if (/[0-9]/.test(pwd)) score++
+  if (/[^A-Za-z0-9]/.test(pwd)) score++
+  var fill = document.getElementById('pwd-fill')
+  var colors = ['#dc2626','#f59e0b','#3b82f6','#16a34a']
+  fill.style.width = (score*25)+'%'
+  fill.style.background = colors[score-1] || '#e8ecf0'
+}
+
+// Format SIRET
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('s-siret').addEventListener('input', function(){
+    var v = this.value.replace(/\D/g,'').slice(0,14)
+    this.value = v.replace(/(\d{3})(?=\d)/g,'$1 ').trim()
+  })
+})
+
+// ── AUTH ──
+async function doLogin() {
+  var email = v('email') || document.getElementById('email').value
+  var pwd = document.getElementById('pwd').value
+  clearAlerts()
+  if (!email || !pwd) return showErr('Remplissez tous les champs.')
+  var btn = document.getElementById('btn-login')
+  btn.textContent='Connexion…'; btn.disabled=true
+  var r = await sb.auth.signInWithPassword({email, password:pwd})
+  btn.textContent='Se connecter →'; btn.disabled=false
+  if (r.error) showErr('Email ou mot de passe incorrect.')
+  else window.location.href='/dashboard'
+}
+
+async function doSignup() {
+  clearAlerts()
+  var email = v('s-email')
+  var pwd = document.getElementById('s-pwd').value
+  var pwd2 = document.getElementById('s-pwd2').value
+  var cgu = document.getElementById('s-cgu').checked
+  if (!email) return showErr('Entrez votre email.')
+  if (pwd.length < 8) return showErr('Le mot de passe doit faire au moins 8 caractères.')
+  if (pwd !== pwd2) return showErr('Les mots de passe ne correspondent pas.')
+  if (!cgu) return showErr('Acceptez les CGU pour continuer.')
+
+  var btn = document.getElementById('btn-signup')
+  btn.textContent='Création…'; btn.disabled=true
+
+  var meta = {
+    prenom: v('s-prenom'), nom: v('s-nom'),
+    telephone: v('s-prefix') + v('s-tel'),
+    role: v('s-role'),
+    entreprise: v('s-entreprise'), siret: v('s-siret'),
+    secteur: v('s-secteur'), taille: v('s-taille'), ca: v('s-ca'),
+    adresse: v('s-rue'), code_postal: v('s-cp'), ville: v('s-ville'),
+    source: v('s-source')
+  }
+
+  var r = await sb.auth.signUp({ email, password:pwd, options:{ data: meta } })
+  btn.textContent='Créer mon compte →'; btn.disabled=false
+  if (r.error) showErr(r.error.message)
+  else { showSuc('Compte créé ! Vérifiez votre email pour activer votre compte.') }
 }
 
 async function forgot() {
   var email = document.getElementById('email').value
-  var err = document.getElementById('err')
-  var suc = document.getElementById('suc')
-  if (!email) { err.textContent="Entrez votre email d'abord."; err.style.display='block'; return }
+  clearAlerts()
+  if (!email) return showErr("Entrez votre email d'abord.")
   await sb.auth.resetPasswordForEmail(email)
-  suc.textContent='Email de réinitialisation envoyé.'
-  suc.style.display='block'
+  showSuc('Email de réinitialisation envoyé.')
 }
 </script>
 </body>
