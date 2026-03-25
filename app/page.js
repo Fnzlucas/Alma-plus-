@@ -1,15 +1,9 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
   useEffect(() => {
-    fetch('/alma-plus-landing.html')
-      .then(r => r.text())
-      .then(html => {
-        document.open()
-        document.write(html)
-        document.close()
-      })
+    window.location.href = '/alma-plus-landing.html'
   }, [])
   return null
 }
