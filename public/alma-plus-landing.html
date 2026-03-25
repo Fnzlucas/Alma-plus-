@@ -8,13 +8,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Inter+Tight:ital,wght@0,700;0,800;0,900;1,800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#f7f8fa; --bg2:#f0f2f6; --bg3:#e4e8f0;
+  --bg:#f5f6f8; --bg2:#f0f1f4; --bg3:#e4e7ec;
   --white:#ffffff;
-  --navy:#1e3a6e; --navy-d:#152d57; --navy-m:#2a4d8f;
-  --action:#2563eb; --action-h:#1d4ed8;
-  --text:#0f1729; --text2:#4a5568; --text3:#94a3b8;
-  --green:#16a34a; --red:#dc2626; --amber:#d97706;
-  --border:rgba(0,0,0,0.07); --border2:rgba(30,58,110,0.18);
+  --navy:#4f46e5; --navy-d:#3730a3; --navy-m:#6366f1;
+  --accent:#7c3aed;
+  --action:#4f46e5; --action-h:#3730a3;
+  --text:#0f1117; --text2:#4b5563; --text3:#9ca3af;
+  --green:#059669; --red:#dc2626; --amber:#d97706;
+  --border:#e4e7ec; --border2:#c7d2fe;
+  --primary-lt:#eef2ff; --primary-border:#c7d2fe;
   --font:'Inter',-apple-system,sans-serif;
   --tight:'Inter Tight','Inter',sans-serif;
   --mono:'SF Mono',ui-monospace,monospace;
@@ -22,50 +24,50 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:var(--font);background:var(--white);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
- 
+
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 52px;box-shadow:0 1px 0 rgba(0,0,0,0.05);}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.nav-mark{width:28px;height:28px;border-radius:6px;background:var(--navy);display:flex;align-items:center;justify-content:center;}
+.nav-mark{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--navy),var(--accent));display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(79,70,229,.3);}
 .nav-name{font-family:var(--tight);font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 .nav-name span{color:var(--navy);}
 .nav-links{display:flex;gap:2px;}
 .nav-link{font-size:13px;font-weight:500;color:var(--text3);text-decoration:none;padding:6px 12px;border-radius:6px;transition:all 0.12s;}
 .nav-link:hover{color:var(--text2);background:var(--bg);}
-.nav-cta{background:var(--navy);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:7px;text-decoration:none;transition:all 0.15s;box-shadow:0 1px 3px rgba(30,58,110,0.25);}
+.nav-cta{background:var(--navy);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:7px;text-decoration:none;transition:all 0.15s;box-shadow:0 1px 3px rgba(79,70,229,0.25);}
 .nav-cta:hover{background:var(--navy-d);transform:translateY(-1px);}
- 
+
 /* HERO */
 .hero{padding:130px 52px 0;background:var(--white);position:relative;overflow:hidden;}
-.hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 15% 30%,rgba(30,58,110,0.04) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 85% 60%,rgba(37,99,235,0.04) 0%,transparent 55%);}
+.hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 15% 30%,rgba(79,70,229,0.05) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 85% 60%,rgba(124,58,237,0.04) 0%,transparent 55%);}
 .hero-inner{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;position:relative;z-index:1;padding-bottom:80px;}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(30,58,110,0.07);border:1px solid rgba(30,58,110,0.14);padding:5px 13px;border-radius:99px;font-size:11.5px;font-weight:600;color:var(--navy);letter-spacing:0.2px;margin-bottom:26px;}
-.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:#16a34a;animation:blink 2s infinite;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(79,70,229,0.07);border:1px solid rgba(79,70,229,0.14);padding:5px 13px;border-radius:99px;font-size:11.5px;font-weight:600;color:var(--navy);letter-spacing:0.2px;margin-bottom:26px;}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:#059669;animation:blink 2s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
 .hero-title{font-family:var(--tight);font-size:clamp(44px,5.5vw,72px);font-weight:900;line-height:1.02;letter-spacing:-2.8px;color:var(--text);margin-bottom:22px;}
 .hero-title .navy{color:var(--navy);}
 .hero-sub{font-size:17px;color:var(--text2);line-height:1.65;max-width:460px;margin-bottom:36px;}
 .hero-sub strong{color:var(--text);font-weight:600;}
 .hero-actions{display:flex;align-items:center;gap:12px;margin-bottom:44px;}
-.btn-main{background:var(--navy);color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border-radius:9px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:all 0.15s;box-shadow:0 2px 8px rgba(30,58,110,0.25);}
-.btn-main:hover{background:var(--navy-d);transform:translateY(-2px);}
+.btn-main{background:var(--navy);color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border-radius:9px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:all 0.15s;box-shadow:0 2px 8px rgba(79,70,229,0.3);}
+.btn-main:hover{background:var(--navy-d);transform:translateY(-2px);box-shadow:0 4px 16px rgba(79,70,229,0.35);}
 .btn-ghost{background:transparent;color:var(--text2);font-size:14px;font-weight:500;padding:14px 20px;border-radius:9px;border:1px solid var(--border);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:7px;transition:all 0.15s;}
-.btn-ghost:hover{border-color:var(--border2);color:var(--text);}
+.btn-ghost:hover{border-color:var(--border2);color:var(--navy);}
 .hero-proof{display:flex;align-items:center;gap:16px;font-size:12.5px;color:var(--text3);}
 .proof-sep{width:3px;height:3px;border-radius:50%;background:var(--bg3);}
 .proof-stars{color:#f59e0b;}
- 
+
 /* Hero card */
 .hero-right{position:relative;}
-.hero-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:0 4px 32px rgba(30,58,110,0.09);position:relative;overflow:hidden;}
-.hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--navy),var(--action));}
+.hero-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:0 4px 32px rgba(79,70,229,0.1);position:relative;overflow:hidden;}
+.hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--navy),var(--accent));}
 .hc-bar{display:flex;align-items:center;gap:8px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);}
 .hc-dot{width:8px;height:8px;border-radius:50%;}
 .hc-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-left:4px;}
 .hc-live{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green);}
 .hc-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
 .prospect-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:1px solid var(--border);margin-bottom:7px;}
-.p-av{width:30px;height:30px;border-radius:6px;background:var(--navy);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.p-av{width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,var(--navy),var(--accent));color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .p-name{font-size:12.5px;font-weight:700;color:var(--text);}
 .p-sub{font-size:10.5px;color:var(--text3);}
 .p-score{margin-left:auto;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:4px;font-family:var(--mono);}
@@ -73,8 +75,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(
 .sc-warm{background:rgba(217,119,6,0.08);color:var(--amber);}
 .hc-footer{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .hc-foot-label{font-size:11.5px;color:var(--text3);}
-.hc-foot-btn{background:var(--action);color:#fff;font-size:11.5px;font-weight:700;padding:6px 14px;border-radius:6px;border:none;cursor:pointer;}
-.float-card{position:absolute;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px 14px;box-shadow:0 8px 32px rgba(30,58,110,0.1);min-width:148px;}
+.hc-foot-btn{background:var(--navy);color:#fff;font-size:11.5px;font-weight:700;padding:6px 14px;border-radius:6px;border:none;cursor:pointer;transition:all .12s;}
+.hc-foot-btn:hover{background:var(--navy-d);}
+.float-card{position:absolute;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px 14px;box-shadow:0 8px 32px rgba(79,70,229,0.12);min-width:148px;}
 .fc-1{bottom:-28px;left:-36px;animation:float1 4s ease-in-out infinite;}
 .fc-2{top:-24px;right:-24px;animation:float2 4.5s ease-in-out infinite;}
 @keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
@@ -82,7 +85,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(
 .fc-label{font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
 .fc-val{font-family:var(--tight);font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.8px;line-height:1;}
 .fc-trend{font-size:11px;font-weight:600;color:var(--green);margin-top:3px;}
- 
+
 /* STATS BAND */
 .stats-band{background:var(--navy);padding:60px 52px;}
 .stats-inner{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);}
@@ -91,7 +94,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(
 .stat-num{font-family:var(--tight);font-size:48px;font-weight:900;color:var(--white);letter-spacing:-2px;line-height:1;margin-bottom:8px;}
 .stat-num .unit{font-size:24px;color:rgba(255,255,255,0.55);font-weight:700;}
 .stat-desc{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.5;}
- 
+
 /* SECTIONS */
 .s-label{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
 .s-label::before{content:'';width:16px;height:2px;background:var(--navy);border-radius:2px;}
@@ -99,28 +102,28 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(
 .s-title .navy{color:var(--navy);}
 .s-sub{font-size:16px;color:var(--text2);line-height:1.65;max-width:520px;}
 .section-center{max-width:1160px;margin:0 auto;}
- 
+
 /* PRODUCT SECTION */
 .product-section{background:var(--bg);padding:96px 52px;position:relative;}
-.app-frame{margin-top:56px;background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 24px 80px rgba(30,58,110,0.11);position:relative;}
-.app-frame::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--navy),var(--action));z-index:1;}
+.app-frame{margin-top:56px;background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 24px 80px rgba(79,70,229,0.1);position:relative;}
+.app-frame::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--navy),var(--accent));z-index:1;}
 .af-topbar{height:46px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;}
-.af-mark{width:22px;height:22px;border-radius:5px;background:var(--navy);display:flex;align-items:center;justify-content:center;}
+.af-mark{width:22px;height:22px;border-radius:5px;background:linear-gradient(135deg,var(--navy),var(--accent));display:flex;align-items:center;justify-content:center;}
 .af-brand{font-family:var(--tight);font-size:13px;font-weight:800;color:var(--text);letter-spacing:-0.3px;}
 .af-brand span{color:var(--navy);}
 .af-nav{display:flex;gap:2px;margin-left:12px;}
 .af-nt{font-size:11px;padding:4px 9px;border-radius:4px;color:var(--text3);font-weight:500;}
-.af-nt.on{color:var(--navy);font-weight:700;background:rgba(30,58,110,0.07);}
-.af-status{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--green);font-weight:600;background:rgba(22,163,74,0.07);border:1px solid rgba(22,163,74,0.15);padding:3px 9px;border-radius:4px;}
+.af-nt.on{color:var(--navy);font-weight:700;background:rgba(79,70,229,0.08);}
+.af-status{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--green);font-weight:600;background:rgba(5,150,105,0.07);border:1px solid rgba(5,150,105,0.15);padding:3px 9px;border-radius:4px;}
 .af-sd{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
 .af-body{display:flex;min-height:440px;}
 .af-sidebar{width:186px;background:var(--white);border-right:1px solid var(--border);padding:12px 8px;flex-shrink:0;}
 .af-ss{font-size:9px;font-weight:600;color:#b0bac8;text-transform:uppercase;letter-spacing:0.7px;padding:10px 8px 4px;}
 .af-si{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:5px;font-size:11.5px;color:var(--text3);margin-bottom:1px;}
-.af-si.on{color:var(--navy);background:rgba(30,58,110,0.07);font-weight:600;}
+.af-si.on{color:var(--navy);background:rgba(79,70,229,0.08);font-weight:600;}
 .af-si-dot{width:11px;height:11px;border-radius:3px;background:currentColor;opacity:0.3;flex-shrink:0;}
 .af-si.on .af-si-dot{opacity:0.7;}
-.af-badge{margin-left:auto;font-size:9.5px;background:rgba(30,58,110,0.09);color:var(--navy);padding:1px 5px;border-radius:3px;font-weight:700;}
+.af-badge{margin-left:auto;font-size:9.5px;background:rgba(79,70,229,0.09);color:var(--navy);padding:1px 5px;border-radius:3px;font-weight:700;}
 .af-main{flex:1;padding:18px 20px;}
 .af-pt{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.4px;margin-bottom:2px;}
 .af-ps{font-size:11px;color:var(--text3);margin-bottom:13px;}
@@ -132,7 +135,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(
 .af-str{font-size:9.5px;color:var(--green);margin-top:2px;font-weight:600;}
 .af-searchbar{display:flex;gap:6px;margin-bottom:11px;}
 .af-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 11px;font-size:11.5px;color:var(--text3);font-family:var(--font);outline:none;}
-.af-btn{background:var(--action);color:#fff;font-size:11.5px;font-weight:700;padding:7px 14px;border-radius:6px;border:none;cursor:pointer;}
+.af-btn{background:var(--navy);color:#fff;font-size:11.5px;font-weight:700;padding:7px 14px;border-radius:6px;border:none;cursor:pointer;}
 .af-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
 .af-pc{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 11px;transition:all 0.12s;cursor:pointer;}
 .af-ph{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
@@ -143,42 +146,42 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(
 .af-pm{font-size:10px;color:var(--text3);margin-bottom:6px;line-height:1.4;}
 .af-pa{display:flex;gap:4px;}
 .af-pbt{font-size:10px;padding:3px 7px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:var(--font);}
-.af-pbt.act{background:var(--action);color:#fff;border-color:transparent;}
- 
+.af-pbt.act{background:var(--navy);color:#fff;border-color:transparent;}
+
 /* PAIN */
 .pain-section{background:var(--white);padding:96px 52px;}
 .pain-grid{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
 .pain-list{display:flex;flex-direction:column;gap:8px;margin-top:32px;}
 .pain-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:8px;font-size:13.5px;font-weight:500;}
 .pain-row.no{background:rgba(220,38,38,0.04);border:1px solid rgba(220,38,38,0.09);color:var(--text2);}
-.pain-row.yes{background:rgba(30,58,110,0.04);border:1px solid rgba(30,58,110,0.1);color:var(--text);}
+.pain-row.yes{background:rgba(79,70,229,0.04);border:1px solid rgba(79,70,229,0.1);color:var(--text);}
 .pain-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;}
 .pain-icon.no{background:rgba(220,38,38,0.1);color:var(--red);}
-.pain-icon.yes{background:rgba(30,58,110,0.1);color:var(--navy);}
+.pain-icon.yes{background:rgba(79,70,229,0.1);color:var(--navy);}
 .pain-title{font-family:var(--tight);font-size:clamp(28px,3.5vw,42px);font-weight:900;letter-spacing:-1.6px;line-height:1.1;color:var(--text);margin-bottom:18px;}
 .pain-title .navy{color:var(--navy);}
 .pain-body{font-size:15.5px;color:var(--text2);line-height:1.7;margin-bottom:32px;}
-.btn-navy{background:var(--navy);color:#fff;font-size:14px;font-weight:700;padding:14px 28px;border-radius:9px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:all 0.15s;box-shadow:0 2px 8px rgba(30,58,110,0.22);}
+.btn-navy{background:var(--navy);color:#fff;font-size:14px;font-weight:700;padding:14px 28px;border-radius:9px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:all 0.15s;box-shadow:0 2px 8px rgba(79,70,229,0.25);}
 .btn-navy:hover{background:var(--navy-d);transform:translateY(-1px);}
- 
+
 /* FEATURES */
 .feat-section{background:var(--bg);padding:96px 52px;}
 .feat-head{max-width:1160px;margin:0 auto 52px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:end;}
 .feat-grid{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
 .feat-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:26px 22px;transition:all 0.18s;position:relative;overflow:hidden;}
-.feat-card:hover{border-color:var(--border2);box-shadow:0 4px 20px rgba(30,58,110,0.08);transform:translateY(-2px);}
+.feat-card:hover{border-color:var(--border2);box-shadow:0 4px 20px rgba(79,70,229,0.1);transform:translateY(-2px);}
 .feat-card.dark{background:var(--navy);border-color:transparent;}
 .feat-card.dark .feat-title{color:var(--white);}
 .feat-card.dark .feat-desc{color:rgba(255,255,255,0.5);}
 .feat-card.dark .feat-icon{background:rgba(255,255,255,0.1);}
 .feat-card.dark .feat-icon svg{stroke:rgba(255,255,255,0.75);}
 .feat-card.dark .feat-tag{color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12);}
-.feat-icon{width:38px;height:38px;border-radius:8px;background:rgba(30,58,110,0.07);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.feat-icon{width:38px;height:38px;border-radius:8px;background:rgba(79,70,229,0.08);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
 .feat-icon svg{width:17px;height:17px;stroke:var(--navy);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
 .feat-title{font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:7px;letter-spacing:-0.25px;}
 .feat-desc{font-size:13px;color:var(--text2);line-height:1.6;}
-.feat-tag{display:inline-block;margin-top:12px;font-size:10.5px;font-weight:600;color:var(--action);background:rgba(37,99,235,0.07);border:1px solid rgba(37,99,235,0.14);padding:2px 8px;border-radius:4px;}
- 
+.feat-tag{display:inline-block;margin-top:12px;font-size:10.5px;font-weight:600;color:var(--navy);background:rgba(79,70,229,0.07);border:1px solid rgba(79,70,229,0.15);padding:2px 8px;border-radius:4px;}
+
 /* RÉSULTATS */
 .results-section{background:var(--navy);padding:80px 52px;}
 .results-inner{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
@@ -192,13 +195,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(
 .res-num{font-family:var(--tight);font-size:48px;font-weight:900;color:var(--white);letter-spacing:-2px;line-height:1;margin-bottom:6px;}
 .res-num .u{font-size:26px;color:rgba(255,255,255,0.4);font-weight:700;}
 .res-label{font-size:12.5px;color:rgba(255,255,255,0.4);line-height:1.5;}
- 
+
 /* PRICING */
 .pricing-section{padding:96px 52px;background:var(--white);}
 .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1000px;margin:52px auto 0;}
 .pc{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:32px 26px;position:relative;transition:all 0.18s;}
-.pc:hover{box-shadow:0 6px 28px rgba(30,58,110,0.08);}
-.pc.star{background:var(--navy);border-color:transparent;box-shadow:0 8px 40px rgba(30,58,110,0.25);}
+.pc:hover{box-shadow:0 6px 28px rgba(79,70,229,0.1);}
+.pc.star{background:var(--navy);border-color:transparent;box-shadow:0 8px 40px rgba(79,70,229,0.3);}
 .pc.star .pc-name{color:rgba(255,255,255,0.45);}
 .pc.star .pc-price{color:var(--white);}
 .pc.star .pc-per{color:rgba(255,255,255,0.35);}
@@ -206,7 +209,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(
 .pc.star .pc-feat svg{stroke:rgba(255,255,255,0.55);}
 .pc.star .pc-div{background:rgba(255,255,255,0.1);}
 .pc-badge-wrap{position:absolute;top:-12px;left:50%;transform:translateX(-50%);}
-.pc-badge{background:var(--action);color:#fff;font-size:11px;font-weight:700;padding:4px 16px;border-radius:99px;white-space:nowrap;}
+.pc-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:4px 16px;border-radius:99px;white-space:nowrap;}
 .pc-name{font-size:11.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;}
 .pc-price{font-family:var(--tight);font-size:46px;font-weight:900;letter-spacing:-2px;color:var(--text);line-height:1;}
 .pc-price sup{font-size:22px;vertical-align:super;font-weight:700;}
@@ -219,13 +222,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(
 .pc-feat.off svg{stroke:var(--text3);}
 .btn-pc{width:100%;padding:13px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;text-align:center;border:none;display:block;text-decoration:none;font-family:var(--font);}
 .btn-pc-light{background:var(--white);color:var(--text2);border:1px solid var(--border);}
-.btn-pc-light:hover{border-color:var(--border2);color:var(--text);}
-.btn-pc-star{background:var(--action);color:#fff;box-shadow:0 3px 12px rgba(37,99,235,0.3);}
-.btn-pc-star:hover{background:var(--action-h);}
- 
+.btn-pc-light:hover{border-color:var(--border2);color:var(--navy);}
+.btn-pc-star{background:var(--accent);color:#fff;box-shadow:0 3px 12px rgba(124,58,237,0.3);}
+.btn-pc-star:hover{background:#6d28d9;}
+
 /* CTA FINAL */
 .cta-section{background:var(--navy);padding:112px 52px;text-align:center;position:relative;overflow:hidden;}
-.cta-section::before{content:'';position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:800px;height:500px;border-radius:50%;background:radial-gradient(ellipse,rgba(37,99,235,0.15) 0%,transparent 65%);pointer-events:none;}
+.cta-section::before{content:'';position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:800px;height:500px;border-radius:50%;background:radial-gradient(ellipse,rgba(124,58,237,0.2) 0%,transparent 65%);pointer-events:none;}
 .cta-inner{position:relative;z-index:1;max-width:600px;margin:0 auto;}
 .cta-title{font-family:var(--tight);font-size:clamp(36px,5vw,58px);font-weight:900;letter-spacing:-2.2px;color:var(--white);margin-bottom:16px;line-height:1.05;}
 .cta-title .light{color:rgba(255,255,255,0.45);font-style:italic;font-weight:800;}
@@ -237,7 +240,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(
 .btn-cta{background:var(--white);color:var(--navy);font-size:14px;font-weight:800;padding:14px 24px;border-radius:9px;border:none;cursor:pointer;white-space:nowrap;transition:all 0.15s;font-family:var(--font);text-decoration:none;}
 .btn-cta:hover{background:var(--bg);transform:translateY(-1px);}
 .cta-note{font-size:12px;color:rgba(255,255,255,0.28);}
- 
+
 /* FOOTER */
 footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;border-top:1px solid rgba(255,255,255,0.06);}
 .footer-logo{font-family:var(--tight);font-size:15px;font-weight:800;color:var(--white);letter-spacing:-0.4px;}
@@ -246,10 +249,10 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
 .footer-link{font-size:13px;color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.12s;}
 .footer-link:hover{color:rgba(255,255,255,0.65);}
 .footer-copy{font-size:12px;color:rgba(255,255,255,0.2);}
- 
+
 /* TICKER */
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
- 
+
 /* RESPONSIVE */
 @media(max-width:960px){
   nav{padding:0 24px;}
@@ -273,7 +276,7 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
 </style>
 </head>
 <body>
- 
+
 <!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">
@@ -286,11 +289,11 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
     <a href="#pricing" class="nav-link">Tarifs</a>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
-    <a href="/login" style="font-size:13px;font-weight:500;color:#4a5568;text-decoration:none;padding:9px 16px;border-radius:7px;border:1px solid rgba(0,0,0,0.09);transition:all 0.12s">Se connecter</a>
+    <a href="/login" style="font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;padding:9px 16px;border-radius:7px;border:1px solid var(--border);transition:all 0.12s">Se connecter</a>
     <a href="/login" class="nav-cta">Démarrer gratuitement →</a>
   </div>
 </nav>
- 
+
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
@@ -330,7 +333,7 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
         <div class="hc-bar">
           <div class="hc-dot" style="background:#dc2626;opacity:.4"></div>
           <div class="hc-dot" style="background:#d97706;opacity:.4"></div>
-          <div class="hc-dot" style="background:#16a34a;opacity:.4"></div>
+          <div class="hc-dot" style="background:#059669;opacity:.4"></div>
           <span class="hc-title">Plombiers Lyon · 48 trouvés</span>
           <span class="hc-live"><span class="hc-live-dot"></span>En cours</span>
         </div>
@@ -340,12 +343,12 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
           <span class="p-score sc-hot">96</span>
         </div>
         <div class="prospect-row">
-          <div class="p-av" style="background:#2a4d8f">SB</div>
+          <div class="p-av" style="background:#6366f1">SB</div>
           <div><div class="p-name">SB Plomberie Pro</div><div class="p-sub">Lyon 6e · 12 ans · ☆ 4.6 (89 avis)</div></div>
           <span class="p-score sc-hot">91</span>
         </div>
         <div class="prospect-row">
-          <div class="p-av" style="background:#1d4ed8">DT</div>
+          <div class="p-av" style="background:#7c3aed">DT</div>
           <div><div class="p-name">Dupont Thermique</div><div class="p-sub">Lyon 2e · 4 ans · ☆ 4.4 (41 avis)</div></div>
           <span class="p-score sc-warm">74</span>
         </div>
@@ -362,7 +365,7 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
     </div>
   </div>
 </section>
- 
+
 <!-- STATS BAND -->
 <div class="stats-band">
   <div class="stats-inner">
@@ -372,33 +375,33 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
     <div class="stat-block"><div class="stat-num">49<span class="unit">€</span></div><div class="stat-desc">par mois<br>pour exploser votre CA</div></div>
   </div>
 </div>
- 
+
 <!-- TICKER -->
-<div style="background:#f7f8fa;border-top:1px solid rgba(0,0,0,0.06);border-bottom:1px solid rgba(0,0,0,0.06);padding:14px 0;overflow:hidden;position:relative">
-  <div style="position:absolute;left:0;top:0;bottom:0;width:80px;background:linear-gradient(90deg,#f7f8fa,transparent);z-index:1"></div>
-  <div style="position:absolute;right:0;top:0;bottom:0;width:80px;background:linear-gradient(-90deg,#f7f8fa,transparent);z-index:1"></div>
+<div style="background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 0;overflow:hidden;position:relative">
+  <div style="position:absolute;left:0;top:0;bottom:0;width:80px;background:linear-gradient(90deg,var(--bg),transparent);z-index:1"></div>
+  <div style="position:absolute;right:0;top:0;bottom:0;width:80px;background:linear-gradient(-90deg,var(--bg),transparent);z-index:1"></div>
   <div style="display:flex;white-space:nowrap;animation:ticker 35s linear infinite">
     <div style="display:flex;flex-shrink:0">
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Plombier · Vaucluse · <strong style="color:#1e3a6e">12 réponses cette semaine</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Consultante RH · Paris · <strong style="color:#1e3a6e">agenda plein en 48h</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Restaurateur · Lyon · <strong style="color:#1e3a6e">+40% de CA en 30 jours</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Agence Growth · Nantes · <strong style="color:#1e3a6e">ROI dès le premier mois</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Architecte · Bordeaux · <strong style="color:#1e3a6e">leads qualifiés chaque matin</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Électricien · Marseille · <strong style="color:#1e3a6e">200 contactés en une nuit</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Coach · Toulouse · <strong style="color:#1e3a6e">pilote auto activé 24h/24</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Plombier · Vaucluse · <strong style="color:var(--navy)">12 réponses cette semaine</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Consultante RH · Paris · <strong style="color:var(--navy)">agenda plein en 48h</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Restaurateur · Lyon · <strong style="color:var(--navy)">+40% de CA en 30 jours</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Agence Growth · Nantes · <strong style="color:var(--navy)">ROI dès le premier mois</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Architecte · Bordeaux · <strong style="color:var(--navy)">leads qualifiés chaque matin</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Électricien · Marseille · <strong style="color:var(--navy)">200 contactés en une nuit</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Coach · Toulouse · <strong style="color:var(--navy)">pilote auto activé 24h/24</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
     </div>
     <div style="display:flex;flex-shrink:0" aria-hidden="true">
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Plombier · Vaucluse · <strong style="color:#1e3a6e">12 réponses cette semaine</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Consultante RH · Paris · <strong style="color:#1e3a6e">agenda plein en 48h</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Restaurateur · Lyon · <strong style="color:#1e3a6e">+40% de CA en 30 jours</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Agence Growth · Nantes · <strong style="color:#1e3a6e">ROI dès le premier mois</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Architecte · Bordeaux · <strong style="color:#1e3a6e">leads qualifiés chaque matin</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Électricien · Marseille · <strong style="color:#1e3a6e">200 contactés en une nuit</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
-      <span style="font-size:13px;color:#4a5568;padding:0 24px">Coach · Toulouse · <strong style="color:#1e3a6e">pilote auto activé 24h/24</strong></span><span style="color:#cbd5e1;padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Plombier · Vaucluse · <strong style="color:var(--navy)">12 réponses cette semaine</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Consultante RH · Paris · <strong style="color:var(--navy)">agenda plein en 48h</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Restaurateur · Lyon · <strong style="color:var(--navy)">+40% de CA en 30 jours</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Agence Growth · Nantes · <strong style="color:var(--navy)">ROI dès le premier mois</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Architecte · Bordeaux · <strong style="color:var(--navy)">leads qualifiés chaque matin</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Électricien · Marseille · <strong style="color:var(--navy)">200 contactés en une nuit</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
+      <span style="font-size:13px;color:var(--text2);padding:0 24px">Coach · Toulouse · <strong style="color:var(--navy)">pilote auto activé 24h/24</strong></span><span style="color:var(--bg3);padding:0 8px">·</span>
     </div>
   </div>
 </div>
- 
+
 <!-- PRODUCT SECTION -->
 <section class="product-section" id="product">
   <div class="section-center">
@@ -447,16 +450,16 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
           </div>
           <div class="af-grid">
             <div class="af-pc"><div class="af-ph"><div class="af-pav" style="background:var(--navy)">PL</div><div><div class="af-pn">Plomberie Leclerc</div><div class="af-pr">Lyon 3e · BTP · 7 ans</div></div><span class="af-ps2 sc-hot">96</span></div><div class="af-pm">☆ 4.8 · 124 avis · Site · Tél. vérifié</div><div class="af-pa"><button class="af-pbt act">Message</button><button class="af-pbt">Pipeline</button><button class="af-pbt">Fiche</button></div></div>
-            <div class="af-pc"><div class="af-ph"><div class="af-pav" style="background:#2a4d8f">SB</div><div><div class="af-pn">SB Plomberie Pro</div><div class="af-pr">Lyon 6e · BTP · 12 ans</div></div><span class="af-ps2 sc-hot">91</span></div><div class="af-pm">☆ 4.6 · 89 avis · Site · Email trouvé</div><div class="af-pa"><button class="af-pbt act">Message</button><button class="af-pbt">Pipeline</button><button class="af-pbt">Fiche</button></div></div>
-            <div class="af-pc"><div class="af-ph"><div class="af-pav" style="background:#1d4ed8">DT</div><div><div class="af-pn">Dupont Thermique</div><div class="af-pr">Lyon 2e · CVC · 4 ans</div></div><span class="af-ps2 sc-warm">74</span></div><div class="af-pm">☆ 4.4 · 41 avis · Tél. vérifié</div><div class="af-pa"><button class="af-pbt act">Message</button><button class="af-pbt">Pipeline</button><button class="af-pbt">Fiche</button></div></div>
-            <div class="af-pc"><div class="af-ph"><div class="af-pav" style="background:#152d57">RB</div><div><div class="af-pn">RB Installations</div><div class="af-pr">Lyon 8e · Plomberie · 2 ans</div></div><span class="af-ps2 sc-ok" style="background:rgba(30,58,110,0.08);color:var(--navy)">61</span></div><div class="af-pm">☆ 4.2 · 18 avis · En croissance ↗</div><div class="af-pa"><button class="af-pbt act">Message</button><button class="af-pbt">Pipeline</button><button class="af-pbt">Fiche</button></div></div>
+            <div class="af-pc"><div class="af-ph"><div class="af-pav" style="background:#6366f1">SB</div><div><div class="af-pn">SB Plomberie Pro</div><div class="af-pr">Lyon 6e · BTP · 12 ans</div></div><span class="af-ps2 sc-hot">91</span></div><div class="af-pm">☆ 4.6 · 89 avis · Site · Email trouvé</div><div class="af-pa"><button class="af-pbt act">Message</button><button class="af-pbt">Pipeline</button><button class="af-pbt">Fiche</button></div></div>
+            <div class="af-pc"><div class="af-ph"><div class="af-pav" style="background:#7c3aed">DT</div><div><div class="af-pn">Dupont Thermique</div><div class="af-pr">Lyon 2e · CVC · 4 ans</div></div><span class="af-ps2 sc-warm">74</span></div><div class="af-pm">☆ 4.4 · 41 avis · Tél. vérifié</div><div class="af-pa"><button class="af-pbt act">Message</button><button class="af-pbt">Pipeline</button><button class="af-pbt">Fiche</button></div></div>
+            <div class="af-pc"><div class="af-ph"><div class="af-pav" style="background:#3730a3">RB</div><div><div class="af-pn">RB Installations</div><div class="af-pr">Lyon 8e · Plomberie · 2 ans</div></div><span class="af-ps2" style="background:rgba(79,70,229,0.08);color:var(--navy)">61</span></div><div class="af-pm">☆ 4.2 · 18 avis · En croissance ↗</div><div class="af-pa"><button class="af-pbt act">Message</button><button class="af-pbt">Pipeline</button><button class="af-pbt">Fiche</button></div></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
- 
+
 <!-- PAIN SECTION -->
 <section class="pain-section">
   <div class="pain-grid">
@@ -482,140 +485,76 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
     </div>
   </div>
 </section>
- 
+
 <!-- SOURCES -->
-<section style="background:#fff;padding:96px 52px;border-top:1px solid rgba(0,0,0,0.06)">
+<section style="background:#fff;padding:96px 52px;border-top:1px solid var(--border)">
   <div style="max-width:1160px;margin:0 auto">
     <div style="text-align:center;margin-bottom:52px">
       <div class="s-label" style="justify-content:center">Sources de données</div>
       <h2 class="s-title" style="text-align:center;margin:0 auto 12px">Les données les plus fraîches<br><span class="navy">du marché français.</span></h2>
       <p class="s-sub" style="text-align:center;margin:0 auto">Alma.+ agrège en temps réel 10 sources officielles et publiques.</p>
     </div>
- 
     <div style="display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(130px,auto);gap:14px;align-items:stretch">
- 
-      <!-- ROW 1 -->
-      <!-- Google Maps — 4col x 2row (grande card verticale gauche) -->
       <div style="grid-column:span 4;grid-row:span 2;background:linear-gradient(160deg,#EA4335 0%,#FBBC05 100%);border-radius:20px;padding:28px;color:white;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end">
         <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.07)"></div>
-        <div style="position:absolute;top:28px;left:28px;width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
+        <div style="position:absolute;top:28px;left:28px;width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
         <div style="font-size:20px;font-weight:800;margin-bottom:8px;letter-spacing:-0.4px">Google Maps</div>
         <div style="font-size:13px;color:rgba(255,255,255,0.82);line-height:1.6;margin-bottom:16px">Commerces locaux, avis clients, numéros vérifiés en temps réel.</div>
         <div style="font-size:11px;font-weight:700;background:rgba(255,255,255,0.2);display:inline-block;padding:5px 14px;border-radius:99px">Places API · Temps réel</div>
       </div>
- 
-      <!-- INSEE — 5col -->
-      <div style="grid-column:span 5;background:linear-gradient(135deg,#003189,#1a4fa8);border-radius:20px;padding:26px 28px;color:white;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden">
+      <div style="grid-column:span 5;background:linear-gradient(135deg,#3730a3,#4f46e5);border-radius:20px;padding:26px 28px;color:white;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden">
         <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.04)"></div>
-        <div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-        </div>
+        <div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
         <div>
           <div style="font-size:17px;font-weight:800;margin-bottom:6px;letter-spacing:-0.3px">INSEE / SIRENE</div>
           <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:12px">Base officielle des entreprises françaises.</div>
           <div style="font-size:34px;font-weight:900;letter-spacing:-1.5px;color:white;font-family:'Inter Tight','Inter',sans-serif;line-height:1">12M<span style="font-size:14px;font-weight:500;color:rgba(255,255,255,0.45);margin-left:6px">entreprises</span></div>
         </div>
       </div>
- 
-      <!-- LinkedIn — 3col -->
       <div style="grid-column:span 3;background:#0A66C2;border-radius:20px;padding:24px;color:white;display:flex;flex-direction:column;justify-content:space-between">
-        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
-        </div>
-        <div>
-          <div style="font-size:15px;font-weight:800;margin-bottom:4px">LinkedIn</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.6)">Décideurs B2B</div>
-        </div>
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg></div>
+        <div><div style="font-size:15px;font-weight:800;margin-bottom:4px">LinkedIn</div><div style="font-size:12px;color:rgba(255,255,255,0.6)">Décideurs B2B</div></div>
       </div>
- 
-      <!-- ROW 2 -->
-      <!-- Google Maps continue (span 2) -->
- 
-      <!-- DVF — 3col -->
       <div style="grid-column:span 3;background:linear-gradient(135deg,#00AC8C,#007a63);border-radius:20px;padding:24px;color:white;display:flex;flex-direction:column;justify-content:space-between">
-        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </div>
-        <div>
-          <div style="font-size:15px;font-weight:800;margin-bottom:4px">DVF</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.65)">Acheteurs immobiliers récents</div>
-        </div>
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div><div style="font-size:15px;font-weight:800;margin-bottom:4px">DVF</div><div style="font-size:12px;color:rgba(255,255,255,0.65)">Acheteurs immobiliers récents</div></div>
       </div>
- 
-      <!-- Ma Prime Rénov — 5col -->
-      <div style="grid-column:span 5;background:linear-gradient(135deg,#0a6640,#16a34a);border-radius:20px;padding:24px 28px;color:white;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden">
+      <div style="grid-column:span 5;background:linear-gradient(135deg,#0a6640,#059669);border-radius:20px;padding:24px 28px;color:white;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden">
         <div style="position:absolute;right:-15px;bottom:-15px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
-        <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
         <div>
           <div style="font-size:16px;font-weight:800;margin-bottom:5px">Ma Prime Rénov</div>
           <div style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5">Propriétaires en rénovation énergétique — idéal pour artisans du bâtiment.</div>
         </div>
       </div>
- 
-      <!-- ROW 3 -->
-      <!-- BODACC — 4col -->
-      <div style="grid-column:span 4;background:linear-gradient(135deg,#1e3a6e,#2a4d8f);border-radius:20px;padding:24px 28px;color:white;display:flex;align-items:center;gap:20px">
-        <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        </div>
-        <div>
-          <div style="font-size:16px;font-weight:800;margin-bottom:5px">BODACC</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.5">Créations et liquidations d'entreprises en temps réel.</div>
-        </div>
+      <div style="grid-column:span 4;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:20px;padding:24px 28px;color:white;display:flex;align-items:center;gap:20px">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div><div style="font-size:16px;font-weight:800;margin-bottom:5px">BODACC</div><div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.5">Créations et liquidations d'entreprises en temps réel.</div></div>
       </div>
- 
-      <!-- Permis construire — 3col -->
       <div style="grid-column:span 3;background:linear-gradient(135deg,#7c3aed,#6d28d9);border-radius:20px;padding:24px;color:white;display:flex;flex-direction:column;justify-content:space-between">
-        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        </div>
-        <div>
-          <div style="font-size:15px;font-weight:800;margin-bottom:4px">Permis construire</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.7)">Propriétaires qui rénovent</div>
-        </div>
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div><div style="font-size:15px;font-weight:800;margin-bottom:4px">Permis construire</div><div style="font-size:12px;color:rgba(255,255,255,0.7)">Propriétaires qui rénovent</div></div>
       </div>
- 
-      <!-- Pages Jaunes — 2col -->
       <div style="grid-column:span 2;background:linear-gradient(135deg,#d97706,#f59e0b);border-radius:20px;padding:24px;color:#1a1200;display:flex;flex-direction:column;justify-content:space-between">
-        <div style="width:44px;height:44px;border-radius:12px;background:rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-        </div>
-        <div>
-          <div style="font-size:15px;font-weight:800;margin-bottom:4px">Pages Jaunes</div>
-          <div style="font-size:12px;color:rgba(0,0,0,0.5)">Annuaire pro</div>
-        </div>
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <div><div style="font-size:15px;font-weight:800;margin-bottom:4px">Pages Jaunes</div><div style="font-size:12px;color:rgba(0,0,0,0.5)">Annuaire pro</div></div>
       </div>
- 
-      <!-- Google Avis — 3col -->
       <div style="grid-column:span 3;background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:20px;padding:24px 28px;color:white;display:flex;align-items:center;gap:18px">
-        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <div>
-          <div style="font-size:15px;font-weight:800;margin-bottom:4px">Google Avis</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.7)">Clients insatisfaits chez vos concurrents</div>
-        </div>
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <div><div style="font-size:15px;font-weight:800;margin-bottom:4px">Google Avis</div><div style="font-size:12px;color:rgba(255,255,255,0.7)">Clients insatisfaits chez vos concurrents</div></div>
       </div>
- 
-      <!-- BOAMP — 12col pleine largeur -->
-      <div style="grid-column:span 12;background:linear-gradient(135deg,#003189,#0047bb);border-radius:20px;padding:24px 36px;color:white;display:flex;align-items:center;gap:28px">
-        <div style="width:50px;height:50px;border-radius:14px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        </div>
+      <div style="grid-column:span 12;background:linear-gradient(135deg,#3730a3,#4f46e5);border-radius:20px;padding:24px 36px;color:white;display:flex;align-items:center;gap:28px">
+        <div style="width:50px;height:50px;border-radius:14px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
         <div style="flex:1">
           <div style="font-size:17px;font-weight:800;margin-bottom:5px;letter-spacing:-0.3px">BOAMP — Appels d'offres publics</div>
           <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5">Marchés publics disponibles — communes, hôpitaux, écoles qui cherchent des prestataires.</div>
         </div>
         <a href="/login" style="flex-shrink:0;background:rgba(255,255,255,0.15);color:white;font-size:13px;font-weight:700;padding:10px 22px;border-radius:9px;text-decoration:none;white-space:nowrap;border:1px solid rgba(255,255,255,0.2)">Prospecter →</a>
       </div>
- 
     </div>
   </div>
 </section>
+
 <!-- FEATURES -->
 <section class="feat-section" id="features">
   <div class="feat-head">
@@ -626,47 +565,17 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
     <p class="s-sub" style="margin:0">De la recherche de prospects à la signature — en un seul outil, sans prise de tête.</p>
   </div>
   <div class="feat-grid">
-    <div class="feat-card">
-      <div class="feat-icon"><svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="6"/><path d="M14 14l3.5 3.5"/></svg></div>
-      <div class="feat-title">Recherche de prospects</div>
-      <div class="feat-desc">Décrivez votre cible en français. Alma.+ trouve les vraies entreprises via Google Maps avec données vérifiées en temps réel.</div>
-      <span class="feat-tag">Google Maps · Places API</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon"><svg viewBox="0 0 20 20"><path d="M10 3C7 3 4 5.5 4 9c0 2 1 3.5 2.5 4.5V16h7v-2.5C15 12.5 16 11 16 9c0-3.5-3-6-6-6z"/></svg></div>
-      <div class="feat-title">Score 0 → 100</div>
-      <div class="feat-desc">12 critères analysés : ancienneté, avis Google, présence web, taille estimée. Traitez les meilleurs prospects en priorité.</div>
-      <span class="feat-tag">Scoring · 12 critères</span>
-    </div>
-    <div class="feat-card dark">
-      <div class="feat-icon"><svg viewBox="0 0 20 20"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M2 7l8 5 8-5"/></svg></div>
-      <div class="feat-title">Emails ultra-personnalisés</div>
-      <div class="feat-desc">Un email unique par prospect. Rédigé sur mesure. Taux de réponse moyen : 34% vs 2% en manuel.</div>
-      <span class="feat-tag">Personnalisation avancée</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon"><svg viewBox="0 0 20 20"><path d="M3 7h14M3 11h14M3 15h8"/></svg></div>
-      <div class="feat-title">Séquences automatiques</div>
-      <div class="feat-desc">Pas de réponse ? Relance à J+3, J+7, J+14 avec des messages différents. Vous ne perdez plus un lead.</div>
-      <span class="feat-tag">Automatisation · Multi-étapes</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg></div>
-      <div class="feat-title">Pipeline & CRM intégré</div>
-      <div class="feat-desc">Kanban visuel, notes, historique complet. Chaque lead à sa place, aucun ne tombe dans les oubliettes.</div>
-      <span class="feat-tag">CRM · Kanban · Rappels</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon"><svg viewBox="0 0 20 20"><path d="M2 15l4-5 3 3 4-6 5 8"/></svg></div>
-      <div class="feat-title">Analytics en temps réel</div>
-      <div class="feat-desc">Taux d'ouverture, réponses, conversions. Vous voyez exactement ce qui fonctionne et optimisez en continu.</div>
-      <span class="feat-tag">Dashboard · Export</span>
-    </div>
+    <div class="feat-card"><div class="feat-icon"><svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="6"/><path d="M14 14l3.5 3.5"/></svg></div><div class="feat-title">Recherche de prospects</div><div class="feat-desc">Décrivez votre cible en français. Alma.+ trouve les vraies entreprises via Google Maps avec données vérifiées en temps réel.</div><span class="feat-tag">Google Maps · Places API</span></div>
+    <div class="feat-card"><div class="feat-icon"><svg viewBox="0 0 20 20"><path d="M10 3C7 3 4 5.5 4 9c0 2 1 3.5 2.5 4.5V16h7v-2.5C15 12.5 16 11 16 9c0-3.5-3-6-6-6z"/></svg></div><div class="feat-title">Score 0 → 100</div><div class="feat-desc">12 critères analysés : ancienneté, avis Google, présence web, taille estimée. Traitez les meilleurs prospects en priorité.</div><span class="feat-tag">Scoring · 12 critères</span></div>
+    <div class="feat-card dark"><div class="feat-icon"><svg viewBox="0 0 20 20"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M2 7l8 5 8-5"/></svg></div><div class="feat-title">Emails ultra-personnalisés</div><div class="feat-desc">Un email unique par prospect. Rédigé sur mesure. Taux de réponse moyen : 34% vs 2% en manuel.</div><span class="feat-tag">Personnalisation avancée</span></div>
+    <div class="feat-card"><div class="feat-icon"><svg viewBox="0 0 20 20"><path d="M3 7h14M3 11h14M3 15h8"/></svg></div><div class="feat-title">Séquences automatiques</div><div class="feat-desc">Pas de réponse ? Relance à J+3, J+7, J+14 avec des messages différents. Vous ne perdez plus un lead.</div><span class="feat-tag">Automatisation · Multi-étapes</span></div>
+    <div class="feat-card"><div class="feat-icon"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg></div><div class="feat-title">Pipeline & CRM intégré</div><div class="feat-desc">Kanban visuel, notes, historique complet. Chaque lead à sa place, aucun ne tombe dans les oubliettes.</div><span class="feat-tag">CRM · Kanban · Rappels</span></div>
+    <div class="feat-card"><div class="feat-icon"><svg viewBox="0 0 20 20"><path d="M2 15l4-5 3 3 4-6 5 8"/></svg></div><div class="feat-title">Analytics en temps réel</div><div class="feat-desc">Taux d'ouverture, réponses, conversions. Vous voyez exactement ce qui fonctionne et optimisez en continu.</div><span class="feat-tag">Dashboard · Export</span></div>
   </div>
 </section>
- 
+
 <!-- COMMENT CA MARCHE -->
-<section style="background:#f7f8fa;padding:96px 52px">
+<section style="background:var(--bg);padding:96px 52px">
   <div style="max-width:1000px;margin:0 auto">
     <div style="text-align:center;margin-bottom:52px">
       <div class="s-label" style="justify-content:center">Comment ça marche</div>
@@ -674,15 +583,15 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
       <p class="s-sub" style="text-align:center;margin:0 auto">Pas de formation. Pas de technicien. Juste vous et vos nouveaux clients.</p>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
-      <div style="background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:16px;padding:32px 28px;overflow:hidden;position:relative">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#1e3a6e,#2563eb)"></div>
-        <div style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#eef2f9;color:#1e3a6e;font-size:14px;font-weight:900;margin-bottom:20px">1</div>
-        <div style="font-size:18px;font-weight:900;color:#0f1729;margin-bottom:10px;letter-spacing:-0.5px;line-height:1.2">Décrivez<br>votre cible</div>
-        <div style="font-size:13px;color:#4a5568;line-height:1.7;margin-bottom:16px">En français, comme vous parlez. "Plombiers en Occitanie", "DRH de PME parisiennes"...</div>
-        <div style="background:#f7f8fa;border-radius:8px;padding:10px 14px;font-size:12px;font-family:monospace;color:#1e3a6e;border:1px solid #e4e8f0">"200 électriciens à Marseille"</div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:32px 28px;overflow:hidden;position:relative">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy),var(--accent))"></div>
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--primary-lt);color:var(--navy);font-size:14px;font-weight:900;margin-bottom:20px">1</div>
+        <div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:10px;letter-spacing:-0.5px;line-height:1.2">Décrivez<br>votre cible</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">En français, comme vous parlez. "Plombiers en Occitanie", "DRH de PME parisiennes"...</div>
+        <div style="background:var(--bg);border-radius:8px;padding:10px 14px;font-size:12px;font-family:monospace;color:var(--navy);border:1px solid var(--border)">"200 électriciens à Marseille"</div>
       </div>
-      <div style="background:#1e3a6e;border-radius:16px;padding:32px 28px;position:relative;overflow:hidden">
-        <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.04)"></div>
+      <div style="background:linear-gradient(135deg,var(--navy),var(--accent));border-radius:16px;padding:32px 28px;position:relative;overflow:hidden">
+        <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05)"></div>
         <div style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;font-size:14px;font-weight:900;margin-bottom:20px">2</div>
         <div style="font-size:18px;font-weight:900;color:white;margin-bottom:10px;letter-spacing:-0.5px;line-height:1.2">Alma.+<br>prospecte</div>
         <div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:16px">Alma.+ trouve les prospects, rédige un message unique pour chacun et les contacte automatiquement.</div>
@@ -692,17 +601,17 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
           <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.7)"><span style="width:6px;height:6px;border-radius:50%;background:#00B67A;flex-shrink:0"></span>Envoie et relance</div>
         </div>
       </div>
-      <div style="background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:16px;padding:32px 28px;overflow:hidden;position:relative">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#2563eb,#16a34a)"></div>
-        <div style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#eef2f9;color:#1e3a6e;font-size:14px;font-weight:900;margin-bottom:20px">3</div>
-        <div style="font-size:18px;font-weight:900;color:#0f1729;margin-bottom:10px;letter-spacing:-0.5px;line-height:1.2">Vous<br>signez</div>
-        <div style="font-size:13px;color:#4a5568;line-height:1.7;margin-bottom:16px">Vous recevez une alerte dès qu'un prospect répond. Vous n'avez plus qu'à conclure.</div>
-        <div style="background:#dcfce7;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:#16a34a;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8l4 4 6-6"/></svg>Nouveau prospect répond !</div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:32px 28px;overflow:hidden;position:relative">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--green))"></div>
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--primary-lt);color:var(--navy);font-size:14px;font-weight:900;margin-bottom:20px">3</div>
+        <div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:10px;letter-spacing:-0.5px;line-height:1.2">Vous<br>signez</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">Vous recevez une alerte dès qu'un prospect répond. Vous n'avez plus qu'à conclure.</div>
+        <div style="background:#dcfce7;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8l4 4 6-6"/></svg>Nouveau prospect répond !</div>
       </div>
     </div>
   </div>
 </section>
- 
+
 <!-- CAS D'USAGE -->
 <section style="background:#fff;padding:96px 52px">
   <div style="max-width:1160px;margin:0 auto">
@@ -712,34 +621,34 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
       <p class="s-sub" style="text-align:center;margin:0 auto">Artisan, consultant, commerçant, agence — Alma.+ s'adapte à votre activité.</p>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
-      <div style="background:#f7f8fa;border:1px solid rgba(0,0,0,0.07);border-radius:16px;padding:26px;position:relative;overflow:hidden">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#1e3a6e,#2563eb)"></div>
-        <div style="width:42px;height:42px;border-radius:10px;background:#1e3a6e;display:flex;align-items:center;justify-content:center;margin-bottom:14px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
-        <div style="font-size:10px;font-weight:700;color:#1e3a6e;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Artisan · BTP</div>
-        <div style="font-size:15px;font-weight:800;color:#0f1729;margin-bottom:8px">Antoine, plombier à Avignon</div>
-        <div style="font-size:13px;color:#4a5568;line-height:1.7;margin-bottom:14px">"Je tape 'propriétaires avec permis de construire dans le Vaucluse'. Alma.+ contacte 200 personnes avec un message personnalisé. Je reçois les réponses directement."</div>
-        <div style="background:#eef2f9;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:#1e3a6e">3 chantiers signés en 1 semaine</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:26px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy),var(--accent))"></div>
+        <div style="width:42px;height:42px;border-radius:10px;background:var(--navy);display:flex;align-items:center;justify-content:center;margin-bottom:14px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
+        <div style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Artisan · BTP</div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px">Antoine, plombier à Avignon</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">"Je tape 'propriétaires avec permis de construire dans le Vaucluse'. Alma.+ contacte 200 personnes avec un message personnalisé. Je reçois les réponses directement."</div>
+        <div style="background:var(--primary-lt);border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--navy)">3 chantiers signés en 1 semaine</div>
       </div>
-      <div style="background:#f7f8fa;border:1px solid rgba(0,0,0,0.07);border-radius:16px;padding:26px;position:relative;overflow:hidden">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#2563eb,#7c3aed)"></div>
-        <div style="width:42px;height:42px;border-radius:10px;background:#2563eb;display:flex;align-items:center;justify-content:center;margin-bottom:14px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-        <div style="font-size:10px;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Consultant · Freelance</div>
-        <div style="font-size:15px;font-weight:800;color:#0f1729;margin-bottom:8px">Sophie, consultante RH à Paris</div>
-        <div style="font-size:13px;color:#4a5568;line-height:1.7;margin-bottom:14px">"Le pilote automatique contacte les DRH de PME parisiennes pendant que je suis en mission. Mon agenda est plein 3 semaines à l'avance."</div>
-        <div style="background:#eff6ff;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:#2563eb">Agenda plein en 48h</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:26px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy),var(--accent))"></div>
+        <div style="width:42px;height:42px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:14px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+        <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Consultant · Freelance</div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px">Sophie, consultante RH à Paris</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">"Le pilote automatique contacte les DRH de PME parisiennes pendant que je suis en mission. Mon agenda est plein 3 semaines à l'avance."</div>
+        <div style="background:var(--primary-lt);border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--navy)">Agenda plein en 48h</div>
       </div>
-      <div style="background:#f7f8fa;border:1px solid rgba(0,0,0,0.07);border-radius:16px;padding:26px;position:relative;overflow:hidden">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7c3aed,#dc2626)"></div>
-        <div style="width:42px;height:42px;border-radius:10px;background:#7c3aed;display:flex;align-items:center;justify-content:center;margin-bottom:14px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
-        <div style="font-size:10px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Agence · Growth</div>
-        <div style="font-size:15px;font-weight:800;color:#0f1729;margin-bottom:8px">Julien, fondateur d'agence à Nantes</div>
-        <div style="font-size:13px;color:#4a5568;line-height:1.7;margin-bottom:14px">"Je gère 10 clients en marque blanche. Je facture 3x le prix d'Alma.+ à mes clients. ROI immédiat."</div>
-        <div style="background:#f5f3ff;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:#7c3aed">ROI dès le premier mois</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:26px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--navy))"></div>
+        <div style="width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--navy),var(--accent));display:flex;align-items:center;justify-content:center;margin-bottom:14px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Agence · Growth</div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px">Julien, fondateur d'agence à Nantes</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">"Je gère 10 clients en marque blanche. Je facture 3x le prix d'Alma.+ à mes clients. ROI immédiat."</div>
+        <div style="background:var(--primary-lt);border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--navy)">ROI dès le premier mois</div>
       </div>
     </div>
   </div>
 </section>
- 
+
 <!-- RÉSULTATS -->
 <section class="results-section">
   <div class="results-inner section-center">
@@ -757,7 +666,7 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
     </div>
   </div>
 </section>
- 
+
 <!-- PRICING -->
 <section class="pricing-section" id="pricing">
   <div class="section-center" style="text-align:center">
@@ -766,7 +675,7 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
     <p class="s-sub" style="margin:0 auto">7 jours pour voir si ça change votre business. Spoiler : ça le change.</p>
   </div>
   <div style="text-align:center;margin:28px 0 0">
-    <span style="display:inline-flex;align-items:center;gap:8px;background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.2);padding:8px 18px;border-radius:99px;font-size:13px;font-weight:600;color:#16a34a">
+    <span style="display:inline-flex;align-items:center;gap:8px;background:rgba(5,150,105,0.08);border:1px solid rgba(5,150,105,0.2);padding:8px 18px;border-radius:99px;font-size:13px;font-weight:600;color:var(--green)">
       7 jours gratuits · CB requise · Aucun prélèvement avant J+7 · Annulable à tout moment
     </span>
   </div>
@@ -816,9 +725,9 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
     </div>
   </div>
 </section>
- 
+
 <!-- TRUSTPILOT -->
-<section style="background:#fff;padding:80px 52px;border-top:1px solid rgba(0,0,0,0.06)">
+<section style="background:#fff;padding:80px 52px;border-top:1px solid var(--border)">
   <div style="max-width:1160px;margin:0 auto">
     <div style="text-align:center;margin-bottom:40px">
       <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px">
@@ -833,136 +742,53 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
         <svg width="30" height="30" viewBox="0 0 24 24"><defs><linearGradient id="sg75" x1="0" x2="1" y1="0" y2="0"><stop offset="75%" stop-color="#00B67A"/><stop offset="75%" stop-color="#dcdce0"/></linearGradient></defs><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" fill="url(#sg75)"/></svg>
       </div>
       <div style="font-size:15px;font-weight:700;color:#191919;margin-bottom:4px">4.8 sur 5 · <strong>Excellent</strong></div>
-      <div style="font-size:13px;color:#94a3b8">Basé sur 127 avis vérifiés</div>
+      <div style="font-size:13px;color:var(--text3)">Basé sur 127 avis vérifiés</div>
     </div>
     <div style="position:relative;overflow:hidden">
       <div id="tp-track" style="display:flex;gap:16px;transition:transform 0.4s cubic-bezier(.25,.46,.45,.94)">
-        <!-- Avis 1 -->
-        <div style="min-width:300px;max-width:300px;background:#f9fafb;border:1px solid rgba(0,0,0,0.07);border-radius:14px;padding:22px;flex-shrink:0">
-          <div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div>
-          <div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">Agenda plein en deux semaines</div>
-          <div style="font-size:12px;color:#4a5568;line-height:1.7;margin-bottom:14px">Freelance en ressources humaines, je passais mes journées à chercher des missions. Alma.+ a tout changé. Les messages sont vraiment personnalisés, mes prospects pensent que je les ai contactés moi-même.</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:32px;height:32px;border-radius:50%;background:#1e3a6e;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">S.</div>
-            <div><div style="font-size:12px;font-weight:700;color:#191919">Sophie G.</div><div style="font-size:10px;color:#94a3b8">Consultante RH indépendante · Paris</div></div>
-            <div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div>
-          </div>
-        </div>
-        <!-- Avis 2 -->
-        <div style="min-width:300px;max-width:300px;background:#f9fafb;border:1px solid rgba(0,0,0,0.07);border-radius:14px;padding:22px;flex-shrink:0">
-          <div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div>
-          <div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">3 chantiers signés la première semaine</div>
-          <div style="font-size:12px;color:#4a5568;line-height:1.7;margin-bottom:14px">Alma.+ contacte les propriétaires avec permis de construire dans mon département. Je me réveille avec des réponses chaque matin. Résultat immédiat, sans effort.</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:32px;height:32px;border-radius:50%;background:#2563eb;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">A.</div>
-            <div><div style="font-size:12px;font-weight:700;color:#191919">Antoine B.</div><div style="font-size:10px;color:#94a3b8">Artisan plombier · Vaucluse</div></div>
-            <div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div>
-          </div>
-        </div>
-        <!-- Avis 3 -->
-        <div style="min-width:300px;max-width:300px;background:#f9fafb;border:1px solid rgba(0,0,0,0.07);border-radius:14px;padding:22px;flex-shrink:0">
-          <div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div>
-          <div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">ROI immédiat, je revends Alma.+ à mes clients</div>
-          <div style="font-size:12px;color:#4a5568;line-height:1.7;margin-bottom:14px">J'ai intégré Alma.+ dans mon offre. Chaque client a sa campagne. Je facture 3x le prix à mes clients. Pur profit dès le premier mois.</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:32px;height:32px;border-radius:50%;background:#7c3aed;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">J.</div>
-            <div><div style="font-size:12px;font-weight:700;color:#191919">Julien T.</div><div style="font-size:10px;color:#94a3b8">Agence de croissance · Nantes</div></div>
-            <div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div>
-          </div>
-        </div>
-        <!-- Avis 4 -->
-        <div style="min-width:300px;max-width:300px;background:#f9fafb;border:1px solid rgba(0,0,0,0.07);border-radius:14px;padding:22px;flex-shrink:0">
-          <div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div>
-          <div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">+40% de CA en 30 jours</div>
-          <div style="font-size:12px;color:#4a5568;line-height:1.7;margin-bottom:14px">Je cherchais des entreprises pour des repas d'équipe. Alma.+ a contacté des DRH de ma ville. Résultat au-delà de mes espérances. Indispensable.</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:32px;height:32px;border-radius:50%;background:#0a6640;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">K.</div>
-            <div><div style="font-size:12px;font-weight:700;color:#191919">Karim A.</div><div style="font-size:10px;color:#94a3b8">Restaurateur · Lyon</div></div>
-            <div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div>
-          </div>
-        </div>
-        <!-- Avis 5 -->
-        <div style="min-width:300px;max-width:300px;background:#f9fafb;border:1px solid rgba(0,0,0,0.07);border-radius:14px;padding:22px;flex-shrink:0">
-          <div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div>
-          <div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">Les leads qualifiés arrivent chaque matin</div>
-          <div style="font-size:12px;color:#4a5568;line-height:1.7;margin-bottom:14px">Alma.+ cible les permis de construire dans ma région. Je reçois des contacts qualifiés sans lever le petit doigt. L'outil que j'attendais depuis des années.</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:32px;height:32px;border-radius:50%;background:#b91c1c;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">M.</div>
-            <div><div style="font-size:12px;font-weight:700;color:#191919">Marie-C. L.</div><div style="font-size:10px;color:#94a3b8">Architecte indépendante · Bordeaux</div></div>
-            <div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div>
-          </div>
-        </div>
-        <!-- Avis 6 -->
-        <div style="min-width:300px;max-width:300px;background:#f9fafb;border:1px solid rgba(0,0,0,0.07);border-radius:14px;padding:22px;flex-shrink:0">
-          <div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div>
-          <div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">200 contactés en une nuit, 12 réponses le matin</div>
-          <div style="font-size:12px;color:#4a5568;line-height:1.7;margin-bottom:14px">J'ai lancé le pilote automatique avant d'aller dormir. Le lendemain matin, 12 réponses m'attendaient. Surréaliste. Je recommande à tous les artisans.</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:32px;height:32px;border-radius:50%;background:#d97706;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">P.</div>
-            <div><div style="font-size:12px;font-weight:700;color:#191919">Pierre V.</div><div style="font-size:10px;color:#94a3b8">Électricien · Marseille</div></div>
-            <div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div>
-          </div>
-        </div>
-        <!-- Avis 7 -->
-        <div style="min-width:300px;max-width:300px;background:#f9fafb;border:1px solid rgba(0,0,0,0.07);border-radius:14px;padding:22px;flex-shrink:0">
-          <div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div>
-          <div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">Mes prospects pensent que je les ai contactés personnellement</div>
-          <div style="font-size:12px;color:#4a5568;line-height:1.7;margin-bottom:14px">Les messages sont si bien rédigés que mes clients pensent que je les ai contactés individuellement. Le taux de réponse est incroyable. Je ne peux plus m'en passer.</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:32px;height:32px;border-radius:50%;background:#003189;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">C.</div>
-            <div><div style="font-size:12px;font-weight:700;color:#191919">Claire M.</div><div style="font-size:10px;color:#94a3b8">Agent immobilier · Nice</div></div>
-            <div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div>
-          </div>
-        </div>
-        <!-- Avis 8 -->
-        <div style="min-width:300px;max-width:300px;background:#f9fafb;border:1px solid rgba(0,0,0,0.07);border-radius:14px;padding:22px;flex-shrink:0">
-          <div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div>
-          <div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">Pipeline plein en permanence</div>
-          <div style="font-size:12px;color:#4a5568;line-height:1.7;margin-bottom:14px">Formateur indépendant, j'avais du mal à remplir mes sessions. Alma.+ contacte les RH d'entreprises de ma région. Mon agenda est plein 2 mois à l'avance.</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:32px;height:32px;border-radius:50%;background:#0A66C2;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">R.</div>
-            <div><div style="font-size:12px;font-weight:700;color:#191919">Romain D.</div><div style="font-size:10px;color:#94a3b8">Formateur indépendant · Toulouse</div></div>
-            <div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div>
-          </div>
-        </div>
+        <div style="min-width:300px;max-width:300px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:22px;flex-shrink:0"><div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div><div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">Agenda plein en deux semaines</div><div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px">Freelance en ressources humaines, je passais mes journées à chercher des missions. Alma.+ a tout changé. Les messages sont vraiment personnalisés.</div><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">S.</div><div><div style="font-size:12px;font-weight:700;color:#191919">Sophie G.</div><div style="font-size:10px;color:var(--text3)">Consultante RH indépendante · Paris</div></div><div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div></div></div>
+        <div style="min-width:300px;max-width:300px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:22px;flex-shrink:0"><div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div><div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">3 chantiers signés la première semaine</div><div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px">Alma.+ contacte les propriétaires avec permis de construire dans mon département. Je me réveille avec des réponses chaque matin.</div><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:var(--accent);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">A.</div><div><div style="font-size:12px;font-weight:700;color:#191919">Antoine B.</div><div style="font-size:10px;color:var(--text3)">Artisan plombier · Vaucluse</div></div><div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div></div></div>
+        <div style="min-width:300px;max-width:300px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:22px;flex-shrink:0"><div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div><div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">ROI immédiat, je revends Alma.+ à mes clients</div><div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px">J'ai intégré Alma.+ dans mon offre. Je facture 3x le prix à mes clients. Pur profit dès le premier mois.</div><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--accent));color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">J.</div><div><div style="font-size:12px;font-weight:700;color:#191919">Julien T.</div><div style="font-size:10px;color:var(--text3)">Agence de croissance · Nantes</div></div><div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div></div></div>
+        <div style="min-width:300px;max-width:300px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:22px;flex-shrink:0"><div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div><div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">+40% de CA en 30 jours</div><div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px">Je cherchais des entreprises pour des repas d'équipe. Alma.+ a contacté des DRH de ma ville. Résultat au-delà de mes espérances.</div><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:#0a6640;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">K.</div><div><div style="font-size:12px;font-weight:700;color:#191919">Karim A.</div><div style="font-size:10px;color:var(--text3)">Restaurateur · Lyon</div></div><div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div></div></div>
+        <div style="min-width:300px;max-width:300px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:22px;flex-shrink:0"><div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div><div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">Les leads qualifiés arrivent chaque matin</div><div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px">Alma.+ cible les permis de construire dans ma région. Je reçois des contacts qualifiés sans lever le petit doigt.</div><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:#b91c1c;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">M.</div><div><div style="font-size:12px;font-weight:700;color:#191919">Marie-C. L.</div><div style="font-size:10px;color:var(--text3)">Architecte indépendante · Bordeaux</div></div><div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div></div></div>
+        <div style="min-width:300px;max-width:300px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:22px;flex-shrink:0"><div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div><div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">200 contactés en une nuit, 12 réponses le matin</div><div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px">J'ai lancé le pilote automatique avant d'aller dormir. Le lendemain matin, 12 réponses m'attendaient. Surréaliste.</div><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:var(--amber);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">P.</div><div><div style="font-size:12px;font-weight:700;color:#191919">Pierre V.</div><div style="font-size:10px;color:var(--text3)">Électricien · Marseille</div></div><div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div></div></div>
+        <div style="min-width:300px;max-width:300px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:22px;flex-shrink:0"><div style="display:flex;gap:2px;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="#00B67A"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg></div><div style="font-size:13px;font-weight:700;color:#191919;margin-bottom:7px">Pipeline plein en permanence</div><div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px">Formateur indépendant, j'avais du mal à remplir mes sessions. Mon agenda est plein 2 mois à l'avance grâce à Alma.+.</div><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:#0A66C2;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">R.</div><div><div style="font-size:12px;font-weight:700;color:#191919">Romain D.</div><div style="font-size:10px;color:var(--text3)">Formateur indépendant · Toulouse</div></div><div style="margin-left:auto;font-size:9px;color:#00B67A;font-weight:700;background:rgba(0,182,122,0.08);padding:2px 7px;border-radius:4px">Vérifié</div></div></div>
       </div>
-      <!-- Navigation -->
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:20px">
-        <button onclick="tpSlide(-1)" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#191919" stroke-width="2" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg></button>
+        <button onclick="tpSlide(-1)" style="width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#191919" stroke-width="2" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg></button>
         <div id="tp-dots" style="display:flex;gap:6px">
-          <div class="tp-dot" style="width:20px;height:6px;border-radius:99px;background:#00B67A;transition:all 0.2s"></div>
-          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:#e4e4e7;transition:all 0.2s"></div>
-          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:#e4e4e7;transition:all 0.2s"></div>
-          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:#e4e4e7;transition:all 0.2s"></div>
-          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:#e4e4e7;transition:all 0.2s"></div>
-          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:#e4e4e7;transition:all 0.2s"></div>
-          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:#e4e4e7;transition:all 0.2s"></div>
-          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:#e4e4e7;transition:all 0.2s"></div>
+          <div class="tp-dot" style="width:20px;height:6px;border-radius:99px;background:var(--navy);transition:all 0.2s"></div>
+          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:var(--border);transition:all 0.2s"></div>
+          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:var(--border);transition:all 0.2s"></div>
+          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:var(--border);transition:all 0.2s"></div>
+          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:var(--border);transition:all 0.2s"></div>
+          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:var(--border);transition:all 0.2s"></div>
+          <div class="tp-dot" style="width:6px;height:6px;border-radius:99px;background:var(--border);transition:all 0.2s"></div>
         </div>
-        <button onclick="tpSlide(1)" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#191919" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg></button>
+        <button onclick="tpSlide(1)" style="width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#191919" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg></button>
       </div>
     </div>
   </div>
 </section>
- 
+
 <!-- FAQ -->
-<section style="background:#f7f8fa;padding:96px 52px">
+<section style="background:var(--bg);padding:96px 52px">
   <div style="max-width:720px;margin:0 auto">
     <div style="text-align:center;margin-bottom:48px">
       <div class="s-label" style="justify-content:center">FAQ</div>
       <h2 class="s-title" style="text-align:center;margin:0 auto">Questions fréquentes</h2>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <details style="background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:#0f1729;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">Je peux annuler quand je veux ? <span style="font-size:18px;color:#94a3b8;font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:#4a5568;line-height:1.7">Oui, sans condition ni pénalité. Deux clics depuis votre espace client et c'est terminé.</p></details>
-      <details style="background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:#0f1729;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">Combien de temps pour avoir des résultats ? <span style="font-size:18px;color:#94a3b8;font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:#4a5568;line-height:1.7">La plupart de nos utilisateurs reçoivent leurs premières réponses dans les 24 à 72h après leur première campagne.</p></details>
-      <details style="background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:#0f1729;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">C'est conforme au RGPD ? <span style="font-size:18px;color:#94a3b8;font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:#4a5568;line-height:1.7">Oui. Données hébergées en Europe, lien de désinscription dans chaque email, uniquement des données publiques légalement accessibles.</p></details>
-      <details style="background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:#0f1729;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">Fonctionne pour tous les secteurs ? <span style="font-size:18px;color:#94a3b8;font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:#4a5568;line-height:1.7">Oui. Artisans, consultants, agences, restaurateurs, commerçants. Si vous cherchez des clients, Alma.+ fonctionne.</p></details>
-      <details style="background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:#0f1729;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">Quelle différence avec Waalaxy ou Lemlist ? <span style="font-size:18px;color:#94a3b8;font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:#4a5568;line-height:1.7">Waalaxy et Lemlist visent les commerciaux B2B sur LinkedIn. Alma.+ va chercher les prospects sur Google Maps, INSEE, DVF, Ma Prime Rénov — pour tous les entrepreneurs français.</p></details>
-      <details style="background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:#0f1729;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">Besoin de compétences techniques ? <span style="font-size:18px;color:#94a3b8;font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:#4a5568;line-height:1.7">Aucune. Si vous savez utiliser WhatsApp, vous saurez utiliser Alma.+. Opérationnel en 5 minutes.</p></details>
+      <details style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">Je peux annuler quand je veux ? <span style="font-size:18px;color:var(--text3);font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:var(--text2);line-height:1.7">Oui, sans condition ni pénalité. Deux clics depuis votre espace client et c'est terminé.</p></details>
+      <details style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">Combien de temps pour avoir des résultats ? <span style="font-size:18px;color:var(--text3);font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:var(--text2);line-height:1.7">La plupart de nos utilisateurs reçoivent leurs premières réponses dans les 24 à 72h après leur première campagne.</p></details>
+      <details style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">C'est conforme au RGPD ? <span style="font-size:18px;color:var(--text3);font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:var(--text2);line-height:1.7">Oui. Données hébergées en Europe, lien de désinscription dans chaque email, uniquement des données publiques légalement accessibles.</p></details>
+      <details style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">Fonctionne pour tous les secteurs ? <span style="font-size:18px;color:var(--text3);font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:var(--text2);line-height:1.7">Oui. Artisans, consultants, agences, restaurateurs, commerçants. Si vous cherchez des clients, Alma.+ fonctionne.</p></details>
+      <details style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">Quelle différence avec Waalaxy ou Lemlist ? <span style="font-size:18px;color:var(--text3);font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:var(--text2);line-height:1.7">Waalaxy et Lemlist visent les commerciaux B2B sur LinkedIn. Alma.+ va chercher les prospects sur Google Maps, INSEE, DVF, Ma Prime Rénov — pour tous les entrepreneurs français.</p></details>
+      <details style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 22px"><summary style="font-size:14px;font-weight:700;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">Besoin de compétences techniques ? <span style="font-size:18px;color:var(--text3);font-weight:300">+</span></summary><p style="margin-top:12px;font-size:13px;color:var(--text2);line-height:1.7">Aucune. Si vous savez utiliser WhatsApp, vous saurez utiliser Alma.+. Opérationnel en 5 minutes.</p></details>
     </div>
   </div>
 </section>
- 
+
 <!-- CTA FINAL -->
 <section class="cta-section" id="cta">
   <div class="cta-inner">
@@ -981,7 +807,7 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
     </div>
   </div>
 </section>
- 
+
 <footer>
   <div class="footer-logo">Alma<span>.</span>+</div>
   <div class="footer-links">
@@ -993,10 +819,10 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
   </div>
   <div class="footer-copy">© 2026 Alma.+ · Tous droits réservés</div>
 </footer>
- 
+
 <script>
 window.addEventListener('scroll', () => {
-  document.querySelector('nav').style.boxShadow = window.scrollY > 30 ? '0 2px 16px rgba(0,0,0,0.08)' : '0 1px 0 rgba(0,0,0,0.05)';
+  document.querySelector('nav').style.boxShadow = window.scrollY > 30 ? '0 2px 16px rgba(79,70,229,0.1)' : '0 1px 0 rgba(0,0,0,0.05)';
 });
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
@@ -1004,7 +830,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
   });
 });
-// Compteur live
 (function(){
   var el = document.getElementById('live-counter');
   if (!el) return;
@@ -1013,19 +838,18 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     if (Math.random() > 0.7) { n += Math.floor(Math.random() * 3) + 1; el.textContent = n.toLocaleString('fr-FR'); }
   }, 3000);
 })();
-// Trustpilot carousel
 var tpIdx = 0, tpW = 316;
 function tpSlide(d) {
-  var max = 7;
+  var max = 6;
   tpIdx = Math.max(0, Math.min(max, tpIdx + d));
   var t = document.getElementById('tp-track');
   if (t) t.style.transform = 'translateX(-' + (tpIdx * tpW) + 'px)';
   document.querySelectorAll('.tp-dot').forEach(function(dot, i) {
     dot.style.width = i === tpIdx ? '20px' : '6px';
-    dot.style.background = i === tpIdx ? '#00B67A' : '#e4e4e7';
+    dot.style.background = i === tpIdx ? 'var(--navy)' : 'var(--border)';
   });
 }
-setInterval(function() { tpSlide(tpIdx >= 7 ? -7 : 1); }, 4500);
+setInterval(function() { tpSlide(tpIdx >= 6 ? -6 : 1); }, 4500);
 </script>
 </body>
 </html>
