@@ -11,7 +11,7 @@
   html, body { height: 100%; overflow: hidden; background: #f4f5f7; }
   body { font-family: 'Inter', sans-serif; font-size: 13px; color: #1a1f2e; }
   :root {
-    --primary: #3525cd; --primary-lt: #eeecff; --secondary: #712ae2;
+    --primary: #1e3a6e; --primary-lt: #eef2f9; --secondary: #2563eb;
     --surface: #fff; --bg: #f4f5f7; --border: #e5e7eb;
     --text: #1a1f2e; --text2: #6b7280; --text3: #9ca3af;
     --green: #16a34a; --green-lt: #dcfce7;
@@ -231,6 +231,44 @@
 
   /* Tag */
   .tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+
+  :root {
+    --primary: #1e3a6e; --primary-lt: #eef2f9; --primary-md: #c7d7f0;
+    --secondary: #2563eb; --surface: #ffffff; --bg: #f7f8fa;
+    --border: #e4e8f0; --text: #0f1729; --text2: #4a5568; --text3: #94a3b8;
+    --green: #16a34a; --green-lt: #dcfce7; --red: #dc2626; --red-lt: #fee2e2;
+    --amber: #d97706; --amber-lt: #fef3c7;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  body { font-family: 'Inter',-apple-system,sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; }
+  .sidebar { width: 224px; box-shadow: var(--shadow-sm); }
+  .logo-mark { background: linear-gradient(135deg,var(--primary),var(--secondary)); border-radius: 8px; }
+  .nav-item { border-radius: 8px; font-size: 12.5px; }
+  .nav-item.active { background: var(--primary-lt); color: var(--primary); font-weight: 600; box-shadow: inset 2px 0 0 var(--primary); }
+  .nav-item:hover { background: var(--bg); color: var(--primary); }
+  .topbar { height: 52px; box-shadow: var(--shadow-sm); }
+  .topbar-title { font-family: 'Manrope',sans-serif; font-weight: 800; font-size: 15px; letter-spacing: -0.3px; }
+  .card { border-radius: 10px; box-shadow: var(--shadow-sm); transition: box-shadow 0.15s; }
+  .card:hover { box-shadow: var(--shadow-md); }
+  .card-title { font-size: 13.5px; font-weight: 700; letter-spacing: -0.2px; }
+  .stat-card { border-radius: 10px; box-shadow: var(--shadow-sm); transition: transform 0.15s, box-shadow 0.15s; }
+  .stat-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .stat-value { font-family: 'Manrope',sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+  .btn { border-radius: 8px; font-size: 12.5px; font-weight: 600; transition: all 0.12s; }
+  .btn-primary { background: linear-gradient(135deg,var(--primary),var(--secondary)); box-shadow: 0 1px 3px rgba(30,58,110,0.2); }
+  .btn-primary:hover { box-shadow: 0 4px 12px rgba(30,58,110,0.3); transform: translateY(-1px); }
+  .btn-ghost:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
+  .form-input { border-radius: 8px; transition: all 0.15s; }
+  .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,58,110,0.08); }
+  .modal { border-radius: 14px; box-shadow: 0 24px 60px rgba(0,0,0,0.15); }
+  .modal-overlay { background: rgba(15,23,41,0.5); backdrop-filter: blur(4px); }
+  .page.active { animation: fadeIn 0.18s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+  th { background: var(--bg); color: var(--text3); font-size: 10.5px; letter-spacing: 0.7px; }
+  tr:hover td { background: var(--primary-lt); }
+  .chip:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
+  .user-avatar { background: linear-gradient(135deg,var(--primary),var(--secondary)); border-radius: 8px; }
+
 </style>
 </head>
 <body>
@@ -333,7 +371,17 @@
 
   <!-- ════════════════ PROSPECTION ════════════════ -->
   <div class="page" id="page-prospection">
-    <div style="max-width:800px">
+    <div style="max-width:900px">
+      <!-- ONGLETS SOURCES B2B -->
+      <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm src-tab" style="border-radius:99px" onclick="switchSrcTab('googlemaps',this)">Google Maps</button>
+        <button class="btn btn-ghost btn-sm src-tab" style="border-radius:99px" onclick="switchSrcTab('sirene',this)">INSEE / SIRENE</button>
+        <button class="btn btn-ghost btn-sm src-tab" style="border-radius:99px" onclick="switchSrcTab('bodacc',this)">BODACC</button>
+        <button class="btn btn-ghost btn-sm src-tab" style="border-radius:99px" onclick="switchSrcTab('permis',this)">Permis de construire</button>
+        <button class="btn btn-ghost btn-sm src-tab" style="border-radius:99px" onclick="switchSrcTab('ao',this)">Appels d'offres</button>
+      </div>
+      <div id="src-panel-googlemaps">
+
       <div id="prsp-no-api" class="alert alert-error" style="display:none">
         <span class="material-symbols-outlined">error</span>
         Clé Google Maps non configurée. Allez dans Paramètres.
@@ -390,7 +438,7 @@
           <div class="card-header">
             <div><div class="card-title" id="results-title">Résultats</div><div class="card-sub" id="results-sub"></div></div>
             <div style="display:flex;gap:6px">
-              <button class="btn btn-sm btn-ghost" onclick="toggleProspectMap()" id="btn-map-toggle">🗺 Carte</button>
+              <button class="btn btn-sm btn-ghost" onclick="toggleProspectMap()" id="btn-map-toggle"> Carte</button>
               <button class="btn btn-sm btn-ghost" onclick="exportCSV()">Exporter CSV</button>
               <button class="btn btn-sm btn-primary" onclick="generateAllEmails()"><span id="all-spinner2" style="display:none" class="spinner"></span>Emails IA pour tous</button>
             </div>
@@ -404,10 +452,10 @@
           <table>
             <thead><tr>
   <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">Entreprise</th>
-  <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">📞 Téléphone</th>
-  <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">🌐 Site web</th>
-  <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">📍 Adresse</th>
-  <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">⭐ Note / Avis</th>
+  <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)"> Téléphone</th>
+  <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)"> Site web</th>
+  <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)"> Adresse</th>
+  <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">Note / Avis</th>
   <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">Score IA</th>
   <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">Email IA</th>
   <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">Actions</th>
@@ -420,6 +468,76 @@
   </div>
 
   <!-- ════════════════ PIPELINE ════════════════ -->
+      </div><!-- /src-panel-googlemaps -->
+
+      <!-- PANEL SIRENE -->
+      <div id="src-panel-sirene" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><div class="card-title">INSEE / SIRENE — 12M entreprises françaises</div></div>
+          <div class="card-body">
+            <div class="form-row" style="margin-bottom:10px">
+              <div class="form-group" style="margin:0"><label class="form-label">Secteur / Métier</label><input class="form-input" id="sirene-q" placeholder="Plombier, électricien..."/></div>
+              <div class="form-group" style="margin:0"><label class="form-label">Ville ou code postal</label><input class="form-input" id="sirene-ville" placeholder="Avignon, 84000..."/></div>
+            </div>
+            <button class="btn btn-primary" onclick="searchSIRENE()">Rechercher</button>
+          </div>
+        </div>
+        <div id="sirene-results"></div>
+      </div>
+
+      <!-- PANEL BODACC -->
+      <div id="src-panel-bodacc" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><div class="card-title">BODACC — Annonces légales officielles</div></div>
+          <div class="card-body">
+            <div class="form-row" style="margin-bottom:10px">
+              <div class="form-group" style="margin:0"><label class="form-label">Type</label>
+                <select class="form-input" id="bodacc-type">
+                  <option value="creation">Créations récentes</option>
+                  <option value="modification">Modifications</option>
+                  <option value="liquidation">Liquidations</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0"><label class="form-label">Département</label><input class="form-input" id="bodacc-dept" placeholder="30, 84, 13..."/></div>
+            </div>
+            <button class="btn btn-primary" onclick="searchBODACC()">Rechercher</button>
+          </div>
+        </div>
+        <div id="bodacc-results"></div>
+      </div>
+
+      <!-- PANEL PERMIS -->
+      <div id="src-panel-permis" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><div class="card-title">Permis de construire — Propriétaires qui construisent</div></div>
+          <div class="card-body">
+            <div class="form-row" style="margin-bottom:10px">
+              <div class="form-group" style="margin:0"><label class="form-label">Département</label><input class="form-input" id="permis-dept" placeholder="30, 84, 13..."/></div>
+              <div class="form-group" style="margin:0"><label class="form-label">Commune</label><input class="form-input" id="permis-commune" placeholder="Avignon, Nîmes..."/></div>
+            </div>
+            <button class="btn btn-primary" onclick="searchPermis()">Rechercher</button>
+          </div>
+        </div>
+        <div id="permis-results"></div>
+      </div>
+
+      <!-- PANEL APPELS D'OFFRES -->
+      <div id="src-panel-ao" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><div class="card-title">Appels d'offres publics — Marchés BOAMP</div></div>
+          <div class="card-body">
+            <div class="form-row" style="margin-bottom:10px">
+              <div class="form-group" style="margin:0"><label class="form-label">Secteur</label><input class="form-input" id="ao-q" placeholder="Nettoyage, informatique, travaux..."/></div>
+              <div class="form-group" style="margin:0"><label class="form-label">Département</label><input class="form-input" id="ao-dept" placeholder="30, 84..."/></div>
+            </div>
+            <button class="btn btn-primary" onclick="searchAppelsOffres()">Rechercher</button>
+          </div>
+        </div>
+        <div id="ao-results"></div>
+      </div>
+
+  </div><!-- /page-prospection -->
+
   <div class="page" id="page-pipeline">
     <div class="card">
       <div class="card-header"><div class="card-title">Pipeline CRM</div><div class="card-sub" id="pipeline-sub">0 prospects</div></div>
@@ -433,7 +551,7 @@
   <!-- ════════════════ MESSAGERIE ════════════════ -->
   <div class="page" id="page-messagerie">
     <div id="msg-brevo-warning" class="alert alert-warning" style="margin-bottom:12px;padding:10px 14px;background:var(--amber-lt);border:1px solid #fde68a;border-radius:6px;font-size:12px;display:none">
-      ⚠ Clé Brevo non configurée. <strong style="cursor:pointer;text-decoration:underline" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">Aller dans Paramètres →</strong>
+       Clé Brevo non configurée. <strong style="cursor:pointer;text-decoration:underline" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">Aller dans Paramètres →</strong>
     </div>
     <div class="msg-layout">
       <!-- Liste conversations -->
@@ -489,21 +607,21 @@
   <div class="page" id="page-b2c">
     <!-- Tabs sources -->
     <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap" id="b2c-tabs">
-      <button class="btn btn-ghost btn-sm b2c-tab active" onclick="switchB2CTab('pj',this)" style="border-radius:99px">🟡 Pages Jaunes</button>
-      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('lbc',this)" style="border-radius:99px">🔴 Leboncoin</button>
-      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('ga',this)" style="border-radius:99px">⭐ Google Avis</button>
-      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('mpr',this)" style="border-radius:99px">🏠 MaPrimeRénov</button>
-      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('dvf',this)" style="border-radius:99px">🏡 Acheteurs DVF</button>
-      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('copro',this)" style="border-radius:99px">🏢 Copropriétés</button>
-      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('leads',this)" style="border-radius:99px;margin-left:auto">📋 Tous les leads <span id="b2c-all-count" style="font-size:10px;background:var(--primary);color:white;padding:1px 5px;border-radius:99px;margin-left:3px">0</span></button>
+      <button class="btn btn-ghost btn-sm b2c-tab active" onclick="switchB2CTab('pj',this)" style="border-radius:99px"> Pages Jaunes</button>
+      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('lbc',this)" style="border-radius:99px"> Leboncoin</button>
+      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('ga',this)" style="border-radius:99px">Google Avis</button>
+      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('mpr',this)" style="border-radius:99px"> MaPrimeRénov</button>
+      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('dvf',this)" style="border-radius:99px"> Acheteurs DVF</button>
+      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('copro',this)" style="border-radius:99px"> Copropriétés</button>
+      <button class="btn btn-ghost btn-sm b2c-tab" onclick="switchB2CTab('leads',this)" style="border-radius:99px;margin-left:auto"> Tous les leads <span id="b2c-all-count" style="font-size:10px;background:var(--primary);color:white;padding:1px 5px;border-radius:99px;margin-left:3px">0</span></button>
     </div>
 
     <!-- PJ -->
     <div class="b2c-panel" id="b2c-panel-pj">
       <div class="card" style="max-width:660px;margin-bottom:12px">
-        <div class="card-header"><div><div class="card-title">🟡 Pages Jaunes — Particuliers</div><div class="card-sub">Recherche de particuliers par besoin et localisation</div></div></div>
+        <div class="card-header"><div><div class="card-title"> Pages Jaunes — Particuliers</div><div class="card-sub">Recherche de particuliers par besoin et localisation</div></div></div>
         <div class="card-body">
-          <div id="b2c-pj-nokey" class="alert alert-warning" style="display:none;margin-bottom:12px">⚠ Clé Pages Jaunes non configurée. <strong style="cursor:pointer;text-decoration:underline" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">Paramètres →</strong></div>
+          <div id="b2c-pj-nokey" class="alert alert-warning" style="display:none;margin-bottom:12px"> Clé Pages Jaunes non configurée. <strong style="cursor:pointer;text-decoration:underline" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">Paramètres →</strong></div>
           <div class="form-row" style="margin-bottom:10px">
             <div class="form-group" style="margin:0"><label class="form-label">Besoin</label><input class="form-input" id="b2c-pj-query" placeholder="plombier, isolation, électricien..."/></div>
             <div class="form-group" style="margin:0"><label class="form-label">Ville / Code postal</label><input class="form-input" id="b2c-pj-city" placeholder="Lyon, 69000..."/></div>
@@ -513,10 +631,10 @@
             <div class="form-group" style="margin:0"><label class="form-label">Résultats max</label><select class="form-input" id="b2c-pj-max"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select></div>
           </div>
           <div style="margin-bottom:12px">
-            <span onclick="document.getElementById('b2c-pj-query').value='plombier';document.getElementById('b2c-pj-city').value='Paris'" style="font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:99px;cursor:pointer;display:inline-block;margin:2px">🔧 Plombier Paris</span>
-            <span onclick="document.getElementById('b2c-pj-query').value='isolation';document.getElementById('b2c-pj-city').value='Lyon'" style="font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:99px;cursor:pointer;display:inline-block;margin:2px">🏠 Isolation Lyon</span>
-            <span onclick="document.getElementById('b2c-pj-query').value='électricien';document.getElementById('b2c-pj-city').value='Marseille'" style="font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:99px;cursor:pointer;display:inline-block;margin:2px">⚡ Électricien Marseille</span>
-            <span onclick="document.getElementById('b2c-pj-query').value='pompe à chaleur';document.getElementById('b2c-pj-city').value='Bordeaux'" style="font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:99px;cursor:pointer;display:inline-block;margin:2px">♨️ PAC Bordeaux</span>
+            <span onclick="document.getElementById('b2c-pj-query').value='plombier';document.getElementById('b2c-pj-city').value='Paris'" style="font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:99px;cursor:pointer;display:inline-block;margin:2px"> Plombier Paris</span>
+            <span onclick="document.getElementById('b2c-pj-query').value='isolation';document.getElementById('b2c-pj-city').value='Lyon'" style="font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:99px;cursor:pointer;display:inline-block;margin:2px"> Isolation Lyon</span>
+            <span onclick="document.getElementById('b2c-pj-query').value='électricien';document.getElementById('b2c-pj-city').value='Marseille'" style="font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:99px;cursor:pointer;display:inline-block;margin:2px"> Électricien Marseille</span>
+            <span onclick="document.getElementById('b2c-pj-query').value='pompe à chaleur';document.getElementById('b2c-pj-city').value='Bordeaux'" style="font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:99px;cursor:pointer;display:inline-block;margin:2px"> PAC Bordeaux</span>
           </div>
           <button class="btn btn-primary" id="b2c-pj-btn" onclick="b2cSearchPJ()"><span class="material-symbols-outlined" style="font-size:15px">search</span>Rechercher</button>
           <div id="b2c-pj-progress" style="display:none;margin-top:10px"><div style="font-size:11px;color:var(--text3);margin-bottom:4px" id="b2c-pj-progress-lbl">Chargement...</div><div style="height:3px;background:var(--border);border-radius:99px;overflow:hidden"><div id="b2c-pj-bar" style="height:100%;background:var(--primary);border-radius:99px;transition:width .4s;width:0%"></div></div></div>
@@ -532,11 +650,11 @@
     <!-- LBC -->
     <div class="b2c-panel" id="b2c-panel-lbc" style="display:none">
       <div class="card" style="max-width:660px;margin-bottom:12px">
-        <div class="card-header"><div><div class="card-title">🔴 Leboncoin — Annonces particuliers</div><div class="card-sub">Particuliers qui cherchent activement un professionnel</div></div></div>
+        <div class="card-header"><div><div class="card-title"> Leboncoin — Annonces particuliers</div><div class="card-sub">Particuliers qui cherchent activement un professionnel</div></div></div>
         <div class="card-body">
-          <div style="padding:10px 12px;background:var(--primary-lt);border-radius:6px;font-size:12px;color:var(--primary);margin-bottom:12px">💡 Ces leads sont <strong>chauds</strong> — le particulier a publié une annonce. Il attend votre contact.</div>
+          <div style="padding:10px 12px;background:var(--primary-lt);border-radius:6px;font-size:12px;color:var(--primary);margin-bottom:12px"> Ces leads sont <strong>chauds</strong> — le particulier a publié une annonce. Il attend votre contact.</div>
           <div id="b2c-lbc-proxy-warning" style="display:none;padding:10px 12px;background:var(--amber-lt);border:1px solid #fde68a;border-radius:6px;font-size:12px;color:var(--amber);margin-bottom:12px">
-            ⚠ <strong>Proxy non détecté.</strong> Lancez <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px">lancer_proxy.bat</code> (Windows) ou <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px">./lancer_proxy.sh</code> (Mac/Linux) et gardez la fenêtre ouverte.
+             <strong>Proxy non détecté.</strong> Lancez <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px">lancer_proxy.bat</code> (Windows) ou <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px">./lancer_proxy.sh</code> (Mac/Linux) et gardez la fenêtre ouverte.
           </div>
           <div class="form-row" style="margin-bottom:10px">
             <div class="form-group" style="margin:0"><label class="form-label">Catégorie</label>
@@ -571,16 +689,16 @@
     <!-- GOOGLE AVIS -->
     <div class="b2c-panel" id="b2c-panel-ga" style="display:none">
       <div class="card" style="max-width:660px;margin-bottom:12px">
-        <div class="card-header"><div><div class="card-title">⭐ Google Avis — Clients insatisfaits</div><div class="card-sub">Clients mécontents chez vos concurrents = vos meilleurs prospects</div></div></div>
+        <div class="card-header"><div><div class="card-title">Google Avis — Clients insatisfaits</div><div class="card-sub">Clients mécontents chez vos concurrents = vos meilleurs prospects</div></div></div>
         <div class="card-body">
-          <div style="padding:10px 12px;background:var(--primary-lt);border-radius:6px;font-size:12px;color:var(--primary);margin-bottom:12px">💡 Un client insatisfait chez un concurrent est votre meilleur prospect. Contactez-le avec ce qu'il reproche exactement.</div>
-          <div id="b2c-ga-nokey" class="alert alert-warning" style="display:none;margin-bottom:12px">⚠ Clé Google Maps requise. <strong style="cursor:pointer;text-decoration:underline" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">Paramètres →</strong></div>
+          <div style="padding:10px 12px;background:var(--primary-lt);border-radius:6px;font-size:12px;color:var(--primary);margin-bottom:12px"> Un client insatisfait chez un concurrent est votre meilleur prospect. Contactez-le avec ce qu'il reproche exactement.</div>
+          <div id="b2c-ga-nokey" class="alert alert-warning" style="display:none;margin-bottom:12px"> Clé Google Maps requise. <strong style="cursor:pointer;text-decoration:underline" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">Paramètres →</strong></div>
           <div class="form-row" style="margin-bottom:10px">
             <div class="form-group" style="margin:0"><label class="form-label">Type de concurrent</label><input class="form-input" id="b2c-ga-type" placeholder="plombier, coiffeur, garage..."/></div>
             <div class="form-group" style="margin:0"><label class="form-label">Ville</label><input class="form-input" id="b2c-ga-city" placeholder="Lyon, Paris..."/></div>
           </div>
           <div class="form-row" style="margin-bottom:12px">
-            <div class="form-group" style="margin:0"><label class="form-label">Note max</label><select class="form-input" id="b2c-ga-rating"><option value="2">⭐ 1-2 étoiles</option><option value="3" selected>⭐⭐ 1-3 étoiles</option></select></div>
+            <div class="form-group" style="margin:0"><label class="form-label">Note max</label><select class="form-input" id="b2c-ga-rating"><option value="2">1-2 étoiles</option><option value="3" selected>1-3 étoiles</option></select></div>
             <div class="form-group" style="margin:0"><label class="form-label">Concurrents à analyser</label><select class="form-input" id="b2c-ga-nb"><option value="3">3</option><option value="5" selected>5</option><option value="10">10</option></select></div>
           </div>
           <button class="btn btn-primary" id="b2c-ga-btn" onclick="b2cSearchGA()"><span class="material-symbols-outlined" style="font-size:15px">reviews</span>Analyser les avis</button>
@@ -595,9 +713,9 @@
     <!-- MPR -->
     <div class="b2c-panel" id="b2c-panel-mpr" style="display:none">
       <div class="card" style="max-width:660px;margin-bottom:12px">
-        <div class="card-header"><div><div class="card-title">🏠 MaPrimeRénov — Zones à prospecter</div><div class="card-sub">Communes à fort potentiel rénovation — données INSEE / data.gouv.fr</div></div></div>
+        <div class="card-header"><div><div class="card-title"> MaPrimeRénov — Zones à prospecter</div><div class="card-sub">Communes à fort potentiel rénovation — données INSEE / data.gouv.fr</div></div></div>
         <div class="card-body">
-          <div style="padding:10px 12px;background:var(--green-lt);border-radius:6px;font-size:12px;color:var(--green);margin-bottom:12px">✓ Données officielles INSEE — aucune clé requise. Identifie les communes avec le plus fort potentiel de prospects MPR pour cibler votre prospection terrain ou courrier.</div>
+          <div style="padding:10px 12px;background:var(--green-lt);border-radius:6px;font-size:12px;color:var(--green);margin-bottom:12px"> Données officielles INSEE — aucune clé requise. Identifie les communes avec le plus fort potentiel de prospects MPR pour cibler votre prospection terrain ou courrier.</div>
           <div class="form-row" style="margin-bottom:10px">
             <div class="form-group" style="margin:0"><label class="form-label">Département</label><input class="form-input" id="b2c-mpr-dept" placeholder="69, 75, 13..." maxlength="3"/></div>
             <div class="form-group" style="margin:0"><label class="form-label">Type de travaux ciblés</label>
@@ -655,7 +773,7 @@
         </div>
         <!-- Script de prospection -->
         <div class="card" id="b2c-mpr-script-card" style="display:none">
-          <div class="card-header"><div class="card-title">📝 Script de prospection généré</div><button class="btn btn-sm btn-ghost" id="b2c-mpr-script-copy" onclick="navigator.clipboard.writeText(document.getElementById('b2c-mpr-script').value);this.textContent='✓ Copié';setTimeout(()=>this.textContent='Copier',2000)">Copier</button></div>
+          <div class="card-header"><div class="card-title"> Script de prospection généré</div><button class="btn btn-sm btn-ghost" id="b2c-mpr-script-copy" onclick="navigator.clipboard.writeText(document.getElementById('b2c-mpr-script').value);this.textContent=' Copié';setTimeout(()=>this.textContent='Copier',2000)">Copier</button></div>
           <div class="card-body"><textarea id="b2c-mpr-script" style="width:100%;min-height:180px;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:12px;font-family:Inter,sans-serif;resize:vertical;outline:none;line-height:1.6" readonly></textarea></div>
         </div>
       </div>
@@ -664,10 +782,10 @@
     <!-- DVF -->
     <div class="b2c-panel" id="b2c-panel-dvf" style="display:none">
       <div class="card" style="max-width:660px;margin-bottom:12px">
-        <div class="card-header"><div><div class="card-title">🏡 DVF — Acheteurs immobiliers récents</div><div class="card-sub">Demandes de Valeurs Foncières — données officielles transactions immobilières</div></div></div>
+        <div class="card-header"><div><div class="card-title"> DVF — Acheteurs immobiliers récents</div><div class="card-sub">Demandes de Valeurs Foncières — données officielles transactions immobilières</div></div></div>
         <div class="card-body">
-          <div style="padding:10px 12px;background:var(--primary-lt);border-radius:6px;font-size:12px;color:var(--primary);margin-bottom:12px">💡 Un acheteur récent = prospect <strong>ultra-chaud</strong> pour isolation, rénovation, cuisine, salle de bain, alarme. Il vient d'acheter et va rénover dans les 12 mois.</div>
-          <div style="padding:10px 12px;background:var(--green-lt);border-radius:6px;font-size:12px;color:var(--green);margin-bottom:12px">✓ API officielle data.gouv.fr — données DVF publiques, aucune clé requise.</div>
+          <div style="padding:10px 12px;background:var(--primary-lt);border-radius:6px;font-size:12px;color:var(--primary);margin-bottom:12px"> Un acheteur récent = prospect <strong>ultra-chaud</strong> pour isolation, rénovation, cuisine, salle de bain, alarme. Il vient d'acheter et va rénover dans les 12 mois.</div>
+          <div style="padding:10px 12px;background:var(--green-lt);border-radius:6px;font-size:12px;color:var(--green);margin-bottom:12px"> API officielle data.gouv.fr — données DVF publiques, aucune clé requise.</div>
           <div class="form-row" style="margin-bottom:10px">
             <div class="form-group" style="margin:0"><label class="form-label">Département</label><input class="form-input" id="dvf-dept" placeholder="30, 69, 13..." maxlength="3"/></div>
             <div class="form-group" style="margin:0"><label class="form-label">Commune (optionnel)</label><input class="form-input" id="dvf-commune" placeholder="Nîmes, Lyon..."/></div>
@@ -713,10 +831,10 @@
     <!-- COPROPRIÉTÉS -->
     <div class="b2c-panel" id="b2c-panel-copro" style="display:none">
       <div class="card" style="max-width:660px;margin-bottom:12px">
-        <div class="card-header"><div><div class="card-title">🏢 Cabinets de Syndics</div><div class="card-sub">Vrais contacts — téléphone, adresse, avis · Google Maps Places</div></div></div>
+        <div class="card-header"><div><div class="card-title"> Cabinets de Syndics</div><div class="card-sub">Vrais contacts — téléphone, adresse, avis · Google Maps Places</div></div></div>
         <div class="card-body">
-          <div style="padding:10px 12px;background:var(--primary-lt);border-radius:6px;font-size:12px;color:var(--primary);margin-bottom:12px">💡 Un cabinet de syndic gère <strong>15 à 50 copropriétés</strong> en moyenne. Décrocher un contrat = des dizaines de chantiers d'un coup. Google Maps donne le <strong>vrai numéro de téléphone + adresse + avis clients</strong>.</div>
-          <div style="padding:10px 12px;background:var(--green-lt);border-radius:6px;font-size:12px;color:var(--green);margin-bottom:12px">✓ Google Maps Places API — mêmes données que votre module B2B, clé déjà configurée.</div>
+          <div style="padding:10px 12px;background:var(--primary-lt);border-radius:6px;font-size:12px;color:var(--primary);margin-bottom:12px"> Un cabinet de syndic gère <strong>15 à 50 copropriétés</strong> en moyenne. Décrocher un contrat = des dizaines de chantiers d'un coup. Google Maps donne le <strong>vrai numéro de téléphone + adresse + avis clients</strong>.</div>
+          <div style="padding:10px 12px;background:var(--green-lt);border-radius:6px;font-size:12px;color:var(--green);margin-bottom:12px"> Google Maps Places API — mêmes données que votre module B2B, clé déjà configurée.</div>
           <div class="form-row" style="margin-bottom:10px">
             <div class="form-group" style="margin:0"><label class="form-label">Ville ou commune</label><input class="form-input" id="copro-cp" placeholder="Nîmes, Avignon, Lyon..."/></div>
             <div class="form-group" style="margin:0"><label class="form-label">Type de recherche</label>
@@ -753,8 +871,8 @@
           <thead><tr style="background:var(--bg)">
             <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">Cabinet</th>
             <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">Adresse</th>
-            <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">📞 Téléphone</th>
-            <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">⭐ Note</th>
+            <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)"> Téléphone</th>
+            <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">Note</th>
             <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">Score</th>
             <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text3);text-align:left;border-bottom:1px solid var(--border)">Action</th>
           </tr></thead>
@@ -1134,7 +1252,7 @@
           </div>
         </div>
 
-        <button class="btn btn-primary" onclick="saveSettings()" style="margin-bottom:40px">💾 Enregistrer toutes les clés</button>
+        <button class="btn btn-primary" onclick="saveSettings()" style="margin-bottom:40px"> Enregistrer toutes les clés</button>
       </div>
 
       <!-- Tab Profile -->
@@ -1233,15 +1351,15 @@ function loadState() {
       };
       Object.entries(map).forEach(([key, elId]) => { const el = document.getElementById(elId); if (el && k[key]) el.value = k[key]; });
       // update statuses
-      if (k.brevo) setApiStatus('brevo-test', true, '✓ Enregistrée');
-      if (k.supaUrl && k.supaAnon) setApiStatus('supa-test', true, '✓ Enregistrée');
-      if (k.pj) setApiStatus('pj', true, '✓ Enregistrée');
-      if (k.inseeConsumer) setApiStatus('insee', true, '✓ Enregistrée');
-      if (k.mpr) setApiStatus('mpr', true, '✓ Enregistrée');
-      if (k.lbcId) setApiStatus('lbc', true, '✓ Enregistrée');
-      if (k.gadsToken) setApiStatus('gads', true, '✓ Enregistrée');
-      if (k.fbToken) setApiStatus('fbads', true, '✓ Enregistrée');
-      if (k.supaUrl) setApiStatus('supa', true, '✓ Enregistrée');
+      if (k.brevo) setApiStatus('brevo-test', true, ' Enregistrée');
+      if (k.supaUrl && k.supaAnon) setApiStatus('supa-test', true, ' Enregistrée');
+      if (k.pj) setApiStatus('pj', true, ' Enregistrée');
+      if (k.inseeConsumer) setApiStatus('insee', true, ' Enregistrée');
+      if (k.mpr) setApiStatus('mpr', true, ' Enregistrée');
+      if (k.lbcId) setApiStatus('lbc', true, ' Enregistrée');
+      if (k.gadsToken) setApiStatus('gads', true, ' Enregistrée');
+      if (k.fbToken) setApiStatus('fbads', true, ' Enregistrée');
+      if (k.supaUrl) setApiStatus('supa', true, ' Enregistrée');
     }
     const profile = localStorage.getItem('alma_profile');
     if (profile) {
@@ -1380,16 +1498,16 @@ async function testGmaps() {
     const d = await r.json();
     hideSpinner('gmaps-spinner');
     if (d.status === 'OK' || d.status === 'ZERO_RESULTS') {
-      setApiStatus('gmaps', true, '✓ Valide');
+      setApiStatus('gmaps', true, ' Valide');
     } else if (d.status === 'REQUEST_DENIED') {
       setApiStatus('gmaps', false, 'Refusée');
     } else {
-      setApiStatus('gmaps', true, '✓ OK');
+      setApiStatus('gmaps', true, ' OK');
     }
   } catch(e) {
     hideSpinner('gmaps-spinner');
     // CORS bloque le fetch direct — la clé sera testée lors de la vraie recherche
-    setApiStatus('gmaps', true, '✓ Enregistrée');
+    setApiStatus('gmaps', true, ' Enregistrée');
   }
 }
 
@@ -1404,7 +1522,7 @@ async function testAnthropic() {
       body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 10, messages: [{ role: 'user', content: 'Hi' }] })
     });
     hideSpinner('ant-spinner');
-    if (r.ok) { setApiStatus('anthropic', true, '✓ Valide'); }
+    if (r.ok) { setApiStatus('anthropic', true, ' Valide'); }
     else { setApiStatus('anthropic', false, 'Invalide'); }
   } catch(e) {
     hideSpinner('ant-spinner');
@@ -1421,11 +1539,11 @@ async function testBrevo() {
       headers: { 'api-key': key, 'accept': 'application/json' }
     });
     hideSpinner('brevo-spinner');
-    if (r.ok) { const d = await r.json(); setApiStatus('brevo-test', true, '✓ ' + (d.email || 'Valide')); }
+    if (r.ok) { const d = await r.json(); setApiStatus('brevo-test', true, ' ' + (d.email || 'Valide')); }
     else { setApiStatus('brevo-test', false, 'Invalide'); }
   } catch(e) {
     hideSpinner('brevo-spinner');
-    setApiStatus('brevo-test', true, '✓ Enregistrée');
+    setApiStatus('brevo-test', true, ' Enregistrée');
   }
 }
 
@@ -1439,11 +1557,11 @@ async function testSupabase() {
       headers: { 'apikey': anon, 'Authorization': 'Bearer ' + anon }
     });
     hideSpinner('supa-spinner');
-    setApiStatus('supa-test', r.ok || r.status === 200 ? true : true, '✓ Connecté');
-    setApiStatus('supa', true, '✓ Connecté');
+    setApiStatus('supa-test', r.ok || r.status === 200 ? true : true, ' Connecté');
+    setApiStatus('supa', true, ' Connecté');
   } catch(e) {
     hideSpinner('supa-spinner');
-    setApiStatus('supa-test', true, '✓ Enregistrée');
+    setApiStatus('supa-test', true, ' Enregistrée');
   }
 }
 
@@ -1609,25 +1727,25 @@ function renderResults(prospects, type, city) {
         </td>
         <td style="padding:10px 12px;min-width:150px">
           ${p.phone
-            ? `<a href="tel:${p.phone}" style="font-weight:700;color:var(--primary);text-decoration:none;font-size:13px;white-space:nowrap;display:block">📞 ${p.phone}</a>`
+            ? `<a href="tel:${p.phone}" style="font-weight:700;color:var(--primary);text-decoration:none;font-size:13px;white-space:nowrap;display:block"> ${p.phone}</a>`
             : `<span style="font-size:11px;color:var(--text3)">Non renseigné</span>`}
-          ${p.google_maps_url ? `<a href="${p.google_maps_url}" target="_blank" style="font-size:10px;color:var(--text3);text-decoration:none;display:block;margin-top:3px">📍 Voir sur Maps</a>` : ''}
+          ${p.google_maps_url ? `<a href="${p.google_maps_url}" target="_blank" style="font-size:10px;color:var(--text3);text-decoration:none;display:block;margin-top:3px"> Voir sur Maps</a>` : ''}
         </td>
         <td style="padding:10px 12px;min-width:140px">
           ${p.website
-            ? `<a href="${p.website}" target="_blank" style="font-size:12px;color:var(--primary);text-decoration:none;display:block;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🌐 ${p.website.replace(/https?:\/\/(www\.)?/,'').split('/')[0]}</a>`
+            ? `<a href="${p.website}" target="_blank" style="font-size:12px;color:var(--primary);text-decoration:none;display:block;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"> ${p.website.replace(/https?:\/\/(www\.)?/,'').split('/')[0]}</a>`
             : `<span style="font-size:11px;color:var(--text3)">—</span>`}
         </td>
         <td style="padding:10px 12px;font-size:11px;color:var(--text2);max-width:200px">
           <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.address}">${p.address}</div>
         </td>
         <td style="padding:10px 12px;white-space:nowrap">
-          <span style="color:#f59e0b;font-weight:700;font-size:13px">${p.rating !== '—' && p.rating ? '★ '+p.rating : '—'}</span>
+          <span style="color:#f59e0b;font-weight:700;font-size:13px">${p.rating !== '—' && p.rating ? ' '+p.rating : '—'}</span>
           <div style="font-size:10px;color:var(--text3)">${p.reviews > 0 ? p.reviews+' avis' : ''}</div>
         </td>
         <td style="padding:10px 12px"><span class="score ${scoreClass}">${p.score}</span></td>
         <td style="padding:10px 12px" id="email-cell-${p.id}">
-          ${p.email_generated ? `<span style="color:var(--green);font-size:11px;font-weight:600">✓ Généré</span>` : `<span style="color:var(--text3);font-size:11px">—</span>`}
+          ${p.email_generated ? `<span style="color:var(--green);font-size:11px;font-weight:600"> Généré</span>` : `<span style="color:var(--text3);font-size:11px">—</span>`}
         </td>
         <td style="padding:10px 12px">
           <div style="display:flex;gap:4px">
@@ -1779,7 +1897,7 @@ async function generateAllEmails() {
 
 function updateEmailCell(pid) {
   const el = document.getElementById('email-cell-' + pid);
-  if (el) el.innerHTML = '<span style="color:var(--green);font-size:11px">✓ Généré</span>';
+  if (el) el.innerHTML = '<span style="color:var(--green);font-size:11px"> Généré</span>';
 }
 
 // ═══ PIPELINE ═══
@@ -1816,7 +1934,7 @@ function refreshPipeline() {
       <td><select style="font-size:11px;border:1px solid var(--border);border-radius:4px;padding:2px 6px;background:${bg};color:${col}" onchange="updateStatus('${p.id}',this.value)">
         ${Object.entries(statusLabels).map(([k,v]) => `<option value="${k}"${p.status===k?' selected':''}>${v}</option>`).join('')}
       </select></td>
-      <td>${p.email_generated ? '<span style="color:var(--green);font-size:11px">✓ Prêt</span>' : '<button class="btn btn-sm btn-ghost" onclick="openEmailModal(\''+p.id+'\')">Générer</button>'}</td>
+      <td>${p.email_generated ? '<span style="color:var(--green);font-size:11px"> Prêt</span>' : '<button class="btn btn-sm btn-ghost" onclick="openEmailModal(\''+p.id+'\')">Générer</button>'}</td>
       <td><button class="btn btn-sm btn-ghost" onclick="openEmailModal(\''+p.id+'\')">Voir email</button></td>
     </tr>`;
   }).join('');
@@ -1958,7 +2076,7 @@ function refreshDashProspects() {
     const initials = p.name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
     return `<div class="prospect-row">
       <div class="avatar" style="background:${colors[i%colors.length]}">${initials}</div>
-      <div class="p-info"><div class="p-name">${p.name}</div><div class="p-meta">${p.address.slice(0,40)} · ☆ ${p.rating}</div></div>
+      <div class="p-info"><div class="p-name">${p.name}</div><div class="p-meta">${p.address.slice(0,40)} ·  ${p.rating}</div></div>
       <span class="score ${scoreClass}">${p.score}</span>
       <button class="p-action" onclick="openEmailModal('${p.id}')">Email IA</button>
     </div>`;
@@ -2192,7 +2310,7 @@ function renderMessages() {
       <div class="bubble ${m.direction==='sent'?'bubble-sent':'bubble-received'}">
         ${m.direction==='received' ? `<div class="bubble-name">${conv?.prospectName||''}</div>` : ''}
         <div style="white-space:pre-wrap">${escapeHtml(m.body)}</div>
-        <div class="bubble-time">${formatMsgTime(m.createdAt)}${m.direction==='sent'?' ✓':''}</div>
+        <div class="bubble-time">${formatMsgTime(m.createdAt)}${m.direction==='sent'?' ':''}</div>
       </div>
     </div>
   `).join('');
@@ -2499,7 +2617,7 @@ async function b2cSearchLBC() {
 
   } catch(e) {
     document.getElementById('b2c-lbc-proxy-warning').style.display = 'block';
-    document.getElementById('b2c-lbc-proxy-warning').innerHTML = '⚠ ' + b2cEsc(e.message);
+    document.getElementById('b2c-lbc-proxy-warning').innerHTML = ' ' + b2cEsc(e.message);
     b2cProgress('lbc', 0, '');
   }
   btn.disabled = false;
@@ -2547,9 +2665,9 @@ function parseLBCHtml(html, dept) {
 
 function detectLBCUrgence(text) {
   const t = text.toLowerCase();
-  if (/urgent|rapidement|dès que possible|vite|asap/.test(t)) return 'Urgent 🔴';
-  if (/semaine|bientôt|prochainement/.test(t)) return 'Cette semaine 🟡';
-  return 'Pas de délai 🟢';
+  if (/urgent|rapidement|dès que possible|vite|asap/.test(t)) return 'Urgent ';
+  if (/semaine|bientôt|prochainement/.test(t)) return 'Cette semaine ';
+  return 'Pas de délai ';
 }
 
 function calcLBCScore(title, date, urgency) {
@@ -2599,11 +2717,11 @@ async function b2cSearchGA() {
       reviews.forEach(r => { allLeads.push({ id:'ga-'+Date.now()+Math.random(), source:'ga', name:r.author_name||'Client anonyme', competitor:place.name, city, rating:r.rating, review:(r.text||'').slice(0,150), besoin:type+' (avis négatif chez '+place.name+')', score:r.rating===1?90:r.rating===2?75:62, status:'new', createdAt:new Date().toISOString() }); });
       grid.innerHTML += `
         <div class="card">
-          <div class="card-header"><div><div class="card-title">${b2cEsc(place.name)}</div><div class="card-sub">${'⭐'.repeat(Math.round(place.rating||0))} ${place.rating||'?'}/5 · ${reviews.length} avis négatif(s)</div></div></div>
+          <div class="card-header"><div><div class="card-title">${b2cEsc(place.name)}</div><div class="card-sub">${place.rating||'?'} ${place.rating||'?'}/5 · ${reviews.length} avis négatif(s)</div></div></div>
           <div class="card-body" style="padding:10px 14px">
             ${reviews.slice(0,2).map(r=>`
               <div style="border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:8px">
-                <div style="color:#f59e0b;font-size:12px;margin-bottom:3px">${'⭐'.repeat(r.rating)}${'☆'.repeat(5-r.rating)} ${r.rating}/5</div>
+                <div style="color:#f59e0b;font-size:12px;margin-bottom:3px">${r.rating}/5</div>
                 <div style="font-size:12px;color:var(--text2);font-style:italic;margin-bottom:6px">"${b2cEsc((r.text||'').slice(0,100))}${r.text?.length>100?'...':''}"</div>
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div style="font-size:11px;color:var(--text3)">— ${b2cEsc(r.author_name||'Anonyme')}</div>
@@ -2699,7 +2817,7 @@ async function b2cSearchMPR() {
     document.getElementById('b2c-mpr-count').textContent = `Top ${results.length} communes · Dép. ${dept} · ${travailLabel}`;
     document.getElementById('b2c-mpr-tbody').innerHTML = results.map((c,i) => `
       <tr>
-        <td><div style="font-weight:600">${i===0?'🥇':i===1?'🥈':i===2?'🥉':''} ${b2cEsc(c.nom)}</div><div style="font-size:11px;color:var(--text3)">${c.codePostal} · ${c.population.toLocaleString('fr')} hab.</div></td>
+        <td><div style="font-weight:600">${i===0?'':i===1?'':i===2?'':''} ${b2cEsc(c.nom)}</div><div style="font-size:11px;color:var(--text3)">${c.codePostal} · ${c.population.toLocaleString('fr')} hab.</div></td>
         <td><div style="font-weight:600;color:var(--amber)">${c.nbA75.toLocaleString('fr')}</div><div style="font-size:11px;color:var(--text3)">${c.tA75}% du parc</div></td>
         <td><div style="font-weight:600">${c.nbProp.toLocaleString('fr')}</div><div style="font-size:11px;color:var(--text3)">${Math.round(c.nbProp/Math.max(c.nbLog,1)*100)}% propriétaires</div></td>
         <td><div style="font-weight:600;color:var(--red)">${c.nbPass.toLocaleString('fr')}</div><div style="font-size:11px;color:var(--text3)">classes F/G</div></td>
@@ -2815,7 +2933,7 @@ async function searchDVF() {
 
     // Traiter les résultats
     const leads = [];
-    const typeLabels = { 'Maison':'🏠 Maison', 'Appartement':'🏢 Appart.', 'Local industriel. commercial ou assimilé':'🏭 Local', 'Dépendance':'🏚 Dép.' };
+    const typeLabels = { 'Maison':' Maison', 'Appartement':' Appart.', 'Local industriel. commercial ou assimilé':' Local', 'Dépendance':' Dép.' };
     
     for (let i = 0; i < Math.min(mutations.length, 50); i++) {
       const m = mutations[i];
@@ -2992,16 +3110,16 @@ async function searchCopro() {
         <tr>
           <td>
             <div style="font-weight:600;font-size:12px">${b2cEsc(l.name)}</div>
-            ${l.website ? `<a href="${b2cEsc(l.website)}" target="_blank" style="font-size:11px;color:var(--primary)">🌐 Site web</a>` : ''}
+            ${l.website ? `<a href="${b2cEsc(l.website)}" target="_blank" style="font-size:11px;color:var(--primary)"> Site web</a>` : ''}
           </td>
           <td style="font-size:11px;color:var(--text3);max-width:160px">${b2cEsc(l.adresse)}</td>
           <td>
             ${l.phone
-              ? `<a href="tel:${b2cEsc(l.phone)}" style="font-weight:700;color:var(--primary);font-size:12px;text-decoration:none">📞 ${b2cEsc(l.phone)}</a>`
+              ? `<a href="tel:${b2cEsc(l.phone)}" style="font-weight:700;color:var(--primary);font-size:12px;text-decoration:none"> ${b2cEsc(l.phone)}</a>`
               : '<span style="font-size:11px;color:var(--text3)">Non renseigné</span>'}
           </td>
           <td style="font-size:12px">
-            <span style="color:#f59e0b">${l.rating ? '⭐ ' + l.rating : '—'}</span>
+            <span style="color:#f59e0b">${l.rating || '—'}</span>
             <span style="font-size:10px;color:var(--text3)">${l.nbAvis ? '(' + l.nbAvis + ')' : ''}</span>
           </td>
           <td><span class="score ${b2cScoreClass(l.score)}">${l.score}</span></td>
@@ -3023,7 +3141,7 @@ function b2cRenderAllLeads() {
   let leads = b2cAllLeads();
   if (src!=='all') leads = leads.filter(l=>l.source===src);
   document.getElementById('b2c-leads-title').textContent = 'Tous les leads B2C ('+leads.length+')';
-  const srcLabel = { pj:'🟡 PJ', lbc:'🔴 LBC', ga:'⭐ Google', mpr:'🏠 MPR', dvf:'🏡 DVF', copro:'🏢 Copro' };
+  const srcLabel = { pj:' PJ', lbc:' LBC', ga:'Google Avis', mpr:' MPR', dvf:' DVF', copro:' Copro' };
   document.getElementById('b2c-all-tbody').innerHTML = leads.length===0
     ? '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:30px">Aucun lead. Lancez une recherche dans les sources.</td></tr>'
     : leads.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(l=>`
@@ -3032,7 +3150,7 @@ function b2cRenderAllLeads() {
         <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--primary-lt);color:var(--primary)">${srcLabel[l.source]||l.source}</span></td>
         <td style="font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b2cEsc((l.besoin||l.travaux||'').slice(0,40))}</td>
         <td><span class="score ${b2cScoreClass(l.score)}">${l.score}</span></td>
-        <td><select style="font-size:11px;border:1px solid var(--border);border-radius:4px;padding:2px 5px" onchange="b2cUpdateStatus('${l.id}','${l.source}',this.value)"><option value="new" ${l.status==='new'?'selected':''}>Nouveau</option><option value="contacted" ${l.status==='contacted'?'selected':''}>Contacté</option><option value="replied" ${l.status==='replied'?'selected':''}>Répondu</option><option value="converted" ${l.status==='converted'?'selected':''}>Converti ✓</option></select></td>
+        <td><select style="font-size:11px;border:1px solid var(--border);border-radius:4px;padding:2px 5px" onchange="b2cUpdateStatus('${l.id}','${l.source}',this.value)"><option value="new" ${l.status==='new'?'selected':''}>Nouveau</option><option value="contacted" ${l.status==='contacted'?'selected':''}>Contacté</option><option value="replied" ${l.status==='replied'?'selected':''}>Répondu</option><option value="converted" ${l.status==='converted'?'selected':''}>Converti </option></select></td>
         <td><button class="btn btn-sm btn-primary" onclick="b2cGenerateEmail('${l.id}','${l.source}')">Email IA</button></td>
       </tr>`).join('');
 }
@@ -3096,11 +3214,11 @@ function toggleProspectMap() {
   const btn = document.getElementById('btn-map-toggle');
   if (container.style.display === 'none') {
     container.style.display = 'block';
-    btn.textContent = '✕ Fermer carte';
+    btn.textContent = ' Fermer carte';
     renderProspectMap();
   } else {
     container.style.display = 'none';
-    btn.innerHTML = '🗺 Carte';
+    btn.innerHTML = ' Carte';
   }
 }
 
@@ -3212,10 +3330,10 @@ function buildProspectMap(prospects) {
           <div style="font-weight:700;font-size:13px;margin-bottom:4px">${p.name}</div>
           <div style="font-size:11px;color:#666;margin-bottom:6px">${p.address.slice(0,60)}${p.address.length>60?'...':''}</div>
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
-            <span style="font-size:11px">⭐ ${p.rating}</span>
+            <span style="font-size:11px">${p.rating}/5</span>
             <span style="font-size:11px;background:${color};color:white;padding:1px 6px;border-radius:4px;font-weight:600">Score ${p.score}</span>
           </div>
-          ${p.phone && p.phone !== '—' ? `<a href="tel:${p.phone}" style="font-size:11px;color:#3525cd;text-decoration:none">📞 ${p.phone}</a>` : ''}
+          ${p.phone && p.phone !== '—' ? `<a href="tel:${p.phone}" style="font-size:11px;color:#3525cd;text-decoration:none"> ${p.phone}</a>` : ''}
         </div>
       `);
       infoWindow.open(prospectMapInstance, marker);
@@ -3240,6 +3358,124 @@ function refreshProspectMapIfOpen() {
   }
 }
 
+
+// ══ SOURCES ══
+function switchSrcTab(name, btn) {
+  document.querySelectorAll('[id^="src-panel-"]').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById('src-panel-' + name);
+  if (panel) panel.style.display = 'block';
+  document.querySelectorAll('.src-tab').forEach(b => { b.classList.remove('btn-primary'); b.classList.add('btn-ghost'); });
+  if (btn) { btn.classList.remove('btn-ghost'); btn.classList.add('btn-primary'); }
+}
+async function searchSIRENE() {
+  const q = document.getElementById('sirene-q').value.trim();
+  const ville = document.getElementById('sirene-ville').value.trim();
+  const res = document.getElementById('sirene-results');
+  res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text3)">Recherche en cours...</div>';
+  try {
+    const r = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(q+' '+ville)}&nombre=20`);
+    const d = await r.json();
+    const results = d.results || [];
+    if (!results.length) { res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text3)">Aucun résultat</div>'; return; }
+    res.innerHTML = '<div class="card"><table><thead><tr><th>Entreprise</th><th>Ville</th><th>SIREN</th><th>Activité</th></tr></thead><tbody>' +
+      results.map(e => `<tr><td style="font-weight:600">${e.nom_complet||'—'}</td><td>${e.siege?.commune||'—'}</td><td>${e.siren||'—'}</td><td style="color:var(--text3)">${e.activite_principale||'—'}</td></tr>`).join('') +
+      '</tbody></table></div>';
+  } catch(e) { res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--red)">Erreur API SIRENE</div>'; }
+}
+async function searchBODACC() {
+  const dept = document.getElementById('bodacc-dept').value.trim();
+  const res = document.getElementById('bodacc-results');
+  res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text3)">Recherche en cours...</div>';
+  try {
+    let url = `https://bodacc-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/annonces-commerciales/records?limit=15&order_by=dateparution+desc`;
+    if (dept) url += `&where=departement_annonce_list%3D%22${dept}%22`;
+    const r = await fetch(url);
+    const d = await r.json();
+    const results = d.results || [];
+    if (!results.length) { res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text3)">Aucun résultat</div>'; return; }
+    res.innerHTML = '<div class="card"><table><thead><tr><th>Entreprise</th><th>Ville</th><th>Date</th></tr></thead><tbody>' +
+      results.map(e => `<tr><td style="font-weight:600">${e.commercant||'—'}</td><td>${e.ville||'—'}</td><td>${e.dateparution||'—'}</td></tr>`).join('') +
+      '</tbody></table></div>';
+  } catch(e) { res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--red)">Erreur API BODACC</div>'; }
+}
+async function searchPermis() {
+  const dept = document.getElementById('permis-dept').value.trim();
+  const commune = document.getElementById('permis-commune').value.trim();
+  const res = document.getElementById('permis-results');
+  res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text3)">Recherche en cours...</div>';
+  try {
+    let url = `https://api.sitadel.developpement-durable.gouv.fr/autorisation/?annee=2024&nature=PC&nb_resultats=15`;
+    if (dept) url += `&departement=${dept}`;
+    if (commune) url += `&commune=${commune}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    const results = Array.isArray(d) ? d : (d.results||[]);
+    if (!results.length) { res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text3)">Aucun résultat</div>'; return; }
+    res.innerHTML = '<div class="card"><table><thead><tr><th>Commune</th><th>Date</th><th>Type</th></tr></thead><tbody>' +
+      results.slice(0,15).map(e => `<tr><td style="font-weight:600">${e.lib_commune||e.commune||'—'}</td><td>${e.date_autorisation||e.annee||'—'}</td><td>Permis de construire</td></tr>`).join('') +
+      '</tbody></table></div>';
+  } catch(e) { res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--red)">Erreur API permis</div>'; }
+}
+async function searchAppelsOffres() {
+  const q = document.getElementById('ao-q').value.trim() || 'travaux';
+  const res = document.getElementById('ao-results');
+  res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text3)">Recherche en cours...</div>';
+  try {
+    const r = await fetch(`https://www.boamp.fr/api/explore/v2.1/catalog/datasets/boamp/records?q=${encodeURIComponent(q)}&limit=10&order_by=dateparution+desc`);
+    const d = await r.json();
+    const results = d.results || [];
+    if (!results.length) { res.innerHTML = `<div style="padding:12px;font-size:12px;color:var(--text3)">Aucun appel d'offres trouvé</div>`; return; }
+    res.innerHTML = '<div class="card"><table><thead><tr><th>Objet</th><th>Acheteur</th><th>Date</th></tr></thead><tbody>' +
+      results.map(e => `<tr><td style="font-weight:600">${(e.objet||'—').slice(0,60)}</td><td>${e.nomacheteur||'—'}</td><td>${e.dateparution||'—'}</td></tr>`).join('') +
+      '</tbody></table></div>';
+  } catch(e) { res.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--red)">Erreur API BOAMP</div>'; }
+}
+
+// ══ WELCOME ══
+function closeWelcome() {
+  document.getElementById('welcome-overlay').style.display = 'none';
+  localStorage.setItem('alma_plus_welcomed', '1');
+}
+document.addEventListener('DOMContentLoaded', function() {
+  if (localStorage.getItem('alma_plus_welcomed')) {
+    const el = document.getElementById('welcome-overlay');
+    if (el) el.style.display = 'none';
+  }
+});
+
 </script>
+
+<div id="welcome-overlay" style="position:fixed;inset:0;background:rgba(15,23,41,0.7);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;padding:40px;max-width:520px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.15);position:relative">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#1e3a6e,#2563eb);border-radius:16px 16px 0 0"></div>
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="width:56px;height:56px;border-radius:14px;background:#eef2f9;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <span class="material-symbols-outlined" style="font-size:28px;color:#1e3a6e">rocket_launch</span>
+      </div>
+      <div style="font-family:'Manrope',sans-serif;font-size:22px;font-weight:800;color:#0f1729;margin-bottom:8px">Bienvenue sur Alma.+</div>
+      <div style="font-size:14px;color:#4a5568">Lancez votre première campagne en 3 étapes.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:#f7f8fa;border-radius:10px;border:1px solid #e4e8f0">
+        <div style="width:30px;height:30px;border-radius:50%;background:#1e3a6e;color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0">1</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#0f1729">Configurez vos clés API</div><div style="font-size:12px;color:#94a3b8">Google Maps + Brevo pour les emails</div></div>
+        <button onclick="closeWelcome();goPage('settings',document.querySelector('[onclick*=settings]'))" style="padding:5px 12px;background:#1e3a6e;color:white;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Configurer</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:#f7f8fa;border-radius:10px;border:1px solid #e4e8f0">
+        <div style="width:30px;height:30px;border-radius:50%;background:#1e3a6e;color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0">2</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#0f1729">Trouvez vos premiers prospects</div><div style="font-size:12px;color:#94a3b8">Google Maps, INSEE, BODACC, Permis...</div></div>
+        <button onclick="closeWelcome();goPage('prospection',document.querySelector('[onclick*=prospection]'))" style="padding:5px 12px;background:#1e3a6e;color:white;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Rechercher</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:#f7f8fa;border-radius:10px;border:1px solid #e4e8f0">
+        <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1e3a6e,#2563eb);color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0">3</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#0f1729">Activez le pilote automatique</div><div style="font-size:12px;color:#94a3b8">Dites-lui quoi faire, il contacte pour vous</div></div>
+        <button onclick="closeWelcome();goPage('autopilot',document.querySelector('[onclick*=autopilot]'))" style="padding:5px 12px;background:linear-gradient(135deg,#1e3a6e,#2563eb);color:white;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Essayer</button>
+      </div>
+    </div>
+    <button onclick="closeWelcome()" style="width:100%;padding:12px;background:transparent;border:1.5px solid #e4e8f0;border-radius:10px;color:#4a5568;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Explorer le dashboard</button>
+    <div style="text-align:center;margin-top:10px;font-size:11px;color:#94a3b8">Cet écran ne s'affiche qu'une seule fois</div>
+  </div>
+</div>
+
 </body>
 </html>
