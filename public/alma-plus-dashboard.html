@@ -1414,6 +1414,11 @@ function getProfile() {
 function goPage(name, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  // Reset src panels B2B
+  document.querySelectorAll('[id^="src-panel-"]').forEach(p => p.style.display = 'none');
+  const gm = document.getElementById('src-panel-googlemaps');
+  if (gm) gm.style.display = '';
+  document.querySelectorAll('.src-tab').forEach((b,i) => b.className = i===0 ? 'btn btn-primary btn-sm src-tab' : 'btn btn-ghost btn-sm src-tab');
   document.getElementById('page-' + name)?.classList.add('active');
   if (btn) btn.classList.add('active');
   const titles = {
