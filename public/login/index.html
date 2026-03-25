@@ -441,8 +441,22 @@ async function doSignup() {
 
   var r = await sb.auth.signUp({ email, password:pwd, options:{ data: meta } })
   btn.textContent='Créer mon compte →'; btn.disabled=false
-  if (r.error) showErr(r.error.message)
-  else { showSuc('Compte créé ! Vérifiez votre email pour activer votre compte.') }
+  if (r.error) {
+    showErr(r.error.message)
+  } else if (r.data && r.data.user) {
+    // Compte créé et session active — redirection immédiate
+    showSuc('Compte créé avec succès ! Redirection...')
+    setTimeout(function() { window.location.href = '/dashboard' }, 800)
+  } else {
+    // Supabase a créé le compte mais pas encore de session — on connecte
+    var r2 = await sb.auth.signInWithPassword({ email: email, password: pwd })
+    if (r2.error) {
+      showSuc('Compte créé ! Connectez-vous maintenant.')
+      setTimeout(function() { setTab(0) }, 1500)
+    } else {
+      window.location.href = '/dashboard'
+    }
+  }
 }
 
 async function forgot() {
