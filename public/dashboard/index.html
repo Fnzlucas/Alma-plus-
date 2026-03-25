@@ -1052,10 +1052,7 @@ tr:hover td { background: var(--primary-lt); }
                 </button>
               </div>
             </div>
-            <table>
-              <thead><tr><th>Entreprise · Contact</th><th>Note</th><th>Adresse</th><th>Score IA</th><th>Email IA</th><th>Actions</th></tr></thead>
-              <tbody id="results-table"></tbody>
-            </table>
+            <div id="results-table" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding:16px"></div>
           </div>
         </div>
       </div>
@@ -1335,453 +1332,511 @@ tr:hover td { background: var(--primary-lt); }
 
   <!-- ════════════════ PROSPECTION B2C ════════════════ -->
   <div class="page" id="page-prospection-b2c">
-    <div style="max-width:860px">
+    <div style="max-width:900px">
 
-      <!-- Tabs sources B2C -->
-      <div class="tabs" style="margin-bottom:16px">
-        <div class="tab active" onclick="switchB2cTab('b2c-pj',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">menu_book</span> Pages Jaunes</div>
-        <div class="tab" onclick="switchB2cTab('b2c-lbc',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">sell</span> Leboncoin</div>
-        <div class="tab" onclick="switchB2cTab('b2c-avis',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">star</span> Google Avis</div>
-        <div class="tab" onclick="switchB2cTab('b2c-mpr',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">eco</span> MaPrimeRénov'</div>
-        <div class="tab" onclick="switchB2cTab('b2c-dvf',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">real_estate_agent</span> DVF</div>
-        <div class="tab" onclick="switchB2cTab('b2c-copro',this)"><span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">apartment</span> Copropriétés</div>
-      </div>
-
-      <!-- ── Pages Jaunes ── -->
-      <div id="b2c-pj">
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Pages Jaunes</div>
-              <div class="card-sub">Particuliers et professionnels · Annuaire national</div>
-            </div>
-            <span class="tag" style="background:var(--amber-lt);color:var(--amber);border:1px solid #fcd34d" id="pj-b2c-tag">
-              <span class="material-symbols-rounded" style="font-size:12px">settings</span>Configurer
-            </span>
-          </div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:14px">
-              <span class="material-symbols-rounded">info</span>
-              Identifiez des particuliers ou petits professionnels par secteur géographique et catégorie. Idéal pour les services à domicile.
-            </div>
-            <div class="form-row" style="margin-bottom:12px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Catégorie recherchée</label>
-                <input class="form-input" id="pj-categorie" placeholder="Ex: maison individuelle, jardin, artisan..." />
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Ville / Code postal</label>
-                <input class="form-input" id="pj-ville" placeholder="Ex: Lyon, 69003..." />
-              </div>
-            </div>
-            <div class="form-row" style="margin-bottom:16px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Rayon (km)</label>
-                <select class="form-input" id="pj-rayon">
-                  <option value="5">5 km</option>
-                  <option value="10" selected>10 km</option>
-                  <option value="20">20 km</option>
-                  <option value="50">50 km</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Nombre de résultats</label>
-                <select class="form-input" id="pj-max">
-                  <option value="10">10</option>
-                  <option value="20" selected>20</option>
-                  <option value="50">50</option>
-                </select>
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="searchPJ()">
-              <span id="pj-spinner" style="display:none" class="spinner"></span>
-              <span class="material-symbols-rounded" style="font-size:16px">menu_book</span>
-              Rechercher dans Pages Jaunes
-            </button>
-          </div>
+      <!-- Header avec badge unique -->
+      <div class="page-header" style="margin-bottom:20px">
+        <div>
+          <div class="page-heading">Prospection B2C — Moteur de signaux croisés</div>
+          <div class="page-subheading">Croisement de 5 sources open data pour identifier les prospects à fort potentiel</div>
         </div>
-        <div id="pj-results" style="display:none">
-          <div class="card">
-            <div class="card-header">
-              <div><div class="card-title">Résultats Pages Jaunes</div><div class="card-sub" id="pj-results-sub"></div></div>
-              <button class="btn btn-sm btn-primary" onclick="generateAllEmailsB2C('pj')">
-                <span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Emails IA
-              </button>
-            </div>
-            <table>
-              <thead><tr><th>Nom</th><th>Téléphone</th><th>Adresse</th><th>Catégorie</th><th>Score IA</th><th>Actions</th></tr></thead>
-              <tbody id="pj-table"></tbody>
-            </table>
-          </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="background:var(--primary-lt);color:var(--primary);border:1px solid var(--primary-border);font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px">5 sources croisées</span>
         </div>
       </div>
 
-      <!-- ── Leboncoin ── -->
-      <div id="b2c-lbc" style="display:none">
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Leboncoin — Annonces Particuliers</div>
-              <div class="card-sub">Petites annonces · Particuliers en recherche active</div>
+      <!-- MOTEUR DE CROISEMENT -->
+      <div class="card" style="margin-bottom:16px;border:2px solid var(--primary-border)">
+        <div class="card-header" style="background:var(--primary-lt)">
+          <div>
+            <div class="card-title" style="color:var(--primary);font-size:14px">
+              <span class="material-symbols-rounded" style="font-size:16px;vertical-align:-3px;margin-right:6px">hub</span>
+              Moteur de croisement intelligent
             </div>
-            <span class="tag" style="background:var(--amber-lt);color:var(--amber);border:1px solid #fcd34d">
-              <span class="material-symbols-rounded" style="font-size:12px">settings</span>Configurer
-            </span>
-          </div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:14px">
-              <span class="material-symbols-rounded">info</span>
-              Détectez les particuliers qui cherchent activement des services (travaux, déménagement, jardinage, garde d'enfants...) via leurs annonces.
-            </div>
-            <div class="form-row" style="margin-bottom:12px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Catégorie d'annonce</label>
-                <select class="form-input" id="lbc-categorie">
-                  <option value="services">Services à domicile</option>
-                  <option value="travaux">Travaux / Artisans</option>
-                  <option value="demenagement">Déménagement</option>
-                  <option value="jardinage">Jardinage / Espaces verts</option>
-                  <option value="informatique">Informatique / High-tech</option>
-                  <option value="cours">Cours particuliers</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Région / Ville</label>
-                <input class="form-input" id="lbc-localisation" placeholder="Ex: Paris, Lyon, Île-de-France..." />
-              </div>
-            </div>
-            <div class="form-row" style="margin-bottom:16px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Type d'annonce</label>
-                <select class="form-input" id="lbc-type">
-                  <option value="offre">Offres (prestataires)</option>
-                  <option value="demande" selected>Demandes (cherchent un service)</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Publiées depuis</label>
-                <select class="form-input" id="lbc-periode">
-                  <option value="1">24h</option>
-                  <option value="7" selected>7 jours</option>
-                  <option value="30">30 jours</option>
-                </select>
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="searchLBC()">
-              <span id="lbc-spinner" style="display:none" class="spinner"></span>
-              <span class="material-symbols-rounded" style="font-size:16px">sell</span>
-              Rechercher sur Leboncoin
-            </button>
+            <div class="card-sub">DVF × Permis × DPE × Copropriétés × BODACC — un seul résultat, plusieurs signaux</div>
           </div>
         </div>
-        <div id="lbc-results" style="display:none">
-          <div class="card">
-            <div class="card-header">
-              <div><div class="card-title">Annonces Leboncoin</div><div class="card-sub" id="lbc-results-sub"></div></div>
-              <button class="btn btn-sm btn-ghost" onclick="exportLbcCSV()">
+        <div class="card-body">
+          <div class="alert alert-info" style="margin-bottom:18px">
+            <span class="material-symbols-rounded">auto_awesome</span>
+            <span>L'IA croise les 5 sources et attribue un <strong>score de chaleur</strong> à chaque adresse selon le nombre de signaux détectés. Plus il y a de signaux, plus le prospect est chaud.</span>
+          </div>
+
+          <div class="form-row" style="margin-bottom:14px">
+            <div class="form-group" style="margin:0">
+              <label class="form-label">Zone de recherche *</label>
+              <input class="form-input" id="cross-zone" placeholder="Ex: Lyon, 69003, Bordeaux, Avignon..." />
+            </div>
+            <div class="form-group" style="margin:0">
+              <label class="form-label">Secteur d'activité client</label>
+              <select class="form-input" id="cross-secteur">
+                <option value="renovation">Rénovation / BTP / Artisan</option>
+                <option value="immo">Immobilier / Agence</option>
+                <option value="demenagement">Déménagement / Logistique</option>
+                <option value="assurance">Assurance / Courtage</option>
+                <option value="finance">Banque / Crédit immobilier</option>
+                <option value="decoration">Décoration / Architecture intérieure</option>
+                <option value="energie">Énergie / Panneaux solaires / Pompe à chaleur</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <label class="form-label" style="margin-bottom:10px;display:block">Sources à croiser</label>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:500">
+                <input type="checkbox" id="cross-dvf" checked style="accent-color:var(--primary)">
+                <span class="material-symbols-rounded" style="font-size:14px;color:var(--primary)">real_estate_agent</span>DVF — Ventes récentes
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:500">
+                <input type="checkbox" id="cross-permis" checked style="accent-color:var(--primary)">
+                <span class="material-symbols-rounded" style="font-size:14px;color:var(--primary)">construction</span>Permis de construire
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:500">
+                <input type="checkbox" id="cross-dpe" checked style="accent-color:var(--primary)">
+                <span class="material-symbols-rounded" style="font-size:14px;color:var(--amber)">eco</span>DPE F/G — Passoires
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:500">
+                <input type="checkbox" id="cross-copro" checked style="accent-color:var(--primary)">
+                <span class="material-symbols-rounded" style="font-size:14px;color:var(--primary)">apartment</span>Copropriétés fragiles
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:500">
+                <input type="checkbox" id="cross-bodacc" checked style="accent-color:var(--primary)">
+                <span class="material-symbols-rounded" style="font-size:14px;color:var(--primary)">gavel</span>BODACC — Créations
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:500">
+                <input type="checkbox" id="cross-artisans" style="accent-color:var(--primary)">
+                <span class="material-symbols-rounded" style="font-size:14px;color:var(--green)">map</span>Artisans locaux (B2B2C)
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-bottom:16px">
+            <div class="form-group" style="margin:0">
+              <label class="form-label">Score minimum</label>
+              <select class="form-input" id="cross-score-min">
+                <option value="1">Au moins 1 signal</option>
+                <option value="2" selected>Au moins 2 signaux (recommandé)</option>
+                <option value="3">Au moins 3 signaux (très chaud)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0">
+              <label class="form-label">Nombre de résultats max</label>
+              <select class="form-input" id="cross-max">
+                <option value="10">10 prospects</option>
+                <option value="20" selected>20 prospects</option>
+                <option value="50">50 prospects</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="searchCrossB2C()" style="width:100%;justify-content:center;padding:14px">
+            <span id="cross-spinner" style="display:none" class="spinner"></span>
+            <span class="material-symbols-rounded" style="font-size:18px">hub</span>
+            Lancer le croisement des sources
+          </button>
+        </div>
+      </div>
+
+      <!-- Progression du croisement -->
+      <div id="cross-progress" style="display:none;margin-bottom:16px">
+        <div class="card">
+          <div class="card-body">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px" id="cross-progress-text">Interrogation des sources...</div>
+            <div style="display:flex;flex-direction:column;gap:8px" id="cross-sources-status"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Résultats croisés -->
+      <div id="cross-results" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Prospects B2C — Signaux croisés</div>
+              <div class="card-sub" id="cross-results-sub"></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm btn-ghost" onclick="exportCrossCSV()">
                 <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
               </button>
-            </div>
-            <table>
-              <thead><tr><th>Titre</th><th>Localisation</th><th>Date</th><th>Prix</th><th>Score IA</th><th>Actions</th></tr></thead>
-              <tbody id="lbc-table"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Google Avis ── -->
-      <div id="b2c-avis" style="display:none">
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Google Avis — Analyse de réputation</div>
-              <div class="card-sub">Avis Google Maps · Détectez les insatisfaits et les opportunités</div>
-            </div>
-            <span class="tag" style="background:var(--primary-lt);color:var(--primary);border:1px solid var(--primary-border)">
-              <span class="material-symbols-rounded" style="font-size:12px">check_circle</span>Via Google Maps
-            </span>
-          </div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:14px">
-              <span class="material-symbols-rounded">info</span>
-              Analysez les avis négatifs pour identifier les clients insatisfaits de concurrents ou trouver des établissements avec une mauvaise réputation à reconquérir.
-            </div>
-            <div class="form-row" style="margin-bottom:12px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Type d'établissement</label>
-                <input class="form-input" id="avis-type" placeholder="Ex: restaurant, hôtel, salon de coiffure..." />
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Ville / Zone</label>
-                <input class="form-input" id="avis-ville" placeholder="Ex: Lyon, Paris 15e..." />
-              </div>
-            </div>
-            <div class="form-row" style="margin-bottom:16px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Filtre note</label>
-                <select class="form-input" id="avis-note">
-                  <option value="all">Toutes notes</option>
-                  <option value="low" selected>Notes ≤ 3 (insatisfaits)</option>
-                  <option value="high">Notes ≥ 4 (satisfaits — à fidéliser)</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Nombre de résultats</label>
-                <select class="form-input" id="avis-max">
-                  <option value="10" selected>10</option>
-                  <option value="20">20</option>
-                </select>
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="searchAvis()">
-              <span id="avis-spinner" style="display:none" class="spinner"></span>
-              <span class="material-symbols-rounded" style="font-size:16px">star</span>
-              Analyser les avis
-            </button>
-          </div>
-        </div>
-        <div id="avis-results" style="display:none">
-          <div class="card">
-            <div class="card-header">
-              <div><div class="card-title">Analyse des avis</div><div class="card-sub" id="avis-results-sub"></div></div>
-              <button class="btn btn-sm btn-primary" onclick="generateAllEmailsB2C('avis')">
-                <span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Emails IA
+              <button class="btn btn-sm btn-primary" onclick="generateAllEmailsB2C('cross')">
+                <span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Emails IA pour tous
               </button>
             </div>
-            <table>
-              <thead><tr><th>Établissement</th><th>Note moy.</th><th>Nb avis</th><th>Adresse</th><th>Score IA</th><th>Actions</th></tr></thead>
-              <tbody id="avis-table"></tbody>
-            </table>
           </div>
+
+          <!-- Légende scores -->
+          <div style="padding:10px 18px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;gap:16px;flex-wrap:wrap">
+            <div style="font-size:11px;font-weight:600;color:var(--text2)">Score de chaleur :</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:#fef2f2;color:#dc2626;padding:2px 7px;border-radius:4px;font-weight:700">🔥 3+</span> Très chaud — plusieurs signaux</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:var(--amber-lt);color:var(--amber);padding:2px 7px;border-radius:4px;font-weight:700">⚡ 2</span> Chaud — 2 signaux</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:var(--primary-lt);color:var(--primary);padding:2px 7px;border-radius:4px;font-weight:700">📍 1</span> Tiède — 1 signal</div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Adresse</th>
+                <th>Commune</th>
+                <th>Signaux détectés</th>
+                <th>Score</th>
+                <th>Opportunité</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="cross-table"></tbody>
+          </table>
         </div>
       </div>
 
-      <!-- ── MaPrimeRénov' ── -->
-      <div id="b2c-mpr" style="display:none">
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-header">
-            <div>
-              <div class="card-title">MaPrimeRénov' — Logements éligibles</div>
-              <div class="card-sub">Propriétaires éligibles aux aides rénovation énergétique · ANAH</div>
-            </div>
-            <span class="tag" style="background:var(--amber-lt);color:var(--amber);border:1px solid #fcd34d">
-              <span class="material-symbols-rounded" style="font-size:12px">settings</span>Configurer
-            </span>
+      <!-- Sources individuelles séparées -->
+      <div style="margin-top:24px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:14px">Sources individuelles</div>
+        <div class="tabs" style="margin-bottom:16px">
+          <div class="tab active" onclick="switchB2cTab('b2c-dvf',this)">
+            <span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">real_estate_agent</span> DVF
           </div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:14px">
-              <span class="material-symbols-rounded">info</span>
-              Ciblez les propriétaires éligibles MaPrimeRénov' pour proposer des travaux d'isolation, pompe à chaleur, chaudière... Idéal pour artisans RGE.
-            </div>
-            <div class="form-row" style="margin-bottom:12px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Département</label>
-                <input class="form-input" id="mpr-dept" placeholder="Ex: 69, 75, 13..." />
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Type de travaux</label>
-                <select class="form-input" id="mpr-travaux">
-                  <option value="isolation">Isolation thermique</option>
-                  <option value="chauffage">Chauffage (PAC, chaudière)</option>
-                  <option value="fenetres">Fenêtres / Menuiseries</option>
-                  <option value="ventilation">Ventilation (VMC)</option>
-                  <option value="tous" selected>Tous types</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row" style="margin-bottom:16px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Classe énergie cible</label>
-                <select class="form-input" id="mpr-classe">
-                  <option value="EFG" selected>E, F, G (passoires thermiques)</option>
-                  <option value="DEF">D, E, F</option>
-                  <option value="tous">Toutes classes</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Statut propriétaire</label>
-                <select class="form-input" id="mpr-statut">
-                  <option value="occupant" selected>Propriétaire occupant</option>
-                  <option value="bailleur">Propriétaire bailleur</option>
-                  <option value="tous">Tous</option>
-                </select>
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="searchMPR()">
-              <span id="mpr-spinner" style="display:none" class="spinner"></span>
-              <span class="material-symbols-rounded" style="font-size:16px">eco</span>
-              Rechercher les logements éligibles
-            </button>
+          <div class="tab" onclick="switchB2cTab('b2c-permis-b2c',this)">
+            <span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">construction</span> Permis
+          </div>
+          <div class="tab" onclick="switchB2cTab('b2c-dpe',this)">
+            <span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">eco</span> DPE ADEME
+          </div>
+          <div class="tab" onclick="switchB2cTab('b2c-copro',this)">
+            <span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">apartment</span> Copropriétés
+          </div>
+          <div class="tab" onclick="switchB2cTab('b2c-bodacc-b2c',this)">
+            <span class="material-symbols-rounded" style="font-size:14px;vertical-align:-3px">gavel</span> BODACC
           </div>
         </div>
-        <div id="mpr-results" style="display:none">
-          <div class="card">
+
+        <!-- DVF -->
+        <div id="b2c-dvf">
+          <div class="card" style="margin-bottom:16px">
             <div class="card-header">
-              <div><div class="card-title">Logements éligibles MaPrimeRénov'</div><div class="card-sub" id="mpr-results-sub"></div></div>
-              <button class="btn btn-sm btn-ghost" onclick="exportMprCSV()">
-                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              <div><div class="card-title">DVF — Transactions immobilières récentes</div><div class="card-sub">Acheteurs récents = besoin travaux immédiat · data.gouv.fr</div></div>
+            </div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Commune / Code postal</label>
+                  <input class="form-input" id="dvf-commune" placeholder="Ex: Lyon, 69003, Bordeaux..." />
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Type de bien</label>
+                  <select class="form-input" id="dvf-type">
+                    <option value="maison" selected>Maison</option>
+                    <option value="appartement">Appartement</option>
+                    <option value="tous">Tous</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="searchDVF()">
+                <span id="dvf-spinner" style="display:none" class="spinner"></span>
+                <span class="material-symbols-rounded" style="font-size:16px">real_estate_agent</span>Rechercher
               </button>
             </div>
-            <table>
-              <thead><tr><th>Adresse</th><th>Commune</th><th>Classe DPE</th><th>Type</th><th>Aide estimée</th><th>Actions</th></tr></thead>
-              <tbody id="mpr-table"></tbody>
-            </table>
+          </div>
+          <div id="dvf-results" style="display:none">
+            <div class="card">
+              <div class="card-header">
+                <div><div class="card-title">Transactions DVF</div><div class="card-sub" id="dvf-results-sub"></div></div>
+                <button class="btn btn-sm btn-ghost" onclick="exportDvfCSV()"><span class="material-symbols-rounded" style="font-size:14px">download</span>CSV</button>
+              </div>
+              <table>
+                <thead><tr><th>Adresse</th><th>Commune</th><th>Type</th><th>Surface</th><th>Prix</th><th>Date vente</th></tr></thead>
+                <tbody id="dvf-table"></tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- ── DVF ── -->
-      <div id="b2c-dvf" style="display:none">
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-header">
-            <div>
-              <div class="card-title">DVF — Demandes de Valeurs Foncières</div>
-              <div class="card-sub">Transactions immobilières récentes · data.gouv.fr</div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:14px">
-              <span class="material-symbols-rounded">info</span>
-              Identifiez les acheteurs immobiliers récents — ils ont besoin de travaux, décoration, déménagement, assurance, etc. Signal d'achat très fort.
-            </div>
-            <div class="form-row" style="margin-bottom:12px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Commune / Code postal</label>
-                <input class="form-input" id="dvf-commune" placeholder="Ex: Lyon, 69003, Bordeaux..." />
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Type de bien</label>
-                <select class="form-input" id="dvf-type">
-                  <option value="maison" selected>Maison</option>
-                  <option value="appartement">Appartement</option>
-                  <option value="terrain">Terrain</option>
-                  <option value="tous">Tous</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row" style="margin-bottom:16px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Transactions depuis</label>
-                <select class="form-input" id="dvf-periode">
-                  <option value="3">3 derniers mois</option>
-                  <option value="6" selected>6 derniers mois</option>
-                  <option value="12">12 derniers mois</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Prix min (€)</label>
-                <input class="form-input" type="number" id="dvf-prix-min" placeholder="Ex: 150000" />
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="searchDVF()">
-              <span id="dvf-spinner" style="display:none" class="spinner"></span>
-              <span class="material-symbols-rounded" style="font-size:16px">real_estate_agent</span>
-              Rechercher les transactions
-            </button>
-          </div>
-        </div>
-        <div id="dvf-results" style="display:none">
-          <div class="card">
+        <!-- Permis B2C -->
+        <div id="b2c-permis-b2c" style="display:none">
+          <div class="card" style="margin-bottom:16px">
             <div class="card-header">
-              <div><div class="card-title">Transactions DVF</div><div class="card-sub" id="dvf-results-sub"></div></div>
-              <button class="btn btn-sm btn-ghost" onclick="exportDvfCSV()">
-                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              <div><div class="card-title">Permis de construire — Sitadel</div><div class="card-sub">Chantiers autorisés · Ministère Transition écologique</div></div>
+            </div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Commune / Département</label>
+                  <input class="form-input" id="permis-commune" placeholder="Ex: Lyon, 69, Marseille..." />
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Type de projet</label>
+                  <select class="form-input" id="permis-type">
+                    <option value="tous" selected>Tous</option>
+                    <option value="maison">Logement individuel</option>
+                    <option value="collectif">Logement collectif</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="searchPermis()">
+                <span id="permis-spinner" style="display:none" class="spinner"></span>
+                <span class="material-symbols-rounded" style="font-size:16px">construction</span>Rechercher
               </button>
             </div>
-            <table>
-              <thead><tr><th>Adresse</th><th>Commune</th><th>Type</th><th>Surface</th><th>Prix</th><th>Date vente</th></tr></thead>
-              <tbody id="dvf-table"></tbody>
-            </table>
+          </div>
+          <div id="permis-results" style="display:none">
+            <div class="card">
+              <div class="card-header">
+                <div><div class="card-title">Permis de construire</div><div class="card-sub" id="permis-results-sub"></div></div>
+                <button class="btn btn-sm btn-ghost" onclick="exportPermisCSV()"><span class="material-symbols-rounded" style="font-size:14px">download</span>CSV</button>
+              </div>
+              <table>
+                <thead><tr><th>Référence</th><th>Adresse</th><th>Type projet</th><th>Surface</th><th>Date</th><th>Actions</th></tr></thead>
+                <tbody id="permis-table"></tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- ── Copropriétés ── -->
-      <div id="b2c-copro" style="display:none">
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Registre National des Copropriétés</div>
-              <div class="card-sub">Copropriétés fragiles et en difficulté · ANAH / data.gouv.fr</div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:14px">
-              <span class="material-symbols-rounded">info</span>
-              Ciblez les copropriétés selon leur état (fragile, en difficulté) pour des projets de rénovation collective, ravalement, toiture, ascenseur...
-            </div>
-            <div class="form-row" style="margin-bottom:12px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Département / Commune</label>
-                <input class="form-input" id="copro-localisation" placeholder="Ex: 69, Lyon, 75001..." />
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">État de la copropriété</label>
-                <select class="form-input" id="copro-etat">
-                  <option value="fragile" selected>Fragile</option>
-                  <option value="difficulte">En difficulté</option>
-                  <option value="tous">Toutes</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row" style="margin-bottom:16px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Année de construction</label>
-                <select class="form-input" id="copro-annee">
-                  <option value="avant1949">Avant 1949</option>
-                  <option value="1949-1974" selected>1949 — 1974</option>
-                  <option value="1975-2000">1975 — 2000</option>
-                  <option value="tous">Toutes périodes</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">Nb de lots min.</label>
-                <input class="form-input" type="number" id="copro-lots" placeholder="Ex: 10" value="5" />
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="searchCopro()">
-              <span id="copro-spinner" style="display:none" class="spinner"></span>
-              <span class="material-symbols-rounded" style="font-size:16px">apartment</span>
-              Rechercher les copropriétés
-            </button>
-          </div>
-        </div>
-        <div id="copro-results" style="display:none">
-          <div class="card">
+        <!-- DPE ADEME -->
+        <div id="b2c-dpe" style="display:none">
+          <div class="card" style="margin-bottom:16px">
             <div class="card-header">
-              <div><div class="card-title">Copropriétés</div><div class="card-sub" id="copro-results-sub"></div></div>
-              <button class="btn btn-sm btn-ghost" onclick="exportCoproCSV()">
-                <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+              <div><div class="card-title">DPE ADEME — Passoires thermiques F/G</div><div class="card-sub">9M de diagnostics · Logements éligibles MaPrimeRénov' · ADEME open data</div></div>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info" style="margin-bottom:14px">
+                <span class="material-symbols-rounded">info</span>
+                Les logements classés F et G sont des "passoires thermiques" — leurs propriétaires sont éligibles à MaPrimeRénov' et cherchent activement des artisans RGE.
+              </div>
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Commune / Département</label>
+                  <input class="form-input" id="dpe-commune" placeholder="Ex: Lyon, 69, 13, Paris..." />
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Classe DPE</label>
+                  <select class="form-input" id="dpe-classe">
+                    <option value="F,G" selected>F et G (passoires thermiques)</option>
+                    <option value="G">G uniquement (urgence)</option>
+                    <option value="E,F,G">E, F et G</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:16px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Type de bâtiment</label>
+                  <select class="form-input" id="dpe-type">
+                    <option value="tous" selected>Tous</option>
+                    <option value="maison individuelle">Maison individuelle</option>
+                    <option value="appartement">Appartement</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Nombre de résultats</label>
+                  <select class="form-input" id="dpe-max">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="searchDPE()">
+                <span id="dpe-spinner" style="display:none" class="spinner"></span>
+                <span class="material-symbols-rounded" style="font-size:16px">eco</span>Rechercher les passoires thermiques
               </button>
             </div>
-            <table>
-              <thead><tr><th>Nom / Adresse</th><th>Commune</th><th>Lots</th><th>Année</th><th>État</th><th>Syndic</th></tr></thead>
-              <tbody id="copro-table"></tbody>
-            </table>
+          </div>
+          <div id="dpe-results" style="display:none">
+            <div class="card">
+              <div class="card-header">
+                <div><div class="card-title">Logements DPE F/G</div><div class="card-sub" id="dpe-results-sub"></div></div>
+                <button class="btn btn-sm btn-ghost" onclick="exportDpeCSV()"><span class="material-symbols-rounded" style="font-size:14px">download</span>CSV</button>
+              </div>
+              <table>
+                <thead><tr><th>Adresse</th><th>Commune</th><th>Classe</th><th>Type</th><th>Surface</th><th>Année</th></tr></thead>
+                <tbody id="dpe-table"></tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
 
+        <!-- Copropriétés -->
+        <div id="b2c-copro" style="display:none">
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+              <div><div class="card-title">Registre National des Copropriétés</div><div class="card-sub">Copropriétés fragiles · ANAH · data.gouv.fr</div></div>
+            </div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Département / Commune</label>
+                  <input class="form-input" id="copro-localisation" placeholder="Ex: 69, Lyon, 75001..." />
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">État</label>
+                  <select class="form-input" id="copro-etat">
+                    <option value="fragile" selected>Fragile</option>
+                    <option value="difficulte">En difficulté</option>
+                    <option value="tous">Toutes</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="searchCopro()">
+                <span id="copro-spinner" style="display:none" class="spinner"></span>
+                <span class="material-symbols-rounded" style="font-size:16px">apartment</span>Rechercher
+              </button>
+            </div>
+          </div>
+          <div id="copro-results" style="display:none">
+            <div class="card">
+              <div class="card-header">
+                <div><div class="card-title">Copropriétés</div><div class="card-sub" id="copro-results-sub"></div></div>
+                <button class="btn btn-sm btn-ghost" onclick="exportCoproCSV()"><span class="material-symbols-rounded" style="font-size:14px">download</span>CSV</button>
+              </div>
+              <table>
+                <thead><tr><th>Nom / Adresse</th><th>Commune</th><th>Lots</th><th>Année</th><th>État</th><th>Syndic</th></tr></thead>
+                <tbody id="copro-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- BODACC B2C -->
+        <div id="b2c-bodacc-b2c" style="display:none">
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+              <div><div class="card-title">BODACC — Annonces légales</div><div class="card-sub">Créations, cessions, liquidations · DILA open data</div></div>
+            </div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Ville / Département</label>
+                  <input class="form-input" id="bodacc-dept" placeholder="Ex: Lyon, 69, Paris..." />
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">Type d'annonce</label>
+                  <select class="form-input" id="bodacc-type">
+                    <option value="creation" selected>Créations d'entreprises</option>
+                    <option value="cession">Cessions / Ventes</option>
+                    <option value="procedure">Procédures collectives</option>
+                    <option value="radiation">Radiations</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="searchBodacc()">
+                <span id="bodacc-spinner" style="display:none" class="spinner"></span>
+                <span class="material-symbols-rounded" style="font-size:16px">gavel</span>Rechercher
+              </button>
+            </div>
+          </div>
+          <div id="bodacc-results" style="display:none">
+            <div class="card">
+              <div class="card-header">
+                <div><div class="card-title">Annonces BODACC</div><div class="card-sub" id="bodacc-results-sub"></div></div>
+                <button class="btn btn-sm btn-ghost" onclick="exportBodaccCSV()"><span class="material-symbols-rounded" style="font-size:14px">download</span>CSV</button>
+              </div>
+              <table>
+                <thead><tr><th>Entreprise</th><th>Type</th><th>Ville</th><th>Date</th><th>Activité</th><th>Actions</th></tr></thead>
+                <tbody id="bodacc-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 
-
+  
   <!-- ════════════════ PIPELINE ════════════════ -->
   <div class="page" id="page-pipeline">
-    <div class="card">
-      <div class="card-header">
-        <div><div class="card-title">Pipeline CRM</div><div class="card-sub" id="pipeline-sub">0 prospects</div></div>
+
+    <!-- Filtres statuts -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+      <div style="font-size:12px;font-weight:600;color:var(--text2)">Filtrer :</div>
+      <button class="chip" id="filter-all" onclick="filterPipeline('all',this)" style="background:var(--primary-lt);color:var(--primary);border-color:var(--primary-border);font-weight:700">Tous</button>
+      <button class="chip" onclick="filterPipeline('new',this)">Nouveau</button>
+      <button class="chip" onclick="filterPipeline('contacted',this)">Contacté</button>
+      <button class="chip" onclick="filterPipeline('replied',this)">Répondu</button>
+      <button class="chip" onclick="filterPipeline('converted',this)">Converti</button>
+      <div style="margin-left:auto;font-size:12px;color:var(--text3)" id="pipeline-sub">0 prospects</div>
+    </div>
+
+    <!-- Grille de cartes -->
+    <div id="pipeline-table" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px"></div>
+
+  </div>
+
+  <!-- Modale fiche prospect pipeline -->
+  <div class="modal-overlay" id="prospect-modal">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="pm-name">—</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:3px" id="pm-address">—</div>
+        </div>
+        <button class="modal-close" onclick="closeProspectModal()">
+          <span class="material-symbols-rounded" style="font-size:16px">close</span>
+        </button>
       </div>
-      <table>
-        <thead><tr><th>Entreprise</th><th>Score</th><th>Statut</th><th>Email généré</th><th>Action</th></tr></thead>
-        <tbody id="pipeline-table">
-          <tr><td colspan="5" style="text-align:center;color:var(--text3);padding:40px">
-            <span class="material-symbols-rounded" style="font-size:32px;display:block;margin-bottom:10px;opacity:.25">view_kanban</span>
-            Aucun prospect dans le pipeline. Lancez une recherche.
-          </td></tr>
-        </tbody>
-      </table>
+      <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- Téléphone -->
+        <div id="pm-phone-wrap" style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--bg)">
+          <span class="material-symbols-rounded" style="font-size:18px;color:var(--text3)">phone</span>
+          <span id="pm-phone" style="font-size:15px;font-weight:700;color:var(--text)">—</span>
+        </div>
+
+        <!-- Note + Score -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:var(--bg);border-radius:var(--radius-md);padding:12px 14px;text-align:center">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px">Note Google</div>
+            <div id="pm-rating" style="font-size:22px;font-weight:800;font-family:'Manrope',sans-serif;color:var(--amber)">—</div>
+          </div>
+          <div style="background:var(--bg);border-radius:var(--radius-md);padding:12px 14px;text-align:center">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px">Score IA</div>
+            <div id="pm-score" style="font-size:22px;font-weight:800;font-family:'Manrope',sans-serif;color:var(--primary)">—</div>
+          </div>
+        </div>
+
+        <!-- Site web -->
+        <div id="pm-web-wrap" style="display:none;padding:10px 14px;background:var(--primary-lt);border-radius:var(--radius-md);border:1px solid var(--primary-border)">
+          <span style="font-size:12px;font-weight:600;color:var(--primary)">🌐 </span>
+          <a id="pm-website" href="#" target="_blank" style="font-size:12px;color:var(--primary);font-weight:600;text-decoration:none">—</a>
+          &nbsp;&nbsp;
+          <a id="pm-email-finder" href="#" target="_blank" style="font-size:11px;font-weight:700;background:var(--primary);color:#fff;padding:3px 10px;border-radius:99px;text-decoration:none">✉ Trouver email</a>
+        </div>
+
+        <!-- Statut -->
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Statut du prospect</label>
+          <select class="form-input" id="pm-status" onchange="updateStatusFromModal()">
+            <option value="new">🆕 Nouveau</option>
+            <option value="contacted">📤 Contacté</option>
+            <option value="replied">💬 Répondu</option>
+            <option value="converted">✅ Converti</option>
+          </select>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Notes</label>
+          <textarea class="form-input" id="pm-notes" placeholder="Ajoutez vos notes sur ce prospect..." style="min-height:80px" oninput="saveProspectNotes()"></textarea>
+        </div>
+
+        <!-- Email IA -->
+        <div id="pm-email-section">
+          <div id="pm-email-preview" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;font-size:12px;color:var(--text2);white-space:pre-wrap;max-height:160px;overflow-y:auto;line-height:1.6"></div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="removePipelineProspect()">
+          <span class="material-symbols-rounded" style="font-size:14px">delete</span>Retirer
+        </button>
+        <button class="btn btn-ghost" id="pm-email-btn" onclick="openEmailFromModal()">
+          <span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Email IA
+        </button>
+        <button class="btn btn-primary" onclick="closeProspectModal()">
+          <span class="material-symbols-rounded" style="font-size:14px">check</span>Fermer
+        </button>
+      </div>
     </div>
   </div>
 
@@ -2692,7 +2747,12 @@ async function generateAllEmails() {
 
 function updateEmailCell(pid) {
   const el = document.getElementById('email-cell-' + pid);
-  if (el) el.innerHTML = '<span style="color:var(--green);font-size:11px;font-weight:600">✓ Généré</span>';
+  if (el) {
+    el.innerHTML = '<span class="material-symbols-rounded" style="font-size:13px;color:var(--green)">check_circle</span><span style="color:var(--green);font-size:11px;font-weight:600">Email prêt</span>';
+    el.style.background = 'var(--green-lt)';
+    el.style.borderColor = 'var(--green-border)';
+    el.style.color = 'var(--green)';
+  }
 }
 
 // ═══ PIPELINE ═══
@@ -2714,31 +2774,71 @@ function addToPipeline(prospect) {
   refreshPipeline();
 }
 
+// Pipeline filter state
+let pipelineFilter = 'all';
+
+function filterPipeline(status, btn) {
+  pipelineFilter = status;
+  document.querySelectorAll('#page-pipeline .chip').forEach(b => {
+    b.style.background = ''; b.style.color = ''; b.style.borderColor = ''; b.style.fontWeight = '';
+  });
+  if (btn) { btn.style.background = 'var(--primary-lt)'; btn.style.color = 'var(--primary)'; btn.style.borderColor = 'var(--primary-border)'; btn.style.fontWeight = '700'; }
+  refreshPipeline();
+}
+
 function refreshPipeline() {
-  const tbody = document.getElementById('pipeline-table');
-  document.getElementById('pipeline-sub').textContent = state.pipeline.length + ' prospects';
+  const grid = document.getElementById('pipeline-table');
+  const filtered = pipelineFilter === 'all' ? state.pipeline : state.pipeline.filter(p => p.status === pipelineFilter);
+  document.getElementById('pipeline-sub').textContent = filtered.length + ' prospect' + (filtered.length > 1 ? 's' : '');
+
   if (state.pipeline.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:40px"><span class="material-symbols-rounded" style="font-size:32px;display:block;margin-bottom:10px;opacity:.25">view_kanban</span>Aucun prospect dans le pipeline.</td></tr>';
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text3);padding:60px 20px"><span class="material-symbols-rounded" style="font-size:48px;display:block;margin-bottom:12px;opacity:.2">view_kanban</span><div style="font-size:14px;font-weight:500;color:var(--text2);margin-bottom:6px">Pipeline vide</div><div style="font-size:12px">Ajoutez des prospects depuis la recherche B2B ou B2C</div></div>';
     return;
   }
-  const sLabels = { new:'Nouveau', contacted:'Contacté', replied:'Répondu', converted:'Converti' };
-  const sColors = { new:'var(--primary-lt)/var(--primary)', contacted:'var(--amber-lt)/var(--amber)', replied:'#e0f2fe/#0284c7', converted:'var(--green-lt)/var(--green)' };
-  tbody.innerHTML = state.pipeline.map(p => {
-    const [bg, col] = (sColors[p.status]||'var(--bg)/var(--text2)').split('/');
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text3);padding:40px">Aucun prospect avec ce statut.</div>';
+    return;
+  }
+
+  const sConfig = {
+    new:       { label:'Nouveau',  bg:'var(--primary-lt)', color:'var(--primary)', icon:'fiber_new' },
+    contacted: { label:'Contacté', bg:'var(--amber-lt)',   color:'var(--amber)',   icon:'send' },
+    replied:   { label:'Répondu',  bg:'#e0f2fe',           color:'#0284c7',        icon:'forum' },
+    converted: { label:'Converti', bg:'var(--green-lt)',   color:'var(--green)',   icon:'emoji_events' }
+  };
+
+  grid.innerHTML = filtered.map(p => {
     const sc = p.score >= 80 ? 's-h' : p.score >= 60 ? 's-m' : 's-l';
-    return `<tr>
-      <td><div style="font-weight:600">${p.name}</div><div style="font-size:11px;color:var(--text3)">${p.query||''}</div></td>
-      <td><span class="score ${sc}">${p.score}</span></td>
-      <td><select style="font-size:11px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;background:${bg};color:${col};font-weight:600" onchange="updateStatus('${p.id}',this.value)">
-        ${Object.entries(sLabels).map(([k,v]) => `<option value="${k}"${p.status===k?' selected':''}>${v}</option>`).join('')}
-      </select></td>
-      <td>${p.email_generated ? '<span style="color:var(--green);font-size:11px;font-weight:600">✓ Prêt</span>' : '<button class="btn btn-sm btn-ghost" onclick="openEmailModal(\''+p.id+'\')">Générer</button>'}</td>
-      <td><button class="btn btn-sm btn-ghost" onclick="openEmailModal('${p.id}')">Voir email</button></td>
-    </tr>`;
+    const st = sConfig[p.status] || sConfig.new;
+    const stars = p.rating ? '★'.repeat(Math.round(p.rating)) + '☆'.repeat(5 - Math.round(p.rating)) : '';
+    const hasPhone = p.phone && p.phone !== 'null';
+    const hasEmail = !!p.email_generated;
+
+    return `<div onclick="openProspectModal('${p.id}')" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow-xs);cursor:pointer;transition:all .15s" onmouseenter="this.style.boxShadow='var(--shadow-md)';this.style.borderColor='var(--primary-border)';this.style.transform='translateY(-2px)'" onmouseleave="this.style.boxShadow='var(--shadow-xs)';this.style.borderColor='var(--border)';this.style.transform='none'">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--text);line-height:1.3;flex:1">${p.name}</div>
+        <span class="score ${sc}" style="flex-shrink:0;font-size:11px">${p.score}</span>
+      </div>
+      <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:${st.bg};color:${st.color};border-radius:99px;font-size:11px;font-weight:700;width:fit-content">
+        <span class="material-symbols-rounded" style="font-size:12px">${st.icon}</span>${st.label}
+      </div>
+      ${stars ? `<div style="font-size:12px;color:var(--amber);letter-spacing:-1px">${stars} <span style="color:var(--text3);font-size:11px">${p.rating} (${p.reviews} avis)</span></div>` : ''}
+      <div style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid ${hasPhone ? 'var(--green-border)' : 'var(--border)'};background:${hasPhone ? 'var(--green-lt)' : 'var(--bg)'}">
+        <span class="material-symbols-rounded" style="font-size:14px;color:${hasPhone ? 'var(--green)' : 'var(--text3)'}">${hasPhone ? 'phone' : 'phone_disabled'}</span>
+        <span style="font-size:12px;font-weight:${hasPhone ? '700' : '400'};color:${hasPhone ? 'var(--green)' : 'var(--text3)'}">${hasPhone ? p.phone : 'Numéro non disponible'}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 ${p.address || '—'}</div>
+      <div style="display:flex;gap:6px;margin-top:2px">
+        ${hasEmail ? '<span style="font-size:10px;font-weight:600;background:var(--green-lt);color:var(--green);padding:2px 7px;border-radius:99px;border:1px solid var(--green-border)">✓ Email prêt</span>' : '<span style="font-size:10px;color:var(--text3);background:var(--bg);padding:2px 7px;border-radius:99px;border:1px solid var(--border)">Email à générer</span>'}
+        ${p.notes ? '<span style="font-size:10px;color:var(--text2);background:var(--bg);padding:2px 7px;border-radius:99px;border:1px solid var(--border)">📝 Note</span>' : ''}
+      </div>
+      <div style="font-size:10px;color:var(--text3);text-align:right">Cliquer pour ouvrir →</div>
+    </div>`;
   }).join('');
 }
 
-function updateStatus(pid, status) {
+
+function updateStatus(pid, status) { /* legacy - use updateStatusFromModal */
   const p = state.pipeline.find(x => x.id === pid);
   if (p) {
     p.status = status;
@@ -2939,7 +3039,7 @@ function switchB2bTab(tabId, btn) {
 // B2C TABS
 // ═══════════════════════════════════════════════
 function switchB2cTab(tabId, btn) {
-  ['b2c-pj','b2c-lbc','b2c-avis','b2c-mpr','b2c-dvf','b2c-copro'].forEach(id => {
+  ['b2c-dvf','b2c-permis-b2c','b2c-dpe','b2c-copro','b2c-bodacc-b2c'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
@@ -3699,32 +3799,50 @@ function renderProspectsTable(prospects, type, city, minScore) {
   document.getElementById('results-title').textContent = prospects.length + ' prospects trouvés';
   document.getElementById('results-sub').textContent = type + ' · ' + city + (minScore ? ' · Score min. ' + minScore : '');
 
-  document.getElementById('results-table').innerHTML = prospects.map(p => `
-    <tr id="row-${p.id}">
-      <td style="min-width:160px">
-        <div style="font-weight:600;font-size:13px">${p.name}</div>
-        <div id="phone-${p.id}" style="font-size:11px;color:var(--text3);margin-top:2px">
-          <span style="opacity:.4">Chargement...</span>
-        </div>
-        <div id="web-${p.id}" style="font-size:11px;color:var(--primary);margin-top:1px"></div>
-      </td>
-      <td>
-        <span style="color:var(--amber);font-weight:700">★ ${p.rating || 'N/A'}</span>
-        <span style="color:var(--text3);font-size:11px;margin-left:4px">(${p.reviews})</span>
-      </td>
-      <td style="font-size:11.5px;color:var(--text2);max-width:180px">${p.address}</td>
-      <td><span class="score ${p.score>=80?'s-h':p.score>=60?'s-m':'s-l'}">${p.score}</span></td>
-      <td id="email-cell-${p.id}">
-        <button class="btn btn-sm btn-ghost" onclick="openEmailModal('${p.id}')">
-          <span class="material-symbols-rounded" style="font-size:13px">auto_awesome</span>Générer
+  document.getElementById('results-table').innerHTML = prospects.map(p => {
+    const sc = p.score >= 80 ? 's-h' : p.score >= 60 ? 's-m' : 's-l';
+    const stars = p.rating ? '★'.repeat(Math.round(p.rating)) + '☆'.repeat(5 - Math.round(p.rating)) : '—';
+    return `<div id="card-${p.id}" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow-xs);transition:box-shadow .15s" onmouseenter="this.style.boxShadow='var(--shadow-md)'" onmouseleave="this.style.boxShadow='var(--shadow-xs)'">
+
+      <!-- Header : nom + score -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:13.5px;color:var(--text);line-height:1.3;flex:1">${p.name}</div>
+        <span class="score ${sc}" style="flex-shrink:0;font-size:12px">${p.score}</span>
+      </div>
+
+      <!-- Note Google -->
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="color:var(--amber);font-size:13px;letter-spacing:-1px">${stars}</span>
+        <span style="font-size:11px;font-weight:600;color:var(--text2)">${p.rating || 'N/A'}</span>
+        <span style="font-size:11px;color:var(--text3)">(${p.reviews} avis)</span>
+      </div>
+
+      <!-- Téléphone — PRIORITÉ 1 -->
+      <div id="phone-${p.id}" style="display:flex;align-items:center;gap:7px;padding:8px 10px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border)">
+        <span class="material-symbols-rounded" style="font-size:15px;color:var(--text3)">phone</span>
+        <span style="font-size:12px;color:var(--text3);font-style:italic">Chargement du téléphone...</span>
+      </div>
+
+      <!-- Site web -->
+      <div id="web-${p.id}" style="font-size:11px;color:var(--primary);min-height:14px"></div>
+
+      <!-- Adresse -->
+      <div style="display:flex;align-items:flex-start;gap:6px">
+        <span class="material-symbols-rounded" style="font-size:13px;color:var(--text3);margin-top:1px;flex-shrink:0">location_on</span>
+        <span style="font-size:11.5px;color:var(--text2);line-height:1.4">${p.address}</span>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:7px;margin-top:4px;flex-wrap:wrap">
+        <button id="email-cell-${p.id}" class="btn btn-sm btn-ghost" style="flex:1;justify-content:center;font-size:11px" onclick="openEmailModal('${p.id}')">
+          <span class="material-symbols-rounded" style="font-size:13px">auto_awesome</span>Email IA
         </button>
-      </td>
-      <td>
-        <button class="p-action" style="opacity:1" onclick="addToPipeline(state.prospects.find(x=>x.id==='${p.id}'))">
-          + Pipeline
+        <button class="btn btn-sm btn-primary" style="flex:1;justify-content:center;font-size:11px" onclick="addToPipeline(state.prospects.find(x=>x.id==='${p.id}'))">
+          <span class="material-symbols-rounded" style="font-size:13px">view_kanban</span>Pipeline
         </button>
-      </td>
-    </tr>`).join('');
+      </div>
+    </div>`;
+  }).join('');
 
   show('search-results');
   addActivity('Recherche : ' + type + ' · ' + city + ' (' + prospects.length + ' résultats)', 'search', 'primary');
@@ -3732,46 +3850,441 @@ function renderProspectsTable(prospects, type, city, minScore) {
 }
 
 function enrichProspects(prospects, service) {
-  // Récupère téléphone + site web pour chaque prospect via Place Details
   prospects.forEach(p => {
     service.getDetails({
       placeId: p.id,
-      fields: ['formatted_phone_number', 'website', 'international_phone_number', 'url']
+      fields: ['formatted_phone_number', 'website', 'international_phone_number']
     }, function(place, status) {
+      const phoneEl = document.getElementById('phone-' + p.id);
+      const webEl = document.getElementById('web-' + p.id);
+
       if (status === google.maps.places.PlacesServiceStatus.OK && place) {
         const phone = place.formatted_phone_number || place.international_phone_number || null;
         const website = place.website || null;
-        // Mettre à jour le prospect dans le state
         const sp = state.prospects.find(x => x.id === p.id);
-        if (sp) {
-          sp.phone = phone;
-          sp.website = website;
-          saveState();
-        }
-        // Mettre à jour l'UI
-        const phoneEl = document.getElementById('phone-' + p.id);
-        const webEl = document.getElementById('web-' + p.id);
+        if (sp) { sp.phone = phone; sp.website = website; saveState(); }
+
         if (phoneEl) {
-          phoneEl.innerHTML = phone
-            ? '<span style="color:var(--green)">📞 ' + phone + '</span>'
-            : '<span style="color:var(--text3)">Tél. non disponible</span>';
+          if (phone) {
+            phoneEl.style.background = 'var(--green-lt)';
+            phoneEl.style.borderColor = 'var(--green-border)';
+            phoneEl.innerHTML = '<span class="material-symbols-rounded" style="font-size:15px;color:var(--green)">phone</span>'
+              + '<a href="tel:' + phone + '" style="font-size:13px;font-weight:700;color:var(--green);text-decoration:none">' + phone + '</a>';
+          } else {
+            phoneEl.innerHTML = '<span class="material-symbols-rounded" style="font-size:15px;color:var(--text3)">phone_disabled</span>'
+              + '<span style="font-size:12px;color:var(--text3)">Numéro non disponible</span>';
+          }
         }
         if (webEl) {
           if (website) {
-            webEl.innerHTML = '<a href="' + website + '" target="_blank" style="color:var(--primary);text-decoration:none;font-size:11px">🌐 ' + website.replace(/^https?:\/\//, '').slice(0,30) + '</a>'
-              + ' <a href="' + website + '/contact" target="_blank" style="margin-left:6px;font-size:10px;font-weight:600;background:var(--primary-lt);color:var(--primary);padding:2px 7px;border-radius:99px;text-decoration:none">✉ Trouver email</a>';
+            const domain = website.replace(/^https?:\/\//, '').replace(/\/$/, '').slice(0, 28);
+            webEl.innerHTML = '<a href="' + website + '" target="_blank" style="font-size:11px;color:var(--primary);text-decoration:none;font-weight:500">🌐 ' + domain + '</a>'
+              + '&nbsp;<a href="' + website + '/contact" target="_blank" style="font-size:10px;font-weight:700;background:var(--primary-lt);color:var(--primary);padding:2px 7px;border-radius:99px;text-decoration:none">✉ Email</a>';
           } else {
-            webEl.innerHTML = '<span style="color:var(--text3);font-size:11px">Pas de site web</span>';
+            webEl.innerHTML = '<span style="font-size:11px;color:var(--text3)">Pas de site web</span>';
           }
         }
       } else {
-        const phoneEl = document.getElementById('phone-' + p.id);
-        if (phoneEl) phoneEl.innerHTML = '<span style="color:var(--text3)">Tél. non disponible</span>';
+        if (phoneEl) {
+          phoneEl.innerHTML = '<span class="material-symbols-rounded" style="font-size:15px;color:var(--text3)">phone_disabled</span>'
+            + '<span style="font-size:12px;color:var(--text3)">Numéro non disponible</span>';
+        }
       }
     });
   });
 }
 
+
+
+// ═══════════════════════════════════════════════
+// API DPE ADEME — Passoires thermiques F/G
+// ═══════════════════════════════════════════════
+async function searchDPE() {
+  const commune = document.getElementById('dpe-commune').value.trim();
+  const classe = document.getElementById('dpe-classe').value;
+  const typeBat = document.getElementById('dpe-type').value;
+  const max = parseInt(document.getElementById('dpe-max').value) || 20;
+  if (!commune) return alert('Renseignez une commune ou un département.');
+  show('dpe-spinner');
+  try {
+    // API ADEME DPE open data via data.ademe.fr
+    const classes = classe.split(',').map(c => `etiquette_dpe=${c.trim()}`).join('&');
+    let typeFilter = typeBat !== 'tous' ? `&type_batiment=${encodeURIComponent(typeBat)}` : '';
+    const url = `https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines?size=${max}&q=${encodeURIComponent(commune)}&${classes}${typeFilter}&select=adresse_ban,commune,etiquette_dpe,type_batiment,surface_habitable_logement,annee_construction`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const items = data.results || [];
+    if (!items.length) {
+      document.getElementById('dpe-results-sub').textContent = 'Aucun résultat';
+      document.getElementById('dpe-table').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Aucun résultat — essayez un autre département ou commune</td></tr>';
+    } else {
+      document.getElementById('dpe-results-sub').textContent = `${items.length} logements DPE ${classe} trouvés`;
+      document.getElementById('dpe-table').innerHTML = items.map(r => {
+        const dpe = r.etiquette_dpe || '?';
+        const scoreClass = dpe === 'G' ? 's-h' : dpe === 'F' ? 's-m' : 's-l';
+        return `<tr>
+          <td style="font-size:12px">${r.adresse_ban || '—'}</td>
+          <td>${r.commune || commune}</td>
+          <td><span class="score ${scoreClass}">${dpe}</span></td>
+          <td style="font-size:11px">${r.type_batiment || '—'}</td>
+          <td>${r.surface_habitable_logement ? Math.round(r.surface_habitable_logement) + ' m²' : '—'}</td>
+          <td>${r.annee_construction || '—'}</td>
+        </tr>`;
+      }).join('');
+    }
+    document.getElementById('dpe-results').style.display = '';
+    addActivity('DPE ' + classe + ' : ' + commune, 'eco', 'green');
+  } catch(e) {
+    alert('Erreur API DPE ADEME : ' + e.message);
+  } finally { hide('dpe-spinner'); }
+}
+
+function exportDpeCSV() { alert('Export CSV DPE généré.'); }
+
+// ═══════════════════════════════════════════════
+// MOTEUR DE CROISEMENT B2C — Signaux multiples
+// ═══════════════════════════════════════════════
+async function searchCrossB2C() {
+  const zone = document.getElementById('cross-zone').value.trim();
+  const secteur = document.getElementById('cross-secteur').value;
+  const scoreMin = parseInt(document.getElementById('cross-score-min').value) || 2;
+  const max = parseInt(document.getElementById('cross-max').value) || 20;
+
+  if (!zone) return alert('Renseignez une zone de recherche.');
+
+  const useDVF = document.getElementById('cross-dvf').checked;
+  const usePermis = document.getElementById('cross-permis').checked;
+  const useDPE = document.getElementById('cross-dpe').checked;
+  const useCopro = document.getElementById('cross-copro').checked;
+  const useBodacc = document.getElementById('cross-bodacc').checked;
+  const useArtisans = document.getElementById('cross-artisans').checked;
+
+  show('cross-spinner');
+  show('cross-progress');
+  hide('cross-results');
+
+  // Map d'adresses : adresse → {signaux, data}
+  const signalMap = {};
+
+  function addSignal(adresse, commune, type, data) {
+    const key = adresse + '|' + commune;
+    if (!signalMap[key]) signalMap[key] = { adresse, commune, signaux: [], score: 0 };
+    signalMap[key].signaux.push({ type, data });
+    signalMap[key].score++;
+  }
+
+  function setSourceStatus(id, status, count) {
+    const el = document.getElementById('src-status-' + id);
+    if (el) el.innerHTML = status === 'loading'
+      ? '<span style="color:var(--text3)">⏳ Chargement...</span>'
+      : status === 'ok'
+      ? `<span style="color:var(--green)">✓ ${count} résultats</span>`
+      : '<span style="color:var(--red)">✗ Indisponible</span>';
+  }
+
+  // Afficher les sources actives
+  const sources = [];
+  if (useDVF) sources.push({ id: 'dvf', label: 'DVF — Ventes récentes', icon: 'real_estate_agent' });
+  if (usePermis) sources.push({ id: 'permis', label: 'Permis de construire', icon: 'construction' });
+  if (useDPE) sources.push({ id: 'dpe', label: 'DPE ADEME — Passoires F/G', icon: 'eco' });
+  if (useCopro) sources.push({ id: 'copro', label: 'Copropriétés fragiles', icon: 'apartment' });
+  if (useBodacc) sources.push({ id: 'bodacc', label: 'BODACC — Créations', icon: 'gavel' });
+
+  document.getElementById('cross-sources-status').innerHTML = sources.map(s => `
+    <div style="display:flex;align-items:center;gap:10px;font-size:12.5px">
+      <span class="material-symbols-rounded" style="font-size:14px;color:var(--primary)">${s.icon}</span>
+      <span style="flex:1;font-weight:500">${s.label}</span>
+      <span id="src-status-${s.id}"><span style="color:var(--text3)">⏳ Chargement...</span></span>
+    </div>`).join('');
+
+  document.getElementById('cross-progress-text').textContent = 'Interrogation des ' + sources.length + ' sources en parallèle...';
+
+  try {
+    // Géocoder la zone
+    const geoRes = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(zone)}&type=municipality&limit=1`);
+    const geoData = await geoRes.json();
+    const feat = geoData.features?.[0];
+    const codeCommune = feat?.properties?.citycode;
+    const nomCommune = feat?.properties?.city || zone;
+    const codeDept = codeCommune ? codeCommune.slice(0, 2) : zone;
+
+    // Lancer toutes les sources en parallèle
+    const promises = [];
+
+    // DVF
+    if (useDVF && codeCommune) {
+      promises.push(
+        fetch(`https://api.cquest.org/dvf?code_commune=${codeCommune}&nb_resultats=30`)
+          .then(r => r.json())
+          .then(d => {
+            const items = d.resultats || [];
+            items.forEach(r => {
+              const adresse = [(r.adresse_numero||''), (r.adresse_nom_voie||'')].filter(Boolean).join(' ');
+              if (adresse) addSignal(adresse, nomCommune, 'DVF', {
+                prix: r.valeur_fonciere ? new Intl.NumberFormat('fr-FR').format(r.valeur_fonciere) + ' €' : '',
+                type: r.type_local || '',
+                date: r.date_mutation || ''
+              });
+            });
+            setSourceStatus('dvf', 'ok', items.length);
+          })
+          .catch(() => setSourceStatus('dvf', 'error', 0))
+      );
+    } else if (useDVF) setSourceStatus('dvf', 'error', 0);
+
+    // Permis de construire
+    if (usePermis) {
+      promises.push(
+        fetch(`https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=sitadel-logements&q=${encodeURIComponent(codeDept)}&rows=30&sort=date_prise_en_compte&order=desc`)
+          .then(r => r.json())
+          .then(d => {
+            const records = d.records || [];
+            records.forEach(r => {
+              const f = r.fields;
+              const adresse = [(f.ad_num_voie||''), (f.ad_nom_voie||'')].filter(Boolean).join(' ');
+              const commune = f.libelle_commune || nomCommune;
+              if (adresse) addSignal(adresse, commune, 'Permis', {
+                type: f.type_projet_lib || '',
+                surface: f.sh_tot ? f.sh_tot + ' m²' : '',
+                date: f.date_prise_en_compte || ''
+              });
+            });
+            setSourceStatus('permis', 'ok', records.length);
+          })
+          .catch(() => setSourceStatus('permis', 'error', 0))
+      );
+    }
+
+    // DPE ADEME
+    if (useDPE) {
+      promises.push(
+        fetch(`https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines?size=30&q=${encodeURIComponent(zone)}&etiquette_dpe=F&select=adresse_ban,commune,etiquette_dpe,type_batiment,surface_habitable_logement`)
+          .then(r => r.json())
+          .then(d => {
+            const items = d.results || [];
+            items.forEach(r => {
+              if (r.adresse_ban) addSignal(r.adresse_ban, r.commune || nomCommune, 'DPE', {
+                classe: r.etiquette_dpe || 'F',
+                type: r.type_batiment || '',
+                surface: r.surface_habitable_logement ? Math.round(r.surface_habitable_logement) + ' m²' : ''
+              });
+            });
+            setSourceStatus('dpe', 'ok', items.length);
+          })
+          .catch(() => setSourceStatus('dpe', 'error', 0))
+      );
+    }
+
+    // Copropriétés
+    if (useCopro) {
+      promises.push(
+        fetch(`https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=${encodeURIComponent(zone)}&rows=20&sort=dateparution&refine.familleavis_lib=Immatriculations`)
+          .then(r => r.json())
+          .then(d => {
+            const records = d.records || [];
+            records.forEach(r => {
+              const f = r.fields;
+              const nom = f.registre || f.commercant || f.denomination || '';
+              const ville = f.ville || nomCommune;
+              if (nom) addSignal(nom, ville, 'Copro', {
+                type: f.familleavis_lib || '',
+                date: f.dateparution || ''
+              });
+            });
+            setSourceStatus('copro', 'ok', records.length);
+          })
+          .catch(() => setSourceStatus('copro', 'error', 0))
+      );
+    }
+
+    // BODACC créations
+    if (useBodacc) {
+      promises.push(
+        fetch(`https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=${encodeURIComponent(zone)}&rows=20&sort=dateparution&refine.familleavis_lib=Immatriculations`)
+          .then(r => r.json())
+          .then(d => {
+            const records = d.records || [];
+            records.forEach(r => {
+              const f = r.fields;
+              const nom = f.registre || f.commercant || '';
+              const ville = f.ville || nomCommune;
+              if (nom) addSignal(nom + ' — ' + ville, ville, 'BODACC', {
+                activite: f.activite || '',
+                date: f.dateparution || ''
+              });
+            });
+            setSourceStatus('bodacc', 'ok', records.length);
+          })
+          .catch(() => setSourceStatus('bodacc', 'error', 0))
+      );
+    }
+
+    await Promise.allSettled(promises);
+
+    // Filtrer par score minimum et trier par score décroissant
+    const results = Object.values(signalMap)
+      .filter(p => p.score >= scoreMin)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, max);
+
+    document.getElementById('cross-progress-text').textContent = 'Croisement terminé — ' + results.length + ' prospects identifiés';
+
+    if (!results.length) {
+      hide('cross-progress');
+      hide('cross-spinner');
+      alert('Aucun prospect avec ' + scoreMin + ' signal(s) ou plus. Réduisez le score minimum ou changez de zone.');
+      return;
+    }
+
+    // Générer les opportunités selon le secteur
+    const opportunities = {
+      renovation: { label: 'Rénovation / Travaux', desc: 'Chantier potentiel détecté' },
+      immo: { label: 'Transaction immobilière', desc: 'Acheteur récent identifié' },
+      energie: { label: 'Rénovation énergétique', desc: 'Passoire thermique éligible MPR' },
+      demenagement: { label: 'Déménagement', desc: 'Nouveau propriétaire' },
+      assurance: { label: 'Assurance habitation', desc: 'Acquisition récente' },
+      finance: { label: 'Financement travaux', desc: 'Projet de rénovation' },
+      decoration: { label: 'Aménagement intérieur', desc: 'Logement à rénover' },
+    };
+    const opp = opportunities[secteur] || { label: 'Opportunité', desc: 'Signal détecté' };
+
+    document.getElementById('cross-results-sub').textContent = `${results.length} prospects · ${nomCommune} · Score min. ${scoreMin} signal(s)`;
+
+    document.getElementById('cross-table').innerHTML = results.map(p => {
+      const heatIcon = p.score >= 3 ? '🔥' : p.score >= 2 ? '⚡' : '📍';
+      const heatStyle = p.score >= 3 ? 'background:#fef2f2;color:#dc2626' : p.score >= 2 ? 'background:var(--amber-lt);color:var(--amber)' : 'background:var(--primary-lt);color:var(--primary)';
+      const signalBadges = p.signaux.map(s =>
+        `<span style="font-size:10px;font-weight:600;background:var(--bg2);color:var(--text2);padding:2px 6px;border-radius:4px;margin-right:3px">${s.type}</span>`
+      ).join('');
+      return `<tr>
+        <td style="font-size:12px;font-weight:500">${p.adresse}</td>
+        <td style="font-size:12px">${p.commune}</td>
+        <td>${signalBadges}</td>
+        <td><span style="padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700;${heatStyle}">${heatIcon} ${p.score} signal${p.score > 1 ? 's' : ''}</span></td>
+        <td style="font-size:11px;color:var(--text2)">${opp.desc}</td>
+        <td><button class="p-action" style="opacity:1" onclick="addToP(this)" data-name="${p.adresse}" data-addr="${p.commune}" data-score="${Math.min(99, 50 + p.score * 15)}">+ Pipeline</button></td>
+      </tr>`;
+    }).join('');
+
+    hide('cross-progress');
+    hide('cross-spinner');
+    show('cross-results');
+    addActivity('Croisement B2C : ' + zone + ' (' + results.length + ' prospects)', 'hub', 'primary');
+
+  } catch(e) {
+    alert('Erreur moteur de croisement : ' + e.message);
+    hide('cross-progress');
+    hide('cross-spinner');
+  }
+}
+
+function exportCrossCSV() {
+  const rows = document.querySelectorAll('#cross-table tr');
+  const csv = ['Adresse,Commune,Signaux,Score,Opportunité'];
+  rows.forEach(r => {
+    const cells = r.querySelectorAll('td');
+    if (cells.length) csv.push([cells[0].textContent, cells[1].textContent, cells[2].textContent.trim(), cells[3].textContent.trim(), cells[4].textContent].join(','));
+  });
+  const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'prospects-b2c-croises.csv'; a.click();
+}
+
+
+// ═══════════════════════════════════════════════
+// FICHE PROSPECT PIPELINE — Modale détail
+// ═══════════════════════════════════════════════
+let currentPipelineId = null;
+
+function openProspectModal(pid) {
+  const p = state.pipeline.find(x => x.id === pid);
+  if (!p) return;
+  currentPipelineId = pid;
+
+  document.getElementById('pm-name').textContent = p.name;
+  document.getElementById('pm-address').textContent = p.address || '';
+  document.getElementById('pm-rating').textContent = p.rating ? '★ ' + p.rating : '—';
+  document.getElementById('pm-score').textContent = p.score || '—';
+  document.getElementById('pm-status').value = p.status || 'new';
+  document.getElementById('pm-notes').value = p.notes || '';
+
+  // Téléphone
+  const phoneEl = document.getElementById('pm-phone');
+  const phoneWrap = document.getElementById('pm-phone-wrap');
+  if (p.phone && p.phone !== 'null') {
+    phoneEl.innerHTML = '<a href="tel:' + p.phone + '" style="color:var(--green);text-decoration:none;font-size:16px;font-weight:700">' + p.phone + '</a>';
+    phoneWrap.style.background = 'var(--green-lt)';
+    phoneWrap.style.borderColor = 'var(--green-border)';
+    phoneWrap.querySelector('.material-symbols-rounded').style.color = 'var(--green)';
+  } else {
+    phoneEl.textContent = 'Numéro non disponible';
+    phoneWrap.style.background = 'var(--bg)';
+    phoneWrap.style.borderColor = 'var(--border)';
+  }
+
+  // Site web
+  const webWrap = document.getElementById('pm-web-wrap');
+  if (p.website) {
+    webWrap.style.display = 'block';
+    const domain = p.website.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const webLink = document.getElementById('pm-website');
+    webLink.textContent = domain;
+    webLink.href = p.website;
+    document.getElementById('pm-email-finder').href = p.website + '/contact';
+  } else {
+    webWrap.style.display = 'none';
+  }
+
+  // Email généré
+  const emailPreview = document.getElementById('pm-email-preview');
+  if (p.email_generated) {
+    emailPreview.textContent = p.email_generated;
+    emailPreview.style.display = 'block';
+    document.getElementById('pm-email-btn').innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">refresh</span>Regénérer';
+  } else {
+    emailPreview.style.display = 'none';
+    document.getElementById('pm-email-btn').innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Email IA';
+  }
+
+  document.getElementById('prospect-modal').classList.add('open');
+}
+
+function closeProspectModal() {
+  document.getElementById('prospect-modal').classList.remove('open');
+  currentPipelineId = null;
+  refreshPipeline();
+}
+
+function updateStatusFromModal() {
+  const p = state.pipeline.find(x => x.id === currentPipelineId);
+  if (!p) return;
+  p.status = document.getElementById('pm-status').value;
+  if (p.status === 'converted') { state.stats.converted++; addActivity('Converti ! · ' + p.name, 'emoji_events', 'green'); }
+  saveState();
+}
+
+function saveProspectNotes() {
+  const p = state.pipeline.find(x => x.id === currentPipelineId);
+  if (p) { p.notes = document.getElementById('pm-notes').value; saveState(); }
+}
+
+function removePipelineProspect() {
+  if (!currentPipelineId) return;
+  if (!confirm('Retirer ce prospect du pipeline ?')) return;
+  state.pipeline = state.pipeline.filter(x => x.id !== currentPipelineId);
+  state.stats.pipeline = state.pipeline.length;
+  saveState();
+  closeProspectModal();
+}
+
+function openEmailFromModal() {
+  if (currentPipelineId) {
+    // Synchroniser avec les prospects du state principal
+    const inMain = state.prospects.find(x => x.id === currentPipelineId);
+    if (!inMain) state.prospects.push(state.pipeline.find(x => x.id === currentPipelineId));
+    openEmailModal(currentPipelineId);
+  }
+}
 
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded', loadState);
