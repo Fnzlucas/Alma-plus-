@@ -1053,7 +1053,7 @@ tr:hover td { background: var(--primary-lt); }
               </div>
             </div>
             <table>
-              <thead><tr><th>Entreprise</th><th>Note</th><th>Adresse</th><th>Score IA</th><th>Email IA</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Entreprise · Contact</th><th>Note</th><th>Adresse</th><th>Score IA</th><th>Email IA</th><th>Actions</th></tr></thead>
               <tbody id="results-table"></tbody>
             </table>
           </div>
@@ -2605,7 +2605,12 @@ async function generateEmail(prospectId) {
   const prompt = `Tu es un expert en prospection commerciale. Rédige un email de prospection B2B court et percutant.\n\nPROSPECT :\n- Entreprise : ${p.name}\n- Secteur : ${p.query || 'entreprise locale'}\n- Note Google : ${p.rating}/5 (${p.reviews} avis)\n- Adresse : ${p.address}\n\nEXPÉDITEUR :\n- Prénom : ${profile.prenom || 'prénom'}\n- Nom : ${profile.nom || 'nom'}\n- Société : ${profile.societe || 'ma société'}\n- Activité : ${profile.activite || 'consultant'}\n- Proposition de valeur : ${profile.valeur || 'je peux vous aider'}\n- Ton : ${profile.ton || 'professionnel'}\n\nCONSIGNES :\n- 150-200 mots max\n- Objet accrocheur ligne 1 (format "Objet: ...")\n- Personnalisé sur la note Google ou l'activité\n- Appel à l'action clair\n- Signature avec prénom, nom, société\n- Français, texte brut`;
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
     body: JSON.stringify({ model, max_tokens: 500, messages: [{ role: 'user', content: prompt }] })
   });
   if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'Erreur Anthropic'); }
@@ -2691,14 +2696,20 @@ function updateEmailCell(pid) {
 }
 
 // ═══ PIPELINE ═══
-function addToPipeline(pid) {
-  const p = state.prospects.find(x => x.id === pid);
+function addToPipeline(prospect) {
+  // Accepte soit un objet prospect, soit un id string
+  let p = (typeof prospect === 'string')
+    ? state.prospects.find(x => x.id === prospect)
+    : prospect;
   if (!p) return;
-  if (!state.pipeline.find(x => x.id === pid)) {
-    state.pipeline.push({ ...p, status: 'new' });
+  if (!state.pipeline.find(x => x.id === p.id)) {
+    // Fusionner avec les données complètes si dispo dans state
+    const full = state.prospects.find(x => x.id === p.id);
+    state.pipeline.push({ ...(full || p), status: 'new' });
     state.stats.pipeline++;
     saveState();
-    addActivity(`Ajouté au pipeline · ${p.name}`, 'view_kanban', 'primary');
+    addActivity('Ajouté au pipeline · ' + p.name, 'view_kanban', 'primary');
+    updateStats();
   }
   refreshPipeline();
 }
@@ -3677,30 +3688,87 @@ function searchProspects() {
     document.getElementById('results-title').textContent = prospects.length + ' prospects trouvés';
     document.getElementById('results-sub').textContent = type + ' · ' + city + ' · Score min. ' + minScore;
 
-    document.getElementById('results-table').innerHTML = prospects.map(p => `
-      <tr id="row-${p.id}">
-        <td><div style="font-weight:600;font-size:13px">${p.name}</div></td>
-        <td>
-          <span style="color:var(--amber);font-weight:700">★ ${p.rating || 'N/A'}</span>
-          <span style="color:var(--text3);font-size:11px;margin-left:4px">(${p.reviews})</span>
-        </td>
-        <td style="font-size:11.5px;color:var(--text2)">${p.address}</td>
-        <td><span class="score ${p.score>=80?'s-h':p.score>=60?'s-m':'s-l'}">${p.score}</span></td>
-        <td id="email-cell-${p.id}">
-          <button class="btn btn-sm btn-ghost" onclick="openEmailModal('${p.id}')">
-            <span class="material-symbols-rounded" style="font-size:13px">auto_awesome</span>Générer
-          </button>
-        </td>
-        <td>
-          <button class="p-action" style="opacity:1" onclick="addToP(this)" data-name="${p.name}" data-addr="${p.address}" data-score="${p.score}">
-            + Pipeline
-          </button>
-        </td>
-      </tr>`).join('');
+    renderProspectsTable(prospects, type, city, minScore);
 
-    show('search-results');
-    addActivity('Recherche : ' + type + ' · ' + city + ' (' + prospects.length + ' résultats)', 'search', 'primary');
-    updateStats();
+    // Enrichir avec les détails (téléphone, site, email) en arrière-plan
+    enrichProspects(prospects, service);
+  });
+}
+
+function renderProspectsTable(prospects, type, city, minScore) {
+  document.getElementById('results-title').textContent = prospects.length + ' prospects trouvés';
+  document.getElementById('results-sub').textContent = type + ' · ' + city + (minScore ? ' · Score min. ' + minScore : '');
+
+  document.getElementById('results-table').innerHTML = prospects.map(p => `
+    <tr id="row-${p.id}">
+      <td style="min-width:160px">
+        <div style="font-weight:600;font-size:13px">${p.name}</div>
+        <div id="phone-${p.id}" style="font-size:11px;color:var(--text3);margin-top:2px">
+          <span style="opacity:.4">Chargement...</span>
+        </div>
+        <div id="web-${p.id}" style="font-size:11px;color:var(--primary);margin-top:1px"></div>
+      </td>
+      <td>
+        <span style="color:var(--amber);font-weight:700">★ ${p.rating || 'N/A'}</span>
+        <span style="color:var(--text3);font-size:11px;margin-left:4px">(${p.reviews})</span>
+      </td>
+      <td style="font-size:11.5px;color:var(--text2);max-width:180px">${p.address}</td>
+      <td><span class="score ${p.score>=80?'s-h':p.score>=60?'s-m':'s-l'}">${p.score}</span></td>
+      <td id="email-cell-${p.id}">
+        <button class="btn btn-sm btn-ghost" onclick="openEmailModal('${p.id}')">
+          <span class="material-symbols-rounded" style="font-size:13px">auto_awesome</span>Générer
+        </button>
+      </td>
+      <td>
+        <button class="p-action" style="opacity:1" onclick="addToPipeline(state.prospects.find(x=>x.id==='${p.id}'))">
+          + Pipeline
+        </button>
+      </td>
+    </tr>`).join('');
+
+  show('search-results');
+  addActivity('Recherche : ' + type + ' · ' + city + ' (' + prospects.length + ' résultats)', 'search', 'primary');
+  updateStats();
+}
+
+function enrichProspects(prospects, service) {
+  // Récupère téléphone + site web pour chaque prospect via Place Details
+  prospects.forEach(p => {
+    service.getDetails({
+      placeId: p.id,
+      fields: ['formatted_phone_number', 'website', 'international_phone_number', 'url']
+    }, function(place, status) {
+      if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+        const phone = place.formatted_phone_number || place.international_phone_number || null;
+        const website = place.website || null;
+        // Mettre à jour le prospect dans le state
+        const sp = state.prospects.find(x => x.id === p.id);
+        if (sp) {
+          sp.phone = phone;
+          sp.website = website;
+          saveState();
+        }
+        // Mettre à jour l'UI
+        const phoneEl = document.getElementById('phone-' + p.id);
+        const webEl = document.getElementById('web-' + p.id);
+        if (phoneEl) {
+          phoneEl.innerHTML = phone
+            ? '<span style="color:var(--green)">📞 ' + phone + '</span>'
+            : '<span style="color:var(--text3)">Tél. non disponible</span>';
+        }
+        if (webEl) {
+          if (website) {
+            webEl.innerHTML = '<a href="' + website + '" target="_blank" style="color:var(--primary);text-decoration:none;font-size:11px">🌐 ' + website.replace(/^https?:\/\//, '').slice(0,30) + '</a>'
+              + ' <a href="' + website + '/contact" target="_blank" style="margin-left:6px;font-size:10px;font-weight:600;background:var(--primary-lt);color:var(--primary);padding:2px 7px;border-radius:99px;text-decoration:none">✉ Trouver email</a>';
+          } else {
+            webEl.innerHTML = '<span style="color:var(--text3);font-size:11px">Pas de site web</span>';
+          }
+        }
+      } else {
+        const phoneEl = document.getElementById('phone-' + p.id);
+        if (phoneEl) phoneEl.innerHTML = '<span style="color:var(--text3)">Tél. non disponible</span>';
+      }
+    });
   });
 }
 
