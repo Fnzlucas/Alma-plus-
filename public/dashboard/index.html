@@ -752,6 +752,7 @@ tr:hover td { background: var(--primary-lt); }
 /* ─── TAG ─── */
 .tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
 </style>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&libraries=places&language=fr"></script>
 </head>
 <body>
 <div class="app">
@@ -3591,7 +3592,7 @@ function addToP(btn) {
 
 
 // ═══════════════════════════════════════════════
-// GOOGLE MAPS B2B — RECHERCHE PROSPECTS
+// GOOGLE MAPS B2B — RECHERCHE PROSPECTS (Places JS SDK)
 // ═══════════════════════════════════════════════
 function fillSearch(type, city) {
   document.getElementById('search-type').value = type;
@@ -3599,7 +3600,7 @@ function fillSearch(type, city) {
   searchProspects();
 }
 
-async function searchProspects() {
+function searchProspects() {
   const type = document.getElementById('search-type').value.trim();
   const city = document.getElementById('search-city').value.trim();
   const maxResults = parseInt(document.getElementById('search-max').value) || 10;
@@ -3611,50 +3612,45 @@ async function searchProspects() {
   show('search-spinner');
   btn.disabled = true;
   show('search-progress');
-  document.getElementById('search-progress-text').textContent = 'Recherche en cours...';
+  document.getElementById('search-progress-text').textContent = 'Recherche Google Maps...';
   document.getElementById('search-progress-fill').style.width = '20%';
   hide('search-results');
 
-  try {
-    const key = ALMA_CONFIG.gmaps;
-    const query = encodeURIComponent(type + ' ' + city);
+  // Utilise le Places JS SDK — pas de CORS, fonctionne directement dans le navigateur
+  const service = new google.maps.places.PlacesService(document.createElement('div'));
 
-    // Google Maps Text Search — passe via un proxy CORS public pour le dev
-    // En production : utiliser votre propre proxy backend
-    document.getElementById('search-progress-fill').style.width = '50%';
-    document.getElementById('search-progress-text').textContent = 'Analyse des résultats...';
+  const request = {
+    query: type + ' ' + city,
+    language: 'fr',
+    region: 'fr',
+  };
 
-    const proxyUrl = `https://corsproxy.io/?url=` + encodeURIComponent(
-      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&language=fr&region=fr&key=${key}`
-    );
+  document.getElementById('search-progress-fill').style.width = '50%';
+  document.getElementById('search-progress-text').textContent = 'Analyse des résultats...';
 
-    const res = await fetch(proxyUrl);
-    const data = await res.json();
+  service.textSearch(request, function(results, status) {
+    hide('search-spinner');
+    hide('search-progress');
+    btn.disabled = false;
 
-    document.getElementById('search-progress-fill').style.width = '80%';
-    document.getElementById('search-progress-text').textContent = 'Scoring IA...';
-
-    const places = (data.results || []).slice(0, maxResults);
-
-    if (!places.length) {
-      alert('Aucun résultat trouvé. Essayez avec des termes différents.');
+    if (status !== google.maps.places.PlacesServiceStatus.OK || !results || !results.length) {
+      alert('Aucun résultat pour "' + type + ' ' + city + '". Essayez des termes différents.');
       return;
     }
 
-    // Calculer le score et construire les prospects
+    const places = results.slice(0, maxResults);
+
     const prospects = places.map(p => {
       const rating = p.rating || 0;
       const reviews = p.user_ratings_total || 0;
-      // Score basé sur : note Google, nombre d'avis, présence web, statut
       let score = 50;
-      if (rating >= 4.5) score += 15;
+      if (rating > 0 && rating < 3.5) score += 20;
+      else if (rating >= 4.5) score += 15;
       else if (rating >= 4.0) score += 10;
-      else if (rating < 3.5) score += 20; // mal noté = besoin d'aide
       if (reviews > 100) score += 15;
       else if (reviews > 50) score += 10;
       else if (reviews > 10) score += 5;
       if (p.business_status === 'OPERATIONAL') score += 5;
-      if (p.website) score += 10;
       score = Math.min(99, Math.max(10, score));
       return {
         id: p.place_id,
@@ -3663,32 +3659,27 @@ async function searchProspects() {
         rating: rating,
         reviews: reviews,
         score: score,
-        status: p.business_status,
-        website: p.website || null,
-        email: null,
         emailGenerated: null,
         addedToPipeline: false
       };
     }).filter(p => p.score >= minScore);
 
-    // Sauvegarder dans le state
-    state.prospects = [...prospects, ...state.prospects];
+    if (!prospects.length) {
+      alert('Aucun prospect avec un score suffisant. Réduisez le score minimum.');
+      return;
+    }
+
+    state.prospects = [...prospects, ...state.prospects.filter(p => !prospects.find(n => n.id === p.id))];
     state.stats.prospects = state.prospects.length;
     saveState();
     updateApiStatus();
 
-    document.getElementById('search-progress-fill').style.width = '100%';
-
-    // Afficher les résultats
-    document.getElementById('results-title').textContent = `${prospects.length} prospects trouvés`;
-    document.getElementById('results-sub').textContent = `${type} · ${city} · Score min. ${minScore}`;
+    document.getElementById('results-title').textContent = prospects.length + ' prospects trouvés';
+    document.getElementById('results-sub').textContent = type + ' · ' + city + ' · Score min. ' + minScore;
 
     document.getElementById('results-table').innerHTML = prospects.map(p => `
       <tr id="row-${p.id}">
-        <td>
-          <div style="font-weight:600;font-size:13px">${p.name}</div>
-          ${p.website ? '<div style="font-size:10px;color:var(--primary);margin-top:2px">🌐 Site web</div>' : ''}
-        </td>
+        <td><div style="font-weight:600;font-size:13px">${p.name}</div></td>
         <td>
           <span style="color:var(--amber);font-weight:700">★ ${p.rating || 'N/A'}</span>
           <span style="color:var(--text3);font-size:11px;margin-left:4px">(${p.reviews})</span>
@@ -3701,7 +3692,7 @@ async function searchProspects() {
           </button>
         </td>
         <td>
-          <button class="p-action" style="opacity:1" onclick="addToPipeline({id:'${p.id}',name:'${p.name.replace(/'/g,"\'")}',address:'${p.address.replace(/'/g,"\'")}',rating:${p.rating},reviews:${p.reviews},score:${p.score}})">
+          <button class="p-action" style="opacity:1" onclick="addToP(this)" data-name="${p.name}" data-addr="${p.address}" data-score="${p.score}">
             + Pipeline
           </button>
         </td>
@@ -3710,15 +3701,9 @@ async function searchProspects() {
     show('search-results');
     addActivity('Recherche : ' + type + ' · ' + city + ' (' + prospects.length + ' résultats)', 'search', 'primary');
     updateStats();
-
-  } catch(e) {
-    alert('Erreur Google Maps : ' + e.message + '. Vérifiez que votre clé API est activée pour Places API.');
-  } finally {
-    hide('search-spinner');
-    hide('search-progress');
-    btn.disabled = false;
-  }
+  });
 }
+
 
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded', loadState);
