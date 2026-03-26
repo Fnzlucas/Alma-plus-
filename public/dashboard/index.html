@@ -3128,13 +3128,24 @@ async function searchBodacc() {
   const dept = document.getElementById('bodacc-dept').value.trim();
   show('bodacc-spinner');
   try {
-    let q = dept || '*';
     let typeFilter = '';
     if (type === 'creation') typeFilter = '&refine.familleavis_lib=Immatriculations';
     if (type === 'cession') typeFilter = '&refine.familleavis_lib=Ventes+et+cessions';
-    if (type === 'procedure') typeFilter = '&refine.familleavis_lib=Procédures+collectives';
+    if (type === 'procedure') typeFilter = '&refine.familleavis_lib=Proc%C3%A9dures+collectives';
     if (type === 'radiation') typeFilter = '&refine.familleavis_lib=Radiations';
-    const url = `https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=${encodeURIComponent(q)}&rows=15&sort=dateparution${typeFilter}`;
+    // Géocoder pour obtenir le bon code département
+    let deptCode = dept;
+    if (dept && isNaN(dept)) {
+      try {
+        const geoR = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(dept) + '&type=municipality&limit=1');
+        const geoD = await geoR.json();
+        const feat = geoD.features?.[0];
+        if (feat) deptCode = feat.properties.citycode.slice(0,2);
+      } catch(_) {}
+    }
+    const url = deptCode
+      ? 'https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&rows=20&sort=dateparution&refine.numerodepartement=' + encodeURIComponent(deptCode) + typeFilter
+      : 'https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&rows=20&sort=dateparution' + typeFilter;
     const data = await proxyFetch(url);
     const records = data.records || [];
     if (!records.length) {
@@ -4173,15 +4184,21 @@ async function searchCrossB2C() {
     // BODACC créations
     if (useBodacc) {
       promises.push(
-        proxyFetch('https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=' + encodeURIComponent(zone) + '&rows=25&sort=dateparution&refine.familleavis_lib=Immatriculations')
+        proxyFetch('https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&rows=25&sort=dateparution&refine.familleavis_lib=Immatriculations&refine.numerodepartement=' + encodeURIComponent(codeDept))
           .then(d => {
             const records = d.records || [];
-            records.forEach(r => {
+            // Filtrer uniquement les enregistrements de la bonne ville
+            const filtered = records.filter(r => {
+              const f = r.fields;
+              const ville = (f.ville || '').toLowerCase();
+              const cp = (f.cp || '');
+              return ville.includes(nomCommune.toLowerCase()) || cp.startsWith(codeDept);
+            });
+            filtered.forEach(r => {
               const f = r.fields;
               const nom = f.commercant || f.denomination || '';
               const ville = f.ville || nomCommune;
               const cp = f.cp || '';
-              // Extraire l'adresse du siège depuis listepersonnes
               let adresse = '';
               try {
                 const p = JSON.parse(f.listepersonnes || '{}');
@@ -4195,7 +4212,7 @@ async function searchCrossB2C() {
                 date: f.dateparution || ''
               });
             });
-            setSourceStatus('bodacc', 'ok', records.length);
+            setSourceStatus('bodacc', 'ok', filtered.length);
           })
           .catch(() => setSourceStatus('bodacc', 'error', 0))
       );
