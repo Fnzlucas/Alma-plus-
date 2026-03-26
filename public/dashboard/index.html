@@ -1773,26 +1773,25 @@ tr:hover td { background: var(--primary-lt); }
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">Total aujourd'hui</div>
           <div id="alertes-total" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:var(--text);letter-spacing:-1px">—</div>
         </div>
-        <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--radius-lg);padding:14px 16px;text-align:center">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#dc2626;margin-bottom:6px">BODACC</div>
-          <div id="alertes-bodacc" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#dc2626;letter-spacing:-1px">—</div>
-        </div>
         <div style="background:var(--primary-lt);border:1px solid var(--primary-border);border-radius:var(--radius-lg);padding:14px 16px;text-align:center">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:6px">DVF</div>
-          <div id="alertes-dvf" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:var(--primary);letter-spacing:-1px">—</div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:6px">Google Maps</div>
+          <div id="alertes-bodacc" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:var(--primary);letter-spacing:-1px">—</div>
         </div>
         <div style="background:var(--green-lt);border:1px solid var(--green-border);border-radius:var(--radius-lg);padding:14px 16px;text-align:center">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:6px">DPE</div>
-          <div id="alertes-dpe" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:var(--green);letter-spacing:-1px">—</div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:6px">Avec téléphone</div>
+          <div id="alertes-dvf" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:var(--green);letter-spacing:-1px">—</div>
+        </div>
+        <div style="background:var(--amber-lt);border:1px solid #fde68a;border-radius:var(--radius-lg);padding:14px 16px;text-align:center">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);margin-bottom:6px">Score moy.</div>
+          <div id="alertes-dpe" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:var(--amber);letter-spacing:-1px">—</div>
         </div>
       </div>
 
       <!-- Filtres -->
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
         <button class="chip" onclick="filterAlertes('all',this)" id="filter-alerte-all" style="background:var(--primary-lt);color:var(--primary);border-color:var(--primary-border);font-weight:700">Tous</button>
-        <button class="chip" onclick="filterAlertes('BODACC',this)">⚖️ BODACC</button>
-        <button class="chip" onclick="filterAlertes('DVF',this)">🏠 DVF</button>
-        <button class="chip" onclick="filterAlertes('DPE',this)">🌡️ DPE</button>
+        <button class="chip" onclick="filterAlertes('GMAPS',this)">🗺️ Google Maps</button>
+        <button class="chip" onclick="filterAlertes('phone',this)">📞 Avec téléphone</button>
         <button class="chip" onclick="filterAlertes('unseen',this)">🔴 Non lus</button>
       </div>
 
@@ -2027,9 +2026,10 @@ tr:hover td { background: var(--primary-lt); }
               <div class="form-group">
                 <label class="form-label">Nombre de prospects par cycle</label>
                 <select class="form-input" id="auto-nb">
-                  <option value="5">5 prospects</option>
-                  <option value="10" selected>10 prospects</option>
                   <option value="20">20 prospects</option>
+                  <option value="50" selected>50 prospects</option>
+                  <option value="100">100 prospects</option>
+                  <option value="200">200 prospects (max)</option>
                 </select>
               </div>
               <div class="form-group">
@@ -3208,6 +3208,8 @@ async function launchAutopilot() {
     const prospects = [];
     let enriched = 0;
 
+    // Google Maps retourne 20 par page max — on pagine pour atteindre nb
+    // allResults est déjà limité à nb dans processResults
     for (const p of places.slice(0, nb)) {
       if (_apStop) break;
       const details = await new Promise(resolve => {
@@ -3256,7 +3258,7 @@ async function launchAutopilot() {
     apLog('success', prospects.length + ' prospects qualifiés (score ≥ ' + minScore + ')');
     apSetProgress(65, 'Génération des emails IA...');
 
-    // ── ÉTAPE 3 : Génération emails ──
+    // ── ÉTAPE 3 : Génération + Envoi emails ──
     if (action === 'email' || action === 'email-send') {
       const key = getKeys().anthropic;
       if (!key) {
@@ -3265,11 +3267,10 @@ async function launchAutopilot() {
         for (let i = 0; i < prospects.length; i++) {
           if (_apStop) break;
           const p = prospects[i];
-          apLog('email', 'Génération email pour <strong>' + p.name + '</strong>...');
           apSetProgress(65 + Math.round(i/prospects.length*25), 'Email ' + (i+1) + '/' + prospects.length + ' — ' + p.name);
           try {
             const profile = getProfile();
-            const prompt = 'Rédige un email de prospection B2B percutant en 150 mots max.\nProspect: ' + p.name + ' (' + p.address + ')\nNote: ' + p.rating + '/5 (' + p.reviews + ' avis)\nExpéditeur: ' + (profile.prenom||'') + ' ' + (profile.nom||'') + ', ' + (profile.societe||'') + '\nActivité: ' + (profile.activite||'') + '\nValeur: ' + (profile.valeur||'') + '\nFormat: Objet: [accroche]\n[corps email]\n[signature]';
+            const prompt = 'Rédige un email de prospection B2B percutant en 150 mots max.\nProspect: ' + p.name + ' (' + p.address + ')\nNote: ' + p.rating + '/5 (' + p.reviews + ' avis)' + (p.phone ? '\nTél: ' + p.phone : '') + '\nExpéditeur: ' + (profile.prenom||'') + ' ' + (profile.nom||'') + ', ' + (profile.societe||'') + '\nActivité: ' + (profile.activite||'') + '\nValeur: ' + (profile.valeur||'') + '\nFormat: Objet: [accroche]\n[corps email]\n[signature]';
             const r = await fetch('https://api.anthropic.com/v1/messages', {
               method: 'POST',
               headers: { 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
@@ -3278,12 +3279,52 @@ async function launchAutopilot() {
             const d = await r.json();
             p.email_generated = d.content?.[0]?.text || null;
             totalEmails++;
-            apLog('success', '✉ Email généré pour <strong>' + p.name + '</strong>');
+
+            // Extraire objet + corps
+            const emailLines = (p.email_generated || '').split('\n');
+            const subjectLine = emailLines.find(l => l.startsWith('Objet:')) || 'Objet: Proposition commerciale';
+            const subject = subjectLine.replace('Objet:', '').trim();
+            const body = emailLines.filter(l => !l.startsWith('Objet:')).join('\n').trim();
+
+            // Afficher email dans le log avec preview
+            apLog('email', '✉ <strong>' + p.name + '</strong> — <em style="color:var(--text2)">' + subject + '</em>');
+            apLogEmail(subject, body, p.name, p.phone);
             apUpdateCounters(totalProspects, totalEmails, totalPipeline);
+
+            // Envoyer via Brevo si option activée et site web disponible
+            if (action === 'email-send' && p.website) {
+              const brevoKey = getKeys().brevo;
+              const fromEmail = getKeys().emailFrom;
+              if (brevoKey && fromEmail) {
+                try {
+                  const domain = p.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+                  const toEmail = 'contact@' + domain;
+                  const sendRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+                    method: 'POST',
+                    headers: { 'Content-Type':'application/json', 'api-key':brevoKey },
+                    body: JSON.stringify({
+                      sender: { name: getKeys().emailName||'Alma', email: fromEmail },
+                      to: [{ email: toEmail, name: p.name }],
+                      subject: subject,
+                      textContent: body
+                    })
+                  });
+                  if (sendRes.ok) {
+                    apLog('success', '📤 Envoyé à <strong>' + toEmail + '</strong>');
+                  } else {
+                    apLog('error', 'Envoi échoué : ' + toEmail);
+                  }
+                } catch(sendErr) {
+                  apLog('error', 'Envoi échoué pour ' + p.name);
+                }
+                await sleep(600);
+              }
+            }
+
           } catch(e) {
             apLog('error', 'Erreur email ' + p.name + ' : ' + e.message);
           }
-          await sleep(300);
+          await sleep(400);
         }
       }
     }
@@ -3339,6 +3380,19 @@ function apFinish(msg) {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function apLogEmail(subject, body, name, phone) {
+  const log = document.getElementById('ap-log');
+  if (!log) return;
+  const preview = body.slice(0, 200).replace(/\n/g, ' ') + (body.length > 200 ? '...' : '');
+  const row = document.createElement('div');
+  row.style.cssText = 'margin:4px 0 8px 22px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-sm);animation:fadeIn .2s ease';
+  row.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">📧 ' + subject + '</div>'
+    + '<div style="font-size:11px;color:var(--text2);line-height:1.5">' + preview + '</div>'
+    + (phone ? '<div style="font-size:10px;color:var(--green);margin-top:4px;font-weight:600">📞 ' + phone + '</div>' : '');
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+}
 function updateStats() {
   document.getElementById('stat-prospects').textContent = state.stats.prospects;
   document.getElementById('stat-emails').textContent = state.stats.emails;
@@ -5057,13 +5111,15 @@ async function loadAlertes() {
 function renderAlertes() {
   const filtered = _alertesFilter === 'all' ? _alertesData
     : _alertesFilter === 'unseen' ? _alertesData.filter(s => !s.seen)
+    : _alertesFilter === 'phone' ? _alertesData.filter(s => s.details?.phone)
     : _alertesData.filter(s => s.source === _alertesFilter);
 
   // Stats
   document.getElementById('alertes-total').textContent = _alertesData.length;
-  document.getElementById('alertes-bodacc').textContent = _alertesData.filter(s=>s.source==='BODACC').length;
-  document.getElementById('alertes-dvf').textContent = _alertesData.filter(s=>s.source==='DVF').length;
-  document.getElementById('alertes-dpe').textContent = _alertesData.filter(s=>s.source==='DPE').length;
+  document.getElementById('alertes-bodacc').textContent = _alertesData.filter(s=>s.source==='GMAPS').length;
+  document.getElementById('alertes-dvf').textContent = _alertesData.filter(s=>s.details?.phone).length;
+  const scores = _alertesData.map(s=>s.score||0).filter(Boolean);
+  document.getElementById('alertes-dpe').textContent = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : '—';
 
   if (!filtered.length) {
     document.getElementById('alertes-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">Aucune alerte avec ce filtre.</div>';
@@ -5071,8 +5127,9 @@ function renderAlertes() {
   }
 
   const sourceConfig = {
+    GMAPS:  { icon:'map', color:'var(--primary)', bg:'var(--primary-lt)', label:'Prospect Google Maps' },
     BODACC: { icon:'gavel', color:'#dc2626', bg:'#fef2f2', label:'Nouvelle entreprise' },
-    DVF:    { icon:'real_estate_agent', color:'var(--primary)', bg:'var(--primary-lt)', label:'Vente immobilière' },
+    DVF:    { icon:'real_estate_agent', color:'#7c3aed', bg:'#f5f3ff', label:'Vente immobilière' },
     DPE:    { icon:'eco', color:'var(--green)', bg:'var(--green-lt)', label:'Passoire thermique' }
   };
 
@@ -5083,6 +5140,7 @@ function renderAlertes() {
     const isNew = !s.seen;
 
     let detailLines = '';
+    if (s.source === 'GMAPS') detailLines = [details.secteur, details.phone ? '📞 ' + details.phone : null, details.rating ? '★ ' + details.rating + ' (' + details.reviews + ' avis)' : null].filter(Boolean).join(' · ');
     if (s.source === 'BODACC') detailLines = details.type || '';
     if (s.source === 'DVF') detailLines = [details.type, details.prix, details.surface].filter(Boolean).join(' · ');
     if (s.source === 'DPE') detailLines = ['Classe ' + (details.classe||'G'), details.type, details.surface, details.eligible_mpr ? '✓ Éligible MaPrimeRénov' : ''].filter(Boolean).join(' · ');
