@@ -1460,8 +1460,8 @@ tr:hover td { background: var(--primary-lt); }
               <button class="btn btn-sm btn-ghost" onclick="exportCrossCSV()">
                 <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
               </button>
-              <button class="btn btn-sm btn-primary" onclick="generateAllEmailsB2C('cross')">
-                <span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Emails IA pour tous
+              <button class="btn btn-sm btn-primary" onclick="genAllCourrierB2C()">
+                <span class="material-symbols-rounded" style="font-size:14px">auto_awesome</span>Courriers IA pour tous
               </button>
             </div>
           </div>
@@ -1474,19 +1474,7 @@ tr:hover td { background: var(--primary-lt); }
             <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:var(--primary-lt);color:var(--primary);padding:2px 7px;border-radius:4px;font-weight:700">📍 1</span> Tiède — 1 signal</div>
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>Adresse</th>
-                <th>Commune</th>
-                <th>Signaux détectés</th>
-                <th>Score</th>
-                <th>Opportunité</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="cross-table"></tbody>
-          </table>
+          <div id="cross-table" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:16px"></div>
         </div>
       </div>
 
@@ -2265,6 +2253,44 @@ tr:hover td { background: var(--primary-lt); }
     </main>
 </div><!-- /main -->
 </div><!-- /app -->
+
+
+<!-- ═══ MODALE COURRIER B2C ═══ -->
+<div class="modal-overlay" id="courrier-modal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Courrier de prospection IA</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px" id="courrier-adresse-title">—</div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('courrier-modal').classList.remove('open')">
+        <span class="material-symbols-rounded" style="font-size:16px">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info" style="margin-bottom:14px">
+        <span class="material-symbols-rounded">mail</span>
+        <span>Courrier physique personnalisé à déposer dans la boîte aux lettres ou envoyer par La Poste.</span>
+      </div>
+      <div id="courrier-loading" style="text-align:center;padding:32px;color:var(--text3)">
+        <div class="spinner spinner-dark" style="display:inline-block;margin-right:8px"></div>
+        Génération du courrier par l'IA...
+      </div>
+      <textarea id="courrier-text" class="form-input" style="min-height:280px;display:none;font-size:12.5px;line-height:1.7;font-family:'Inter',sans-serif"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="regenCourrier()">
+        <span class="material-symbols-rounded" style="font-size:14px">refresh</span>Regénérer
+      </button>
+      <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('courrier-text').value)">
+        <span class="material-symbols-rounded" style="font-size:14px">content_copy</span>Copier
+      </button>
+      <button class="btn btn-primary" onclick="document.getElementById('courrier-modal').classList.remove('open')">
+        <span class="material-symbols-rounded" style="font-size:14px">check</span>Fermer
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ MODALE ANNULATION ═══ -->
 <div class="modal-overlay" id="cancel-modal">
@@ -4134,28 +4160,95 @@ async function searchCrossB2C() {
     };
     const opp = opportunities[secteur] || { label: 'Opportunité', desc: 'Signal détecté' };
 
-    document.getElementById('cross-results-sub').textContent = `${results.length} prospects · ${nomCommune} · Score min. ${scoreMin} signal(s)`;
+    document.getElementById('cross-results-sub').textContent = results.length + ' opportunités · ' + nomCommune + ' · ' + scoreMin + '+ signal(s)';
 
-    document.getElementById('cross-table').innerHTML = results.map(p => {
+    // Stocker les résultats pour accès depuis les boutons
+    window._b2cResults = results;
+    window._b2cOpp = opp;
+    window._b2cSecteur = secteur;
+
+    document.getElementById('cross-table').innerHTML = results.map((p, idx) => {
       const heatIcon = p.score >= 3 ? '🔥' : p.score >= 2 ? '⚡' : '📍';
-      const heatStyle = p.score >= 3 ? 'background:#fef2f2;color:#dc2626' : p.score >= 2 ? 'background:var(--amber-lt);color:var(--amber)' : 'background:var(--primary-lt);color:var(--primary)';
-      const signalBadges = p.signaux.map(s =>
-        `<span style="font-size:10px;font-weight:600;background:var(--bg2);color:var(--text2);padding:2px 6px;border-radius:4px;margin-right:3px">${s.type}</span>`
-      ).join('');
-      return `<tr>
-        <td style="font-size:12px;font-weight:500">${p.adresse}</td>
-        <td style="font-size:12px">${p.commune}</td>
-        <td>${signalBadges}</td>
-        <td><span style="padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700;${heatStyle}">${heatIcon} ${p.score} signal${p.score > 1 ? 's' : ''}</span></td>
-        <td style="font-size:11px;color:var(--text2)">${opp.desc}</td>
-        <td><button class="p-action" style="opacity:1" onclick="addToP(this)" data-name="${p.adresse}" data-addr="${p.commune}" data-score="${Math.min(99, 50 + p.score * 15)}">+ Pipeline</button></td>
-      </tr>`;
+      const heatBg = p.score >= 3 ? '#fef2f2' : p.score >= 2 ? 'var(--amber-lt)' : 'var(--primary-lt)';
+      const heatColor = p.score >= 3 ? '#dc2626' : p.score >= 2 ? 'var(--amber)' : 'var(--primary)';
+
+      const signalBadges = p.signaux.map(s => {
+        const sColors = { DVF:'#00AC8C', Permis:'#7c3aed', DPE:'#059669', Copro:'#0284c7', BODACC:'#4f46e5' };
+        const col = sColors[s.type] || 'var(--primary)';
+        const detail = s.data ? Object.values(s.data).filter(Boolean).slice(0,2).join(' · ') : '';
+        return '<span style="font-size:10px;font-weight:700;background:' + col + '1a;color:' + col + ';padding:3px 8px;border-radius:99px;border:1px solid ' + col + '33">' + s.type + '</span>';
+      }).join(' ');
+
+      // Infos détaillées par signal
+      const signalDetails = p.signaux.map(s => {
+        const d = s.data || {};
+        if (s.type === 'DVF') return '🏠 Vendu ' + (d.prix || '') + (d.type ? ' — ' + d.type : '') + (d.date ? ' le ' + d.date : '');
+        if (s.type === 'Permis') return '🔨 Permis ' + (d.type || '') + (d.surface ? ' · ' + d.surface : '') + (d.date ? ' · ' + d.date : '');
+        if (s.type === 'DPE') return '🌡️ DPE ' + (d.classe || 'F') + (d.type ? ' · ' + d.type : '') + (d.surface ? ' · ' + d.surface : '');
+        if (s.type === 'Copro') return '🏢 ' + (d.type || '') + (d.date ? ' · ' + d.date : '');
+        if (s.type === 'BODACC') return '⚖️ ' + (d.activite || '') + (d.date ? ' · ' + d.date : '');
+        return s.type;
+      }).filter(Boolean);
+
+      const mapsLink = 'https://www.google.com/maps/search/' + encodeURIComponent(p.adresse + ' ' + p.commune);
+      const score = Math.min(99, 50 + p.score * 15);
+
+      return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow-xs)">'
+
+        // Score de chaleur
+        + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
+        + '<span style="padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;background:' + heatBg + ';color:' + heatColor + '">' + heatIcon + ' ' + p.score + ' signal' + (p.score > 1 ? 's' : '') + '</span>'
+        + '<span style="font-size:10px;color:var(--text3)">Score ' + score + '/99</span>'
+        + '</div>'
+
+        // Adresse — élément principal
+        + '<div>'
+        + '<div style="display:flex;align-items:flex-start;gap:8px">'
+        + '<span class="material-symbols-rounded" style="font-size:16px;color:var(--primary);margin-top:1px;flex-shrink:0">location_on</span>'
+        + '<div>'
+        + '<div style="font-family:Manrope,sans-serif;font-weight:800;font-size:13.5px;color:var(--text);line-height:1.3">' + p.adresse + '</div>'
+        + '<div style="font-size:12px;color:var(--text2);margin-top:2px">' + p.commune + '</div>'
+        + '</div>'
+        + '</div>'
+        + '</div>'
+
+        // Signaux détectés avec détails
+        + '<div style="display:flex;flex-direction:column;gap:6px">'
+        + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Signaux détectés</div>'
+        + signalBadges
+        + '<div style="margin-top:4px;display:flex;flex-direction:column;gap:3px">'
+        + signalDetails.map(d => '<div style="font-size:11px;color:var(--text2)">' + d + '</div>').join('')
+        + '</div>'
+        + '</div>'
+
+        // Ce que ça veut dire
+        + '<div style="background:var(--primary-lt);border:1px solid var(--primary-border);border-radius:var(--radius-sm);padding:10px 12px">'
+        + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:4px">💡 Opportunité</div>'
+        + '<div style="font-size:12px;color:var(--text2);">' + opp.desc + '</div>'
+        + '</div>'
+
+        // Actions
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:2px">'
+        + '<a href="' + mapsLink + '" target="_blank" class="btn btn-sm btn-ghost" style="justify-content:center;font-size:11px;text-decoration:none">'
+        + '<span class="material-symbols-rounded" style="font-size:13px">map</span>Voir sur Maps'
+        + '</a>'
+        + '<button class="btn btn-sm btn-ghost" style="justify-content:center;font-size:11px" onclick="genCourrierB2C(' + idx + ')">'
+        + '<span class="material-symbols-rounded" style="font-size:13px">auto_awesome</span>Courrier IA'
+        + '</button>'
+        + '<button class="btn btn-sm btn-ghost" style="justify-content:center;font-size:11px" onclick="findArtisansNear(this.dataset.q)" data-q="' + encodeURIComponent(p.adresse + ' ' + p.commune) + '">'
+        + '<span class="material-symbols-rounded" style="font-size:13px">search</span>Artisans proches'
+        + '</button>'
+        + '<button class="btn btn-sm btn-primary" style="justify-content:center;font-size:11px" onclick="addToP(this)" data-name="' + p.adresse + '" data-addr="' + p.commune + '" data-score="' + score + '">'
+        + '<span class="material-symbols-rounded" style="font-size:13px">view_kanban</span>Pipeline'
+        + '</button>'
+        + '</div>'
+        + '</div>';
     }).join('');
 
     hide('cross-progress');
     hide('cross-spinner');
     show('cross-results');
-    addActivity('Croisement B2C : ' + zone + ' (' + results.length + ' prospects)', 'hub', 'primary');
+    addActivity('Croisement B2C : ' + zone + ' (' + results.length + ' opportunités)', 'hub', 'primary');
 
   } catch(e) {
     alert('Erreur moteur de croisement : ' + e.message);
@@ -4270,6 +4363,99 @@ function openEmailFromModal() {
     if (!inMain) state.prospects.push(state.pipeline.find(x => x.id === currentPipelineId));
     openEmailModal(currentPipelineId);
   }
+}
+
+
+// ═══════════════════════════════════════════════
+// COURRIER IA B2C + ARTISANS PROCHES
+// ═══════════════════════════════════════════════
+let _currentCourrierIdx = null;
+
+async function genCourrierB2C(idx) {
+  _currentCourrierIdx = idx;
+  await _genCourrierFromIdx(idx);
+}
+
+async function regenCourrier() {
+  if (_currentCourrierIdx !== null) await _genCourrierFromIdx(_currentCourrierIdx);
+}
+
+async function genAllCourrierB2C() {
+  alert('Génération en masse — sélectionnez un prospect pour générer son courrier individuellement.');
+}
+
+async function _genCourrierFromIdx(idx) {
+  const results = window._b2cResults || [];
+  const p = results[idx];
+  if (!p) return;
+
+  const opp = window._b2cOpp || { label: 'Rénovation', desc: 'Opportunité détectée' };
+  const secteur = window._b2cSecteur || 'renovation';
+  const profile = getProfile();
+
+  document.getElementById('courrier-adresse-title').textContent = p.adresse + ' — ' + p.commune;
+  document.getElementById('courrier-loading').style.display = 'block';
+  document.getElementById('courrier-text').style.display = 'none';
+  document.getElementById('courrier-modal').classList.add('open');
+
+  const signalDesc = p.signaux.map(s => {
+    const d = s.data || {};
+    if (s.type === 'DVF') return 'vente immobilière récente (' + (d.prix || '') + ')';
+    if (s.type === 'Permis') return 'permis de construire déposé (' + (d.type || 'travaux') + ')';
+    if (s.type === 'DPE') return 'logement classé DPE ' + (d.classe || 'F') + ' (passoire thermique)';
+    if (s.type === 'Copro') return 'copropriété identifiée';
+    if (s.type === 'BODACC') return "création d'entreprise récente";
+    return s.type;
+  }).join(', ');
+
+  const secteurLabels = {
+    renovation: 'artisan en rénovation / BTP',
+    energie: 'expert en rénovation énergétique',
+    immo: 'agent immobilier',
+    demenagement: 'société de déménagement',
+    assurance: 'courtier en assurance habitation',
+    finance: 'conseiller en financement travaux',
+    decoration: "architecte d'intérieur / décorateur"
+  };
+
+  const prompt = 'Tu es un expert en prospection locale. Rédige un courrier physique court.\n\n'
+    + 'ADRESSE : ' + p.adresse + ', ' + p.commune + '\n'
+    + 'SIGNAUX : ' + signalDesc + '\n\n'
+    + 'EXPÉDITEUR :\n'
+    + '- Nom : ' + (profile.prenom || '') + ' ' + (profile.nom || '') + '\n'
+    + '- Société : ' + (profile.societe || 'notre entreprise') + '\n'
+    + '- Activité : ' + (secteurLabels[secteur] || profile.activite || 'prestataire local') + '\n'
+    + '- Valeur : ' + (profile.valeur || 'service de qualité') + '\n\n'
+    + 'CONSIGNES : courrier physique 150-200 mots, commencer par Madame Monsieur, mentionner discrètement les travaux détectés, ton professionnel et chaleureux, proposer RDV gratuit, terminer avec coordonnées. Texte brut prêt à imprimer.';
+
+  try {
+    const key = getKeys().anthropic;
+    if (!key) throw new Error('Clé Anthropic non configurée');
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: getKeys().model, max_tokens: 500, messages: [{ role: 'user', content: prompt }] })
+    });
+    const d = await r.json();
+    const text = d.content?.[0]?.text || 'Erreur de génération';
+    document.getElementById('courrier-text').value = text;
+    document.getElementById('courrier-loading').style.display = 'none';
+    document.getElementById('courrier-text').style.display = 'block';
+    addActivity('Courrier B2C généré · ' + p.adresse, 'mail', 'primary');
+  } catch(e) {
+    document.getElementById('courrier-text').value = 'Erreur : ' + e.message;
+    document.getElementById('courrier-loading').style.display = 'none';
+    document.getElementById('courrier-text').style.display = 'block';
+  }
+}
+
+function findArtisansNear(encodedAddr) {
+  const addr = decodeURIComponent(encodedAddr);
+  // Remplir la recherche B2B et aller sur la page prospection
+  document.getElementById('search-type').value = 'artisan rénovation';
+  document.getElementById('search-city').value = addr;
+  goPage('prospection', document.querySelector('[onclick*=prospection]'));
+  setTimeout(() => searchProspects(), 300);
 }
 
 // ═══ INIT ═══
