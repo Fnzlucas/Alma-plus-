@@ -4472,7 +4472,11 @@ const SUPABASE_PROXY = 'https://tzrtptpzbrszibuifzns.supabase.co/functions/v1/pr
 async function proxyFetch(url) {
   const res = await fetch(SUPABASE_PROXY, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk',
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk'
+    },
     body: JSON.stringify({ url })
   });
   return res.json();
