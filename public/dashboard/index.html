@@ -752,7 +752,7 @@ tr:hover td { background: var(--primary-lt); }
 /* ─── TAG ─── */
 .tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
 </style>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&libraries=places&language=fr"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&libraries=places&language=fr&loading=async" async defer></script>
 </head>
 <body>
 <div class="app">
@@ -4022,12 +4022,17 @@ async function searchCrossB2C() {
           .then(d => {
             const items = d.resultats || [];
             items.forEach(r => {
-              const adresse = [(r.adresse_numero||''), (r.adresse_nom_voie||'')].filter(Boolean).join(' ');
-              if (adresse) addSignal(adresse, nomCommune, 'DVF', {
-                prix: r.valeur_fonciere ? new Intl.NumberFormat('fr-FR').format(r.valeur_fonciere) + ' €' : '',
-                type: r.type_local || '',
-                date: r.date_mutation || ''
-              });
+              const num = r.adresse_numero || r.no_voie || '';
+              const voie = r.adresse_nom_voie || r.voie || '';
+              const adresse = [num, voie].filter(Boolean).join(' ') || r.l_codinsee || '';
+              const commune = r.l_commune || nomCommune;
+              if (adresse || r.valeur_fonciere) {
+                addSignal(adresse || 'Transaction ' + commune, commune, 'DVF', {
+                  prix: r.valeur_fonciere ? new Intl.NumberFormat('fr-FR').format(r.valeur_fonciere) + ' €' : '',
+                  type: r.type_local || r.nature_culture || '',
+                  date: r.date_mutation || ''
+                });
+              }
             });
             setSourceStatus('dvf', 'ok', items.length);
           })
@@ -4043,12 +4048,15 @@ async function searchCrossB2C() {
             const records = d.records || [];
             records.forEach(r => {
               const f = r.fields;
-              const adresse = [(f.ad_num_voie||''), (f.ad_nom_voie||'')].filter(Boolean).join(' ');
-              const commune = f.libelle_commune || nomCommune;
-              if (adresse) addSignal(adresse, commune, 'Permis', {
-                type: f.type_projet_lib || '',
+              const num = f.ad_num_voie || f.adresse_numero || '';
+              const voie = f.ad_nom_voie || f.adresse_voie || '';
+              const adresse = [num, voie].filter(Boolean).join(' ');
+              const commune = f.libelle_commune || f.commune || nomCommune;
+              const display = adresse || ('PC ' + (f.num_dep_permis || '') + ' ' + commune);
+              addSignal(display, commune, 'Permis', {
+                type: f.type_projet_lib || f.nature_projet_lib || '',
                 surface: f.sh_tot ? f.sh_tot + ' m²' : '',
-                date: f.date_prise_en_compte || ''
+                date: f.date_prise_en_compte || f.date_autorisation || ''
               });
             });
             setSourceStatus('permis', 'ok', records.length);
@@ -4064,7 +4072,9 @@ async function searchCrossB2C() {
           .then(d => {
             const items = d.results || [];
             items.forEach(r => {
-              if (r.adresse_ban) addSignal(r.adresse_ban, r.commune || nomCommune, 'DPE', {
+              const adresse = r.adresse_ban || r.adresse || '';
+              const commune = r.commune || nomCommune;
+              if (adresse) addSignal(adresse, commune, 'DPE', {
                 classe: r.etiquette_dpe || 'F',
                 type: r.type_batiment || '',
                 surface: r.surface_habitable_logement ? Math.round(r.surface_habitable_logement) + ' m²' : ''
@@ -4103,32 +4113,32 @@ async function searchCrossB2C() {
       );
     }
 
-    // BODACC créations — uniquement les adresses postales valides
+    // BODACC créations
     if (useBodacc) {
       promises.push(
         proxyFetch('https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=' + encodeURIComponent(zone) + '&rows=25&sort=dateparution&refine.familleavis_lib=Immatriculations')
           .then(d => {
             const records = d.records || [];
-            let count = 0;
             records.forEach(r => {
               const f = r.fields;
-              // Chercher une vraie adresse dans les champs BODACC
-              const adresse = f.adresse || f.adresseetablissement || '';
-              const ville = f.ville || f.cp || nomCommune;
-              const nom = f.registre || f.commercant || f.denomination || '';
-              const activite = f.activite || '';
-
-              // Seulement si on a une vraie adresse de rue (pas un SIREN, pas juste un nom)
-              if (adresse && adresse.length > 8 && !/^\d{9,14}/.test(adresse)) {
-                addSignal(adresse, ville, 'BODACC', {
-                  nom: nom,
-                  activite: activite.slice(0, 50),
-                  date: f.dateparution || ''
-                });
-                count++;
-              }
+              const nom = f.commercant || f.denomination || '';
+              const ville = f.ville || nomCommune;
+              const cp = f.cp || '';
+              // Extraire l'adresse du siège depuis listepersonnes
+              let adresse = '';
+              try {
+                const p = JSON.parse(f.listepersonnes || '{}');
+                const siege = p.personne?.adresseSiegeSocial || {};
+                adresse = [siege.numeroVoie, siege.typeVoie, siege.nomVoie].filter(Boolean).join(' ');
+              } catch(_) {}
+              const display = adresse ? adresse + ', ' + cp + ' ' + ville : nom + ' — ' + ville;
+              if (nom) addSignal(display, ville, 'BODACC', {
+                nom: nom,
+                activite: '',
+                date: f.dateparution || ''
+              });
             });
-            setSourceStatus('bodacc', 'ok', count);
+            setSourceStatus('bodacc', 'ok', records.length);
           })
           .catch(() => setSourceStatus('bodacc', 'error', 0))
       );
