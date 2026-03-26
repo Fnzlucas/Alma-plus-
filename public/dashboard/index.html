@@ -235,6 +235,67 @@ body { font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; color: 
 .page.active { display: block; animation: fadeIn .15s ease; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
 
+/* ─── MOBILE ─── */
+#mob-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:998; }
+#mob-overlay.show { display:block; }
+#btn-mob-menu { display:none; }
+
+@media (max-width: 768px) {
+  body > div { flex-direction:column; }
+
+  #btn-mob-menu {
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:6px;
+    color:var(--text);
+    margin-right:6px;
+  }
+
+  .sidebar {
+    position:fixed !important;
+    left:-240px !important;
+    top:0; bottom:0;
+    z-index:999;
+    transition:left .22s ease;
+    box-shadow:none;
+  }
+  .sidebar.mob-open {
+    left:0 !important;
+    box-shadow:4px 0 20px rgba(0,0,0,.15);
+  }
+
+  .main {
+    width:100% !important;
+    height:100vh;
+  }
+
+  .content {
+    padding:16px 14px 32px;
+    overflow-x:hidden;
+  }
+
+  .topbar { padding:0 14px; gap:8px; }
+  .topbar-sub { display:none; }
+  .status-pill span { display:none; }
+
+  .stats-grid { grid-template-columns:1fr 1fr !important; gap:8px !important; }
+  .main-grid { grid-template-columns:1fr !important; }
+  .form-row { flex-direction:column !important; }
+  #prospects-grid { grid-template-columns:1fr !important; }
+  .card-body { padding:14px !important; }
+
+  #page-autopilot > div > div[style*="grid-template-columns:340px"] {
+    grid-template-columns:1fr !important;
+  }
+  #alertes-stats { grid-template-columns:1fr 1fr !important; }
+  #pipeline-board { flex-direction:column !important; }
+  .pipeline-col { min-width:unset !important; width:100% !important; }
+}
+
 /* ─── PAGE HEADER ─── */
 .page-header {
   display: flex;
@@ -832,7 +893,12 @@ tr:hover td { background: var(--primary-lt); }
 
 <!-- ═══ MAIN ═══ -->
 <div class="main">
+  <div id="mob-overlay" onclick="mobCloseSidebar()"></div>
+
   <header class="topbar">
+    <button id="btn-mob-menu" onclick="mobToggleSidebar()">
+      <span class="material-symbols-rounded" style="font-size:22px">menu</span>
+    </button>
     <div>
       <span class="topbar-title" id="page-title">Vue globale</span>
       <span class="topbar-sub" id="page-sub"> · Tableau de bord</span>
@@ -2756,6 +2822,7 @@ function goPage(name, btn) {
     rapport:['Rapport','Vos performances'],
     veille:['Veille IA','Analyse concurrentielle'],
     settings:['Paramètres','Configuration'],
+    alertes:['Alertes du jour','Signaux détectés automatiquement'],
   };
   if (titles[name]) {
     document.getElementById('page-title').textContent = titles[name][0];
@@ -5572,6 +5639,24 @@ async function proxyFetch(url) {
 
 document.addEventListener('DOMContentLoaded', function() { loadState(); updateSeenCounter(); initAlertesBadge(); });
 
+
+
+// ─── MOBILE SIDEBAR ───
+function mobToggleSidebar() {
+  const sb = document.querySelector('.sidebar');
+  const ov = document.getElementById('mob-overlay');
+  sb.classList.toggle('mob-open');
+  ov.classList.toggle('show');
+}
+function mobCloseSidebar() {
+  document.querySelector('.sidebar').classList.remove('mob-open');
+  document.getElementById('mob-overlay').classList.remove('show');
+}
+// Fermer sidebar après navigation sur mobile
+document.addEventListener('click', function(e) {
+  const navItem = e.target.closest('.nav-item');
+  if (navItem && window.innerWidth <= 768) mobCloseSidebar();
+});
 
 </script>
 </body>
