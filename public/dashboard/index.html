@@ -4026,8 +4026,7 @@ async function searchCrossB2C() {
     // DVF
     if (useDVF && codeCommune) {
       promises.push(
-        fetch(`https://api.cquest.org/dvf?code_commune=${codeCommune}&nb_resultats=30`)
-          .then(r => r.json())
+        proxyFetch(`https://api.cquest.org/dvf?code_commune=${codeCommune}&nb_resultats=30`)
           .then(d => {
             const items = d.resultats || [];
             items.forEach(r => {
@@ -4047,8 +4046,7 @@ async function searchCrossB2C() {
     // Permis de construire
     if (usePermis) {
       promises.push(
-        fetch(`https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=sitadel-logements&q=${encodeURIComponent(codeDept)}&rows=30&sort=date_prise_en_compte&order=desc`)
-          .then(r => r.json())
+        proxyFetch(`https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=sitadel-logements&q=${encodeURIComponent(codeDept)}&rows=30&sort=date_prise_en_compte&order=desc`)
           .then(d => {
             const records = d.records || [];
             records.forEach(r => {
@@ -4070,8 +4068,7 @@ async function searchCrossB2C() {
     // DPE ADEME
     if (useDPE) {
       promises.push(
-        fetch(`https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines?size=30&q=${encodeURIComponent(zone)}&etiquette_dpe=F&select=adresse_ban,commune,etiquette_dpe,type_batiment,surface_habitable_logement`)
-          .then(r => r.json())
+        proxyFetch(`https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines?size=30&q=${encodeURIComponent(zone)}&etiquette_dpe=F&select=adresse_ban,commune,etiquette_dpe,type_batiment,surface_habitable_logement`)
           .then(d => {
             const items = d.results || [];
             items.forEach(r => {
@@ -4090,8 +4087,7 @@ async function searchCrossB2C() {
     // Copropriétés — registre national, cherche par localisation
     if (useCopro) {
       promises.push(
-        fetch('https://registre-coproprietes.gouv.fr/api/coproprietes?commune=' + encodeURIComponent(nomCommune) + '&size=15')
-          .then(r => r.json())
+        proxyFetch('https://registre-coproprietes.gouv.fr/api/coproprietes?commune=' + encodeURIComponent(nomCommune) + '&size=15')
           .then(d => {
             const items = d.results || d.coproprietes || [];
             let count = 0;
@@ -4118,8 +4114,7 @@ async function searchCrossB2C() {
     // BODACC créations — uniquement les adresses postales valides
     if (useBodacc) {
       promises.push(
-        fetch('https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=' + encodeURIComponent(zone) + '&rows=25&sort=dateparution&refine.familleavis_lib=Immatriculations')
-          .then(r => r.json())
+        proxyFetch('https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=' + encodeURIComponent(zone) + '&rows=25&sort=dateparution&refine.familleavis_lib=Immatriculations')
           .then(d => {
             const records = d.records || [];
             let count = 0;
@@ -4472,6 +4467,19 @@ function findArtisansNear(encodedAddr) {
   document.getElementById('search-city').value = addr;
   goPage('prospection', document.querySelector('[onclick*=prospection]'));
   setTimeout(() => searchProspects(), 300);
+}
+
+
+// ═══ PROXY SUPABASE — contourne le CORS pour les APIs open data ═══
+const SUPABASE_PROXY = 'https://tzrtptpzbrszibuifzns.supabase.co/functions/v1/proxy';
+
+async function proxyFetch(url) {
+  const res = await fetch(SUPABASE_PROXY, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url })
+  });
+  return res.json();
 }
 
 // ═══ INIT ═══
