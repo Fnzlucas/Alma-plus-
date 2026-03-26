@@ -1931,39 +1931,126 @@ tr:hover td { background: var(--primary-lt); }
 
   <!-- ════════════════ AUTOPILOT ════════════════ -->
   <div class="page" id="page-autopilot">
-    <div style="max-width:600px">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Pilote Automatique</div>
-          <div id="autopilot-toggle" class="status-pill off" style="cursor:pointer" onclick="toggleAutopilot()">
-            <div class="pulse"></div><span>Inactif</span>
-          </div>
+    <div style="max-width:860px">
+
+      <!-- Header -->
+      <div class="page-header" style="margin-bottom:24px">
+        <div>
+          <div class="page-heading">Pilote Automatique IA</div>
+          <div class="page-subheading">Prospection autonome · Recherche · Scoring · Email · Pipeline — en temps réel</div>
         </div>
-        <div class="card-body">
-          <div class="alert alert-info" style="margin-bottom:16px">
-            <span class="material-symbols-rounded">info</span>
-            Le pilote automatique lance des recherches et génère des emails selon vos paramètres.
+        <div id="autopilot-toggle" class="status-pill off" style="cursor:pointer;padding:8px 18px;font-size:13px" onclick="toggleAutopilot()">
+          <div class="pulse"></div><span>Inactif</span>
+        </div>
+      </div>
+
+      <!-- Config + Live en 2 colonnes -->
+      <div style="display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start">
+
+        <!-- Config -->
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Configuration</div></div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Type de business cible</label>
+                <input class="form-input" id="auto-query" placeholder="plombier, électricien, agence immo..." />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Zone géographique</label>
+                <input class="form-input" id="auto-zone" placeholder="Lyon, Paris 15e, Bordeaux..." />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nombre de prospects par cycle</label>
+                <select class="form-input" id="auto-nb">
+                  <option value="5">5 prospects</option>
+                  <option value="10" selected>10 prospects</option>
+                  <option value="20">20 prospects</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Score minimum</label>
+                <input class="form-input" type="number" id="auto-score" value="60" min="0" max="100" />
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Action automatique</label>
+                <select class="form-input" id="auto-action">
+                  <option value="email">Générer email IA + Pipeline</option>
+                  <option value="pipeline">Ajouter au pipeline uniquement</option>
+                  <option value="email-send">Générer + Envoyer email</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Cible automatique</label>
-            <input class="form-input" id="auto-query" placeholder="plombier Lyon, électricien Paris..." />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Fréquence</label>
-            <select class="form-input" id="auto-freq">
-              <option value="daily">Chaque jour</option>
-              <option value="weekly" selected>Chaque semaine</option>
-              <option value="manual">Manuel uniquement</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Score minimum</label>
-            <input class="form-input" type="number" id="auto-score" value="60" min="0" max="100" />
-            <div class="form-hint">Ne traiter que les prospects avec un score ≥ à cette valeur</div>
-          </div>
-          <button class="btn btn-primary" onclick="saveAutopilot()">
-            <span class="material-symbols-rounded" style="font-size:15px">save</span>Enregistrer
+
+          <button class="btn btn-primary" onclick="launchAutopilot()" id="btn-autopilot" style="width:100%;justify-content:center;padding:13px;font-size:13px">
+            <span class="material-symbols-rounded" style="font-size:18px">rocket_launch</span>
+            Lancer le pilote maintenant
           </button>
+          <button class="btn btn-ghost" onclick="stopAutopilot()" id="btn-stop-autopilot" style="width:100%;justify-content:center;display:none">
+            <span class="material-symbols-rounded" style="font-size:16px">stop_circle</span>
+            Arrêter
+          </button>
+        </div>
+
+        <!-- Live dashboard -->
+        <div style="display:flex;flex-direction:column;gap:14px">
+
+          <!-- Compteurs temps réel -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;text-align:center;box-shadow:var(--shadow-xs)">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">Prospects trouvés</div>
+              <div id="ap-count-prospects" style="font-family:'Manrope',sans-serif;font-size:36px;font-weight:800;color:var(--primary);letter-spacing:-1px;line-height:1">0</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;text-align:center;box-shadow:var(--shadow-xs)">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">Emails générés</div>
+              <div id="ap-count-emails" style="font-family:'Manrope',sans-serif;font-size:36px;font-weight:800;color:var(--accent);letter-spacing:-1px;line-height:1">0</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;text-align:center;box-shadow:var(--shadow-xs)">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px">En pipeline</div>
+              <div id="ap-count-pipeline" style="font-family:'Manrope',sans-serif;font-size:36px;font-weight:800;color:var(--green);letter-spacing:-1px;line-height:1">0</div>
+            </div>
+          </div>
+
+          <!-- Barre de progression globale -->
+          <div id="ap-progress-wrap" style="display:none">
+            <div class="card">
+              <div class="card-body" style="padding:14px 18px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <div style="font-size:12px;font-weight:600;color:var(--text)" id="ap-step-label">En attente...</div>
+                  <div style="font-size:11px;color:var(--text3)" id="ap-step-pct">0%</div>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="ap-progress-fill" style="width:0%;transition:width .5s"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Log temps réel -->
+          <div class="card" style="flex:1">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Journal en temps réel</div>
+                <div class="card-sub" id="ap-log-sub">En attente de lancement...</div>
+              </div>
+              <div id="ap-live-dot" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1s infinite"></div>
+            </div>
+            <div id="ap-log" style="height:320px;overflow-y:auto;padding:12px 18px;display:flex;flex-direction:column;gap:6px">
+              <div style="text-align:center;color:var(--text3);font-size:12px;padding:40px 0">
+                <span class="material-symbols-rounded" style="font-size:36px;display:block;margin-bottom:10px;opacity:.2">smart_toy</span>
+                Configurez et lancez le pilote pour voir l'activité en temps réel
+              </div>
+            </div>
+          </div>
+
+          <!-- Derniers prospects ajoutés -->
+          <div class="card" id="ap-results-card" style="display:none">
+            <div class="card-header">
+              <div class="card-title">Prospects ajoutés au pipeline</div>
+              <button class="btn btn-sm btn-ghost" onclick="goPage('pipeline', document.querySelector('[onclick*=pipeline]'))">Voir pipeline →</button>
+            </div>
+            <div id="ap-results-list" style="max-height:200px;overflow-y:auto"></div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -2932,14 +3019,268 @@ async function runVeille() {
 
 // ═══ SÉQUENCES & AUTOPILOT ═══
 function saveSequence() { alert('Séquence enregistrée !'); }
+let _apRunning = false;
+let _apStop = false;
+
 function toggleAutopilot() {
-  state.autopilotActive = !state.autopilotActive;
   const el = document.getElementById('autopilot-toggle');
-  el.className = 'status-pill ' + (state.autopilotActive ? 'on' : 'off');
-  el.querySelector('span').textContent = state.autopilotActive ? 'Actif' : 'Inactif';
-  saveState();
+  if (_apRunning) { stopAutopilot(); }
+  else { launchAutopilot(); }
 }
-function saveAutopilot() { alert('Paramètres du pilote automatique enregistrés.'); }
+
+function saveAutopilot() { apLog('info', 'Configuration sauvegardée'); }
+
+function apLog(type, msg) {
+  const log = document.getElementById('ap-log');
+  if (!log) return;
+  const icons = { info:'info', success:'check_circle', email:'mail', pipeline:'view_kanban', search:'search', error:'error' };
+  const colors = { info:'var(--primary)', success:'var(--green)', email:'var(--accent)', pipeline:'#0284c7', search:'var(--amber)', error:'var(--red)' };
+  const empty = log.querySelector('[style*="padding:40px"]');
+  if (empty) empty.remove();
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--border-lt);animation:fadeIn .2s ease';
+  row.innerHTML = '<span class="material-symbols-rounded" style="font-size:14px;color:' + (colors[type]||'var(--text3)') + ';flex-shrink:0;margin-top:1px">' + (icons[type]||'circle') + '</span>'
+    + '<span style="font-size:12px;color:var(--text);flex:1;line-height:1.5">' + msg + '</span>'
+    + '<span style="font-size:10px;color:var(--text3);flex-shrink:0">' + new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) + '</span>';
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+}
+
+function apSetProgress(pct, label) {
+  const fill = document.getElementById('ap-progress-fill');
+  const lbl = document.getElementById('ap-step-label');
+  const pctEl = document.getElementById('ap-step-pct');
+  if (fill) fill.style.width = pct + '%';
+  if (lbl) lbl.textContent = label;
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
+function apUpdateCounters(prospects, emails, pipeline) {
+  const animate = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const current = parseInt(el.textContent) || 0;
+    if (val > current) {
+      el.style.transform = 'scale(1.2)';
+      el.style.transition = 'transform .2s';
+      setTimeout(() => { el.style.transform = 'scale(1)'; }, 200);
+    }
+    el.textContent = val;
+  };
+  animate('ap-count-prospects', prospects);
+  animate('ap-count-emails', emails);
+  animate('ap-count-pipeline', pipeline);
+}
+
+function apAddResult(prospect) {
+  document.getElementById('ap-results-card').style.display = '';
+  const list = document.getElementById('ap-results-list');
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--border-lt);animation:fadeIn .3s ease';
+  const hasPhone = prospect.phone && prospect.phone !== 'null';
+  row.innerHTML = '<div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">' + (prospect.name||'?').slice(0,2).toUpperCase() + '</div>'
+    + '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + prospect.name + '</div>'
+    + '<div style="font-size:11px;color:' + (hasPhone?'var(--green)':'var(--text3)') + '">' + (hasPhone ? '📞 ' + prospect.phone : prospect.address||'') + '</div></div>'
+    + '<span class="score ' + (prospect.score>=80?'s-h':prospect.score>=60?'s-m':'s-l') + '" style="font-size:10px">' + prospect.score + '</span>'
+    + (prospect.email_generated ? '<span style="font-size:10px;background:var(--green-lt);color:var(--green);padding:2px 7px;border-radius:99px;border:1px solid var(--green-border)">✉ Email</span>' : '');
+  list.appendChild(row);
+  list.scrollTop = list.scrollHeight;
+}
+
+async function launchAutopilot() {
+  const query = document.getElementById('auto-query')?.value.trim();
+  const zone = document.getElementById('auto-zone')?.value.trim();
+  const nb = parseInt(document.getElementById('auto-nb')?.value) || 10;
+  const minScore = parseInt(document.getElementById('auto-score')?.value) || 60;
+  const action = document.getElementById('auto-action')?.value || 'email';
+
+  if (!query || !zone) { alert('Renseignez le type de business et la zone géographique.'); return; }
+
+  _apRunning = true;
+  _apStop = false;
+
+  // UI — état actif
+  document.getElementById('autopilot-toggle').className = 'status-pill on';
+  document.getElementById('autopilot-toggle').querySelector('span').textContent = 'Actif';
+  document.getElementById('btn-autopilot').style.display = 'none';
+  document.getElementById('btn-stop-autopilot').style.display = '';
+  document.getElementById('ap-progress-wrap').style.display = '';
+  document.getElementById('ap-live-dot').style.display = '';
+  document.getElementById('ap-log-sub').textContent = 'En cours...';
+
+  // Reset compteurs
+  apUpdateCounters(0, 0, 0);
+  document.getElementById('ap-results-list').innerHTML = '';
+
+  // Reset log
+  document.getElementById('ap-log').innerHTML = '';
+
+  let totalProspects = 0, totalEmails = 0, totalPipeline = 0;
+
+  apLog('info', 'Pilote démarré — cible : <strong>' + query + '</strong> à <strong>' + zone + '</strong>');
+  apSetProgress(5, 'Connexion à Google Maps...');
+  await sleep(400);
+
+  try {
+    // ── ÉTAPE 1 : Recherche Google Maps ──
+    apLog('search', 'Recherche Google Maps Places en cours...');
+    apSetProgress(15, 'Recherche des établissements...');
+
+    const service = new google.maps.places.PlacesService(document.createElement('div'));
+    let places = await new Promise((resolve) => {
+      service.textSearch({ query: query + ' ' + zone, language: 'fr', region: 'fr' }, (results, status) => {
+        resolve(status === google.maps.places.PlacesServiceStatus.OK ? results : []);
+      });
+    });
+
+    if (_apStop) { apFinish('Arrêté par utilisateur'); return; }
+    if (!places.length) { apFinish('Aucun résultat Google Maps pour "' + query + ' ' + zone + '"'); return; }
+
+    apLog('success', places.length + ' établissements trouvés sur Google Maps');
+    apSetProgress(30, 'Récupération des coordonnées téléphoniques...');
+
+    // ── ÉTAPE 2 : Enrichissement téléphones ──
+    const prospects = [];
+    let enriched = 0;
+
+    for (const p of places.slice(0, nb)) {
+      if (_apStop) break;
+      const details = await new Promise(resolve => {
+        service.getDetails({ placeId: p.place_id, fields: ['formatted_phone_number','website','international_phone_number'] }, (place, status) => {
+          resolve(status === google.maps.places.PlacesServiceStatus.OK ? place : null);
+        });
+      });
+
+      const rating = p.rating || 0;
+      const reviews = p.user_ratings_total || 0;
+      let score = 50;
+      if (rating < 3.5 && rating > 0) score += 20;
+      else if (rating >= 4.5) score += 15;
+      else if (rating >= 4.0) score += 10;
+      if (reviews > 100) score += 15;
+      else if (reviews > 50) score += 10;
+      else if (reviews > 10) score += 5;
+      score = Math.min(99, Math.max(10, score));
+
+      if (score < minScore) { enriched++; continue; }
+
+      const prospect = {
+        id: p.place_id,
+        name: p.name,
+        address: p.formatted_address || p.vicinity || '',
+        rating, reviews, score,
+        phone: details?.formatted_phone_number || details?.international_phone_number || null,
+        website: details?.website || null,
+        email_generated: null
+      };
+
+      prospects.push(prospect);
+      enriched++;
+      totalProspects++;
+
+      apLog('info', '📍 <strong>' + p.name + '</strong>' + (prospect.phone ? ' — <span style="color:var(--green)">📞 ' + prospect.phone + '</span>' : ' — pas de téléphone') + ' (score ' + score + ')');
+      apUpdateCounters(totalProspects, totalEmails, totalPipeline);
+      apSetProgress(30 + Math.round(enriched/places.slice(0,nb).length*30), 'Coordonnées : ' + enriched + '/' + Math.min(nb,places.length));
+
+      await sleep(150);
+    }
+
+    if (_apStop) { apFinish('Arrêté par utilisateur'); return; }
+    if (!prospects.length) { apFinish('Aucun prospect avec score suffisant (' + minScore + ')'); return; }
+
+    apLog('success', prospects.length + ' prospects qualifiés (score ≥ ' + minScore + ')');
+    apSetProgress(65, 'Génération des emails IA...');
+
+    // ── ÉTAPE 3 : Génération emails ──
+    if (action === 'email' || action === 'email-send') {
+      const key = getKeys().anthropic;
+      if (!key) {
+        apLog('error', 'Clé Anthropic non configurée — emails non générés');
+      } else {
+        for (let i = 0; i < prospects.length; i++) {
+          if (_apStop) break;
+          const p = prospects[i];
+          apLog('email', 'Génération email pour <strong>' + p.name + '</strong>...');
+          apSetProgress(65 + Math.round(i/prospects.length*25), 'Email ' + (i+1) + '/' + prospects.length + ' — ' + p.name);
+          try {
+            const profile = getProfile();
+            const prompt = 'Rédige un email de prospection B2B percutant en 150 mots max.\nProspect: ' + p.name + ' (' + p.address + ')\nNote: ' + p.rating + '/5 (' + p.reviews + ' avis)\nExpéditeur: ' + (profile.prenom||'') + ' ' + (profile.nom||'') + ', ' + (profile.societe||'') + '\nActivité: ' + (profile.activite||'') + '\nValeur: ' + (profile.valeur||'') + '\nFormat: Objet: [accroche]\n[corps email]\n[signature]';
+            const r = await fetch('https://api.anthropic.com/v1/messages', {
+              method: 'POST',
+              headers: { 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+              body: JSON.stringify({ model: getKeys().model, max_tokens: 400, messages: [{ role:'user', content:prompt }] })
+            });
+            const d = await r.json();
+            p.email_generated = d.content?.[0]?.text || null;
+            totalEmails++;
+            apLog('success', '✉ Email généré pour <strong>' + p.name + '</strong>');
+            apUpdateCounters(totalProspects, totalEmails, totalPipeline);
+          } catch(e) {
+            apLog('error', 'Erreur email ' + p.name + ' : ' + e.message);
+          }
+          await sleep(300);
+        }
+      }
+    }
+
+    if (_apStop) { apFinish('Arrêté par utilisateur'); return; }
+
+    // ── ÉTAPE 4 : Ajout pipeline ──
+    apSetProgress(92, 'Ajout au pipeline CRM...');
+    for (const p of prospects) {
+      if (!state.pipeline.find(x => x.id === p.id)) {
+        state.pipeline.push({ ...p, status: 'new' });
+        totalPipeline++;
+        apAddResult(p);
+        apLog('pipeline', '<strong>' + p.name + '</strong> ajouté au pipeline');
+        apUpdateCounters(totalProspects, totalEmails, totalPipeline);
+        await sleep(100);
+      }
+    }
+
+    // Sauvegarder dans le state
+    state.prospects = [...prospects, ...state.prospects.filter(p => !prospects.find(n => n.id === p.id))];
+    state.stats.prospects = state.prospects.length;
+    state.stats.pipeline = state.pipeline.length;
+    state.stats.emails += totalEmails;
+    saveState();
+    updateStats();
+
+    apSetProgress(100, 'Terminé !');
+    apFinish('✅ Cycle terminé — ' + totalProspects + ' prospects · ' + totalEmails + ' emails · ' + totalPipeline + ' pipeline');
+
+  } catch(e) {
+    apLog('error', 'Erreur pilote : ' + e.message);
+    apFinish('Erreur — ' + e.message);
+  }
+}
+
+function stopAutopilot() {
+  _apStop = true;
+}
+
+function apFinish(msg) {
+  _apRunning = false;
+  _apStop = false;
+  document.getElementById('autopilot-toggle').className = 'status-pill off';
+  document.getElementById('autopilot-toggle').querySelector('span').textContent = 'Inactif';
+  document.getElementById('btn-autopilot').style.display = '';
+  document.getElementById('btn-stop-autopilot').style.display = 'none';
+  document.getElementById('ap-live-dot').style.display = 'none';
+  document.getElementById('ap-log-sub').textContent = 'Dernier cycle : ' + new Date().toLocaleTimeString('fr-FR');
+  apLog('info', msg);
+  addActivity('Pilote Auto : ' + msg, 'smart_toy', 'primary');
+  refreshAll();
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function updateStats() {
+  document.getElementById('stat-prospects').textContent = state.stats.prospects;
+  document.getElementById('stat-emails').textContent = state.stats.emails;
+  document.getElementById('stat-pipeline').textContent = state.pipeline.length;
+  document.getElementById('stat-converted').textContent = state.stats.converted;
+}
+
 
 // ═══ REFRESH UI ═══
 function refreshAll() {
