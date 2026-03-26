@@ -1010,9 +1010,10 @@ tr:hover td { background: var(--primary-lt); }
               <div class="form-group" style="margin:0">
                 <label class="form-label">Nombre max de résultats</label>
                 <select class="form-input" id="search-max">
-                  <option value="5">5 prospects</option>
-                  <option value="10" selected>10 prospects</option>
+                  <option value="10">10 prospects</option>
                   <option value="20">20 prospects</option>
+                  <option value="40" selected>40 prospects</option>
+                  <option value="60">60 prospects (max)</option>
                 </select>
               </div>
               <div class="form-group" style="margin:0">
@@ -1020,11 +1021,18 @@ tr:hover td { background: var(--primary-lt); }
                 <input class="form-input" id="search-minscore" type="number" min="0" max="100" value="40" />
               </div>
             </div>
-            <button class="btn btn-primary" id="btn-search" onclick="searchProspects()">
-              <span id="search-spinner" style="display:none" class="spinner"></span>
-              <span class="material-symbols-rounded" style="font-size:16px">search</span>
-              Lancer la recherche
-            </button>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <button class="btn btn-primary" id="btn-search" onclick="searchProspects()">
+                <span id="search-spinner" style="display:none" class="spinner"></span>
+                <span class="material-symbols-rounded" style="font-size:16px">search</span>
+                Lancer la recherche
+              </button>
+              <div id="seen-counter" style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px">
+                <span class="material-symbols-rounded" style="font-size:13px">visibility_off</span>
+                <span id="seen-count">0</span> prospect(s) mémorisés
+                <button onclick="resetSeenProspects()" style="font-size:10px;font-weight:700;background:none;border:1px solid var(--border);border-radius:99px;padding:2px 8px;cursor:pointer;color:var(--text3);transition:all .12s" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'">Réinitialiser</button>
+              </div>
+            </div>
             <div id="search-progress" style="display:none;margin-top:14px">
               <div style="font-size:12px;color:var(--text2);margin-bottom:6px" id="search-progress-text">Recherche en cours...</div>
               <div class="progress-bar"><div class="progress-fill" id="search-progress-fill" style="width:0%"></div></div>
@@ -1045,6 +1053,9 @@ tr:hover td { background: var(--primary-lt); }
               <div style="display:flex;gap:8px">
                 <button class="btn btn-sm btn-ghost" onclick="exportCSV()">
                   <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+                </button>
+                <button class="btn btn-sm btn-ghost" onclick="markAllAsSeen()" title="Mémoriser tous ces prospects — ils n'apparaîtront plus">
+                  <span class="material-symbols-rounded" style="font-size:14px">bookmark_add</span>Mémoriser tous
                 </button>
                 <button class="btn btn-sm btn-primary" onclick="generateAllEmails()">
                   <span id="all-spinner2" style="display:none" class="spinner"></span>
@@ -3758,19 +3769,60 @@ function searchProspects() {
   document.getElementById('search-progress-fill').style.width = '50%';
   document.getElementById('search-progress-text').textContent = 'Analyse des résultats...';
 
-  service.textSearch(request, function(results, status) {
+  // Google Maps textSearch avec pagination pour plus de résultats
+  let allResults = [];
+
+  function doTextSearch(pageToken) {
+    const req = pageToken ? { ...request, pageToken } : request;
+    service.textSearch(req, function(results, status, pagination) {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+        allResults = allResults.concat(results);
+        document.getElementById('search-progress-text').textContent = allResults.length + ' résultats récupérés...';
+        // Continuer si on a besoin de plus et qu'il y a une page suivante
+        if (allResults.length < maxResults && pagination && pagination.hasNextPage) {
+          setTimeout(() => pagination.nextPage(), 300);
+        } else {
+          processResults(allResults.slice(0, maxResults));
+        }
+      } else if (allResults.length > 0) {
+        processResults(allResults.slice(0, maxResults));
+      } else {
+        hide('search-spinner');
+        hide('search-progress');
+        btn.disabled = false;
+        alert('Aucun résultat pour "' + type + ' ' + city + '". Essayez des termes différents.');
+      }
+    });
+  }
+
+  function processResults(results) {
     hide('search-spinner');
     hide('search-progress');
     btn.disabled = false;
 
-    if (status !== google.maps.places.PlacesServiceStatus.OK || !results || !results.length) {
+    if (!results || !results.length) {
       alert('Aucun résultat pour "' + type + ' ' + city + '". Essayez des termes différents.');
       return;
     }
 
-    const places = results.slice(0, maxResults);
+    const places = results;
 
-    const prospects = places.map(p => {
+    // Filtrer les prospects déjà vus
+    const seenList = getSeenProspects();
+    const unseenPlaces = places.filter(p => !seenList.includes(p.place_id));
+    if (unseenPlaces.length === 0 && places.length > 0) {
+      hide('search-spinner'); hide('search-progress'); btn.disabled = false;
+      if (confirm('Tous les résultats ont déjà été vus ! Réinitialiser la liste pour les voir à nouveau ?')) {
+        resetSeenProspects();
+        processResults(places);
+      }
+      return;
+    }
+    const filteredPlaces = unseenPlaces.length < places.length
+      ? (document.getElementById('search-progress-text').textContent = unseenPlaces.length + ' nouveaux prospects (sur ' + places.length + ' trouvés)', unseenPlaces)
+      : places;
+
+    const prospects = filteredPlaces.map(p => {
       const rating = p.rating || 0;
       const reviews = p.user_ratings_total || 0;
       let score = 50;
@@ -3838,7 +3890,9 @@ function searchProspects() {
       document.getElementById('search-progress-fill').style.width = '100%';
       renderProspectsTable(prospects, type, city, minScore);
     });
-  });
+  } // end processResults
+
+  doTextSearch(); // Lancer la recherche avec pagination
 }
 
 function renderProspectsTable(prospects, type, city, minScore) {
@@ -3887,6 +3941,9 @@ function renderProspectsTable(prospects, type, city, minScore) {
         </button>
         <button class="btn btn-sm btn-primary" style="flex:1;justify-content:center;font-size:11px" onclick="addToPipeline(state.prospects.find(x=>x.id==='${p.id}'))">
           <span class="material-symbols-rounded" style="font-size:13px">view_kanban</span>Pipeline
+        </button>
+        <button class="btn btn-sm btn-ghost" style="flex:1;justify-content:center;font-size:11px;color:var(--text3)" onclick="markAsSeen('${p.id}')" title="Mémoriser — n'apparaîtra plus dans les prochaines recherches">
+          <span class="material-symbols-rounded" style="font-size:13px">bookmark_add</span>Mémoriser
         </button>
       </div>
     </div>`;
@@ -4472,6 +4529,70 @@ function findArtisansNear(encodedAddr) {
 }
 
 
+
+// ═══════════════════════════════════════════════
+// PROSPECTS DÉJÀ VUS — Blacklist
+// ═══════════════════════════════════════════════
+function getSeenProspects() {
+  try { return JSON.parse(localStorage.getItem('alma_memorized_prospects') || '[]'); } catch(_) { return []; }
+}
+
+function saveSeenProspects(list) {
+  localStorage.setItem('alma_memorized_prospects', JSON.stringify(list));
+  updateSeenCounter();
+}
+
+function updateSeenCounter() {
+  const seen = getSeenProspects();
+  const el = document.getElementById('seen-count');
+  if (el) el.textContent = seen.length;
+}
+
+function markAsSeen(pid) {
+  const seen = getSeenProspects();
+  if (!seen.includes(pid)) {
+    seen.push(pid);
+    saveSeenProspects(seen);
+  }
+  // Marquer la carte comme mémorisée visuellement
+  const card = document.getElementById('card-' + pid);
+  if (card) {
+    const btn = card.querySelector('[onclick*="markAsSeen"]');
+    if (btn) {
+      btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:13px;color:var(--green)">bookmark</span><span style="color:var(--green)">Mémorisé</span>';
+      btn.disabled = true;
+      btn.style.background = 'var(--green-lt)';
+      btn.style.borderColor = 'var(--green-border)';
+    }
+    card.style.opacity = '0.5';
+  }
+  addActivity('Mémorisé · ' + (state.prospects.find(x=>x.id===pid)?.name || pid), 'visibility_off', 'secondary');
+}
+
+function markAllAsSeen() {
+  const seen = getSeenProspects();
+  state.prospects.forEach(p => { if (!seen.includes(p.id)) seen.push(p.id); });
+  saveSeenProspects(seen);
+  // Marquer toutes les cartes comme mémorisées
+  document.querySelectorAll('[id^="card-"]').forEach(card => {
+    const btn = card.querySelector('[onclick*="markAsSeen"]');
+    if (btn) {
+      btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:13px;color:var(--green)">bookmark</span><span style="color:var(--green)">Mémorisé</span>';
+      btn.disabled = true;
+      btn.style.background = 'var(--green-lt)';
+      btn.style.borderColor = 'var(--green-border)';
+    }
+    card.style.opacity = '0.5';
+  });
+}
+
+function resetSeenProspects() {
+  if (!confirm('Réinitialiser la mémoire ? Ces prospects réapparaîtront dans les prochaines recherches.')) return;
+  localStorage.removeItem('alma_memorized_prospects');
+  updateSeenCounter();
+  addActivity('Mémoire réinitialisée', 'visibility', 'primary');
+}
+
 // ═══ PROXY SUPABASE — contourne le CORS pour les APIs open data ═══
 const SUPABASE_PROXY = 'https://tzrtptpzbrszibuifzns.supabase.co/functions/v1/proxy';
 
@@ -4489,7 +4610,7 @@ async function proxyFetch(url) {
 }
 
 // ═══ INIT ═══
-document.addEventListener('DOMContentLoaded', loadState);
+document.addEventListener('DOMContentLoaded', function() { loadState(); updateSeenCounter(); });
 </script>
 </body>
 </html>
