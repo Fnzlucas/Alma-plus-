@@ -883,10 +883,13 @@ tr:hover td { background: var(--primary-lt); }
     </button>
     <div class="user-row">
       <div class="user-avatar">U</div>
-      <div>
+      <div style="flex:1;min-width:0">
         <div class="user-name">Mon compte</div>
         <div class="user-plan">Plan Pro</div>
       </div>
+      <button onclick="confirmLogout()" title="Se déconnecter" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:var(--text3);display:flex;align-items:center;flex-shrink:0;transition:color .12s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text3)'">
+        <span class="material-symbols-rounded" style="font-size:18px">logout</span>
+      </button>
     </div>
   </div>
 </aside>
@@ -5641,6 +5644,13 @@ document.addEventListener('DOMContentLoaded', function() { loadState(); updateSe
 
 
 
+
+function confirmLogout() {
+  if (confirm('Se déconnecter de Alma.+ ?')) {
+    localStorage.clear();
+    window.location.href = '/login.html';
+  }
+}
 // ─── MOBILE SIDEBAR ───
 function mobToggleSidebar() {
   const sb = document.querySelector('.sidebar');
