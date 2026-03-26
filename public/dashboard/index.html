@@ -3160,10 +3160,12 @@ function apAddResult(prospect) {
   const count = list.children.length + 1;
   const subEl = document.getElementById('ap-results-sub');
   if (subEl) subEl.textContent = count + ' ajouté' + (count>1?'s':'') + ' au pipeline';
-  const row = document.createElement('div');
-  row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--border-lt);animation:fadeIn .3s ease';
   const hasPhone = prospect.phone && prospect.phone !== 'null';
-  row.innerHTML = '<div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">' + (prospect.name||'?').slice(0,2).toUpperCase() + '</div>'
+  const row = document.createElement('div');
+  row.setAttribute('data-prospect-id', prospect.id);
+  row.style.cssText = 'padding:9px 18px;border-bottom:1px solid var(--border-lt);animation:fadeIn .3s ease';
+  row.innerHTML = '<div style="display:flex;align-items:center;gap:10px">'
+    + '<div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">' + (prospect.name||'?').slice(0,2).toUpperCase() + '</div>'
     + '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + prospect.name + '</div>'
     + '<div style="font-size:11px;color:' + (hasPhone?'var(--green)':'var(--text3)') + '">' + (hasPhone ? '📞 ' + prospect.phone : prospect.address||'') + '</div></div>'
     + '<span class="score ' + (prospect.score>=80?'s-h':prospect.score>=60?'s-m':'s-l') + '" style="font-size:10px">' + prospect.score + '</span>'
@@ -3304,21 +3306,21 @@ async function launchAutopilot() {
             const emailLines = (p.email_generated || '').split('\n');
             const subjectLine = emailLines.find(l => l.startsWith('Objet:')) || 'Objet: Proposition commerciale';
             const subject = subjectLine.replace('Objet:', '').trim();
-            const body = emailLines.filter(l => !l.startsWith('Objet:')).join('\n').trim();
+            const emailBody = emailLines.filter(l => !l.startsWith('Objet:')).join('\n').trim();
 
-            // Afficher email dans le log avec preview
-            apLog('email', '✉ <strong>' + p.name + '</strong> — <em style="color:var(--text2)">' + subject + '</em>');
-            apLogEmail(subject, body, p.name, p.phone);
             apUpdateCounters(totalProspects, totalEmails, totalPipeline);
+            apLog('email', '✉ Email généré pour <strong>' + p.name + '</strong> — ' + subject);
 
-            // Envoyer via Brevo si option activée et site web disponible
-            if (action === 'email-send' && p.website) {
+            // Créer conversation dans la Messagerie
+            apCreateConversation(p, subject, emailBody);
+
+            // Envoyer via Brevo si option activée
+            if (action === 'email-send') {
               const brevoKey = getKeys().brevo;
               const fromEmail = getKeys().emailFrom;
-              if (brevoKey && fromEmail) {
+              const toEmail = p.website ? 'contact@' + p.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : null;
+              if (brevoKey && fromEmail && toEmail) {
                 try {
-                  const domain = p.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-                  const toEmail = 'contact@' + domain;
                   const sendRes = await fetch('https://api.brevo.com/v3/smtp/email', {
                     method: 'POST',
                     headers: { 'Content-Type':'application/json', 'api-key':brevoKey },
@@ -3326,22 +3328,20 @@ async function launchAutopilot() {
                       sender: { name: getKeys().emailName||'Alma', email: fromEmail },
                       to: [{ email: toEmail, name: p.name }],
                       subject: subject,
-                      textContent: body
+                      textContent: emailBody
                     })
                   });
                   if (sendRes.ok) {
-                    apLog('success', '📤 Envoyé à <strong>' + toEmail + '</strong>');
-                    apAddEmailSent(p, subject, toEmail, 'sent', body);
+                    apLog('success', '📤 Envoyé à ' + toEmail);
+                    // Marquer comme envoyé dans la conversation
+                    apMarkConvSent(p.id, toEmail);
                   } else {
-                    const errData = await sendRes.json().catch(()=>({}));
-                    apLog('error', 'Envoi échoué : ' + toEmail + (errData.message ? ' — ' + errData.message : ''));
-                    apAddEmailSent(p, subject, toEmail, 'failed', body);
+                    apLog('error', 'Envoi échoué : ' + toEmail);
                   }
-                } catch(sendErr) {
-                  apLog('error', 'Envoi échoué pour ' + p.name + ' : ' + sendErr.message);
-                  apAddEmailSent(p, subject, toEmail, 'failed', body);
+                } catch(e2) {
+                  apLog('error', 'Erreur envoi ' + p.name);
                 }
-                await sleep(600);
+                await sleep(500);
               }
             }
 
@@ -5331,6 +5331,88 @@ async function initAlertesBadge() {
       updateAlerteBadge();
     }
   } catch(_) {}
+}
+
+
+// ═══ PILOTE AUTO → MESSAGERIE ═══
+function apCreateConversation(prospect, subject, emailBody) {
+  // Charger les conversations existantes
+  const saved = localStorage.getItem('alma_conversations');
+  const convs = saved ? JSON.parse(saved) : [];
+
+  // Créer une conversation unique par prospect
+  const convId = 'ap-' + prospect.id;
+  const existing = convs.find(c => c.id === convId);
+  if (!existing) {
+    const conv = {
+      id: convId,
+      prospectName: prospect.name,
+      prospectEmail: prospect.website ? 'contact@' + prospect.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : prospect.name.toLowerCase().replace(/[^a-z0-9]/g,'') + '@prospect.fr',
+      subject: subject,
+      lastPreview: emailBody.slice(0, 60),
+      lastAt: new Date().toISOString(),
+      unread: 0,
+      status: 'sent'
+    };
+    convs.unshift(conv);
+    localStorage.setItem('alma_conversations', JSON.stringify(convs));
+    msgState.conversations = convs;
+  }
+
+  // Ajouter l'email comme message envoyé
+  const messages = localStorage.getItem('alma_messages_' + convId);
+  const msgs = messages ? JSON.parse(messages) : [];
+  msgs.push({
+    id: 'msg-' + Date.now(),
+    direction: 'sent',
+    body: 'Objet: ' + subject + '\n\n' + emailBody,
+    createdAt: new Date().toISOString(),
+    status: 'generated'
+  });
+  localStorage.setItem('alma_messages_' + convId, JSON.stringify(msgs));
+
+  // Mettre à jour le badge messagerie
+  updateUnreadBadge();
+  renderConvList();
+
+  // Mettre à jour la carte prospect dans le pilote
+  apUpdateProspectCard(prospect.id, subject, emailBody);
+}
+
+function apMarkConvSent(prospectId, toEmail) {
+  const convId = 'ap-' + prospectId;
+  const msgs = localStorage.getItem('alma_messages_' + convId);
+  if (msgs) {
+    const arr = JSON.parse(msgs);
+    if (arr.length > 0) {
+      arr[arr.length - 1].status = 'sent';
+      arr[arr.length - 1].toEmail = toEmail;
+      localStorage.setItem('alma_messages_' + convId, JSON.stringify(arr));
+    }
+  }
+}
+
+function apUpdateProspectCard(prospectId, subject, emailBody) {
+  // Trouver la carte dans ap-results-list et ajouter l'email
+  const list = document.getElementById('ap-results-list');
+  if (!list) return;
+  const cards = list.querySelectorAll('[data-prospect-id]');
+  cards.forEach(card => {
+    if (card.getAttribute('data-prospect-id') === prospectId) {
+      // Ajouter badge email sur la carte
+      const emailBadge = card.querySelector('.ap-email-badge');
+      if (!emailBadge) {
+        const badge = document.createElement('div');
+        badge.className = 'ap-email-badge';
+        badge.style.cssText = 'margin-top:6px;padding:6px 10px;background:var(--primary-lt);border:1px solid var(--primary-border);border-radius:var(--radius-sm);cursor:pointer';
+        badge.innerHTML = '<div style="font-size:10px;font-weight:700;color:var(--primary);margin-bottom:2px">✉ ' + subject + '</div>'
+          + '<div style="font-size:10px;color:var(--text2);line-height:1.5;max-height:40px;overflow:hidden">' + emailBody.slice(0,100) + '...</div>'
+          + '<div style="font-size:10px;color:var(--primary);margin-top:3px;font-weight:600">Voir dans Messagerie →</div>';
+        badge.onclick = () => goPage('messagerie', document.querySelector('[onclick*=messagerie]'));
+        card.appendChild(badge);
+      }
+    }
+  });
 }
 
 // ═══ PROXY SUPABASE — contourne le CORS pour les APIs open data ═══
