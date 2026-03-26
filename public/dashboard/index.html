@@ -3124,8 +3124,7 @@ async function searchBodacc() {
     if (type === 'procedure') typeFilter = '&refine.familleavis_lib=Procédures+collectives';
     if (type === 'radiation') typeFilter = '&refine.familleavis_lib=Radiations';
     const url = `https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=${encodeURIComponent(q)}&rows=15&sort=dateparution${typeFilter}`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = await proxyFetch(url);
     const records = data.records || [];
     if (!records.length) {
       document.getElementById('bodacc-results-sub').textContent = 'Aucune annonce trouvée';
@@ -3171,8 +3170,7 @@ async function searchPermis() {
 
     // API Sitadel via data.gouv
     const url = `https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=sitadel-logements&q=${encodeURIComponent(codeDept)}&rows=15&sort=date_prise_en_compte&order=desc`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = await proxyFetch(url);
     const records = data.records || [];
 
     if (!records.length) {
@@ -3207,8 +3205,7 @@ async function searchAO() {
   try {
     // API BOAMP via OpenDataSoft — gratuite, zéro clé
     const url = `https://boamp-datadila.opendatasoft.com/api/records/1.0/search/?dataset=boamp&q=${encodeURIComponent(kw)}&rows=15&sort=dateparution`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = await proxyFetch(url);
     const records = data.records || [];
     if (!records.length) {
       document.getElementById('ao-results-sub').textContent = "Aucun appel d'offres trouvé";
@@ -3341,8 +3338,7 @@ async function searchMPR() {
   try {
     // API ANAH open data — données MaPrimeRénov via data.gouv
     const url = `https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=dpe-logements-existants&q=${encodeURIComponent(dept)}&rows=15&refine.dpe_energie=F,G&sort=date_reception_dpe&order=desc`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = await proxyFetch(url);
     const records = data.records || [];
     if (records.length) {
       document.getElementById('mpr-results-sub').textContent = `${records.length} logements éligibles trouvés`;
