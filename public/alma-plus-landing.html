@@ -326,9 +326,8 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
   details{padding:14px 16px;}
   details summary{font-size:13px;}
   div[style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr !important;}
-  div[style*="grid-template-columns:repeat(12,1fr)"]{grid-template-columns:1fr 1fr !important;grid-auto-rows:auto !important;}
-  div[style*="grid-column:span 4"],div[style*="grid-column:span 5"],div[style*="grid-column:span 3"],div[style*="grid-column:span 2"]{grid-column:span 1 !important;grid-row:span 1 !important;min-height:110px !important;}
-  div[style*="grid-column:span 12"]{grid-column:span 2 !important;grid-row:span 1 !important;}
+  .sources-grid{display:flex !important;flex-direction:column !important;gap:10px !important;}
+  .sources-grid > div{grid-column:unset !important;grid-row:unset !important;min-height:90px !important;border-radius:14px !important;}
 }
 
 /* ═══ MOBILE 400px ═══ */
@@ -577,7 +576,7 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
       <h2 class="s-title" style="text-align:center;margin:0 auto 12px">Les données les plus fraîches<br><span class="navy">du marché français.</span></h2>
       <p class="s-sub" style="text-align:center;margin:0 auto">Alma.+ agrège en temps réel 10 sources officielles et publiques.</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(130px,auto);gap:14px;align-items:stretch">
+    <div style="display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(130px,auto);gap:14px;align-items:stretch" class="sources-grid">
       <div style="grid-column:span 4;grid-row:span 2;background:linear-gradient(160deg,#EA4335 0%,#FBBC05 100%);border-radius:20px;padding:28px;color:white;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end">
         <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.07)"></div>
         <div style="position:absolute;top:28px;left:28px;width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
