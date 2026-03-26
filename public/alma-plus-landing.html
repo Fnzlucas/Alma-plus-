@@ -253,6 +253,12 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
 /* TICKER */
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
+
+@media(max-width:960px){
+  .nav-hamburger{display:flex !important;}
+  .nav-login-btn{display:none;}
+}
+
 /* RESPONSIVE */
 @media(max-width:960px){
   nav{padding:0 24px;}
@@ -273,6 +279,66 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
   .cta-form{flex-direction:column;}
   footer{padding:32px 24px;flex-direction:column;}
 }
+
+/* ═══ MOBILE 640px ═══ */
+@media(max-width:640px){
+  nav{padding:0 16px;height:52px;}
+  .nav-cta{padding:7px 14px;font-size:12px;}
+  .hero{padding:72px 16px 0;}
+  .hero-eyebrow{font-size:11px;padding:4px 10px;}
+  .hero-title{font-size:32px;letter-spacing:-1.5px;margin-bottom:16px;}
+  .hero-sub{font-size:14px;margin-bottom:28px;}
+  .hero-actions{flex-direction:column;align-items:stretch;gap:10px;}
+  .btn-main,.btn-ghost{width:100%;justify-content:center;padding:13px 20px;font-size:14px;}
+  .hero-proof{flex-wrap:wrap;gap:6px;font-size:11px;}
+  .proof-sep{display:none;}
+  .stats-band{padding:36px 16px;}
+  .stats-inner{grid-template-columns:1fr 1fr;}
+  .stat-num{font-size:32px;letter-spacing:-1.5px;}
+  .stat-num .unit{font-size:18px;}
+  .stat-desc{font-size:11px;}
+  .product-section,.pain-section,.feat-section,.pricing-section,.results-section,.cta-section{padding:48px 16px;}
+  .app-frame .af-sidebar{display:none;}
+  .app-frame .af-stats{grid-template-columns:1fr 1fr;}
+  .app-frame .af-grid{grid-template-columns:1fr;}
+  .af-body{min-height:300px;}
+  .pain-title{font-size:26px;letter-spacing:-1px;}
+  .pain-body{font-size:13.5px;}
+  .btn-navy{width:100%;justify-content:center;}
+  .feat-grid{grid-template-columns:1fr;}
+  .s-title{font-size:26px !important;letter-spacing:-1px !important;}
+  .s-sub{font-size:14px !important;}
+  .res-title{font-size:26px;letter-spacing:-1.2px;}
+  .res-grid{grid-template-columns:1fr 1fr;}
+  .res-num{font-size:32px;}
+  .res-cta{width:100%;justify-content:center;}
+  .pricing-grid{gap:12px;}
+  .pc{padding:22px 18px;}
+  .pc-price{font-size:38px;}
+  #tp-track>div{min-width:calc(100vw - 40px) !important;max-width:calc(100vw - 40px) !important;}
+  .cta-title{font-size:28px;letter-spacing:-1.2px;}
+  .cta-sub{font-size:14px;margin-bottom:28px;}
+  .cta-form{flex-direction:column;gap:8px;}
+  .cta-input,.btn-cta{width:100%;text-align:center;padding:13px;}
+  .cta-note{font-size:11px;}
+  footer{gap:14px;text-align:center;padding:28px 16px;}
+  .footer-links{flex-wrap:wrap;justify-content:center;gap:10px;}
+  details{padding:14px 16px;}
+  details summary{font-size:13px;}
+  div[style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr !important;}
+  div[style*="grid-template-columns:repeat(12,1fr)"]{grid-template-columns:1fr 1fr !important;grid-auto-rows:auto !important;}
+  div[style*="grid-column:span 4"],div[style*="grid-column:span 5"],div[style*="grid-column:span 3"],div[style*="grid-column:span 2"]{grid-column:span 1 !important;grid-row:span 1 !important;min-height:110px !important;}
+  div[style*="grid-column:span 12"]{grid-column:span 2 !important;grid-row:span 1 !important;}
+}
+
+/* ═══ MOBILE 400px ═══ */
+@media(max-width:400px){
+  .hero-title{font-size:28px;}
+  .stats-inner{grid-template-columns:1fr 1fr;}
+  .stat-num{font-size:28px;}
+  .cta-title{font-size:24px;}
+  .res-num{font-size:28px;}
+}
 </style>
 </head>
 <body>
@@ -283,16 +349,33 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
     <div class="nav-mark"><svg viewBox="0 0 14 14" fill="none" width="13" height="13"><path d="M2 12L7 2L12 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8.5H10" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg></div>
     <span class="nav-name">Alma<span>.</span>+</span>
   </a>
+  <button class="nav-hamburger" onclick="openMobMenu()" style="display:none;background:none;border:none;cursor:pointer;padding:6px;margin-right:4px;align-items:center;justify-content:center;border-radius:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
   <div class="nav-links">
     <a href="#product" class="nav-link">Le produit</a>
     <a href="#features" class="nav-link">Fonctionnalités</a>
     <a href="#pricing" class="nav-link">Tarifs</a>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
-    <a href="/login" style="font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;padding:9px 16px;border-radius:7px;border:1px solid var(--border);transition:all 0.12s">Se connecter</a>
+    <a href="/login" style="font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;padding:9px 16px;border-radius:7px;border:1px solid var(--border);transition:all 0.12s" class="nav-login-btn">Se connecter</a>
     <a href="/login" class="nav-cta">Démarrer gratuitement →</a>
   </div>
 </nav>
+
+<!-- Mobile menu overlay -->
+<div id="mob-overlay" onclick="closeMobMenu()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199"></div>
+<div id="mob-menu" style="display:none;position:fixed;top:0;right:0;width:75%;max-width:280px;height:100vh;background:#fff;z-index:300;padding:24px 20px;box-shadow:-4px 0 24px rgba(0,0,0,.15);flex-direction:column;gap:4px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <span style="font-family:'Inter Tight',sans-serif;font-size:15px;font-weight:800;color:var(--text)">Alma<span style="color:var(--navy)">.</span>+</span>
+    <button onclick="closeMobMenu()" style="background:none;border:none;cursor:pointer;padding:4px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <a href="#product" onclick="closeMobMenu()" style="display:block;padding:12px 14px;border-radius:8px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border)">Le produit</a>
+  <a href="#features" onclick="closeMobMenu()" style="display:block;padding:12px 14px;border-radius:8px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border)">Fonctionnalités</a>
+  <a href="#pricing" onclick="closeMobMenu()" style="display:block;padding:12px 14px;border-radius:8px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border)">Tarifs</a>
+  <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+    <a href="/login" style="display:block;text-align:center;padding:12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--text2);text-decoration:none;border:1px solid var(--border)">Se connecter</a>
+    <a href="/login" style="display:block;text-align:center;padding:12px;border-radius:8px;font-size:14px;font-weight:700;color:#fff;text-decoration:none;background:var(--navy)">Démarrer gratuitement →</a>
+  </div>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -821,6 +904,15 @@ footer{background:var(--navy-d);padding:44px 52px;display:flex;align-items:cente
 </footer>
 
 <script>
+function openMobMenu() {
+  document.getElementById('mob-menu').style.display = 'flex';
+  document.getElementById('mob-overlay').style.display = 'block';
+}
+function closeMobMenu() {
+  document.getElementById('mob-menu').style.display = 'none';
+  document.getElementById('mob-overlay').style.display = 'none';
+}
+
 window.addEventListener('scroll', () => {
   document.querySelector('nav').style.boxShadow = window.scrollY > 30 ? '0 2px 16px rgba(79,70,229,0.1)' : '0 1px 0 rgba(0,0,0,0.05)';
 });
