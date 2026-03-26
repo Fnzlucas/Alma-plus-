@@ -780,6 +780,10 @@ tr:hover td { background: var(--primary-lt); }
     <button class="nav-item" onclick="goPage('prospection-b2c',this)">
       <span class="material-symbols-rounded">home_work</span>Prospection B2C
     </button>
+    <button class="nav-item" onclick="goPage('alertes',this)" id="nav-alertes">
+      <span class="material-symbols-rounded">notifications_active</span>Alertes du jour
+      <span class="nav-badge" id="badge-alertes" style="display:none;background:#dc2626">0</span>
+    </button>
     <button class="nav-item" onclick="goPage('pipeline',this)">
       <span class="material-symbols-rounded">view_kanban</span>Pipeline CRM
     </button>
@@ -1743,6 +1747,66 @@ tr:hover td { background: var(--primary-lt); }
   </div>
 
   
+  <!-- ════════════════ ALERTES DU JOUR ════════════════ -->
+  <div class="page" id="page-alertes">
+    <div style="max-width:900px">
+
+      <!-- Header -->
+      <div class="page-header" style="margin-bottom:20px">
+        <div>
+          <div class="page-heading">🔥 Alertes du jour</div>
+          <div class="page-subheading">Nouveaux signaux détectés automatiquement cette nuit · Mis à jour chaque matin à 6h</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="loadAlertes()" id="btn-refresh-alertes">
+            <span class="material-symbols-rounded" style="font-size:15px">refresh</span>Actualiser
+          </button>
+          <button class="btn btn-primary" onclick="markAllAlertesRead()">
+            <span class="material-symbols-rounded" style="font-size:15px">done_all</span>Tout marquer lu
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats bandeau -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px" id="alertes-stats">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;text-align:center">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">Total aujourd'hui</div>
+          <div id="alertes-total" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:var(--text);letter-spacing:-1px">—</div>
+        </div>
+        <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--radius-lg);padding:14px 16px;text-align:center">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#dc2626;margin-bottom:6px">BODACC</div>
+          <div id="alertes-bodacc" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#dc2626;letter-spacing:-1px">—</div>
+        </div>
+        <div style="background:var(--primary-lt);border:1px solid var(--primary-border);border-radius:var(--radius-lg);padding:14px 16px;text-align:center">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:6px">DVF</div>
+          <div id="alertes-dvf" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:var(--primary);letter-spacing:-1px">—</div>
+        </div>
+        <div style="background:var(--green-lt);border:1px solid var(--green-border);border-radius:var(--radius-lg);padding:14px 16px;text-align:center">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:6px">DPE</div>
+          <div id="alertes-dpe" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:var(--green);letter-spacing:-1px">—</div>
+        </div>
+      </div>
+
+      <!-- Filtres -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="chip" onclick="filterAlertes('all',this)" id="filter-alerte-all" style="background:var(--primary-lt);color:var(--primary);border-color:var(--primary-border);font-weight:700">Tous</button>
+        <button class="chip" onclick="filterAlertes('BODACC',this)">⚖️ BODACC</button>
+        <button class="chip" onclick="filterAlertes('DVF',this)">🏠 DVF</button>
+        <button class="chip" onclick="filterAlertes('DPE',this)">🌡️ DPE</button>
+        <button class="chip" onclick="filterAlertes('unseen',this)">🔴 Non lus</button>
+      </div>
+
+      <!-- Liste des alertes -->
+      <div id="alertes-list" style="display:flex;flex-direction:column;gap:10px">
+        <div style="text-align:center;padding:60px;color:var(--text3)">
+          <span class="material-symbols-rounded" style="font-size:48px;display:block;margin-bottom:12px;opacity:.2">notifications_active</span>
+          <div style="font-size:14px;font-weight:500;color:var(--text2);margin-bottom:6px">Chargement des alertes...</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ════════════════ PIPELINE ════════════════ -->
   <div class="page" id="page-pipeline">
 
@@ -2683,6 +2747,7 @@ function goPage(name, btn) {
   }
   if (name === 'pipeline') refreshPipeline();
   if (name === 'messagerie') initMessagerie();
+  if (name === 'alertes') loadAlertes();
 }
 
 function switchTab(tabId, btn) {
@@ -4951,6 +5016,195 @@ function resetSeenProspects() {
   addActivity('Mémoire réinitialisée', 'visibility', 'primary');
 }
 
+
+// ═══════════════════════════════════════════════
+// ALERTES DU JOUR — Signaux temps réel Supabase
+// ═══════════════════════════════════════════════
+let _alertesData = [];
+let _alertesFilter = 'all';
+
+async function loadAlertes() {
+  const btn = document.getElementById('btn-refresh-alertes');
+  if (btn) btn.innerHTML = '<span class="spinner spinner-dark" style="display:inline-block"></span> Chargement...';
+
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const res = await fetch(ALMA_CONFIG.supaUrl + '/rest/v1/signals?order=created_at.desc&limit=100&created_at=gte.' + today + 'T00:00:00Z', {
+      headers: {
+        'apikey': ALMA_CONFIG.supaAnon,
+        'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!res.ok) throw new Error('Erreur Supabase ' + res.status);
+    _alertesData = await res.json();
+
+    renderAlertes();
+    updateAlerteBadge();
+
+  } catch(e) {
+    // Si pas encore de données, afficher un état vide informatif
+    document.getElementById('alertes-list').innerHTML = '<div class="card"><div class="card-body" style="text-align:center;padding:40px"><span class="material-symbols-rounded" style="font-size:42px;display:block;margin-bottom:12px;opacity:.2;color:var(--primary)">notifications_active</span><div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:8px">Scan de nuit pas encore effectué</div><div style="font-size:12px;color:var(--text3);line-height:1.8;margin-bottom:20px">Le pilote scanne automatiquement les APIs chaque matin à 6h.<br>Lancez un scan manuel pour voir les signaux du jour.</div><button class="btn btn-primary" onclick="manualScan()"><span class="material-symbols-rounded" style="font-size:15px">play_arrow</span>Lancer un scan maintenant</button></div></div>';
+    ['alertes-total','alertes-bodacc','alertes-dvf','alertes-dpe'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.textContent = '0';
+    });
+  }
+
+  if (btn) btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:15px">refresh</span>Actualiser';
+}
+
+function renderAlertes() {
+  const filtered = _alertesFilter === 'all' ? _alertesData
+    : _alertesFilter === 'unseen' ? _alertesData.filter(s => !s.seen)
+    : _alertesData.filter(s => s.source === _alertesFilter);
+
+  // Stats
+  document.getElementById('alertes-total').textContent = _alertesData.length;
+  document.getElementById('alertes-bodacc').textContent = _alertesData.filter(s=>s.source==='BODACC').length;
+  document.getElementById('alertes-dvf').textContent = _alertesData.filter(s=>s.source==='DVF').length;
+  document.getElementById('alertes-dpe').textContent = _alertesData.filter(s=>s.source==='DPE').length;
+
+  if (!filtered.length) {
+    document.getElementById('alertes-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">Aucune alerte avec ce filtre.</div>';
+    return;
+  }
+
+  const sourceConfig = {
+    BODACC: { icon:'gavel', color:'#dc2626', bg:'#fef2f2', label:'Nouvelle entreprise' },
+    DVF:    { icon:'real_estate_agent', color:'var(--primary)', bg:'var(--primary-lt)', label:'Vente immobilière' },
+    DPE:    { icon:'eco', color:'var(--green)', bg:'var(--green-lt)', label:'Passoire thermique' }
+  };
+
+  document.getElementById('alertes-list').innerHTML = filtered.map(s => {
+    const cfg = sourceConfig[s.source] || { icon:'circle', color:'var(--text3)', bg:'var(--bg)', label:s.source };
+    const details = s.details || {};
+    const timeStr = new Date(s.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+    const isNew = !s.seen;
+
+    let detailLines = '';
+    if (s.source === 'BODACC') detailLines = details.type || '';
+    if (s.source === 'DVF') detailLines = [details.type, details.prix, details.surface].filter(Boolean).join(' · ');
+    if (s.source === 'DPE') detailLines = ['Classe ' + (details.classe||'G'), details.type, details.surface, details.eligible_mpr ? '✓ Éligible MaPrimeRénov' : ''].filter(Boolean).join(' · ');
+
+    return '<div style="background:var(--surface);border:1px solid ' + (isNew?'var(--primary-border)':'var(--border)') + ';border-left:3px solid ' + (isNew?'var(--primary)':'var(--border)') + ';border-radius:var(--radius-lg);padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-xs)">'
+      + '<div style="width:38px;height:38px;border-radius:10px;background:' + cfg.bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+      + '<span class="material-symbols-rounded" style="font-size:18px;color:' + cfg.color + '">' + cfg.icon + '</span>'
+      + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">'
+      + '<span style="font-size:10px;font-weight:700;background:' + cfg.bg + ';color:' + cfg.color + ';padding:2px 8px;border-radius:99px">' + s.source + '</span>'
+      + (isNew ? '<span style="font-size:10px;font-weight:700;background:#dc2626;color:white;padding:2px 8px;border-radius:99px">NOUVEAU</span>' : '')
+      + '<span style="font-size:10px;color:var(--text3);margin-left:auto">' + timeStr + '</span>'
+      + '</div>'
+      + '<div style="font-family:Manrope,sans-serif;font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
+      + s.adresse + (s.commune ? ', ' + s.commune : '')
+      + '</div>'
+      + (detailLines ? '<div style="font-size:11px;color:var(--text3);margin-top:2px">' + detailLines + '</div>' : '')
+      + '</div>'
+      + '<div style="display:flex;gap:7px;flex-shrink:0">'
+      + `<button class="btn btn-sm btn-ghost" style="font-size:11px" onclick="addAlerteToPipeline('${s.id}')"><span class="material-symbols-rounded" style="font-size:13px">view_kanban</span>Pipeline</button><button class="btn btn-sm btn-ghost" style="font-size:11px;color:var(--text3)" onclick="markAlerteRead('${s.id}')"><span class="material-symbols-rounded" style="font-size:13px">done</span></button>`
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function filterAlertes(filter, btn) {
+  _alertesFilter = filter;
+  document.querySelectorAll('#page-alertes .chip').forEach(b => {
+    b.style.background=''; b.style.color=''; b.style.borderColor=''; b.style.fontWeight='';
+  });
+  if (btn) { btn.style.background='var(--primary-lt)'; btn.style.color='var(--primary)'; btn.style.borderColor='var(--primary-border)'; btn.style.fontWeight='700'; }
+  renderAlertes();
+}
+
+async function markAlerteRead(id) {
+  const s = _alertesData.find(x => x.id === id);
+  if (s) s.seen = true;
+  renderAlertes();
+  updateAlerteBadge();
+  // Mettre à jour en base
+  await fetch(ALMA_CONFIG.supaUrl + '/rest/v1/signals?id=eq.' + id, {
+    method: 'PATCH',
+    headers: { 'apikey': ALMA_CONFIG.supaAnon, 'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ seen: true })
+  });
+}
+
+async function markAllAlertesRead() {
+  _alertesData.forEach(s => s.seen = true);
+  renderAlertes();
+  updateAlerteBadge();
+  const today = new Date().toISOString().split('T')[0];
+  await fetch(ALMA_CONFIG.supaUrl + '/rest/v1/signals?created_at=gte.' + today + 'T00:00:00Z', {
+    method: 'PATCH',
+    headers: { 'apikey': ALMA_CONFIG.supaAnon, 'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ seen: true })
+  });
+}
+
+function updateAlerteBadge() {
+  const unseen = _alertesData.filter(s => !s.seen).length;
+  const badge = document.getElementById('badge-alertes');
+  if (badge) {
+    badge.textContent = unseen;
+    badge.style.display = unseen > 0 ? 'inline' : 'none';
+  }
+}
+
+function addAlerteToPipeline(id) {
+  const s = _alertesData.find(x => x.id === id);
+  if (!s) return;
+  const details = s.details || {};
+  const desc = [details.type, details.prix, details.surface].filter(Boolean).join(' · ');
+  addToPipeline({
+    id: 'alert-' + s.id,
+    name: s.nom || s.adresse,
+    address: s.adresse + (s.commune ? ', ' + s.commune : ''),
+    rating: 0, reviews: 0,
+    score: (s.score || 1) * 25,
+    phone: null, website: null
+  });
+  markAlerteRead(id);
+}
+
+async function manualScan() {
+  const btn = event.target.closest('button');
+  if (btn) { btn.disabled=true; btn.textContent='Scan en cours...'; }
+  try {
+    const res = await fetch(ALMA_CONFIG.supaUrl + '/functions/v1/daily-scan', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon,
+        'apikey': ALMA_CONFIG.supaAnon
+      },
+      body: JSON.stringify({ trigger: 'manual' })
+    });
+    const data = await res.json();
+    addActivity('Scan manuel : ' + (data.signals_inserted||0) + ' nouveaux signaux', 'notifications_active', 'primary');
+    setTimeout(() => loadAlertes(), 1000);
+  } catch(e) {
+    alert('Erreur scan : ' + e.message);
+  }
+  if (btn) { btn.disabled=false; btn.innerHTML='<span class="material-symbols-rounded" style="font-size:15px">play_arrow</span>Lancer un scan maintenant'; }
+}
+
+// Charger les alertes au démarrage et compter les non-lus
+async function initAlertesBadge() {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const res = await fetch(ALMA_CONFIG.supaUrl + '/rest/v1/signals?select=id,seen&order=created_at.desc&limit=100&created_at=gte.' + today + 'T00:00:00Z', {
+      headers: { 'apikey': ALMA_CONFIG.supaAnon, 'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      _alertesData = data;
+      updateAlerteBadge();
+    }
+  } catch(_) {}
+}
+
 // ═══ PROXY SUPABASE — contourne le CORS pour les APIs open data ═══
 const SUPABASE_PROXY = 'https://tzrtptpzbrszibuifzns.supabase.co/functions/v1/proxy';
 
@@ -4968,7 +5222,7 @@ async function proxyFetch(url) {
 }
 
 // ═══ INIT ═══
-document.addEventListener('DOMContentLoaded', function() { loadState(); updateSeenCounter(); });
+document.addEventListener('DOMContentLoaded', function() { loadState(); updateSeenCounter(); initAlertesBadge(); });
 </script>
 </body>
 </html>
