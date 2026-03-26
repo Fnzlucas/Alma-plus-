@@ -2039,11 +2039,12 @@ tr:hover td { background: var(--primary-lt); }
               <div class="form-group" style="margin-bottom:0">
                 <label class="form-label">Action automatique</label>
                 <select class="form-input" id="auto-action">
-                  <option value="email">Générer email IA + Pipeline</option>
-                  <option value="pipeline">Ajouter au pipeline uniquement</option>
-                  <option value="email-send">Générer + Envoyer email</option>
-                  <option value="sms">Générer + Envoyer SMS (si tél. dispo)</option>
-                  <option value="email-sms">Email + SMS</option>
+                  <option value="pipeline">Pipeline uniquement</option>
+                  <option value="email">Email IA + Pipeline</option>
+                  <option value="email-send">Envoyer email + Pipeline</option>
+                  <option value="sms">SMS + Pipeline (si tél. dispo)</option>
+                  <option value="email-sms">Email + SMS + Pipeline</option>
+                  <option value="full" selected>Email + SMS + Pipeline (tout)</option>
                 </select>
               </div>
             </div>
@@ -2666,6 +2667,8 @@ const ALMA_CONFIG = {
   mpr:           'VOTRE_CLE_MPR',
   supaUrl:       'https://tzrtptpzbrszibuifzns.supabase.co',
   supaAnon:      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk',
+  resendKey: 're_XJ71yfZm_8NGwnEVT8nvRdedepPBhcg9Y',
+  resendFrom: 'onboarding@resend.dev',
 };
 
 // ═══ STATE ═══
@@ -3283,7 +3286,7 @@ async function launchAutopilot() {
     apSetProgress(65, 'Génération des emails IA...');
 
     // ── ÉTAPE 3 : Génération + Envoi emails ──
-    if (action === 'email' || action === 'email-send') {
+    if (action === 'email' || action === 'email-send' || action === 'email-sms' || action === 'full') {
       const key = getKeys().anthropic;
       if (!key) {
         apLog('error', 'Clé Anthropic non configurée — emails non générés');
@@ -3316,43 +3319,27 @@ async function launchAutopilot() {
             // Créer conversation dans la Messagerie
             apCreateConversation(p, subject, emailBody);
 
-            // Envoyer via Brevo si option activée
-            if (action === 'email-send') {
-              const brevoKey = getKeys().brevo;
-              const fromEmail = getKeys().emailFrom;
-              const toEmail = p.website ? 'contact@' + p.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : null;
-              if (brevoKey && fromEmail && toEmail) {
+            // Envoyer via Resend avec recherche IA de l'email
+            if (action === 'email-send' || action === 'email-sms' || action === 'full') {
+              apLog('info', '🔍 Recherche email pour <strong>' + p.name + '</strong>...');
+              const toEmail = await findProspectEmail(p);
+              if (toEmail) {
+                apLog('info', '📧 Email trouvé : <strong>' + toEmail + '</strong>');
                 try {
-                  const sendRes = await fetch(SUPABASE_PROXY, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon,
-                      'apikey': ALMA_CONFIG.supaAnon
-                    },
-                    body: JSON.stringify({
-                      url: 'https://api.brevo.com/v3/smtp/email',
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json', 'api-key': brevoKey },
-                      body: {
-                        sender: { name: getKeys().emailName||'Alma', email: fromEmail },
-                        to: [{ email: toEmail, name: p.name }],
-                        subject: subject,
-                        textContent: emailBody
-                      }
-                    })
-                  });
+                  const sendRes = await sendEmailResend(toEmail, p.name, subject, emailBody);
                   if (sendRes.ok) {
-                    apLog('success', '📤 Envoyé à ' + toEmail);
-                    // Marquer comme envoyé dans la conversation
+                    apLog('success', '📤 Envoyé à <strong>' + toEmail + '</strong>');
                     apMarkConvSent(p.id, toEmail);
+                    p.email = toEmail;
                   } else {
                     apLog('error', 'Envoi échoué : ' + toEmail);
                   }
                 } catch(e2) {
-                  apLog('error', 'Erreur envoi ' + p.name);
+                  apLog('error', 'Erreur envoi ' + p.name + ' : ' + e2.message);
                 }
                 await sleep(500);
+              } else {
+                apLog('info', '⚠️ Pas d\'email trouvé pour <strong>' + p.name + '</strong>');
               }
             }
 
@@ -3365,7 +3352,7 @@ async function launchAutopilot() {
     }
 
     // ── ÉTAPE 3b : Envoi SMS si téléphone disponible ──
-    if (action === 'sms' || action === 'email-sms') {
+    if (action === 'sms' || action === 'email-sms' || action === 'full') {
       const brevoKey = getKeys().brevo;
       const smsProspects = prospects.filter(p => p.phone && p.phone !== 'null');
       if (!brevoKey) {
@@ -4217,16 +4204,7 @@ async function sendReply() {
     renderMessages(); textarea.value = text; btn.disabled = false; return;
   }
   try {
-    const res = await fetch(SUPABASE_PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon, 'apikey': ALMA_CONFIG.supaAnon },
-      body: JSON.stringify({
-        url: 'https://api.brevo.com/v3/smtp/email',
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'api-key': brevoKey },
-        body: { sender:{name:fromName,email:fromEmail}, to:[{email:conv.prospectEmail,name:conv.prospectName}], subject:'Re: '+(conv.subject||'Suite à notre échange'), textContent:text }
-      })
-    });
+    const res = await sendEmailResend(conv.prospectEmail, conv.prospectName, 'Re: '+(conv.subject||'Suite à notre échange'), text);
     if (!res.ok) { const err = await res.json(); throw new Error(err.message||'Erreur Brevo'); }
     tempMsg.id = 'msg-'+Date.now();
     conv.lastPreview = text.slice(0,60); conv.lastAt = new Date().toISOString();
@@ -5474,6 +5452,102 @@ function apUpdateProspectCard(prospectId, subject, emailBody) {
       }
     }
   });
+}
+
+
+// ═══ RESEND EMAIL ═══
+async function sendEmailResend(to, toName, subject, body) {
+  const fromName = getProfile().prenom + ' ' + getProfile().nom || 'Alma';
+  const res = await fetch(SUPABASE_PROXY, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon,
+      'apikey': ALMA_CONFIG.supaAnon
+    },
+    body: JSON.stringify({
+      url: 'https://api.resend.com/emails',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + ALMA_CONFIG.resendKey
+      },
+      body: {
+        from: fromName + ' <' + ALMA_CONFIG.resendFrom + '>',
+        to: [to],
+        subject: subject,
+        text: body
+      }
+    })
+  });
+  const data = await res.json();
+  return { ok: res.ok && data.ok !== false, data };
+}
+
+
+// ═══ TROUVE EMAIL PROSPECT VIA IA ═══
+async function findProspectEmail(prospect) {
+  // Si pas de site web, on ne peut rien faire
+  if (!prospect.website) return null;
+
+  const key = getKeys().anthropic;
+  if (!key) return null;
+
+  try {
+    // Étape 1 : récupérer le contenu de la page contact via proxy
+    const domain = prospect.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+    const urlsToTry = [
+      prospect.website + '/contact',
+      prospect.website + '/nous-contacter',
+      prospect.website + '/contact-us',
+      prospect.website,
+    ];
+
+    let pageContent = '';
+    for (const url of urlsToTry) {
+      try {
+        const res = await proxyFetch(url);
+        if (res && typeof res === 'string' && res.includes('@')) {
+          pageContent = res.slice(0, 3000);
+          break;
+        } else if (res && res.error === undefined) {
+          pageContent = JSON.stringify(res).slice(0, 3000);
+          if (pageContent.includes('@')) break;
+        }
+      } catch(_) {}
+    }
+
+    // Étape 2 : si pas trouvé via proxy, demander à Claude de deviner
+    const prompt = pageContent && pageContent.includes('@')
+      ? 'Voici le contenu HTML/texte d\'une page web d\'entreprise. Extrait UNIQUEMENT l\'adresse email de contact. Réponds avec JUSTE l\'email, rien d\'autre. Si aucun email trouvé, réponds "null".\n\nContenu:\n' + pageContent
+      : 'Le site web de cette entreprise est ' + prospect.website + ' (domaine: ' + domain + ').\nNom: ' + prospect.name + '\nAdresse: ' + prospect.address + '\n\nDevine l\'adresse email de contact la plus probable pour cette entreprise française. Réponds avec JUSTE l\'email le plus probable (ex: contact@domaine.fr, info@domaine.fr, direction@domaine.fr). Rien d\'autre.';
+
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: getKeys().model,
+        max_tokens: 50,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const d = await r.json();
+    const email = (d.content?.[0]?.text || '').trim().toLowerCase();
+
+    // Valider que c'est bien un email
+    if (email && email !== 'null' && email.includes('@') && email.includes('.') && email.length < 80) {
+      return email;
+    }
+    return null;
+  } catch(e) {
+    return null;
+  }
 }
 
 // ═══ PROXY SUPABASE — contourne le CORS pour les APIs open data ═══
