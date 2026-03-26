@@ -3390,10 +3390,9 @@ async function searchDVF() {
     const nomCommune = feat?.properties?.city || commune;
     if (!codeCommune) throw new Error('Commune non trouvée — essayez avec le nom complet');
 
-    // API DVF Etalab
+    // API DVF Etalab via proxy
     const url = `https://api.cquest.org/dvf?code_commune=${codeCommune}&nb_resultats=15`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = await proxyFetch(url);
     const items = data.resultats || [];
     const typeBien = document.getElementById('dvf-type').value;
     const filtered = typeBien === 'tous' ? items : items.filter(r => (r.type_local||'').toLowerCase().includes(typeBien));
@@ -3429,15 +3428,13 @@ async function searchCopro() {
   try {
     // API Registre national des copropriétés — data.gouv, gratuit
     const url = `https://rnc2.registre-coproprietes.gouv.fr/api/coproprietes?q=${encodeURIComponent(loc)}&size=15&sort=nb_lots:desc`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = await proxyFetch(url);
     const items = data.results || data.coproprietes || [];
 
     if (!items.length) {
       // Fallback avec API Opendatasoft registre copropriétés
       const url2 = `https://opendata.koumoul.com/api/v1/datasets/registre-national-des-coproprietes/lines?q=${encodeURIComponent(loc)}&size=10`;
-      const res2 = await fetch(url2);
-      const data2 = await res2.json();
+      const data2 = await proxyFetch(url2);
       const items2 = data2.results || [];
       if (!items2.length) {
         // Fallback données simulées
@@ -3919,8 +3916,7 @@ async function searchDPE() {
     const classes = classe.split(',').map(c => `etiquette_dpe=${c.trim()}`).join('&');
     let typeFilter = typeBat !== 'tous' ? `&type_batiment=${encodeURIComponent(typeBat)}` : '';
     const url = `https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines?size=${max}&q=${encodeURIComponent(commune)}&${classes}${typeFilter}&select=adresse_ban,commune,etiquette_dpe,type_batiment,surface_habitable_logement,annee_construction`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = await proxyFetch(url);
     const items = data.results || [];
     if (!items.length) {
       document.getElementById('dpe-results-sub').textContent = 'Aucun résultat';
