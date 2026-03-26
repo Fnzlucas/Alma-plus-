@@ -2042,6 +2042,8 @@ tr:hover td { background: var(--primary-lt); }
                   <option value="email">Générer email IA + Pipeline</option>
                   <option value="pipeline">Ajouter au pipeline uniquement</option>
                   <option value="email-send">Générer + Envoyer email</option>
+                  <option value="sms">Générer + Envoyer SMS (si tél. dispo)</option>
+                  <option value="email-sms">Email + SMS</option>
                 </select>
               </div>
             </div>
@@ -3067,7 +3069,7 @@ async function generateDevis() {
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({ model: getKeys().model, max_tokens: 800, messages: [{ role: 'user', content: `Génère un devis professionnel en français pour :\nClient : ${client}\nPrestataire : ${activite}\nPrestation : ${desc}\nBudget : ${budget ? budget + '€' : 'à définir'}\nDélai : ${delai || 'à définir'}\n\nFormat : devis structuré avec titre, date, détail des prestations, total HT, TVA 20%, total TTC, conditions de paiement. Texte brut, pas de markdown.` }] })
     });
     const d = await r.json();
@@ -3089,7 +3091,7 @@ async function runVeille() {
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({ model: getKeys().model, max_tokens: 600, messages: [{ role: 'user', content: `Analyse le marché du secteur "${secteur}" en France en 2025.\nFournis :\n1. Taille et tendances du marché\n2. Points de douleur typiques\n3. Arguments commerciaux les plus efficaces\n4. Meilleure approche de prospection\n5. Objections courantes et comment les gérer\n\nRéponse concise et actionnable, en français.` }] })
     });
     const d = await r.json();
@@ -3321,14 +3323,23 @@ async function launchAutopilot() {
               const toEmail = p.website ? 'contact@' + p.website.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : null;
               if (brevoKey && fromEmail && toEmail) {
                 try {
-                  const sendRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+                  const sendRes = await fetch(SUPABASE_PROXY, {
                     method: 'POST',
-                    headers: { 'Content-Type':'application/json', 'api-key':brevoKey },
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon,
+                      'apikey': ALMA_CONFIG.supaAnon
+                    },
                     body: JSON.stringify({
-                      sender: { name: getKeys().emailName||'Alma', email: fromEmail },
-                      to: [{ email: toEmail, name: p.name }],
-                      subject: subject,
-                      textContent: emailBody
+                      url: 'https://api.brevo.com/v3/smtp/email',
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'api-key': brevoKey },
+                      body: {
+                        sender: { name: getKeys().emailName||'Alma', email: fromEmail },
+                        to: [{ email: toEmail, name: p.name }],
+                        subject: subject,
+                        textContent: emailBody
+                      }
                     })
                   });
                   if (sendRes.ok) {
@@ -3347,6 +3358,51 @@ async function launchAutopilot() {
 
           } catch(e) {
             apLog('error', 'Erreur email ' + p.name + ' : ' + e.message);
+          }
+          await sleep(400);
+        }
+      }
+    }
+
+    // ── ÉTAPE 3b : Envoi SMS si téléphone disponible ──
+    if (action === 'sms' || action === 'email-sms') {
+      const brevoKey = getKeys().brevo;
+      const smsProspects = prospects.filter(p => p.phone && p.phone !== 'null');
+      if (!brevoKey) {
+        apLog('error', 'Clé Brevo requise pour les SMS');
+      } else if (!smsProspects.length) {
+        apLog('info', 'Aucun prospect avec téléphone pour les SMS');
+      } else {
+        apLog('info', 'Envoi SMS pour ' + smsProspects.length + ' prospect(s) avec téléphone...');
+        for (const p of smsProspects) {
+          if (_apStop) break;
+          try {
+            const profile = getProfile();
+            const smsText = 'Bonjour, ' + (profile.prenom||'notre équipe') + ' de ' + (profile.societe||'notre société') + '. Nous avons analysé votre activité et aimerions vous proposer ' + (profile.valeur||'nos services'). slice(0,80) + '. Répondez STOP pour ne plus recevoir de messages.';
+            const phone = p.phone.replace(/\s/g, '').replace(/^0/, '+33');
+            const smsRes = await fetch(SUPABASE_PROXY, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon, 'apikey': ALMA_CONFIG.supaAnon },
+              body: JSON.stringify({
+                url: 'https://api.brevo.com/v3/transactionalSMS/sms',
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'api-key': brevoKey },
+                body: {
+                  sender: (profile.societe||'AlmaPlus').slice(0,11),
+                  recipient: phone,
+                  content: smsText,
+                  type: 'transactional'
+                }
+              })
+            });
+            const smsData = await smsRes.json();
+            if (smsData.ok) {
+              apLog('success', '📱 SMS envoyé à <strong>' + p.name + '</strong> (' + p.phone + ')');
+            } else {
+              apLog('error', 'SMS échoué : ' + p.name + ' — ' + (smsData.data?.message || 'erreur'));
+            }
+          } catch(e3) {
+            apLog('error', 'Erreur SMS ' + p.name);
           }
           await sleep(400);
         }
@@ -4161,10 +4217,15 @@ async function sendReply() {
     renderMessages(); textarea.value = text; btn.disabled = false; return;
   }
   try {
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','api-key':brevoKey},
-      body:JSON.stringify({ sender:{name:fromName,email:fromEmail}, to:[{email:conv.prospectEmail,name:conv.prospectName}], subject:'Re: '+(conv.subject||'Suite à notre échange'), textContent:text })
+    const res = await fetch(SUPABASE_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon, 'apikey': ALMA_CONFIG.supaAnon },
+      body: JSON.stringify({
+        url: 'https://api.brevo.com/v3/smtp/email',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'api-key': brevoKey },
+        body: { sender:{name:fromName,email:fromEmail}, to:[{email:conv.prospectEmail,name:conv.prospectName}], subject:'Re: '+(conv.subject||'Suite à notre échange'), textContent:text }
+      })
     });
     if (!res.ok) { const err = await res.json(); throw new Error(err.message||'Erreur Brevo'); }
     tempMsg.id = 'msg-'+Date.now();
