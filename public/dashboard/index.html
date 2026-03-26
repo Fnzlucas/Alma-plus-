@@ -4087,45 +4087,61 @@ async function searchCrossB2C() {
       );
     }
 
-    // Copropriétés
+    // Copropriétés — registre national, cherche par localisation
     if (useCopro) {
       promises.push(
-        fetch(`https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=${encodeURIComponent(zone)}&rows=20&sort=dateparution&refine.familleavis_lib=Immatriculations`)
+        fetch('https://registre-coproprietes.gouv.fr/api/coproprietes?commune=' + encodeURIComponent(nomCommune) + '&size=15')
           .then(r => r.json())
           .then(d => {
-            const records = d.records || [];
-            records.forEach(r => {
-              const f = r.fields;
-              const nom = f.registre || f.commercant || f.denomination || '';
-              const ville = f.ville || nomCommune;
-              if (nom) addSignal(nom, ville, 'Copro', {
-                type: f.familleavis_lib || '',
-                date: f.dateparution || ''
-              });
+            const items = d.results || d.coproprietes || [];
+            let count = 0;
+            items.forEach(r => {
+              // N'utiliser que les entrées avec une vraie adresse postale
+              const adresse = r.adresse_siege || r.adresse || '';
+              const commune = r.commune || nomCommune;
+              // Exclure les entrées sans adresse ou qui ressemblent à des SIREN
+              if (adresse && !/^\d{9}/.test(adresse) && adresse.length > 5) {
+                addSignal(adresse, commune, 'Copro', {
+                  nom: r.nom_usage || r.nom || '',
+                  lots: r.nb_lots_total || '',
+                  syndic: r.nom_syndic || ''
+                });
+                count++;
+              }
             });
-            setSourceStatus('copro', 'ok', records.length);
+            setSourceStatus('copro', 'ok', count);
           })
           .catch(() => setSourceStatus('copro', 'error', 0))
       );
     }
 
-    // BODACC créations
+    // BODACC créations — uniquement les adresses postales valides
     if (useBodacc) {
       promises.push(
-        fetch(`https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=${encodeURIComponent(zone)}&rows=20&sort=dateparution&refine.familleavis_lib=Immatriculations`)
+        fetch('https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&q=' + encodeURIComponent(zone) + '&rows=25&sort=dateparution&refine.familleavis_lib=Immatriculations')
           .then(r => r.json())
           .then(d => {
             const records = d.records || [];
+            let count = 0;
             records.forEach(r => {
               const f = r.fields;
-              const nom = f.registre || f.commercant || '';
-              const ville = f.ville || nomCommune;
-              if (nom) addSignal(nom + ' — ' + ville, ville, 'BODACC', {
-                activite: f.activite || '',
-                date: f.dateparution || ''
-              });
+              // Chercher une vraie adresse dans les champs BODACC
+              const adresse = f.adresse || f.adresseetablissement || '';
+              const ville = f.ville || f.cp || nomCommune;
+              const nom = f.registre || f.commercant || f.denomination || '';
+              const activite = f.activite || '';
+
+              // Seulement si on a une vraie adresse de rue (pas un SIREN, pas juste un nom)
+              if (adresse && adresse.length > 8 && !/^\d{9,14}/.test(adresse)) {
+                addSignal(adresse, ville, 'BODACC', {
+                  nom: nom,
+                  activite: activite.slice(0, 50),
+                  date: f.dateparution || ''
+                });
+                count++;
+              }
             });
-            setSourceStatus('bodacc', 'ok', records.length);
+            setSourceStatus('bodacc', 'ok', count);
           })
           .catch(() => setSourceStatus('bodacc', 'error', 0))
       );
@@ -4185,8 +4201,8 @@ async function searchCrossB2C() {
         if (s.type === 'DVF') return '🏠 Vendu ' + (d.prix || '') + (d.type ? ' — ' + d.type : '') + (d.date ? ' le ' + d.date : '');
         if (s.type === 'Permis') return '🔨 Permis ' + (d.type || '') + (d.surface ? ' · ' + d.surface : '') + (d.date ? ' · ' + d.date : '');
         if (s.type === 'DPE') return '🌡️ DPE ' + (d.classe || 'F') + (d.type ? ' · ' + d.type : '') + (d.surface ? ' · ' + d.surface : '');
-        if (s.type === 'Copro') return '🏢 ' + (d.type || '') + (d.date ? ' · ' + d.date : '');
-        if (s.type === 'BODACC') return '⚖️ ' + (d.activite || '') + (d.date ? ' · ' + d.date : '');
+        if (s.type === 'Copro') return '🏢 Copropriété ' + (d.nom ? '"' + d.nom + '"' : '') + (d.lots ? ' · ' + d.lots + ' lots' : '') + (d.syndic ? ' · ' + d.syndic : '');
+        if (s.type === 'BODACC') return '⚖️ Nouvelle entreprise : ' + (d.nom ? '"' + d.nom + '"' : '') + (d.activite ? ' — ' + d.activite : '') + (d.date ? ' · ' + d.date : '');
         return s.type;
       }).filter(Boolean);
 
