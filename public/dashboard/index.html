@@ -2109,10 +2109,27 @@ tr:hover td { background: var(--primary-lt); }
           <!-- Derniers prospects ajoutés -->
           <div class="card" id="ap-results-card" style="display:none">
             <div class="card-header">
-              <div class="card-title">Prospects ajoutés au pipeline</div>
+              <div>
+                <div class="card-title">Prospects traités</div>
+                <div class="card-sub" id="ap-results-sub">0 ajoutés au pipeline</div>
+              </div>
               <button class="btn btn-sm btn-ghost" onclick="goPage('pipeline', document.querySelector('[onclick*=pipeline]'))">Voir pipeline →</button>
             </div>
-            <div id="ap-results-list" style="max-height:200px;overflow-y:auto"></div>
+            <div id="ap-results-list" style="max-height:220px;overflow-y:auto"></div>
+          </div>
+
+          <!-- Récap emails envoyés -->
+          <div class="card" id="ap-emails-card" style="display:none">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Emails envoyés</div>
+                <div class="card-sub" id="ap-emails-sub">0 envoyés</div>
+              </div>
+              <a href="https://app.brevo.com/email-marketing/statistics/list" target="_blank" class="btn btn-sm btn-ghost">
+                <span class="material-symbols-rounded" style="font-size:13px">open_in_new</span>Voir dans Brevo
+              </a>
+            </div>
+            <div id="ap-emails-list" style="max-height:220px;overflow-y:auto"></div>
           </div>
 
         </div>
@@ -2154,7 +2171,7 @@ tr:hover td { background: var(--primary-lt); }
           </button>
         </div>
         <div class="card-body">
-          <pre id="devis-text" style="white-space:pre-wrap;font-family:'Inter',sans-serif;font-size:13px;line-height:1.7;color:var(--text)"></pre>
+          <pre id="devis-text" style="white-space:pre-wrap;font-family:Inter,sans-serif;font-size:13px;line-height:1.7;color:var(--text)"></pre>
         </div>
       </div>
     </div>
@@ -2438,7 +2455,7 @@ tr:hover td { background: var(--primary-lt); }
         <div class="spinner spinner-dark" style="display:inline-block;margin-right:8px"></div>
         Génération du courrier par l'IA...
       </div>
-      <textarea id="courrier-text" class="form-input" style="min-height:280px;display:none;font-size:12.5px;line-height:1.7;font-family:'Inter',sans-serif"></textarea>
+      <textarea id="courrier-text" class="form-input" style="min-height:280px;display:none;font-size:12.5px;line-height:1.7;font-family:Inter,sans-serif"></textarea>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="regenCourrier()">
@@ -3140,6 +3157,9 @@ function apUpdateCounters(prospects, emails, pipeline) {
 function apAddResult(prospect) {
   document.getElementById('ap-results-card').style.display = '';
   const list = document.getElementById('ap-results-list');
+  const count = list.children.length + 1;
+  const subEl = document.getElementById('ap-results-sub');
+  if (subEl) subEl.textContent = count + ' ajouté' + (count>1?'s':'') + ' au pipeline';
   const row = document.createElement('div');
   row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--border-lt);animation:fadeIn .3s ease';
   const hasPhone = prospect.phone && prospect.phone !== 'null';
@@ -3311,11 +3331,15 @@ async function launchAutopilot() {
                   });
                   if (sendRes.ok) {
                     apLog('success', '📤 Envoyé à <strong>' + toEmail + '</strong>');
+                    apAddEmailSent(p, subject, toEmail, 'sent', body);
                   } else {
-                    apLog('error', 'Envoi échoué : ' + toEmail);
+                    const errData = await sendRes.json().catch(()=>({}));
+                    apLog('error', 'Envoi échoué : ' + toEmail + (errData.message ? ' — ' + errData.message : ''));
+                    apAddEmailSent(p, subject, toEmail, 'failed', body);
                   }
                 } catch(sendErr) {
-                  apLog('error', 'Envoi échoué pour ' + p.name);
+                  apLog('error', 'Envoi échoué pour ' + p.name + ' : ' + sendErr.message);
+                  apAddEmailSent(p, subject, toEmail, 'failed', body);
                 }
                 await sleep(600);
               }
@@ -3380,16 +3404,62 @@ function apFinish(msg) {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function apToggle(id) { const el = document.getElementById(id); if(el) el.style.display = el.style.display === 'none' ? 'block' : 'none'; }
+document.addEventListener('click', function(e) {
+  const t = e.target.closest('[data-toggle]');
+  if (t) apToggle(t.getAttribute('data-toggle'));
+});
+
+function apAddEmailSent(prospect, subject, toEmail, status, body) {
+  document.getElementById('ap-emails-card').style.display = '';
+  const list = document.getElementById('ap-emails-list');
+  const isOk = status === 'sent';
+  const id = 'sent-full-' + Date.now();
+  const row = document.createElement('div');
+  row.style.cssText = 'border-bottom:1px solid var(--border-lt);animation:fadeIn .3s ease;overflow:hidden';
+  row.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer" data-toggle="' + id + '">'
+    + '<span class="material-symbols-rounded" style="font-size:16px;color:' + (isOk?'var(--green)':'var(--red)') + '">' + (isOk?'mark_email_read':'mail_off') + '</span>'
+    + '<div style="flex:1;min-width:0">'
+    + '<div style="font-size:12px;font-weight:600;color:var(--text)">' + prospect.name + '</div>'
+    + '<div style="font-size:10px;color:var(--text3)">' + toEmail + ' · ' + subject + '</div>'
+    + '</div>'
+    + '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:' + (isOk?'var(--green-lt)':'var(--red-lt)') + ';color:' + (isOk?'var(--green)':'var(--red)') + ';flex-shrink:0">'
+    + (isOk ? '✓ Envoyé' : '✗ Échoué') + '</span>'
+    + '</div>'
+    + (body ? '<div id="' + id + '" style="display:none;border-top:1px solid var(--border-lt);padding:12px 18px;background:var(--bg)">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">📧 ' + subject + '</div>'
+    + '<pre style="font-size:12px;color:var(--text);line-height:1.7;white-space:pre-wrap;font-family:Inter,sans-serif;margin:0">' + (body||'').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre>'
+    + '<button class="btn btn-sm btn-ghost" style="margin-top:8px;font-size:11px" onclick="navigator.clipboard.writeText(' + JSON.stringify(subject + '\n\n' + (body||'')) + ')"><span class="material-symbols-rounded" style="font-size:12px">content_copy</span>Copier</button>'
+    + '</div>' : '');
+  list.appendChild(row);
+  list.scrollTop = list.scrollHeight;
+  const allRows = list.children.length;
+  const sent = [...list.querySelectorAll('.material-symbols-rounded')].filter(el => el.textContent === 'mark_email_read').length;
+  const failed = allRows - sent;
+  document.getElementById('ap-emails-sub').textContent = sent + ' envoyé' + (sent>1?'s':'') + (failed?' · ' + failed + ' échoué' + (failed>1?'s':''):'');
+}
 
 function apLogEmail(subject, body, name, phone) {
   const log = document.getElementById('ap-log');
   if (!log) return;
-  const preview = body.slice(0, 200).replace(/\n/g, ' ') + (body.length > 200 ? '...' : '');
+  const id = 'email-full-' + Date.now();
+  const preview = body.slice(0, 120).replace(/\n/g, ' ');
   const row = document.createElement('div');
-  row.style.cssText = 'margin:4px 0 8px 22px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-sm);animation:fadeIn .2s ease';
-  row.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">📧 ' + subject + '</div>'
-    + '<div style="font-size:11px;color:var(--text2);line-height:1.5">' + preview + '</div>'
-    + (phone ? '<div style="font-size:10px;color:var(--green);margin-top:4px;font-weight:600">📞 ' + phone + '</div>' : '');
+  row.style.cssText = 'margin:4px 0 8px 22px;background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-sm);animation:fadeIn .2s ease;overflow:hidden';
+  row.innerHTML = '<div style="padding:10px 14px;cursor:pointer" data-toggle="' + id + '">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--accent)">📧 ' + subject + '</div>'
+    + '<span style="font-size:10px;color:var(--primary);font-weight:600;flex-shrink:0">Voir email complet ↓</span>'
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + preview + '...</div>'
+    + (phone ? '<div style="font-size:10px;color:var(--green);margin-top:3px;font-weight:600">📞 ' + phone + '</div>' : '')
+    + '</div>'
+    + '<div id="' + id + '" style="display:none;border-top:1px solid var(--border);padding:12px 14px">'
+    + '<pre style="font-size:12px;color:var(--text);line-height:1.7;white-space:pre-wrap;font-family:Inter,sans-serif;margin:0">' + body.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre>'
+    + '<div style="display:flex;gap:8px;margin-top:10px">'
+    + '<button class="btn btn-sm btn-ghost" style="font-size:11px" onclick="navigator.clipboard.writeText(' + JSON.stringify(subject + '\n\n' + body) + ')"><span class="material-symbols-rounded" style="font-size:12px">content_copy</span>Copier</button>'
+    + '</div>'
+    + '</div>';
   log.appendChild(row);
   log.scrollTop = log.scrollHeight;
 }
