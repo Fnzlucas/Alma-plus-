@@ -751,6 +751,152 @@ tr:hover td { background: var(--primary-lt); }
 
 /* ─── TAG ─── */
 .tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE MOBILE
+═══════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Sidebar — cachée par défaut, slide depuis la gauche */
+  .sidebar {
+    position: fixed !important;
+    left: -260px !important;
+    top: 0 !important;
+    height: 100vh !important;
+    z-index: 1000 !important;
+    transition: left .25s ease !important;
+    box-shadow: 4px 0 24px rgba(0,0,0,.15) !important;
+  }
+  .sidebar.open {
+    left: 0 !important;
+  }
+
+  /* Overlay sombre derrière la sidebar */
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.4);
+    z-index: 999;
+  }
+  #sidebar-overlay.show { display: block; }
+
+  /* Main content — pleine largeur */
+  .main {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Topbar — hamburger menu */
+  .topbar {
+    padding: 0 14px !important;
+    height: 52px !important;
+  }
+  #btn-hamburger {
+    display: flex !important;
+  }
+
+  /* Pages — padding réduit */
+  .page { padding: 14px !important; }
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  /* Cards */
+  .card { border-radius: 10px !important; }
+  .card-body { padding: 14px !important; }
+  .card-header { padding: 12px 14px !important; }
+
+  /* Grilles → 1 colonne */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Prospect cards — 1 colonne */
+  #prospects-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Forms */
+  .form-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .form-input, .btn { font-size: 14px !important; }
+
+  /* Buttons */
+  .btn { padding: 8px 14px !important; }
+  .btn-primary { width: 100% !important; justify-content: center !important; }
+
+  /* Autopilot grid */
+  #page-autopilot > div > div[style*="grid-template-columns:340px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Alertes stats */
+  #alertes-stats {
+    grid-template-columns: repeat(2,1fr) !important;
+  }
+
+  /* Pipeline */
+  #pipeline-board {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  .pipeline-col {
+    min-width: unset !important;
+    width: 100% !important;
+  }
+
+  /* Messagerie */
+  #msg-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  #msg-main { display: none !important; }
+  #msg-main.show { display: flex !important; }
+  #msg-sidebar.hide { display: none !important; }
+
+  /* Search bar B2B */
+  #page-prospection-b2b .form-row,
+  #page-prospection-b2c .form-row {
+    flex-direction: column !important;
+  }
+
+  /* Chips filtres */
+  .chips-row {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  /* Counters autopilot */
+  #ap-count-prospects,
+  #ap-count-emails,
+  #ap-count-pipeline {
+    font-size: 28px !important;
+  }
+
+  /* Hide long text on mobile */
+  .nav-item span:not(.material-symbols-rounded):not(.nav-badge) {
+    font-size: 12px !important;
+  }
+
+  /* Score badges */
+  .score { font-size: 9px !important; padding: 2px 6px !important; }
+
+  /* Page heading */
+  .page-heading { font-size: 20px !important; }
+  .page-subheading { font-size: 11px !important; }
+}
+
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr 1fr !important; }
+  .topbar-title { font-size: 14px !important; }
+}
 </style>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&libraries=places&language=fr&loading=async" async defer></script>
 </head>
@@ -831,15 +977,21 @@ tr:hover td { background: var(--primary-lt); }
 
 <!-- ═══ MAIN ═══ -->
 <div class="main">
+  <!-- Overlay mobile sidebar -->
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
   <header class="topbar">
+    <button id="btn-hamburger" onclick="toggleSidebar()" style="display:none;background:none;border:none;cursor:pointer;padding:6px;margin-right:8px;color:var(--text);border-radius:8px;align-items:center;justify-content:center">
+      <span class="material-symbols-rounded" style="font-size:22px">menu</span>
+    </button>
     <div>
       <span class="topbar-title" id="page-title">Vue globale</span>
       <span class="topbar-sub" id="page-sub"> · Tableau de bord</span>
     </div>
     <div class="topbar-spacer"></div>
-    <div class="status-pill on" id="api-status-pill">
+    <div class="status-pill on" id="api-status-pill" style="display:none" >
       <div class="pulse"></div>
-      <span id="api-status-text">Toutes les APIs actives</span>
+      <span id="api-status-text">APIs actives</span>
     </div>
     <button class="topbar-btn" onclick="goPage('settings', document.querySelector('[onclick*=settings]'))">
       <span class="material-symbols-rounded">settings</span>
@@ -5567,7 +5719,65 @@ async function proxyFetch(url) {
 }
 
 // ═══ INIT ═══
-document.addEventListener('DOMContentLoaded', function() { loadState(); updateSeenCounter(); initAlertesBadge(); });
+
+// ═══ MOBILE SIDEBAR ═══
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+}
+function closeSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+}
+
+// Afficher hamburger sur mobile
+function initMobile() {
+  const isMobile = window.innerWidth <= 768;
+  const hamburger = document.getElementById('btn-hamburger');
+  const apiPill = document.getElementById('api-status-pill');
+  if (hamburger) hamburger.style.display = isMobile ? 'flex' : 'none';
+  if (apiPill) apiPill.style.display = isMobile ? 'none' : 'flex';
+
+  // Messagerie mobile — back button
+  const msgMain = document.getElementById('msg-main');
+  if (isMobile && msgMain) {
+    const backBtn = document.getElementById('msg-back-btn');
+    if (!backBtn) {
+      const btn = document.createElement('button');
+      btn.id = 'msg-back-btn';
+      btn.className = 'btn btn-ghost';
+      btn.style.cssText = 'display:none;margin-bottom:10px';
+      btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:16px">arrow_back</span> Retour';
+      btn.onclick = () => {
+        document.getElementById('msg-sidebar').classList.remove('hide');
+        msgMain.classList.remove('show');
+        btn.style.display = 'none';
+      };
+      msgMain.prepend(btn);
+    }
+  }
+}
+
+// Fermer sidebar quand on change de page sur mobile
+const _origGoPage = goPage;
+function goPage(name, el) {
+  _origGoPage(name, el);
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
+window.addEventListener('resize', initMobile);
+document.addEventListener('DOMContentLoaded', function() {
+  loadState();
+  updateSeenCounter();
+  initAlertesBadge();
+  initMobile();
+});
+
+
 </script>
 </body>
 </html>
