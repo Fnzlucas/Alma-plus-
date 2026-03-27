@@ -130,6 +130,39 @@ body { font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; color: 
   font-weight: 600;
 }
 .nav-item .material-symbols-rounded { font-size: 17px; flex-shrink: 0; }
+.cc-btn {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px;border-radius:10px;width:100%;
+  font-family:inherit;font-size:12px;font-weight:500;
+  color:var(--text2);background:#fff;
+  border:1.5px solid var(--border);
+  cursor:pointer;transition:all .12s;text-align:left;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.cc-btn:hover {
+  border-color:var(--primary);color:var(--primary);
+  background:var(--primary-lt);box-shadow:0 2px 8px rgba(79,108,255,.12);
+}
+.cc-btn:active { transform:scale(.98); }
+.cc-btn[data-type="rdv"]:hover        { border-color:var(--green);color:var(--green);background:var(--green-lt);box-shadow:0 2px 8px rgba(34,197,94,.12); }
+.cc-btn[data-type="converti"]:hover   { border-color:var(--primary);color:var(--primary);background:var(--primary-lt); }
+.cc-btn[data-type="interesse"]:hover  { border-color:var(--primary);color:var(--primary);background:var(--primary-lt); }
+.cc-btn[data-type="rappel"]:hover     { border-color:var(--amber);color:var(--amber);background:var(--amber-lt);box-shadow:0 2px 8px rgba(245,158,11,.12); }
+.cc-btn[data-type="non_interesse"]:hover,
+.cc-btn[data-type="raccroche"]:hover  { border-color:var(--error);color:var(--error);background:#fef2f2;box-shadow:0 2px 8px rgba(239,68,68,.1); }
+.cc-btn span:last-child {
+  font-size:10px;font-weight:600;padding:1px 7px;
+  border-radius:99px;background:var(--bg);color:var(--text3);
+  flex-shrink:0;min-width:22px;text-align:center;
+  border:1px solid var(--border);
+}
+.cc-btn-count {
+  position:absolute;top:8px;right:10px;
+  font-size:11px;font-weight:800;
+  background:rgba(0,0,0,.08);border-radius:99px;
+  padding:1px 7px;min-width:22px;text-align:center;
+}
+
 .nav-badge {
   margin-left: auto;
   font-size: 10px;
@@ -818,6 +851,20 @@ tr:hover td { background: var(--primary-lt); }
 /* ─── TAG ─── */
 .tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
 
+
+/* ─── CC KPI INLINE ─── */
+.cc-kpi-inline {
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:11px 6px;gap:2px;
+}
+.cc-kpi-sep { border-left:1px solid var(--border); }
+.cc-kpi-inline-val {
+  font-size:17px;font-weight:700;color:inherit;
+  font-family:'Manrope',sans-serif;letter-spacing:-.5px;line-height:1;
+}
+.cc-kpi-inline-label {
+  font-size:10px;color:var(--text3);font-weight:500;text-align:center;
+}
 </style>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&libraries=places&language=fr&loading=async" async defer></script>
 </head>
@@ -879,6 +926,9 @@ tr:hover td { background: var(--primary-lt); }
     </button>
     <button class="nav-item" onclick="goPage('veille',this)">
       <span class="material-symbols-rounded">radar</span>Veille IA
+    </button>
+    <button class="nav-item" onclick="goPage('coldcall',this)">
+      <span class="material-symbols-rounded">call</span>Tracker Appels
     </button>
   </nav>
 
@@ -1843,7 +1893,7 @@ tr:hover td { background: var(--primary-lt); }
       </div>
 
       <!-- Stats bandeau -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px" id="alertes-stats">
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px" id="alertes-stats">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;text-align:center">
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">Total aujourd'hui</div>
           <div id="alertes-total" style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:var(--text);letter-spacing:-1px">—</div>
@@ -2319,6 +2369,140 @@ tr:hover td { background: var(--primary-lt); }
           <div id="veille-text" style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--text)"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ COLD CALL TRACKER ════════════════ -->
+  <div class="page" id="page-coldcall">
+    <div style="max-width:960px">
+
+      <!-- Header -->
+      <div class="page-header" style="margin-bottom:20px">
+        <div>
+          <div class="page-heading">Tracker Appels</div>
+          <div class="page-subheading" id="cc-session">Aujourd'hui · 0 appel</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select class="form-input" id="cc-kpi-filter" onchange="updateCCStats()" style="font-size:12px;width:auto;padding:6px 10px">
+            <option value="today">Aujourd'hui</option>
+            <option value="week">Cette semaine</option>
+            <option value="month">Ce mois</option>
+            <option value="all">Tout</option>
+          </select>
+          <button class="btn btn-ghost" onclick="exportCC()" style="font-size:12px;gap:5px">
+            <span class="material-symbols-rounded" style="font-size:14px">download</span>CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- KPIs row -->
+      <div style="display:flex;align-items:center;gap:0;margin-bottom:16px;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)">
+        <div class="cc-kpi-inline">
+          <span class="cc-kpi-inline-val" id="kpi-total">0</span>
+          <span class="cc-kpi-inline-label">Appels passés</span>
+        </div>
+        <div class="cc-kpi-inline cc-kpi-sep">
+          <span class="cc-kpi-inline-val" id="kpi-contact">—</span>
+          <span class="cc-kpi-inline-label">Ont décroché</span>
+        </div>
+        <div class="cc-kpi-inline cc-kpi-sep" style="color:var(--green)">
+          <span class="cc-kpi-inline-val" id="kpi-rdv">0</span>
+          <span class="cc-kpi-inline-label">RDV pris</span>
+          <span style="font-size:9px;color:var(--text3)" id="kpi-rdv-sub"></span>
+        </div>
+        <div class="cc-kpi-inline cc-kpi-sep" style="color:var(--primary)">
+          <span class="cc-kpi-inline-val" id="kpi-conv">0</span>
+          <span class="cc-kpi-inline-label">Clients signés</span>
+          <span style="font-size:9px;color:var(--text3)" id="kpi-conv-sub"></span>
+        </div>
+        <div class="cc-kpi-inline cc-kpi-sep">
+          <span class="cc-kpi-inline-val" id="kpi-rappel">0</span>
+          <span class="cc-kpi-inline-label">À rappeler</span>
+        </div>
+        <div class="cc-kpi-inline cc-kpi-sep" style="color:var(--error)">
+          <span class="cc-kpi-inline-val" id="kpi-refus">—</span>
+          <span class="cc-kpi-inline-label">Taux de refus</span>
+        </div>
+      </div>
+
+      <!-- Layout principal -->
+      <div class="cc-main-grid" style="margin-bottom:14px">
+
+        <!-- Boutons -->
+        <div class="card">
+          <div class="card-header" style="padding-bottom:12px">
+            <div class="card-title">Résultat de l'appel</div>
+          </div>
+          <div style="padding:0 16px 16px">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px">
+              <button onclick="logCC('rdv')"          class="cc-btn" data-type="rdv">          RDV Pris       <span id="cc-c-rdv">0</span></button>
+              <button onclick="logCC('converti')"      class="cc-btn" data-type="converti">      Converti        <span id="cc-c-converti">0</span></button>
+              <button onclick="logCC('interesse')"     class="cc-btn" data-type="interesse">     Intéressé       <span id="cc-c-interesse">0</span></button>
+              <button onclick="logCC('rappel')"        class="cc-btn" data-type="rappel">        À rappeler      <span id="cc-c-rappel">0</span></button>
+              <button onclick="logCC('objection')"     class="cc-btn" data-type="objection">     Objection       <span id="cc-c-objection">0</span></button>
+              <button onclick="logCC('deja_equipe')"   class="cc-btn" data-type="deja_equipe">   Déjà équipé     <span id="cc-c-deja_equipe">0</span></button>
+              <button onclick="logCC('non_repondu')"   class="cc-btn" data-type="non_repondu">   Non répondu     <span id="cc-c-non_repondu">0</span></button>
+              <button onclick="logCC('non_interesse')" class="cc-btn" data-type="non_interesse"> Non intéressé   <span id="cc-c-non_interesse">0</span></button>
+              <button onclick="logCC('raccroche')"     class="cc-btn" data-type="raccroche">     Raccroché       <span id="cc-c-raccroche">0</span></button>
+            </div>
+            <input class="form-input" id="cc-note" placeholder="Note — nom, entreprise..." style="font-size:13px;width:100%">
+          </div>
+          </div>
+        </div>
+
+        <!-- Stats + Objectif -->
+        <div style="display:flex;flex-direction:column;gap:12px">
+
+          <!-- Répartition -->
+          <div class="card" style="flex:1">
+            <div class="card-header"><div class="card-title">Répartition</div></div>
+            <div id="cc-breakdown" style="padding:4px 16px 14px;display:flex;flex-direction:column;gap:4px">
+              <div style="text-align:center;padding:24px;color:var(--text3);font-size:12px">Aucune donnée</div>
+            </div>
+          </div>
+
+          <!-- Objectif -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">Objectif</div></div>
+            <div style="padding:0 16px 16px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <input type="number" class="form-input" id="cc-goal" value="50" min="1" max="999"
+                  style="width:64px;font-size:14px;font-weight:700;text-align:center" oninput="updateCCGoal()">
+                <span style="font-size:13px;color:var(--text3)">appels / jour</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" id="cc-goal-bar" style="width:0%;transition:width .4s"></div></div>
+              <div style="display:flex;justify-content:space-between;margin-top:6px">
+                <span style="font-size:12px;color:var(--text3)" id="cc-goal-label">0 / 50 appels</span>
+                <span style="font-size:12px;font-weight:600;color:var(--primary)" id="cc-goal-pct">0%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reset -->
+          <button class="btn btn-ghost" onclick="resetCCToday()" style="font-size:12px;width:100%;justify-content:center;color:var(--text3)">
+            <span class="material-symbols-rounded" style="font-size:14px">restart_alt</span>
+            Réinitialiser aujourd'hui
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Historique -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Historique</div>
+          <select class="form-input" id="cc-hist-filter" onchange="renderCCHistory()" style="font-size:12px;width:auto;padding:5px 10px">
+            <option value="today">Aujourd'hui</option>
+            <option value="week">Cette semaine</option>
+            <option value="month">Ce mois</option>
+            <option value="all">Tout</option>
+          </select>
+        </div>
+        <div id="cc-history" style="max-height:280px;overflow-y:auto;padding:0 16px 8px">
+          <div style="text-align:center;padding:28px;color:var(--text3);font-size:13px">Aucun appel enregistré.</div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2831,6 +3015,7 @@ function goPage(name, btn) {
     veille:['Veille IA','Analyse concurrentielle'],
     settings:['Paramètres','Configuration'],
     alertes:['Alertes du jour','Signaux détectés automatiquement'],
+    coldcall:['Cold Call Tracker','Enregistrez vos appels · Suivez vos stats'],
   };
   if (titles[name]) {
     document.getElementById('page-title').textContent = titles[name][0];
@@ -2846,6 +3031,7 @@ function goPage(name, btn) {
   if (name === 'pipeline') refreshPipeline();
   if (name === 'messagerie') initMessagerie();
   if (name === 'alertes') loadAlertes();
+  if (name === 'coldcall') initColdCall();
 }
 
 function switchTab(tabId, btn) {
@@ -5656,7 +5842,159 @@ function confirmLogout() {
     window.location.href = '/login';
   }
 }
-// ─── MOBILE SIDEBAR ───
+
+// ═══════════════════════════════════════════════
+// COLD CALL TRACKER
+// ═══════════════════════════════════════════════
+const CC_CFG = {
+  rdv:          { label:'RDV Pris',       color:'var(--green)',   icon:'event_available' },
+  converti:     { label:'Converti',       color:'#7c3aed',        icon:'emoji_events'    },
+  interesse:    { label:'Intéressé',      color:'var(--primary)', icon:'thumb_up'        },
+  rappel:       { label:'À rappeler',     color:'var(--amber)',   icon:'schedule_send'   },
+  objection:    { label:'Objection',      color:'var(--text3)',   icon:'report_problem'  },
+  deja_equipe:  { label:'Déjà équipé',    color:'var(--text3)',   icon:'inventory_2'     },
+  non_repondu:  { label:'Non répondu',    color:'var(--text3)',   icon:'phone_missed'    },
+  non_interesse:{ label:'Non intéressé',  color:'#dc2626',        icon:'thumb_down'      },
+  raccroche:    { label:'Raccroché',      color:'#dc2626',        icon:'call_end'        },
+};
+
+function getCCData(){ try{ return JSON.parse(localStorage.getItem('alma_coldcall')||'[]'); }catch(_){ return []; } }
+function saveCCData(d){ localStorage.setItem('alma_coldcall', JSON.stringify(d)); }
+
+function filterCC(filter){
+  const all = getCCData();
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+  if(filter==='today')  return all.filter(d=>d.ts.startsWith(today));
+  if(filter==='week')   return all.filter(d=>d.ts >= new Date(now-7*86400000).toISOString());
+  if(filter==='month')  return all.filter(d=>d.ts >= new Date(now-30*86400000).toISOString());
+  return all;
+}
+
+function logCC(type){
+  const note = (document.getElementById('cc-note')?.value||'').trim();
+  saveCCData([{id:Date.now(),type,note,ts:new Date().toISOString()}, ...getCCData()]);
+  document.getElementById('cc-note').value = '';
+  // bump counter on button
+  const el = document.getElementById('cc-c-'+type);
+  if(el){ el.textContent=parseInt(el.textContent||0)+1; el.style.transform='scale(1.4)'; setTimeout(()=>el.style.transform='scale(1)',180); }
+  updateCCStats();
+  renderCCHistory();
+}
+
+function updateCCStats(){
+  const filter = document.getElementById('cc-kpi-filter')?.value || 'today';
+  const data = filterCC(filter);
+  const T  = data.length;
+  const nr = data.filter(d=>d.type==='non_repondu').length;
+  const rd = data.filter(d=>d.type==='rdv').length;
+  const cv = data.filter(d=>d.type==='converti').length;
+  const it = data.filter(d=>d.type==='interesse').length;
+  const rp = data.filter(d=>d.type==='rappel').length;
+  const rc = data.filter(d=>d.type==='raccroche').length;
+  const ni = data.filter(d=>d.type==='non_interesse').length;
+
+  const contacted = T - nr;                                         // ont décroché
+  const pContact  = T>0 ? Math.round(contacted/T*100) : 0;
+  const pRdv      = T>0 ? Math.round(rd/T*100) : 0;               // RDV / total appels
+  const pRdvCont  = contacted>0 ? Math.round(rd/contacted*100):0; // RDV / contacts
+  const pConv     = rd>0  ? Math.round(cv/rd*100) : 0;            // Convertis / RDV
+  const pRefus    = contacted>0 ? Math.round((rc+ni)/contacted*100):0;
+  const pInt      = contacted>0 ? Math.round(it/contacted*100):0;
+
+  const set = (id,val,sub) => {
+    const v=document.getElementById(id); if(v){ v.textContent=val; v.style.transform='scale(1.1)'; setTimeout(()=>v.style.transform='scale(1)',140); }
+    const s=document.getElementById(id+'-sub'); if(s&&sub!==undefined) s.textContent=sub;
+  };
+
+  // KPI strip
+  const setV = (id,val) => { const e=document.getElementById(id); if(e){ e.textContent=val; e.style.transform='scale(1.1)'; setTimeout(()=>e.style.transform='',140); } };
+  const setSub = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  setV('kpi-total',   T);
+  setV('kpi-contact', pContact+'%');     setSub('kpi-contact-sub', contacted+' / '+T+' ont décroché');
+  setV('kpi-rdv',     rd);               setSub('kpi-rdv-sub',     pRdv+'% des appels');
+  setV('kpi-conv',    cv);               setSub('kpi-conv-sub',    pConv+'% des RDV');
+  setV('kpi-rappel',  rp);
+  setV('kpi-refus',   pRefus+'%');       setSub('kpi-refus-sub',   (rc+ni)+' sur '+contacted);
+
+  // button counters
+  Object.keys(CC_CFG).forEach(type=>{
+    const el=document.getElementById('cc-c-'+type);
+    if(el) el.textContent=filterCC(filter).filter(d=>d.type===type).length;
+  });
+
+  // session label
+  const todayData = filterCC('today');
+  const s=document.getElementById('cc-session');
+  if(s) s.textContent='Aujourd\'hui · '+todayData.length+' appel'+(todayData.length!==1?'s':'');
+
+  updateCCGoal();
+}
+
+function updateCCGoal(){
+  const goal = parseInt(document.getElementById('cc-goal')?.value)||50;
+  const today = filterCC('today').length;
+  const pct   = Math.min(100,Math.round(today/goal*100));
+  const bar   = document.getElementById('cc-goal-bar');
+  if(bar) bar.style.width=pct+'%';
+  const lbl=document.getElementById('cc-goal-label'); if(lbl) lbl.textContent=today+' / '+goal;
+  const pctEl=document.getElementById('cc-goal-pct'); if(pctEl) pctEl.textContent=pct+'%';
+}
+
+function renderCCHistory(){
+  const filter = document.getElementById('cc-hist-filter')?.value||'today';
+  const data = filterCC(filter);
+  const container = document.getElementById('cc-history');
+  if(!container) return;
+  if(!data.length){
+    container.innerHTML='<div style="text-align:center;padding:32px;color:var(--text3);font-size:13px">Aucun appel enregistré.</div>';
+    return;
+  }
+  container.innerHTML = data.map(d=>{
+    const cfg = CC_CFG[d.type]||{label:d.type,color:'var(--text3)',icon:'call'};
+    const t = new Date(d.ts);
+    const time = t.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const date = t.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border-lt)">
+      <span class="material-symbols-rounded" style="font-size:15px;color:${cfg.color};flex-shrink:0">${cfg.icon}</span>
+      <span style="font-size:13px;font-weight:600;color:${cfg.color};flex-shrink:0">${cfg.label}</span>
+      ${d.note?`<span style="font-size:12px;color:var(--text3);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">— ${d.note}</span>`:'<span style="flex:1"></span>'}
+      <span style="font-size:11px;color:var(--text3);flex-shrink:0">${date} ${time}</span>
+      <button onclick="deleteCC(${d.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:2px 4px;opacity:.4;transition:opacity .1s;flex-shrink:0" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.4">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function deleteCC(id){
+  saveCCData(getCCData().filter(d=>d.id!==id));
+  updateCCStats(); renderCCHistory();
+}
+
+function resetCCToday(){
+  if(!confirm('Supprimer tous les appels du jour ?')) return;
+  const today=new Date().toISOString().split('T')[0];
+  saveCCData(getCCData().filter(d=>!d.ts.startsWith(today)));
+  updateCCStats(); renderCCHistory();
+}
+
+function exportCC(){
+  const data=getCCData();
+  if(!data.length){ alert('Aucun appel à exporter.'); return; }
+  const rows=[['Date','Heure','Résultat','Note']];
+  data.forEach(d=>{
+    const t=new Date(d.ts);
+    rows.push([t.toLocaleDateString('fr-FR'),t.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),CC_CFG[d.type]?.label||d.type,d.note||'']);
+  });
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='tracker-appels-'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+}
+
+function initColdCall(){ updateCCStats(); renderCCHistory(); }
+
+// ─── MOBILE SIDEBAR ───// ─── MOBILE SIDEBAR ───
 function mobToggleSidebar() {
   const sb = document.querySelector('.sidebar');
   const ov = document.getElementById('mob-overlay');
