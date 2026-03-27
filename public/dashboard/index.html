@@ -6242,8 +6242,10 @@ function ccChartHover(e) {
   if(mx < pad.left || mx > pad.left+cW) { tooltip.style.display='none'; return; }
   const b = buckets[idx];
   tooltip.style.display = 'block';
-  tooltip.style.left = (e.clientX+14)+'px';
-  tooltip.style.top  = (e.clientY-50)+'px';
+  const ttW = 140;
+  const left = e.clientX + 14 + ttW > window.innerWidth ? e.clientX - ttW - 10 : e.clientX + 14;
+  tooltip.style.left = left + 'px';
+  tooltip.style.top  = Math.max(10, e.clientY - 50) + 'px';
   tooltip.innerHTML = `<div style="font-weight:600;margin-bottom:5px">${labels[idx]}</div>
     <div>Appels : <b style="color:#fff">${b.total}</b></div>
     <div>RDV : <b style="color:#6ee7b7">${b.rdv}</b></div>
