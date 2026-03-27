@@ -865,6 +865,18 @@ tr:hover td { background: var(--primary-lt); }
 .cc-kpi-inline-label {
   font-size:10px;color:var(--text3);font-weight:500;text-align:center;
 }
+
+/* ─── CC CHART ─── */
+.cc-period-btn {
+  font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;
+  border:1px solid var(--border);background:transparent;color:var(--text3);
+  cursor:pointer;font-family:inherit;transition:all .1s;
+}
+.cc-period-btn:hover { background:var(--bg);color:var(--text2); }
+.cc-period-active {
+  background:var(--primary-lt)!important;color:var(--primary)!important;
+  border-color:var(--primary-border)!important;font-weight:600!important;
+}
 </style>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&libraries=places&language=fr&loading=async" async defer></script>
 </head>
@@ -2484,6 +2496,42 @@ tr:hover td { background: var(--primary-lt); }
             Réinitialiser aujourd'hui
           </button>
 
+        </div>
+      </div>
+
+      <!-- Graphique évolution -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-header">
+          <div class="card-title">Évolution des appels</div>
+          <div style="display:flex;gap:4px" id="cc-chart-periods">
+            <button class="cc-period-btn" data-period="24h" onclick="setCCPeriod('24h',this)">24h</button>
+            <button class="cc-period-btn" data-period="7d"  onclick="setCCPeriod('7d',this)">7 j</button>
+            <button class="cc-period-btn cc-period-active" data-period="30d" onclick="setCCPeriod('30d',this)">30 j</button>
+            <button class="cc-period-btn" data-period="90d" onclick="setCCPeriod('90d',this)">3 mois</button>
+            <button class="cc-period-btn" data-period="180d" onclick="setCCPeriod('180d',this)">6 mois</button>
+            <button class="cc-period-btn" data-period="365d" onclick="setCCPeriod('365d',this)">12 mois</button>
+            <button class="cc-period-btn" data-period="all"  onclick="setCCPeriod('all',this)">Tout</button>
+          </div>
+        </div>
+        <div style="padding:8px 18px 18px">
+          <!-- Légende -->
+          <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)">
+              <span style="width:16px;height:2px;background:var(--primary);display:inline-block;border-radius:2px"></span>Total appels
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)">
+              <span style="width:16px;height:2px;background:var(--green);display:inline-block;border-radius:2px"></span>RDV pris
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)">
+              <span style="width:16px;height:2px;background:#7c3aed;display:inline-block;border-radius:2px"></span>Convertis
+            </div>
+          </div>
+          <div style="position:relative;height:180px">
+            <canvas id="cc-chart" style="width:100%;height:100%"></canvas>
+            <div id="cc-chart-empty" style="display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px">Pas encore assez de données</div>
+          </div>
+          <!-- Tooltip -->
+          <div id="cc-chart-tooltip" style="display:none;position:fixed;background:var(--ink,#111);color:#fff;font-size:11px;padding:8px 12px;border-radius:8px;pointer-events:none;z-index:999;min-width:120px;box-shadow:0 4px 16px rgba(0,0,0,.2)"></div>
         </div>
       </div>
 
@@ -5880,6 +5928,8 @@ function logCC(type){
   if(el){ el.textContent=parseInt(el.textContent||0)+1; el.style.transform='scale(1.4)'; setTimeout(()=>el.style.transform='scale(1)',180); }
   updateCCStats();
   renderCCHistory();
+  updateCCPeriodBtns();
+  renderCCChart();
 }
 
 function updateCCStats(){
@@ -5992,7 +6042,229 @@ function exportCC(){
   a.click();
 }
 
-function initColdCall(){ updateCCStats(); renderCCHistory(); }
+// ─── CC CHART ───
+let ccChartPeriod = '30d';
+let ccChartInstance = null;
+
+function setCCPeriod(period, btn) {
+  ccChartPeriod = period;
+  document.querySelectorAll('.cc-period-btn').forEach(b => b.classList.remove('cc-period-active'));
+  if(btn) btn.classList.add('cc-period-active');
+  renderCCChart();
+}
+
+function updateCCPeriodBtns() {
+  const data = getCCData();
+  if(!data.length) return;
+  const oldest = new Date(Math.min(...data.map(d=>new Date(d.ts).getTime())));
+  const spanDays = (new Date() - oldest) / 86400000;
+  const thresholds = { '24h':0, '7d':1, '30d':7, '90d':30, '180d':90, '365d':180, 'all':0 };
+  let bestPeriod = '24h';
+  document.querySelectorAll('.cc-period-btn').forEach(btn => {
+    const p = btn.dataset.period;
+    const needed = thresholds[p];
+    if(spanDays >= needed) {
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+      bestPeriod = p; // last valid one
+    } else {
+      btn.style.opacity = '.3';
+      btn.style.pointerEvents = 'none';
+    }
+  });
+  // Auto-select the most relevant period
+  const autoMap = [
+    [365, 'all'], [180, '365d'], [90, '180d'], [30, '90d'], [7, '30d'], [1, '7d'], [0, '24h']
+  ];
+  const auto = autoMap.find(([d]) => spanDays >= d)?.[1] || '24h';
+  ccChartPeriod = auto;
+  document.querySelectorAll('.cc-period-btn').forEach(b => {
+    b.classList.toggle('cc-period-active', b.dataset.period === auto);
+  });
+}
+
+function renderCCChart() {
+  const canvas = document.getElementById('cc-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const allData = getCCData();
+  const empty = document.getElementById('cc-chart-empty');
+
+  if (!allData.length) {
+    if(empty) { empty.style.display='flex'; empty.style.position='absolute'; }
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    return;
+  }
+  if(empty) empty.style.display='none';
+
+  const now = new Date();
+  let startDate;
+  if      (ccChartPeriod==='24h')  startDate = new Date(now - 24*3600000);
+  else if (ccChartPeriod==='7d')   startDate = new Date(now - 7*86400000);
+  else if (ccChartPeriod==='30d')  startDate = new Date(now - 30*86400000);
+  else if (ccChartPeriod==='90d')  startDate = new Date(now - 90*86400000);
+  else if (ccChartPeriod==='180d') startDate = new Date(now - 180*86400000);
+  else if (ccChartPeriod==='365d') startDate = new Date(now - 365*86400000);
+  else startDate = new Date(Math.min(...allData.map(d=>new Date(d.ts).getTime())));
+
+  // Auto groupBy based on actual span in days
+  const spanDays = (now - startDate) / 86400000;
+  const groupBy = spanDays <= 2 ? 'hour' : spanDays <= 60 ? 'day' : spanDays <= 400 ? 'week' : 'month';
+
+  // Key function
+  const fmt = (d) => {
+    if(groupBy==='hour')  return d.toISOString().slice(0,13);
+    if(groupBy==='day')   return d.toISOString().slice(0,10);
+    if(groupBy==='week')  {
+      const w = new Date(d);
+      w.setDate(w.getDate() - ((w.getDay()+6)%7)); // Monday
+      return w.toISOString().slice(0,10);
+    }
+    return d.toISOString().slice(0,7);
+  };
+
+  // Generate all bucket keys between start and now
+  const keySet = new Map();
+  const cur = new Date(startDate);
+  cur.setMinutes(0,0,0);
+  if(groupBy==='day'||groupBy==='week'||groupBy==='month') cur.setHours(0);
+  if(groupBy==='week') { cur.setDate(cur.getDate() - ((cur.getDay()+6)%7)); }
+  if(groupBy==='month') { cur.setDate(1); }
+
+  let safety = 0;
+  while(cur <= now && safety++ < 500) {
+    const k = fmt(cur);
+    if(!keySet.has(k)) keySet.set(k, {key:k, total:0, rdv:0, conv:0});
+    if(groupBy==='hour')  cur.setHours(cur.getHours()+1);
+    else if(groupBy==='day')   cur.setDate(cur.getDate()+1);
+    else if(groupBy==='week')  cur.setDate(cur.getDate()+7);
+    else { cur.setMonth(cur.getMonth()+1); cur.setDate(1); }
+  }
+  const buckets = Array.from(keySet.values());
+
+  // Fill with filtered data
+  allData.filter(d => new Date(d.ts) >= startDate).forEach(d => {
+    const k = fmt(new Date(d.ts));
+    const b = keySet.get(k);
+    if(!b) return;
+    b.total++;
+    if(d.type==='rdv')      b.rdv++;
+    if(d.type==='converti') b.conv++;
+  });
+
+  // Labels
+  const labels = buckets.map(b => {
+    if(groupBy==='hour')  return b.key.slice(11)+'h';
+    if(groupBy==='day')   { const d=new Date(b.key+'T12:00:00'); return d.getDate()+'/'+(d.getMonth()+1); }
+    if(groupBy==='week')  { const d=new Date(b.key+'T12:00:00'); return d.getDate()+'/'+(d.getMonth()+1); }
+    const d=new Date(b.key+'-15');
+    return ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'][d.getMonth()];
+  });
+
+  // Canvas setup
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const pad={top:12,right:16,bottom:32,left:36};
+  const cW=W-pad.left-pad.right, cH=H-pad.top-pad.bottom;
+  const maxVal=Math.max(...buckets.map(b=>b.total),1);
+  const N=buckets.length;
+  if(!N) return;
+
+  const cs=getComputedStyle(document.documentElement);
+  const cPrimary=cs.getPropertyValue('--primary').trim()||'#4f6cff';
+  const cGreen  =cs.getPropertyValue('--green').trim()  ||'#22c55e';
+  const cBorder =cs.getPropertyValue('--border').trim() ||'#e5e7eb';
+  const cText3  =cs.getPropertyValue('--text3').trim()  ||'#9ca3af';
+
+  // Grid
+  ctx.strokeStyle=cBorder; ctx.lineWidth=1;
+  const nLines=4;
+  for(let i=0;i<=nLines;i++) {
+    const r=i/nLines;
+    const y=pad.top+cH*(1-r);
+    ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+cW,y); ctx.stroke();
+    ctx.fillStyle=cText3; ctx.font='10px Inter,sans-serif'; ctx.textAlign='right';
+    ctx.fillText(Math.round(maxVal*r), pad.left-5, y+3);
+  }
+
+  // Draw series
+  const xOf = i => pad.left + (N===1 ? cW/2 : i/(N-1)*cW);
+  const yOf = v => pad.top + cH*(1 - v/maxVal);
+
+  const drawSeries = (vals, color, fill) => {
+    if(!vals.some(v=>v>0)) return;
+    const pts = vals.map((v,i)=>({x:xOf(i),y:yOf(v)}));
+    if(fill) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pad.top+cH);
+      pts.forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.lineTo(pts[N-1].x, pad.top+cH);
+      ctx.closePath();
+      ctx.globalAlpha=0.07; ctx.fillStyle=color; ctx.fill(); ctx.globalAlpha=1;
+    }
+    ctx.beginPath();
+    pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.stroke();
+    if(N<=40) pts.forEach(p=>{
+      ctx.beginPath(); ctx.arc(p.x,p.y,2.5,0,Math.PI*2);
+      ctx.fillStyle=color; ctx.fill();
+    });
+  };
+
+  drawSeries(buckets.map(b=>b.total), cPrimary, true);
+  drawSeries(buckets.map(b=>b.rdv),   cGreen,   false);
+  drawSeries(buckets.map(b=>b.conv),  '#7c3aed', false);
+
+  // X labels
+  ctx.fillStyle=cText3; ctx.font='10px Inter,sans-serif'; ctx.textAlign='center';
+  const step = N<=10?1:N<=20?2:N<=40?Math.ceil(N/10):Math.ceil(N/8);
+  labels.forEach((l,i)=>{
+    if(i%step!==0 && i!==N-1) return;
+    ctx.fillText(l, xOf(i), H-6);
+  });
+
+  // Store for tooltip
+  canvas._chart = {buckets,labels,pad,cW,cH,N,maxVal,W,H,xOf,yOf};
+}
+function ccChartHover(e) {
+  const canvas = document.getElementById('cc-chart');
+  const tooltip = document.getElementById('cc-chart-tooltip');
+  if(!canvas || !canvas._chart || !tooltip) return;
+  const { buckets, labels, pad, cW, N } = canvas._chart;
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const idx = Math.max(0, Math.min(N-1, Math.round((mx - pad.left) / cW * (N-1))));
+  if(mx < pad.left || mx > pad.left+cW) { tooltip.style.display='none'; return; }
+  const b = buckets[idx];
+  tooltip.style.display = 'block';
+  tooltip.style.left = (e.clientX+14)+'px';
+  tooltip.style.top  = (e.clientY-50)+'px';
+  tooltip.innerHTML = `<div style="font-weight:600;margin-bottom:5px">${labels[idx]}</div>
+    <div>Appels : <b style="color:#fff">${b.total}</b></div>
+    <div>RDV : <b style="color:#6ee7b7">${b.rdv}</b></div>
+    <div>Convertis : <b style="color:#c4b5fd">${b.conv}</b></div>`;
+}
+
+function initColdCall(){
+  updateCCStats();
+  renderCCHistory();
+  updateCCPeriodBtns();
+  renderCCChart();
+  // Attach hover
+  setTimeout(() => {
+    const canvas = document.getElementById('cc-chart');
+    const tooltip = document.getElementById('cc-chart-tooltip');
+    if(canvas) {
+      canvas.addEventListener('mousemove', ccChartHover);
+      canvas.addEventListener('mouseleave', () => { if(tooltip) tooltip.style.display='none'; });
+    }
+  }, 100);
+}
 
 // ─── MOBILE SIDEBAR ───// ─── MOBILE SIDEBAR ───
 function mobToggleSidebar() {
