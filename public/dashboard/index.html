@@ -1611,7 +1611,7 @@ tr:hover td { background: var(--primary-lt); }
             <div style="font-size:11px;font-weight:600;color:var(--text2)">Score de chaleur :</div>
             <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:#fef2f2;color:#dc2626;padding:2px 7px;border-radius:4px;font-weight:700">🔥 3+</span> Très chaud — plusieurs signaux</div>
             <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:var(--amber-lt);color:var(--amber);padding:2px 7px;border-radius:4px;font-weight:700">⚡ 2</span> Chaud — 2 signaux</div>
-            <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:var(--primary-lt);color:var(--primary);padding:2px 7px;border-radius:4px;font-weight:700">📍 1</span> Tiède — 1 signal</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:var(--primary-lt);color:var(--primary);padding:2px 7px;border-radius:4px;font-weight:700">1</span> Tiède — 1 signal</div>
           </div>
 
           <div id="cross-table" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:16px"></div>
@@ -1879,7 +1879,7 @@ tr:hover td { background: var(--primary-lt); }
       <!-- Header -->
       <div class="page-header" style="margin-bottom:20px">
         <div>
-          <div class="page-heading">🔥 Alertes du jour</div>
+          <div class="page-heading">Alertes du jour</div>
           <div class="page-subheading">Nouveaux signaux détectés automatiquement cette nuit · Mis à jour chaque matin à 6h</div>
         </div>
         <div style="display:flex;gap:8px">
@@ -1915,9 +1915,9 @@ tr:hover td { background: var(--primary-lt); }
       <!-- Filtres -->
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
         <button class="chip" onclick="filterAlertes('all',this)" id="filter-alerte-all" style="background:var(--primary-lt);color:var(--primary);border-color:var(--primary-border);font-weight:700">Tous</button>
-        <button class="chip" onclick="filterAlertes('GMAPS',this)">🗺️ Google Maps</button>
-        <button class="chip" onclick="filterAlertes('phone',this)">📞 Avec téléphone</button>
-        <button class="chip" onclick="filterAlertes('unseen',this)">🔴 Non lus</button>
+        <button class="chip" onclick="filterAlertes('GMAPS',this)">Google Maps</button>
+        <button class="chip" onclick="filterAlertes('phone',this)">Avec téléphone</button>
+        <button class="chip" onclick="filterAlertes('unseen',this)">Non lus</button>
       </div>
 
       <!-- Liste des alertes -->
@@ -5511,10 +5511,10 @@ function renderAlertes() {
     const isNew = !s.seen;
 
     let detailLines = '';
-    if (s.source === 'GMAPS') detailLines = [details.secteur, details.phone ? '📞 ' + details.phone : null, details.rating ? '★ ' + details.rating + ' (' + details.reviews + ' avis)' : null].filter(Boolean).join(' · ');
+    if (s.source === 'GMAPS') detailLines = [details.secteur, details.phone ? ' ' + details.phone : null, details.rating ? ' ' + details.rating + ' (' + details.reviews + ' avis)' : null].filter(Boolean).join(' · ');
     if (s.source === 'BODACC') detailLines = details.type || '';
     if (s.source === 'DVF') detailLines = [details.type, details.prix, details.surface].filter(Boolean).join(' · ');
-    if (s.source === 'DPE') detailLines = ['Classe ' + (details.classe||'G'), details.type, details.surface, details.eligible_mpr ? '✓ Éligible MaPrimeRénov' : ''].filter(Boolean).join(' · ');
+    if (s.source === 'DPE') detailLines = ['Classe ' + (details.classe||'G'), details.type, details.surface, details.eligible_mpr ? ' Éligible MaPrimeRénov' : ''].filter(Boolean).join(' · ');
 
     return '<div style="background:var(--surface);border:1px solid ' + (isNew?'var(--primary-border)':'var(--border)') + ';border-left:3px solid ' + (isNew?'var(--primary)':'var(--border)') + ';border-radius:var(--radius-lg);padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-xs)">'
       + '<div style="width:38px;height:38px;border-radius:10px;background:' + cfg.bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">'
