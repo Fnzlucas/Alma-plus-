@@ -310,7 +310,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
       <div style="width:32px;height:32px;border-radius:9px;background:#004ced;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;flex-shrink:0">U</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:11px;font-weight:700;color:#0a0a1a" id="sidebar-user-name">mon compte</div>
-        <div style="font-size:9px;color:#9ca3af;font-weight:600;letter-spacing:.1em">plan pro</div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase" id="sidebar-plan-badge" style="color:#9ca3af">starter</div>
       </div>
       <button onclick="confirmLogout()" style="background:none;border:none;cursor:pointer;color:#d1d5db;padding:4px;border-radius:6px;transition:color .12s;display:flex;align-items:center" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#d1d5db'">
         <span class="msym" style="font-size:16px">logout</span>
@@ -1130,7 +1130,47 @@ tr:hover td { background: rgba(255,255,255,0.3); }
                 <div style="background:rgba(255,255,255,0.5);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.5)"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:6px">prospects ce mois</div><div style="font-size:24px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="plan-prospects-count">—</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">illimités avec pro</div></div>
                 <div style="background:rgba(255,255,255,0.5);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.5)"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:6px">emails générés</div><div style="font-size:24px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="plan-emails-count">—</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">illimités avec pro</div></div>
               </div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap">
+
+              <!-- Widget quotas -->
+              <div style="margin-top:20px">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:14px">utilisation ce mois</div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                      <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#004ced">mail</span>emails ia</span>
+                      <span style="font-size:11px;font-weight:800;color:#004ced" id="quota-emails-label">0 / 300</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="quota-emails-bar" style="width:0%"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                      <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#004ced">psychology</span>fiches pré-appel</span>
+                      <span style="font-size:11px;font-weight:800;color:#004ced" id="quota-fiches-label">0 / 10</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="quota-fiches-bar" style="width:0%"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                      <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#004ced">phone_in_talk</span>appels assistés</span>
+                      <span style="font-size:11px;font-weight:800;color:#004ced" id="quota-appels-label">0 / 100</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="quota-appels-bar" style="width:0%"></div></div>
+                  </div>
+                  <div style="display:flex;justify-content:space-between">
+                    <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#004ced">description</span>devis ia</span>
+                    <span style="font-size:11px;font-weight:800;color:#004ced" id="quota-devis-label">0 / 20</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between">
+                    <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#004ced">radar</span>veille ia</span>
+                    <span style="font-size:11px;font-weight:800;color:#004ced" id="quota-veille-label">0 / 3</span>
+                  </div>
+                </div>
+                <div style="margin-top:16px;padding:10px 14px;background:rgba(0,76,237,0.04);border-radius:10px;border:1px solid rgba(0,76,237,0.1);font-size:11px;color:#6b7280;display:flex;align-items:center;gap:6px">
+                  <span class="msym" style="font-size:14px;color:#004ced">refresh</span>
+                  remise à zéro le 1er de chaque mois
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
                 <button class="btn btn-ghost" onclick="alert('portail stripe — bientôt disponible.')"><span class="msym">receipt_long</span>facturation</button>
                 <button class="btn" style="background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.15)" onclick="startCancellation()">annuler l'abonnement</button>
               </div>
@@ -1301,6 +1341,100 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 
 <script>
 
+
+// ═══ QUOTAS & PLANS ═══
+const PLANS = {
+  starter: { name:'starter', emails:300,  fiches:200,  appels:100, devis:20,  veille:10, prospects:500,      autopilot:false },
+  pro:     { name:'pro',     emails:4000, fiches:1000, appels:500, devis:100, veille:50, prospects:Infinity, autopilot:true  },
+  ultra:   { name:'ultra',   emails:Infinity, fiches:Infinity, appels:Infinity, devis:Infinity, veille:Infinity, prospects:Infinity, autopilot:true },
+  agency:  { name:'agence',  emails:Infinity, fiches:Infinity, appels:Infinity, devis:Infinity, veille:Infinity, prospects:Infinity, autopilot:true },
+};
+
+function getCurrentPlan(){ return localStorage.getItem('alma_plan')||'starter'; }
+function getPlanLimits(){ return PLANS[getCurrentPlan()]||PLANS.starter; }
+function getQuotaMonth(){ const n=new Date(); return n.getFullYear()+'-'+n.getMonth(); }
+function getUsage(){ try{ return JSON.parse(localStorage.getItem('alma_usage_'+getQuotaMonth())||'{}'); }catch{return{};} }
+function saveUsage(u){ localStorage.setItem('alma_usage_'+getQuotaMonth(),JSON.stringify(u)); }
+
+function incrementUsage(type, count=1){
+  const u=getUsage(); u[type]=(u[type]||0)+count; saveUsage(u); updateQuotaUI();
+}
+
+function checkQuota(type){
+  const limits=getPlanLimits(); const usage=getUsage();
+  const used=usage[type]||0; const limit=limits[type];
+  if(limit===Infinity) return true;
+  if(used>=limit){ showUpgradeModal(type,used,limit); return false; }
+  return true;
+}
+
+function checkAutopilot(){
+  if(!getPlanLimits().autopilot){ showUpgradeModal('autopilot',0,0); return false; }
+  return true;
+}
+
+function showUpgradeModal(type, used, limit){
+  const labels={emails:'emails ia',fiches:'fiches pré-appel',appels:'appels assistés ia',devis:'devis ia',veille:'analyses de marché',autopilot:'pilote automatique',prospects:'prospects'};
+  const plan=getCurrentPlan();
+  const nextPlan=plan==='starter'?'pro':plan==='pro'?'ultra':'agence';
+  const nextPrice=plan==='starter'?'129€/mois':plan==='pro'?'290€/mois':'sur devis';
+  document.getElementById('upgrade-feature').textContent=labels[type]||type;
+  document.getElementById('upgrade-used').textContent=used;
+  document.getElementById('upgrade-limit').textContent=limit===Infinity?'illimité':limit;
+  document.getElementById('upgrade-plan-name').textContent=nextPlan;
+  document.getElementById('upgrade-plan-price').textContent=nextPrice;
+  // Adapter features selon plan cible
+  const featList=document.getElementById('upgrade-features-list');
+  if(featList){
+    if(nextPlan==='ultra'){
+      featList.innerHTML='<div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">all_inclusive</span>tout illimité — emails, fiches, appels, devis, veille</div><div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>pilote automatique ia</div><div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>prospects illimités</div>';
+    } else if(nextPlan==='pro'){
+      featList.innerHTML='<div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>4 000 emails ia / mois</div><div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>1 000 fiches pré-appel</div><div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>500 appels assistés ia</div><div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>pilote automatique ia</div>';
+    }
+  }
+  document.getElementById('upgrade-modal').classList.add('open');
+}
+
+function updateQuotaUI(){
+  const limits=getPlanLimits(); const usage=getUsage(); const plan=getCurrentPlan();
+  // Barre emails
+  const emailUsed=usage.emails||0; const emailLimit=limits.emails;
+  const emailPct=emailLimit===Infinity?0:Math.min(100,Math.round(emailUsed/emailLimit*100));
+  const emailBar=document.getElementById('quota-emails-bar');
+  const emailLabel=document.getElementById('quota-emails-label');
+  if(emailBar) emailBar.style.width=emailPct+'%';
+  if(emailLabel) emailLabel.textContent=emailLimit===Infinity?emailUsed+' / illimité':emailUsed+' / '+emailLimit;
+  // Fiches
+  const ficheUsed=usage.fiches||0; const ficheLimit=limits.fiches;
+  const fichePct=ficheLimit===Infinity?0:Math.min(100,Math.round(ficheUsed/ficheLimit*100));
+  const ficheBar=document.getElementById('quota-fiches-bar');
+  const ficheLabel=document.getElementById('quota-fiches-label');
+  if(ficheBar) ficheBar.style.width=fichePct+'%';
+  if(ficheLabel) ficheLabel.textContent=ficheLimit===Infinity?ficheUsed+' / illimité':ficheUsed+' / '+ficheLimit;
+  // Appels
+  const appelsUsed=usage.appels||0; const appelsLimit=limits.appels;
+  const appelsBar=document.getElementById('quota-appels-bar');
+  const appelsLabel=document.getElementById('quota-appels-label');
+  const appelsPct=appelsLimit===Infinity?0:Math.min(100,Math.round(appelsUsed/appelsLimit*100));
+  if(appelsBar) appelsBar.style.width=appelsPct+'%';
+  if(appelsLabel) appelsLabel.textContent=appelsLimit===Infinity?appelsUsed+' / illimité':appelsUsed+' / '+appelsLimit;
+  if(appelsBar) appelsBar.style.background=appelsPct>=90?'#dc2626':appelsPct>=70?'#d97706':'#004ced';
+  // Devis
+  const devisUsed=usage.devis||0; const devisLimit=limits.devis;
+  const devisLabel=document.getElementById('quota-devis-label');
+  if(devisLabel) devisLabel.textContent=devisLimit===Infinity?devisUsed+' / illimité':devisUsed+' / '+devisLimit;
+  // Veille
+  const veilleUsed=usage.veille||0; const veilleLimit=limits.veille;
+  const veilleLabel=document.getElementById('quota-veille-label');
+  if(veilleLabel) veilleLabel.textContent=veilleLimit===Infinity?veilleUsed+' / illimité':veilleUsed+' / '+veilleLimit;
+  // Badge plan sidebar
+  const planBadge=document.getElementById('sidebar-plan-badge');
+  if(planBadge){ const colors={starter:'#9ca3af',pro:'#004ced',agency:'#00d4ff'}; planBadge.textContent=plan; planBadge.style.color=colors[plan]||'#9ca3af'; }
+  // Couleur barre selon seuil
+  if(emailBar){ emailBar.style.background=emailPct>=90?'#dc2626':emailPct>=70?'#d97706':'#004ced'; }
+  if(ficheBar){ ficheBar.style.background=fichePct>=90?'#dc2626':fichePct>=70?'#d97706':'#004ced'; }
+}
+
 // ═══ CLAUDE API PROXY ═══
 async function claudeAPI(messages, max_tokens=800) {
   const res = await fetch('/api/claude', {
@@ -1338,6 +1472,7 @@ function loadState() {
   updateApiStatus();
   refreshAll();
   updateSeenCounter();
+  updateQuotaUI();
 }
 function saveState() { try { localStorage.setItem('alma_state', JSON.stringify(state)); } catch(_) {} }
 
@@ -1635,6 +1770,7 @@ async function generateFiche(p) {
 
   // Si déjà en cache, retourner directement
   if (p.fiche_preappel) return p.fiche_preappel;
+  if(!checkQuota('fiches')) throw new Error('quota fiches atteint');
 
   const prompt = `tu es un expert en prospection commerciale et vente B2B. analyse ce prospect et génère une fiche pré-appel ultra-personnalisée.
 
@@ -1665,6 +1801,7 @@ Génère une analyse JSON avec exactement cette structure (sans markdown, sans b
 
   const d = await claudeAPI([{ role: 'user', content: prompt }], 700);
   const text = d.content[0].text.trim().replace(/```json|```/g, '').trim();
+  incrementUsage('fiches');
   return JSON.parse(text);
 }
 
@@ -1736,9 +1873,11 @@ function renderFicheStandalone(fiche) {
 // ═══ EMAIL IA ═══
 async function generateEmail(prospectId) {
   const p=state.prospects.find(x=>x.id===prospectId);if(!p) return null;
+  if(!checkQuota('emails')) return null;
   const profile=getProfile();
   const prompt=`tu es un expert en prospection commerciale. rédige un email de prospection b2b court.\n\nprospect :\n- entreprise : ${p.name}\n- note google : ${p.rating}/5 (${p.reviews} avis)\n- adresse : ${p.address}\n\nexpéditeur :\n- prénom : ${profile.prenom||'prénom'}\n- nom : ${profile.nom||'nom'}\n- société : ${profile.societe||'ma société'}\n- activité : ${profile.activite||'consultant'}\n- valeur : ${profile.valeur||'je peux vous aider'}\n- ton : ${profile.ton||'professionnel'}\n\nconsignes :\n- 150-200 mots max\n- objet accrocheur ligne 1\n- personnalisé\n- appel à l'action clair\n- signature complète\n- français, texte brut`;
   const d=await claudeAPI([{role:'user',content:prompt}],500);
+  incrementUsage('emails');
   return d.content[0].text;
 }
 
@@ -1885,9 +2024,9 @@ async function searchPermis(){const commune=document.getElementById('permis-comm
 async function searchAO(){const kw=document.getElementById('ao-keywords').value.trim();if(!kw) return alert('renseignez des mots-clés.');showSpinner('ao-spinner');try{const data=await proxyFetch('https://boamp-datadila.opendatasoft.com/api/records/1.0/search/?dataset=boamp&q='+encodeURIComponent(kw)+'&rows=15&sort=dateparution');const records=data.records||[];document.getElementById('ao-results-sub').textContent=records.length+' marchés trouvés';document.getElementById('ao-table').innerHTML=records.map(r=>{const f=r.fields;const titre=(f.objet||f.intitule||'—').slice(0,80);return`<tr><td style="max-width:200px"><strong style="font-size:11px">${titre}</strong></td><td style="font-size:11px">${f.nomacheteur||'—'}</td><td><span class="badge badge-blue">${f.famille||'marché'}</span></td><td>${f.codedepartement||'—'}</td><td style="color:#d97706;font-weight:700;font-size:11px">${f.datelimitereponse||'—'}</td><td><button class="btn btn-ghost btn-sm" onclick="addToP(this)" data-name="ao: ${titre.slice(0,25)}" data-addr="${f.codedepartement||''}" data-score="80">+ pipeline</button></td></tr>`;}).join('');document.getElementById('ao-results').style.display='';}catch(e){alert('erreur boamp : '+e.message);}finally{hideSpinner('ao-spinner');}}
 
 // ═══ VEILLE & DEVIS ═══
-async function runVeille(){const secteur=document.getElementById('veille-secteur').value.trim();if(!secteur) return;showSpinner('veille-spinner');document.getElementById('btn-veille').disabled=true;try{const d=await claudeAPI([{role:'user',content:'analyse le marché du secteur "'+secteur+'" en france. fournis : 1. tendances 2. points de douleur 3. arguments commerciaux 4. meilleure approche. réponse concise en français.'}],600);document.getElementById('veille-text').textContent=d.content[0].text;show('veille-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('veille-spinner');document.getElementById('btn-veille').disabled=false;}
+async function runVeille(){const secteur=document.getElementById('veille-secteur').value.trim();if(!secteur) return;if(!checkQuota('veille')) return;showSpinner('veille-spinner');document.getElementById('btn-veille').disabled=true;try{const d=await claudeAPI([{role:'user',content:'analyse le marché du secteur "'+secteur+'" en france. fournis : 1. tendances 2. points de douleur 3. arguments commerciaux 4. meilleure approche. réponse concise en français.'}],600);incrementUsage('veille');document.getElementById('veille-text').textContent=d.content[0].text;show('veille-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('veille-spinner');document.getElementById('btn-veille').disabled=false;}
 
-async function generateDevis(){const client=document.getElementById('devis-client').value.trim();const desc=document.getElementById('devis-desc').value.trim();if(!client||!desc){alert('renseignez le client et la prestation.');return;}showSpinner('devis-spinner');document.getElementById('btn-devis').disabled=true;try{const d=await claudeAPI([{role:'user',content:'génère un devis professionnel en français pour :\nclient : '+client+'\nprestataire : '+document.getElementById('devis-activite').value+'\nprestation : '+desc+'\nbudget : '+(document.getElementById('devis-budget').value||'à définir')+'€\ndélai : '+(document.getElementById('devis-delai').value||'à définir')+'\n\nformat : devis structuré, texte brut, pas de markdown.'}],800);document.getElementById('devis-text').textContent=d.content[0].text;show('devis-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('devis-spinner');document.getElementById('btn-devis').disabled=false;}
+async function generateDevis(){const client=document.getElementById('devis-client').value.trim();const desc=document.getElementById('devis-desc').value.trim();if(!client||!desc){alert('renseignez le client et la prestation.');return;}if(!checkQuota('devis')) return;showSpinner('devis-spinner');document.getElementById('btn-devis').disabled=true;try{const d=await claudeAPI([{role:'user',content:'génère un devis professionnel en français pour :\nclient : '+client+'\nprestataire : '+document.getElementById('devis-activite').value+'\nprestation : '+desc+'\nbudget : '+(document.getElementById('devis-budget').value||'à définir')+'€\ndélai : '+(document.getElementById('devis-delai').value||'à définir')+'\n\nformat : devis structuré, texte brut, pas de markdown.'}],800);incrementUsage('devis');document.getElementById('devis-text').textContent=d.content[0].text;show('devis-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('devis-spinner');document.getElementById('btn-devis').disabled=false;}
 
 // ═══ SÉQUENCES ═══
 function saveSequence(){alert('séquence enregistrée !');}
@@ -1900,6 +2039,7 @@ function apSetProgress(pct,label){const fill=document.getElementById('ap-progres
 function apUpdateCounters(p,e,pl){['ap-count-prospects','ap-count-emails','ap-count-pipeline'].forEach((id,i)=>{const el=document.getElementById(id);if(el) el.textContent=[p,e,pl][i];});}
 
 async function launchAutopilot(){
+  if(!checkAutopilot()) return;
   const query=document.getElementById('auto-query')?.value.trim();const zone=document.getElementById('auto-zone')?.value.trim();const nb=parseInt(document.getElementById('auto-nb')?.value)||10;const minScore=parseInt(document.getElementById('auto-score')?.value)||60;
   if(!query||!zone){alert('renseignez le type de business et la zone.');return;}
   _apRunning=true;_apStop=false;
@@ -2074,7 +2214,15 @@ function mobClose(){document.getElementById('sidebar').classList.remove('mob-ope
 document.addEventListener('click',function(e){const navItem=e.target.closest('.nav-item');if(navItem&&window.innerWidth<=768) mobClose();});
 
 // ═══ LOGOUT ═══
-function confirmLogout(){if(confirm('se déconnecter de alma.+ ?')){localStorage.clear();window.location.href='/login';}}
+async function confirmLogout(){
+  if(confirm('se déconnecter de alma.+ ?')){
+    const { createClient } = supabase;
+    const sb = createClient('https://tzrtptpzbrszibuifzns.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk');
+    await sb.auth.signOut();
+    localStorage.clear();
+    window.location.href='/login';
+  }
+}
 
 // ═══ FICHE PRÉ-APPEL IA ═══
 async function genFichePreAppel() {
@@ -2193,6 +2341,56 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
   document.getElementById('pm-fiche-btn').disabled = false;
 }
 
+
+// ═══ AUTH & PLAN CHECK ═══
+(async function() {
+  const SUPA_URL = 'https://tzrtptpzbrszibuifzns.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk';
+  const { createClient } = supabase;
+  const sb = createClient(SUPA_URL, SUPA_KEY);
+
+  // 1. Vérifier session
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = '/login'; return; }
+
+  // 2. Vérifier plan dans localStorage d'abord
+  let plan = localStorage.getItem('alma_plan');
+
+  // 3. Si pas de plan en local → chercher dans Supabase
+  if (!plan || plan === 'null' || plan === 'undefined') {
+    try {
+      const { data: profile, error } = await sb
+        .from('profiles')
+        .select('plan, subscription_status')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (!error && profile && profile.plan && profile.subscription_status === 'active') {
+        plan = profile.plan;
+        localStorage.setItem('alma_plan', plan);
+      } else {
+        // Pas de plan → pricing
+        window.location.href = '/pricing';
+        return;
+      }
+    } catch(e) {
+      // Erreur Supabase → pricing par sécurité
+      window.location.href = '/pricing';
+      return;
+    }
+  }
+
+  // 4. Mettre à jour nom sidebar
+  const meta = session.user.user_metadata || {};
+  const name = [meta.prenom, meta.nom].filter(Boolean).join(' ') || session.user.email;
+  const nameEl = document.getElementById('sidebar-user-name');
+  if (nameEl) nameEl.textContent = name.toLowerCase();
+
+  // 5. Mettre à jour badge plan
+  localStorage.setItem('alma_plan', plan);
+  updateQuotaUI();
+})();
+
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCounter();});
 </script>
@@ -2261,6 +2459,43 @@ document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCo
   </div>
 </div>
 
+
+
+<!-- Upgrade Modal -->
+<div class="modal-overlay" id="upgrade-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header" style="background:linear-gradient(135deg,#0a0a1a,#1a1a3e);border-radius:24px 24px 0 0">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(0,76,237,0.3);display:flex;align-items:center;justify-content:center">
+          <span class="msym" style="color:#00d4ff;font-size:22px">rocket_launch</span>
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:white;letter-spacing:-.5px">quota atteint</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">passez au niveau supérieur</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('upgrade-modal').classList.remove('open')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6)"><span class="msym" style="font-size:16px">close</span></button>
+    </div>
+    <div class="modal-body" style="text-align:center;padding:32px 28px">
+      <div style="font-size:13px;color:#6b7280;margin-bottom:8px">vous avez utilisé</div>
+      <div style="font-size:48px;font-weight:900;letter-spacing:-3px;color:#0a0a1a;line-height:1"><span id="upgrade-used">0</span><span style="font-size:20px;color:#9ca3af"> / <span id="upgrade-limit">0</span></span></div>
+      <div style="font-size:13px;font-weight:700;color:#004ced;margin-bottom:28px;text-transform:uppercase;letter-spacing:.1em" id="upgrade-feature">emails ia</div>
+      <div style="background:rgba(0,76,237,0.04);border:1px solid rgba(0,76,237,0.12);border-radius:16px;padding:20px;margin-bottom:24px;text-align:left">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#004ced;margin-bottom:12px">plan <span id="upgrade-plan-name">pro</span> — <span id="upgrade-plan-price">119€/mois</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>4 000 emails ia / mois</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>100 fiches pré-appel</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>pilote automatique ia</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>prospects illimités</div>
+        </div>
+      </div>
+      <a href="/pricing" class="btn btn-primary" style="width:100%;justify-content:center;font-size:13px;padding:15px;border-radius:14px;text-decoration:none">
+        <span class="msym">arrow_forward</span>upgrader mon plan
+      </a>
+      <button onclick="document.getElementById('upgrade-modal').classList.remove('open')" style="margin-top:12px;background:none;border:none;font-size:12px;color:#9ca3af;cursor:pointer;font-family:inherit">rester sur mon plan actuel</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
