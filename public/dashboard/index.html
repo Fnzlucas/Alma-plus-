@@ -131,31 +131,13 @@ body { font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; color: 
 }
 .nav-item .material-symbols-rounded { font-size: 17px; flex-shrink: 0; }
 .cc-btn {
-  display:flex;align-items:center;justify-content:space-between;
-  padding:9px 12px;border-radius:10px;width:100%;
-  font-family:inherit;font-size:12px;font-weight:500;
-  color:var(--text2);background:#fff;
-  border:1.5px solid var(--border);
-  cursor:pointer;transition:all .12s;text-align:left;
-  box-shadow:0 1px 2px rgba(0,0,0,.04);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;padding:16px 12px;border-radius:var(--radius-lg);
+  cursor:pointer;transition:all .15s;position:relative;
+  font-family:inherit;
 }
-.cc-btn:hover {
-  border-color:var(--primary);color:var(--primary);
-  background:var(--primary-lt);box-shadow:0 2px 8px rgba(79,108,255,.12);
-}
-.cc-btn:active { transform:scale(.98); }
-.cc-btn[data-type="rdv"]:hover        { border-color:var(--green);color:var(--green);background:var(--green-lt);box-shadow:0 2px 8px rgba(34,197,94,.12); }
-.cc-btn[data-type="converti"]:hover   { border-color:var(--primary);color:var(--primary);background:var(--primary-lt); }
-.cc-btn[data-type="interesse"]:hover  { border-color:var(--primary);color:var(--primary);background:var(--primary-lt); }
-.cc-btn[data-type="rappel"]:hover     { border-color:var(--amber);color:var(--amber);background:var(--amber-lt);box-shadow:0 2px 8px rgba(245,158,11,.12); }
-.cc-btn[data-type="non_interesse"]:hover,
-.cc-btn[data-type="raccroche"]:hover  { border-color:var(--error);color:var(--error);background:#fef2f2;box-shadow:0 2px 8px rgba(239,68,68,.1); }
-.cc-btn span:last-child {
-  font-size:10px;font-weight:600;padding:1px 7px;
-  border-radius:99px;background:var(--bg);color:var(--text3);
-  flex-shrink:0;min-width:22px;text-align:center;
-  border:1px solid var(--border);
-}
+.cc-btn:hover { transform:scale(1.03); filter:brightness(.97); }
+.cc-btn:active { transform:scale(.97); }
 .cc-btn-count {
   position:absolute;top:8px;right:10px;
   font-size:11px;font-weight:800;
@@ -269,6 +251,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; color: 
 
 .page { display: none; }
 .page.active { display: block; animation: fadeIn .15s ease; }
+#page-settings.active { display: flex; justify-content: center; animation: fadeIn .15s ease; }
+#page-settings { width: 100%; }
+#page-settings > div { width: 100%; max-width: 720px; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
 
 /* ─── MOBILE ─── */
@@ -853,30 +838,13 @@ tr:hover td { background: var(--primary-lt); }
 
 
 /* ─── CC KPI INLINE ─── */
-.cc-kpi-inline {
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  padding:11px 6px;gap:2px;
-}
-.cc-kpi-sep { border-left:1px solid var(--border); }
-.cc-kpi-inline-val {
-  font-size:17px;font-weight:700;color:inherit;
-  font-family:'Manrope',sans-serif;letter-spacing:-.5px;line-height:1;
-}
-.cc-kpi-inline-label {
-  font-size:10px;color:var(--text3);font-weight:500;text-align:center;
-}
-
-/* ─── CC CHART ─── */
-.cc-period-btn {
-  font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;
-  border:1px solid var(--border);background:transparent;color:var(--text3);
-  cursor:pointer;font-family:inherit;transition:all .1s;
-}
-.cc-period-btn:hover { background:var(--bg);color:var(--text2); }
-.cc-period-active {
-  background:var(--primary-lt)!important;color:var(--primary)!important;
-  border-color:var(--primary-border)!important;font-weight:600!important;
-}
+.cc-kpi-inline{flex:1;display:flex;flex-direction:column;align-items:center;padding:11px 6px;gap:2px;}
+.cc-kpi-sep{border-left:1px solid var(--border);}
+.cc-kpi-inline-val{font-size:17px;font-weight:700;color:inherit;font-family:'Manrope',sans-serif;letter-spacing:-.5px;line-height:1;}
+.cc-kpi-inline-label{font-size:10px;color:var(--text3);font-weight:500;text-align:center;}
+.cc-period-btn{font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all .1s;}
+.cc-period-btn:hover{background:var(--bg);color:var(--text2);}
+.cc-period-active{background:var(--primary-lt)!important;color:var(--primary)!important;border-color:var(--primary-border)!important;font-weight:600!important;}
 </style>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&libraries=places&language=fr&loading=async" async defer></script>
 </head>
@@ -1623,7 +1591,7 @@ tr:hover td { background: var(--primary-lt); }
             <div style="font-size:11px;font-weight:600;color:var(--text2)">Score de chaleur :</div>
             <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:#fef2f2;color:#dc2626;padding:2px 7px;border-radius:4px;font-weight:700">🔥 3+</span> Très chaud — plusieurs signaux</div>
             <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:var(--amber-lt);color:var(--amber);padding:2px 7px;border-radius:4px;font-weight:700">⚡ 2</span> Chaud — 2 signaux</div>
-            <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:var(--primary-lt);color:var(--primary);padding:2px 7px;border-radius:4px;font-weight:700">1</span> Tiède — 1 signal</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="background:var(--primary-lt);color:var(--primary);padding:2px 7px;border-radius:4px;font-weight:700">📍 1</span> Tiède — 1 signal</div>
           </div>
 
           <div id="cross-table" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:16px"></div>
@@ -1891,7 +1859,7 @@ tr:hover td { background: var(--primary-lt); }
       <!-- Header -->
       <div class="page-header" style="margin-bottom:20px">
         <div>
-          <div class="page-heading">Alertes du jour</div>
+          <div class="page-heading">🔥 Alertes du jour</div>
           <div class="page-subheading">Nouveaux signaux détectés automatiquement cette nuit · Mis à jour chaque matin à 6h</div>
         </div>
         <div style="display:flex;gap:8px">
@@ -1927,9 +1895,9 @@ tr:hover td { background: var(--primary-lt); }
       <!-- Filtres -->
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
         <button class="chip" onclick="filterAlertes('all',this)" id="filter-alerte-all" style="background:var(--primary-lt);color:var(--primary);border-color:var(--primary-border);font-weight:700">Tous</button>
-        <button class="chip" onclick="filterAlertes('GMAPS',this)">Google Maps</button>
-        <button class="chip" onclick="filterAlertes('phone',this)">Avec téléphone</button>
-        <button class="chip" onclick="filterAlertes('unseen',this)">Non lus</button>
+        <button class="chip" onclick="filterAlertes('GMAPS',this)">🗺️ Google Maps</button>
+        <button class="chip" onclick="filterAlertes('phone',this)">📞 Avec téléphone</button>
+        <button class="chip" onclick="filterAlertes('unseen',this)">🔴 Non lus</button>
       </div>
 
       <!-- Liste des alertes -->
@@ -2556,7 +2524,7 @@ tr:hover td { background: var(--primary-lt); }
 
   <!-- ════════════════ SETTINGS ════════════════ -->
   <div class="page" id="page-settings">
-    <div style="max-width:700px">
+    <div>
 
       <!-- Header -->
       <div class="page-header" style="margin-bottom:28px">
@@ -2641,7 +2609,7 @@ tr:hover td { background: var(--primary-lt); }
           <div class="card-body">
             <div class="alert alert-info" style="margin-bottom:18px">
               <span class="material-symbols-rounded">info</span>
-              <span>Par défaut, vos emails partent depuis <strong>noreply@alma-plus.fr</strong>. Configurez votre adresse perso pour un meilleur taux de réponse.</span>
+              <span>Par défaut, vos emails partent depuis <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="aac4c5d8cfdac6d3eacbc6c7cb87dac6dfd984ccd8">[email&#160;protected]</a></strong>. Configurez votre adresse perso pour un meilleur taux de réponse.</span>
             </div>
             <div class="form-group">
               <label class="form-label">Votre adresse email d'envoi</label>
@@ -2954,7 +2922,7 @@ tr:hover td { background: var(--primary-lt); }
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ═══════════════════════════════════════════════
 // ALMA PLATFORM KEYS — configurées par Alma, invisibles au client
 // À remplacer par vos vraies clés avant déploiement
@@ -5559,10 +5527,10 @@ function renderAlertes() {
     const isNew = !s.seen;
 
     let detailLines = '';
-    if (s.source === 'GMAPS') detailLines = [details.secteur, details.phone ? ' ' + details.phone : null, details.rating ? ' ' + details.rating + ' (' + details.reviews + ' avis)' : null].filter(Boolean).join(' · ');
+    if (s.source === 'GMAPS') detailLines = [details.secteur, details.phone ? '📞 ' + details.phone : null, details.rating ? '★ ' + details.rating + ' (' + details.reviews + ' avis)' : null].filter(Boolean).join(' · ');
     if (s.source === 'BODACC') detailLines = details.type || '';
     if (s.source === 'DVF') detailLines = [details.type, details.prix, details.surface].filter(Boolean).join(' · ');
-    if (s.source === 'DPE') detailLines = ['Classe ' + (details.classe||'G'), details.type, details.surface, details.eligible_mpr ? ' Éligible MaPrimeRénov' : ''].filter(Boolean).join(' · ');
+    if (s.source === 'DPE') detailLines = ['Classe ' + (details.classe||'G'), details.type, details.surface, details.eligible_mpr ? '✓ Éligible MaPrimeRénov' : ''].filter(Boolean).join(' · ');
 
     return '<div style="background:var(--surface);border:1px solid ' + (isNew?'var(--primary-border)':'var(--border)') + ';border-left:3px solid ' + (isNew?'var(--primary)':'var(--border)') + ';border-radius:var(--radius-lg);padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-xs)">'
       + '<div style="width:38px;height:38px;border-radius:10px;background:' + cfg.bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">'
@@ -6284,7 +6252,6 @@ document.addEventListener('click', function(e) {
   const navItem = e.target.closest('.nav-item');
   if (navItem && window.innerWidth <= 768) mobCloseSidebar();
 });
-
 </script>
 </body>
 </html>
