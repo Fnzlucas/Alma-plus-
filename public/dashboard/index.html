@@ -1300,6 +1300,21 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 
 
 <script>
+
+// ═══ CLAUDE API PROXY ═══
+async function claudeAPI(messages, max_tokens=800) {
+  const res = await fetch('/api/claude', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, max_tokens })
+  });
+  if (!res.ok) {
+    const e = await res.json();
+    throw new Error(e.error || 'erreur api claude');
+  }
+  return res.json();
+}
+
 // ═══ CONFIG ═══
 const ALMA_CONFIG = {
   anthropic: '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',
@@ -1616,8 +1631,6 @@ async function openFicheModal(pid) {
 }
 
 async function generateFiche(p) {
-  const key = getKeys().anthropic;
-  if (!key) throw new Error('clé anthropic manquante');
   const profile = getProfile();
 
   // Si déjà en cache, retourner directement
@@ -1650,23 +1663,7 @@ Génère une analyse JSON avec exactement cette structure (sans markdown, sans b
   "closing": "conseil clé pour conclure avec ce type de prospect (1-2 phrases)"
 }`;
 
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: getKeys().model,
-      max_tokens: 700,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-
-  if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'erreur api'); }
-  const d = await r.json();
+  const d = await claudeAPI([{ role: 'user', content: prompt }], 700);
   const text = d.content[0].text.trim().replace(/```json|```/g, '').trim();
   return JSON.parse(text);
 }
@@ -1739,13 +1736,10 @@ function renderFicheStandalone(fiche) {
 // ═══ EMAIL IA ═══
 async function generateEmail(prospectId) {
   const p=state.prospects.find(x=>x.id===prospectId);if(!p) return null;
-  const key=getKeys().anthropic;const model=getKeys().model;
-  if(!key){alert('clé anthropic non configurée.');return null;}
   const profile=getProfile();
   const prompt=`tu es un expert en prospection commerciale. rédige un email de prospection b2b court.\n\nprospect :\n- entreprise : ${p.name}\n- note google : ${p.rating}/5 (${p.reviews} avis)\n- adresse : ${p.address}\n\nexpéditeur :\n- prénom : ${profile.prenom||'prénom'}\n- nom : ${profile.nom||'nom'}\n- société : ${profile.societe||'ma société'}\n- activité : ${profile.activite||'consultant'}\n- valeur : ${profile.valeur||'je peux vous aider'}\n- ton : ${profile.ton||'professionnel'}\n\nconsignes :\n- 150-200 mots max\n- objet accrocheur ligne 1\n- personnalisé\n- appel à l'action clair\n- signature complète\n- français, texte brut`;
-  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model,max_tokens:500,messages:[{role:'user',content:prompt}]})});
-  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'erreur anthropic');}
-  const d=await r.json();return d.content[0].text;
+  const d=await claudeAPI([{role:'user',content:prompt}],500);
+  return d.content[0].text;
 }
 
 async function openEmailModal(prospectId) {
@@ -1891,9 +1885,9 @@ async function searchPermis(){const commune=document.getElementById('permis-comm
 async function searchAO(){const kw=document.getElementById('ao-keywords').value.trim();if(!kw) return alert('renseignez des mots-clés.');showSpinner('ao-spinner');try{const data=await proxyFetch('https://boamp-datadila.opendatasoft.com/api/records/1.0/search/?dataset=boamp&q='+encodeURIComponent(kw)+'&rows=15&sort=dateparution');const records=data.records||[];document.getElementById('ao-results-sub').textContent=records.length+' marchés trouvés';document.getElementById('ao-table').innerHTML=records.map(r=>{const f=r.fields;const titre=(f.objet||f.intitule||'—').slice(0,80);return`<tr><td style="max-width:200px"><strong style="font-size:11px">${titre}</strong></td><td style="font-size:11px">${f.nomacheteur||'—'}</td><td><span class="badge badge-blue">${f.famille||'marché'}</span></td><td>${f.codedepartement||'—'}</td><td style="color:#d97706;font-weight:700;font-size:11px">${f.datelimitereponse||'—'}</td><td><button class="btn btn-ghost btn-sm" onclick="addToP(this)" data-name="ao: ${titre.slice(0,25)}" data-addr="${f.codedepartement||''}" data-score="80">+ pipeline</button></td></tr>`;}).join('');document.getElementById('ao-results').style.display='';}catch(e){alert('erreur boamp : '+e.message);}finally{hideSpinner('ao-spinner');}}
 
 // ═══ VEILLE & DEVIS ═══
-async function runVeille(){const secteur=document.getElementById('veille-secteur').value.trim();const key=getKeys().anthropic;if(!secteur||!key) return;showSpinner('veille-spinner');document.getElementById('btn-veille').disabled=true;try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:getKeys().model,max_tokens:600,messages:[{role:'user',content:'analyse le marché du secteur "'+secteur+'" en france. fournis : 1. tendances 2. points de douleur 3. arguments commerciaux 4. meilleure approche. réponse concise en français.'}]})});const d=await r.json();document.getElementById('veille-text').textContent=d.content[0].text;show('veille-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('veille-spinner');document.getElementById('btn-veille').disabled=false;}
+async function runVeille(){const secteur=document.getElementById('veille-secteur').value.trim();if(!secteur) return;showSpinner('veille-spinner');document.getElementById('btn-veille').disabled=true;try{const d=await claudeAPI([{role:'user',content:'analyse le marché du secteur "'+secteur+'" en france. fournis : 1. tendances 2. points de douleur 3. arguments commerciaux 4. meilleure approche. réponse concise en français.'}],600);document.getElementById('veille-text').textContent=d.content[0].text;show('veille-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('veille-spinner');document.getElementById('btn-veille').disabled=false;}
 
-async function generateDevis(){const client=document.getElementById('devis-client').value.trim();const desc=document.getElementById('devis-desc').value.trim();const key=getKeys().anthropic;if(!client||!desc||!key){alert('renseignez le client, la prestation et configurez votre clé anthropic.');return;}showSpinner('devis-spinner');document.getElementById('btn-devis').disabled=true;try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:getKeys().model,max_tokens:800,messages:[{role:'user',content:'génère un devis professionnel en français pour :\nclient : '+client+'\nprestataire : '+document.getElementById('devis-activite').value+'\nprestation : '+desc+'\nbudget : '+(document.getElementById('devis-budget').value||'à définir')+'€\ndélai : '+(document.getElementById('devis-delai').value||'à définir')+'\n\nformat : devis structuré, texte brut, pas de markdown.'}]})});const d=await r.json();document.getElementById('devis-text').textContent=d.content[0].text;show('devis-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('devis-spinner');document.getElementById('btn-devis').disabled=false;}
+async function generateDevis(){const client=document.getElementById('devis-client').value.trim();const desc=document.getElementById('devis-desc').value.trim();if(!client||!desc){alert('renseignez le client et la prestation.');return;}showSpinner('devis-spinner');document.getElementById('btn-devis').disabled=true;try{const d=await claudeAPI([{role:'user',content:'génère un devis professionnel en français pour :\nclient : '+client+'\nprestataire : '+document.getElementById('devis-activite').value+'\nprestation : '+desc+'\nbudget : '+(document.getElementById('devis-budget').value||'à définir')+'€\ndélai : '+(document.getElementById('devis-delai').value||'à définir')+'\n\nformat : devis structuré, texte brut, pas de markdown.'}],800);document.getElementById('devis-text').textContent=d.content[0].text;show('devis-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('devis-spinner');document.getElementById('btn-devis').disabled=false;}
 
 // ═══ SÉQUENCES ═══
 function saveSequence(){alert('séquence enregistrée !');}
@@ -1941,7 +1935,7 @@ async function launchAutopilot(){
       for(let i=0;i<prospects.length;i++){
         if(_apStop) break;
         const p=prospects[i];apSetProgress(65+Math.round(i/prospects.length*25),'email '+(i+1)+'/'+prospects.length+' — '+p.name);
-        try{const profile=getProfile();const prompt='rédige un email de prospection b2b en 150 mots max.\nprospect: '+p.name+' ('+p.address+')\nnote: '+p.rating+'/5 ('+p.reviews+' avis)\nexpéditeur: '+profile.prenom+' '+profile.nom+', '+profile.societe+'\nactivité: '+profile.activite+'\nvaleur: '+profile.valeur;const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:getKeys().model,max_tokens:400,messages:[{role:'user',content:prompt}]})});const d=await r.json();p.email_generated=d.content?.[0]?.text||null;totalEmails++;apUpdateCounters(totalProspects,totalEmails,totalPipeline);apLog('email','✉ email généré pour <strong>'+p.name+'</strong>');}
+        try{const profile=getProfile();const prompt='rédige un email de prospection b2b en 150 mots max.\nprospect: '+p.name+' ('+p.address+')\nnote: '+p.rating+'/5 ('+p.reviews+' avis)\nexpéditeur: '+profile.prenom+' '+profile.nom+', '+profile.societe+'\nactivité: '+profile.activite+'\nvaleur: '+profile.valeur;const d=await claudeAPI([{role:'user',content:prompt}],400);p.email_generated=d.content?.[0]?.text||null;totalEmails++;apUpdateCounters(totalProspects,totalEmails,totalPipeline);apLog('email','✉ email généré pour <strong>'+p.name+'</strong>');}
         catch(e){apLog('error','erreur email '+p.name);}
         await sleep(400);
       }
@@ -1999,7 +1993,7 @@ function genAllCourrierB2C(){alert('sélectionnez un prospect pour générer son
 
 // ═══ COURRIER B2C ═══
 let _currentCourrierIdx=null;
-async function genCourrierB2C(idx){_currentCourrierIdx=idx;const results=window._b2cResults||[];const p=results[idx];if(!p) return;document.getElementById('courrier-adresse-title').textContent=p.adresse+' — '+p.commune;document.getElementById('courrier-loading').style.display='block';document.getElementById('courrier-text').style.display='none';document.getElementById('courrier-modal').classList.add('open');const key=getKeys().anthropic;const profile=getProfile();const prompt='tu es un expert en prospection locale. rédige un courrier physique court.\nadresse : '+p.adresse+', '+p.commune+'\nsignaux : '+p.signaux.map(s=>s.type).join(', ')+'\nexpéditeur : '+profile.prenom+' '+profile.nom+', '+(profile.societe||'mon entreprise')+'\nactivité : '+(profile.activite||'prestataire local')+'\nvaleur : '+(profile.valeur||'service de qualité')+'\nconsignes : 150-200 mots, commencer par madame/monsieur, ton professionnel, proposer rdv gratuit, texte brut.';try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:getKeys().model,max_tokens:500,messages:[{role:'user',content:prompt}]})});const d=await r.json();document.getElementById('courrier-text').value=d.content?.[0]?.text||'erreur de génération';}catch(e){document.getElementById('courrier-text').value='erreur : '+e.message;}document.getElementById('courrier-loading').style.display='none';document.getElementById('courrier-text').style.display='block';}
+async function genCourrierB2C(idx){_currentCourrierIdx=idx;const results=window._b2cResults||[];const p=results[idx];if(!p) return;document.getElementById('courrier-adresse-title').textContent=p.adresse+' — '+p.commune;document.getElementById('courrier-loading').style.display='block';document.getElementById('courrier-text').style.display='none';document.getElementById('courrier-modal').classList.add('open');const profile=getProfile();const prompt='tu es un expert en prospection locale. rédige un courrier physique court.\nadresse : '+p.adresse+', '+p.commune+'\nsignaux : '+p.signaux.map(s=>s.type).join(', ')+'\nexpéditeur : '+profile.prenom+' '+profile.nom+', '+(profile.societe||'mon entreprise')+'\nactivité : '+(profile.activite||'prestataire local')+'\nvaleur : '+(profile.valeur||'service de qualité')+'\nconsignes : 150-200 mots, commencer par madame/monsieur, ton professionnel, proposer rdv gratuit, texte brut.';try{const d=await claudeAPI([{role:'user',content:prompt}],500);document.getElementById('courrier-text').value=d.content?.[0]?.text||'erreur de génération';}catch(e){document.getElementById('courrier-text').value='erreur : '+e.message;}document.getElementById('courrier-loading').style.display='none';document.getElementById('courrier-text').style.display='block';}
 async function regenCourrier(){if(_currentCourrierIdx!==null) await genCourrierB2C(_currentCourrierIdx);}
 
 // ═══ CANCELLATION ═══
@@ -2145,12 +2139,7 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
 }`;
 
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: getKeys().model, max_tokens: 800, messages: [{ role: 'user', content: prompt }] })
-    });
-    const d = await r.json();
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 800);
     const raw = d.content?.[0]?.text || '{}';
     const clean = raw.replace(/```json|```/g, '').trim();
     const fiche = JSON.parse(clean);
