@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>alma.+ — tarifs</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Outfit',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-0.03em;
+  font-weight:300;
+  background-color:#f8f9ff;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(0,76,237,0.07) 0%, transparent 50%),
+    radial-gradient(circle at 85% 80%, rgba(0,212,255,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(0,76,237,0.03) 0%, transparent 60%);
+  min-height:100vh;
+  color:#1a1a2e;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Noise overlay */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.4;
+}
+
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px}
+
+/* NAV */
+nav{padding:20px 0;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:22px;font-weight:900;letter-spacing:-1px;color:#0a0a1a;text-decoration:none}
+.logo span{color:#004ced}
+.nav-back{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:400;color:#9ca3af;text-decoration:none;transition:color .15s}
+.nav-back:hover{color:#004ced}
+.nav-back svg{transition:transform .15s}
+.nav-back:hover svg{transform:translateX(-3px)}
+
+/* HERO */
+.hero{text-align:center;padding:60px 0 48px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;background:rgba(0,76,237,0.06);border:1px solid rgba(0,76,237,0.15);border-radius:99px;font-size:11px;font-weight:400;color:#004ced;text-transform:uppercase;letter-spacing:.12em;margin-bottom:24px}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:#004ced;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-size:clamp(36px,6vw,64px);font-weight:400;letter-spacing:-4px;line-height:1;color:#0a0a1a;margin-bottom:16px}
+h1 em{font-style:normal;color:#004ced}
+.hero-sub{font-size:16px;color:#6b7280;font-weight:300;max-width:480px;margin:0 auto 40px;line-height:1.65}
+
+/* TOGGLE */
+.toggle-wrap{display:inline-flex;align-items:center;gap:0;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.5);border-radius:99px;padding:5px;backdrop-filter:blur(12px);margin-bottom:56px;position:relative}
+.toggle-btn{padding:10px 28px;border-radius:99px;font-size:12px;font-weight:400;cursor:pointer;border:none;background:none;font-family:'Outfit',sans-serif;color:#9ca3af;transition:all .2s;letter-spacing:-.01em;position:relative;z-index:1}
+.toggle-btn.active{background:white;color:#004ced;box-shadow:0 2px 12px rgba(0,76,237,0.12)}
+.toggle-badge{position:absolute;top:-10px;right:8px;background:#004ced;color:white;font-size:9px;font-weight:400;padding:2px 8px;border-radius:99px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+
+/* GRID */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start;margin-bottom:40px}
+@media(max-width:900px){.plans{grid-template-columns:1fr;max-width:440px;margin-left:auto;margin-right:auto}}
+
+/* CARD */
+.plan-card{border-radius:24px;padding:32px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;background:rgba(255,255,255,0.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.4)}
+.plan-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,76,237,0.1)}
+.plan-card.featured{background:#0a0a1a;border:1px solid rgba(255,255,255,0.08);transform:scale(1.03);box-shadow:0 24px 80px rgba(0,76,237,0.25)}
+.plan-card.featured:hover{transform:scale(1.03) translateY(-4px)}
+
+/* Glow featured */
+.plan-card.featured::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(0,76,237,0.3);filter:blur(70px);border-radius:50%;pointer-events:none}
+.plan-card.featured::after{content:'';position:absolute;bottom:-40px;left:-40px;width:120px;height:120px;background:rgba(0,212,255,0.15);filter:blur(60px);border-radius:50%;pointer-events:none}
+
+/* Scanline on featured */
+.scanline{position:absolute;left:0;width:100%;height:1px;background:linear-gradient(to right,transparent,rgba(0,212,255,0.2),transparent);animation:scan 5s linear infinite;pointer-events:none;z-index:1}
+@keyframes scan{0%{top:0}100%{top:100%}}
+
+.plan-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:99px;font-size:9px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px}
+.badge-popular{background:rgba(0,76,237,0.1);color:#004ced;border:1px solid rgba(0,76,237,0.2)}
+.badge-popular-dark{background:rgba(0,212,255,0.15);color:#00d4ff;border:1px solid rgba(0,212,255,0.3)}
+.badge-agency{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.12)}
+.badge-starter{background:rgba(100,100,120,0.08);color:#6b7280;border:1px solid rgba(100,100,120,0.15);visibility:hidden}
+
+.plan-name{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px;color:#9ca3af}
+.plan-name-dark{color:rgba(255,255,255,0.4)}
+
+.plan-price{display:flex;align-items:baseline;gap:4px;margin-bottom:6px}
+.price-amount{font-size:52px;font-weight:400;letter-spacing:-4px;line-height:1;color:#0a0a1a}
+.price-amount-dark{color:white}
+.price-period{font-size:13px;font-weight:400;color:#9ca3af;margin-bottom:2px}
+.price-period-dark{color:rgba(255,255,255,0.4)}
+.price-annual-note{font-size:10px;font-weight:400;color:#9ca3af;margin-bottom:24px;min-height:16px}
+.price-annual-note-dark{color:rgba(255,255,255,0.3)}
+.price-annual-note span{color:#059669;font-weight:400}
+.price-annual-note-dark span{color:#00d4ff}
+
+.plan-desc{font-size:13px;color:#6b7280;line-height:1.65;margin-bottom:28px;font-weight:300}
+.plan-desc-dark{color:rgba(255,255,255,0.5)}
+
+/* Divider */
+.plan-divider{height:1px;background:rgba(0,0,0,0.06);margin:0 -32px 24px;position:relative}
+.plan-divider-dark{background:rgba(255,255,255,0.08)}
+
+/* Features */
+.features{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+.feature{display:flex;align-items:flex-start;gap:10px;font-size:13px;font-weight:400;color:#1a1a2e}
+.feature-dark{color:rgba(255,255,255,0.75)}
+.feature-icon{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.fi-green{background:rgba(5,150,105,0.1)}
+.fi-blue{background:rgba(0,76,237,0.1)}
+.fi-accent{background:rgba(0,212,255,0.15)}
+.feature-check{width:8px;height:8px;display:block}
+
+/* CTA */
+.plan-cta{width:100%;padding:14px;border-radius:14px;font-size:13px;font-weight:400;cursor:pointer;border:none;font-family:'Outfit',sans-serif;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;text-decoration:none}
+.cta-primary{background:#004ced;color:white;box-shadow:0 4px 20px rgba(0,76,237,0.3)}
+.cta-primary:hover{background:#0038b8;transform:translateY(-1px);box-shadow:0 8px 28px rgba(0,76,237,0.35)}
+.cta-white{background:white;color:#004ced;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+.cta-white:hover{box-shadow:0 8px 28px rgba(0,0,0,0.2);transform:translateY(-1px)}
+.cta-ghost{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.12)}
+.cta-ghost:hover{background:rgba(255,255,255,0.12);color:white;border-color:rgba(255,255,255,0.2)}
+.cta-agency{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.12)}
+.cta-agency:hover{background:rgba(255,255,255,0.15);color:white}
+
+.cta-loading{opacity:.7;cursor:not-allowed;pointer-events:none}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.spinner-dark{border-color:rgba(0,76,237,0.2);border-top-color:#004ced}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TRUST */
+.trust{text-align:center;padding:0 0 80px}
+.trust-title{font-size:11px;font-weight:400;text-transform:uppercase;letter-spacing:.2em;color:#9ca3af;margin-bottom:24px}
+.trust-items{display:flex;flex-wrap:wrap;justify-content:center;gap:20px}
+.trust-item{display:flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:99px;font-size:12px;font-weight:400;color:#6b7280;backdrop-filter:blur(12px)}
+.trust-icon{font-size:11px;font-weight:400;color:#004ced}
+
+/* FAQ */
+.faq{max-width:640px;margin:0 auto 80px}
+.faq-title{font-size:24px;font-weight:400;letter-spacing:-1px;text-align:center;margin-bottom:32px;color:#0a0a1a}
+.faq-item{border-bottom:1px solid rgba(255,255,255,0.4);padding:18px 0;cursor:pointer}
+.faq-q{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:400;color:#0a0a1a;gap:16px}
+.faq-a{font-size:13px;color:#6b7280;line-height:1.7;margin-top:12px;font-weight:300;display:none}
+.faq-a.open{display:block}
+.faq-arrow{flex-shrink:0;transition:transform .2s;color:#9ca3af;font-size:16px}
+.faq-arrow.open{transform:rotate(180deg)}
+
+/* ERROR */
+.error-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:white;padding:14px 24px;border-radius:14px;font-size:13px;font-weight:400;box-shadow:0 8px 32px rgba(0,0,0,0.2);display:none;z-index:100;border:1px solid rgba(255,255,255,0.08);letter-spacing:-.01em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="logo">alma<span>.</span>+</a>
+    <a href="/dashboard" class="nav-back">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      retour au dashboard
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      tarification simple et transparente
+    </div>
+    <h1>investissez dans votre<br/><em>croissance</em></h1>
+    <p class="hero-sub">sans frais cachés, sans engagement. changez de plan à tout moment.</p>
+
+    <!-- Toggle mensuel/annuel -->
+    <div class="toggle-wrap">
+      <button class="toggle-btn active" id="btn-monthly" onclick="setBilling('monthly')">mensuel</button>
+      <button class="toggle-btn" id="btn-annual" onclick="setBilling('annual')" style="position:relative">
+        annuel
+        <span class="toggle-badge">−2 mois offerts</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- PLANS -->
+  <div class="plans">
+
+    <!-- STARTER -->
+    <div class="plan-card" id="card-starter">
+      <span class="plan-badge badge-starter">starter</span>
+      <div class="plan-name">starter</div>
+      <div class="plan-price">
+        <span class="price-amount" id="price-starter">49</span>
+        <div>
+          <div class="price-period">€ / mois</div>
+        </div>
+      </div>
+      <div class="price-annual-note" id="note-starter">&nbsp;</div>
+      <p class="plan-desc">lancez votre prospection intelligente. idéal pour les indépendants et petites équipes.</p>
+      <div class="plan-divider"></div>
+      <div class="features">
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>prospection google maps</div>
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>500 prospects / mois</div>
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>300 emails ia / mois</div>
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>200 fiches pré-appel / mois</div>
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>100 appels assistés ia / mois</div>
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>pipeline crm + tracker appels</div>
+        <div class="feature"><div class="feature-icon fi-blue"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#004ced" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>support par email</div>
+      </div>
+      <button class="plan-cta cta-primary" id="cta-starter" onclick="checkout('starter')">
+        <span class="spinner" id="spin-starter"></span>
+        commencer avec starter
+      </button>
+    </div>
+
+    <!-- PRO (featured) -->
+    <div class="plan-card featured" id="card-pro">
+      <div class="scanline"></div>
+      <span class="plan-badge badge-popular-dark">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1l1.2 2.5L9 4l-2 1.9.5 2.6L5 7.2 2.5 8.5 3 5.9 1 4l2.8-.5L5 1z" fill="#00d4ff"/></svg>
+        plus populaire
+      </span>
+      <div class="plan-name plan-name-dark">pro</div>
+      <div class="plan-price">
+        <span class="price-amount price-amount-dark" id="price-pro">79</span>
+        <div>
+          <div class="price-period price-period-dark">€ / mois</div>
+        </div>
+      </div>
+      <div class="price-annual-note price-annual-note-dark" id="note-pro">&nbsp;</div>
+      <p class="plan-desc plan-desc-dark">la puissance complète d'alma.+ pour des résultats maximaux.</p>
+      <div class="plan-divider plan-divider-dark"></div>
+      <div class="features">
+        <div class="feature feature-dark"><div class="feature-icon fi-accent"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>4 000 emails ia / mois</div>
+        <div class="feature feature-dark"><div class="feature-icon fi-accent"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>1 000 fiches pré-appel / mois</div>
+        <div class="feature feature-dark"><div class="feature-icon fi-accent"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>500 appels assistés ia / mois</div>
+        <div class="feature feature-dark"><div class="feature-icon fi-accent"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>prospects illimités</div>
+        <div class="feature feature-dark"><div class="feature-icon fi-accent"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>pilote automatique ia</div>
+        <div class="feature feature-dark"><div class="feature-icon fi-accent"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>séquences de relance ia</div>
+        <div class="feature feature-dark"><div class="feature-icon fi-accent"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>support prioritaire</div>
+      </div>
+      <button class="plan-cta cta-white" id="cta-pro" onclick="checkout('pro')">
+        <span class="spinner spinner-dark" id="spin-pro"></span>
+        commencer avec pro
+      </button>
+    </div>
+
+    <!-- ULTRA -->
+    <div class="plan-card" id="card-ultra">
+      <div class="plan-name">ultra</div>
+      <div class="plan-price">
+        <span class="price-amount" id="price-ultra">290</span>
+        <div><div class="price-period">€ / mois</div></div>
+      </div>
+      <div class="price-annual-note" id="note-ultra">&nbsp;</div>
+      <p class="plan-desc">zéro limite. pour les équipes commerciales qui prospectent à plein régime.</p>
+      <div class="plan-divider"></div>
+      <div class="features">
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>emails ia illimités</div>
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>fiches pré-appel illimitées</div>
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>appels assistés ia illimités</div>
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>prospects illimités</div>
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>pilote automatique ia</div>
+        <div class="feature"><div class="feature-icon fi-green"><svg class="feature-check" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>support prioritaire 7j/7</div>
+      </div>
+      <button class="plan-cta cta-primary" id="cta-ultra" onclick="checkout('ultra')">
+        <span class="spinner" id="spin-ultra"></span>
+        passer en ultra
+      </button>
+    </div>
+
+
+
+  </div>
+
+  <!-- AGENCE BANNER -->
+  <div style="max-width:680px;margin:24px auto 60px;padding:18px 28px;background:rgba(255,255,255,0.5);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.4);border-radius:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+    <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,76,237,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" stroke="#004ced" stroke-width="1.5"/><path d="M5 4V3a3 3 0 016 0v1" stroke="#004ced" stroke-width="1.5"/></svg>
+    </div>
+    <div style="flex:1;min-width:200px">
+      <div style="font-size:13px;font-weight:400;color:#0a0a1a;letter-spacing:-.3px">vous gérez plusieurs comptes clients ?</div>
+      <div style="font-size:12px;color:#9ca3af;margin-top:2px">plan agence sur devis — multi-comptes, onboarding dédié, support 7j/7</div>
+    </div>
+    <a href="mailto:contact@alma-plus.fr?subject=Plan%20Agence%20Alma.%2B" style="font-size:12px;font-weight:400;color:#004ced;text-decoration:none;background:rgba(0,76,237,0.08);border:1px solid rgba(0,76,237,0.2);padding:9px 20px;border-radius:99px;white-space:nowrap;transition:all .15s" onmouseover="this.style.background='rgba(0,76,237,0.15)'" onmouseout="this.style.background='rgba(0,76,237,0.08)'">nous contacter →</a>
+  </div>
+
+  <!-- TRUST -->
+  <div class="trust">
+    <div class="trust-title">pourquoi alma.+</div>
+    <div class="trust-items">
+      <div class="trust-item"><span class="trust-icon">→</span>paiement sécurisé stripe</div>
+      <div class="trust-item"><span class="trust-icon">→</span>résiliation à tout moment</div>
+      <div class="trust-item"><span class="trust-icon">→</span>accès immédiat après paiement</div>
+      <div class="trust-item"><span class="trust-icon">→</span>données hébergées en france</div>
+      <div class="trust-item"><span class="trust-icon">→</span>support en français</div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq">
+    <div class="faq-title">questions fréquentes</div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">puis-je changer de plan à tout moment ?<span class="faq-arrow">↓</span></div>
+      <div class="faq-a">oui, vous pouvez upgrader ou downgrader à tout moment. le changement est immédiat et la différence est calculée au prorata.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">que se passe-t-il à la fin de mon abonnement annuel ?<span class="faq-arrow">↓</span></div>
+      <div class="faq-a">votre abonnement se renouvelle automatiquement. vous pouvez l'annuler à tout moment depuis votre espace client, sans frais.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">mes données sont-elles sécurisées ?<span class="faq-arrow">↓</span></div>
+      <div class="faq-a">oui. toutes les données sont chiffrées et hébergées sur des serveurs européens conformes au rgpd. nous ne revendons jamais vos données.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">y a-t-il une période d'essai ?<span class="faq-arrow">↓</span></div>
+      <div class="faq-a">nous n'offrons pas de période d'essai, mais vous pouvez annuler à tout moment. notre support est disponible pour vous accompagner dès le premier jour.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="error-toast" id="error-toast"></div>
+
+<script>
+const PRICES = {
+  starter: {
+    monthly: 'price_1TG2SHIWLBfIp5GxaZJGYEue',
+    annual:  'price_1TG2XbIWLBfIp5GxatKtPfot',
+  },
+  pro: {
+    monthly: 'price_1TG2TkIWLBfIp5GxAMFc6os0',
+    annual:  'price_1TG2XxIWLBfIp5Gxvwo8TLcO',
+  },
+  ultra: {
+    monthly: 'price_1TG5JaIWLBfIp5Gxfvn0AQf4',
+    annual:  'price_1TG5JtIWLBfIp5GxMnRoLPNt',
+  }
+};
+
+let billing = 'monthly';
+
+function setBilling(mode) {
+  billing = mode;
+  document.getElementById('btn-monthly').classList.toggle('active', mode === 'monthly');
+  document.getElementById('btn-annual').classList.toggle('active', mode === 'annual');
+
+  if (mode === 'monthly') {
+    document.getElementById('price-starter').textContent = '49';
+    document.getElementById('price-pro').textContent = '129';
+    document.getElementById('note-starter').innerHTML = '&nbsp;';
+    document.getElementById('note-pro').innerHTML = '&nbsp;';
+  } else {
+    document.getElementById('price-starter').textContent = '40';
+    document.getElementById('price-pro').textContent = '107';
+    document.getElementById('note-starter').innerHTML = '<span>490 € / an</span> — 2 mois offerts';
+    document.getElementById('note-pro').innerHTML = '<span>1 290 € / an</span> — 2 mois offerts';
+  }
+}
+
+async function checkout(plan) {
+  const priceId = PRICES[plan][billing];
+  const spinEl = document.getElementById('spin-' + plan);
+  const btnEl = document.getElementById('cta-' + plan);
+
+  spinEl.style.display = 'inline-block';
+  btnEl.classList.add('cta-loading');
+
+  try {
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ priceId, plan, billing }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'erreur serveur');
+    }
+
+    const { url } = await res.json();
+    window.location.href = url;
+
+  } catch (e) {
+    showError('erreur : ' + e.message);
+    spinEl.style.display = 'none';
+    btnEl.classList.remove('cta-loading');
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-toast');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+function toggleFaq(item) {
+  const a = item.querySelector('.faq-a');
+  const arrow = item.querySelector('.faq-arrow');
+  a.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+// Staggered entrance animation
+document.querySelectorAll('.plan-card').forEach((card, i) => {
+  card.style.opacity = '0';
+  card.style.transform = card.classList.contains('featured')
+    ? 'scale(1.03) translateY(20px)'
+    : 'translateY(20px)';
+  card.style.transition = 'opacity .4s ease, transform .4s ease';
+  setTimeout(() => {
+    card.style.opacity = '1';
+    card.style.transform = card.classList.contains('featured') ? 'scale(1.03)' : 'translateY(0)';
+  }, 100 + i * 80);
+});
+// Prix Ultra annuel
+document.getElementById('price-ultra').textContent = '290';
+</script>
+</body>
+</html>
