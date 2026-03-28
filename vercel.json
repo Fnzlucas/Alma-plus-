@@ -1,13 +1,10 @@
 {
   "rewrites": [
-    {
-      "source": "/dashboard",
-      "destination": "/dashboard/index.html"
-    },
-    {
-      "source": "/",
-      "destination": "/index.html"
-    }
+    { "source": "/dashboard", "destination": "/public/dashboard/index.html" },
+    { "source": "/login",     "destination": "/public/login/index.html" },
+    { "source": "/pricing",   "destination": "/public/pricing/index.html" },
+    { "source": "/success",   "destination": "/public/success/index.html" },
+    { "source": "/",          "destination": "/public/index.html" }
   ],
   "headers": [
     {
