@@ -1171,9 +1171,54 @@ tr:hover td { background: rgba(255,255,255,0.3); }
       <div class="form-group" style="margin:0"><label class="form-label">notes</label><textarea class="form-input" id="pm-notes" placeholder="notes sur ce prospect..." oninput="saveProspectNotes()"></textarea></div>
       <div id="pm-email-preview" style="display:none;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;padding:12px;font-size:12px;color:#6b7280;white-space:pre-wrap;max-height:140px;overflow-y:auto;line-height:1.6"></div>
     </div>
+      <!-- Fiche IA pré-appel -->
+      <div id="pm-fiche-wrap" style="display:none;flex-direction:column;gap:0;border-radius:14px;overflow:hidden;border:1px solid rgba(0,76,237,0.15)">
+        <!-- Header fiche -->
+        <div style="background:linear-gradient(135deg,#004ced,#0038b8);padding:14px 18px;display:flex;align-items:center;gap:10px">
+          <span class="msym" style="color:#00d4ff;font-size:20px">psychology</span>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:800;color:white;letter-spacing:-.3px">fiche pré-appel ia</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:1px">analyse générée par claude</div>
+          </div>
+          <button onclick="document.getElementById('pm-fiche-wrap').style.display='none'" style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;width:26px;height:26px;cursor:pointer;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:14px">✕</button>
+        </div>
+        <!-- Loading state -->
+        <div id="pm-fiche-loading" style="padding:32px;text-align:center;background:rgba(0,76,237,0.03)">
+          <div class="spinner spinner-dark" style="display:inline-block;margin-bottom:10px"></div>
+          <div style="font-size:12px;color:#6b7280" id="pm-fiche-loading-text">analyse du prospect en cours...</div>
+        </div>
+        <!-- Content -->
+        <div id="pm-fiche-content" style="display:none;background:rgba(0,76,237,0.02)">
+          <!-- Accroche -->
+          <div style="padding:16px 18px;border-bottom:1px solid rgba(0,76,237,0.08)">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#004ced;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">record_voice_over</span>accroche d'ouverture</div>
+            <div id="pm-fiche-accroche" style="font-size:13px;font-weight:700;color:#0a0a1a;line-height:1.6;padding:12px 14px;background:rgba(0,76,237,0.06);border-radius:10px;border-left:3px solid #004ced"></div>
+          </div>
+          <!-- Points de douleur -->
+          <div style="padding:16px 18px;border-bottom:1px solid rgba(0,76,237,0.08)">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#d97706;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">crisis_alert</span>points de douleur probables</div>
+            <div id="pm-fiche-douleurs" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+          <!-- Objections -->
+          <div style="padding:16px 18px;border-bottom:1px solid rgba(0,76,237,0.08)">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#dc2626;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">shield</span>objections + réponses</div>
+            <div id="pm-fiche-objections" style="display:flex;flex-direction:column;gap:8px"></div>
+          </div>
+          <!-- Tip de closing -->
+          <div style="padding:16px 18px">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#059669;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">emoji_events</span>conseil de closing</div>
+            <div id="pm-fiche-closing" style="font-size:12px;color:#1a1a2e;line-height:1.65;padding:12px 14px;background:rgba(5,150,105,0.06);border-radius:10px;border-left:3px solid #059669"></div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="modal-footer">
       <button class="btn" style="background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.15)" onclick="removePipelineProspect()"><span class="msym">delete</span>retirer</button>
       <button class="btn btn-ghost" id="pm-email-btn" onclick="openEmailFromModal()"><span class="msym">auto_awesome</span>email ia</button>
+      <button class="btn" style="background:linear-gradient(135deg,#004ced,#0038b8);color:white;box-shadow:0 4px 16px rgba(0,76,237,0.3)" id="pm-fiche-btn" onclick="genFichePreAppel()">
+        <span id="pm-fiche-btn-spinner" style="display:none" class="spinner"></span>
+        <span class="msym">psychology</span>fiche pré-appel
+      </button>
       <button class="btn btn-primary" onclick="closeProspectModal()"><span class="msym">check</span>fermer</button>
     </div>
   </div>
@@ -1494,9 +1539,201 @@ function renderProspectsTable(prospects,type,city,minScore){
         <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="addToPipeline(state.prospects.find(x=>x.id==='${p.id}'))"><span class="msym">conversion_path</span>pipeline</button>
         <button class="btn btn-ghost btn-sm" onclick="markAsSeen('${p.id}')" title="mémoriser"><span class="msym">bookmark_add</span></button>
       </div>
+      <button class="btn btn-sm" style="width:100%;justify-content:center;margin-top:6px;background:linear-gradient(135deg,rgba(0,76,237,0.08),rgba(0,76,237,0.04));color:#004ced;border:1px solid rgba(0,76,237,0.2)" onclick="openFicheModal('${p.id}')"><span class="msym" style="font-size:13px">psychology</span>fiche pré-appel ia</button>
     </div>`;
   }).join('');
   show('search-results');
+}
+
+
+// ═══ FICHE PRÉ-APPEL IA ═══
+async function genFichePreAppel() {
+  const pid = currentPipelineId;
+  if (!pid) return;
+  const p = state.pipeline.find(x => x.id === pid) || state.prospects.find(x => x.id === pid);
+  if (!p) return;
+
+  const wrap = document.getElementById('pm-fiche-wrap');
+  const loading = document.getElementById('pm-fiche-loading');
+  const content = document.getElementById('pm-fiche-content');
+  const btn = document.getElementById('pm-fiche-btn');
+  const spinner = document.getElementById('pm-fiche-btn-spinner');
+
+  wrap.style.display = 'flex';
+  loading.style.display = 'block';
+  content.style.display = 'none';
+  showSpinner('pm-fiche-btn-spinner');
+  btn.disabled = true;
+
+  // Scroll vers la fiche
+  setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+
+  try {
+    const fiche = await generateFiche(p);
+    renderFicheInModal(fiche);
+    // Sauvegarder
+    p.fiche_preappel = fiche;
+    saveState();
+    addActivity('fiche pré-appel · ' + p.name, 'psychology', 'primary');
+  } catch(e) {
+    document.getElementById('pm-fiche-loading-text').textContent = 'erreur : ' + e.message;
+  }
+
+  hideSpinner('pm-fiche-btn-spinner');
+  btn.disabled = false;
+}
+
+async function openFicheModal(pid) {
+  // Chercher dans prospects ou pipeline
+  const p = state.prospects.find(x => x.id === pid) || state.pipeline.find(x => x.id === pid);
+  if (!p) return;
+
+  // Si déjà dans le pipeline, ouvrir le modal prospect avec la fiche
+  const inPipeline = state.pipeline.find(x => x.id === pid);
+  if (inPipeline) {
+    openProspectModal(pid);
+    setTimeout(() => genFichePreAppel(), 300);
+    return;
+  }
+
+  // Sinon afficher dans une modal dédiée
+  state.currentFicheProspect = pid;
+  document.getElementById('fiche-standalone-name').textContent = p.name;
+  document.getElementById('fiche-standalone-addr').textContent = p.address || '';
+  document.getElementById('fiche-standalone-modal').classList.add('open');
+  document.getElementById('fiche-standalone-loading').style.display = 'block';
+  document.getElementById('fiche-standalone-content').style.display = 'none';
+
+  try {
+    const fiche = await generateFiche(p);
+    p.fiche_preappel = fiche;
+    saveState();
+    renderFicheStandalone(fiche);
+    addActivity('fiche pré-appel · ' + p.name, 'psychology', 'primary');
+  } catch(e) {
+    document.getElementById('fiche-standalone-loading').innerHTML = '<div style="padding:24px;text-align:center;color:#dc2626;font-size:12px">erreur : ' + e.message + '</div>';
+  }
+}
+
+async function generateFiche(p) {
+  const key = getKeys().anthropic;
+  if (!key) throw new Error('clé anthropic manquante');
+  const profile = getProfile();
+
+  // Si déjà en cache, retourner directement
+  if (p.fiche_preappel) return p.fiche_preappel;
+
+  const prompt = `tu es un expert en prospection commerciale et vente B2B. analyse ce prospect et génère une fiche pré-appel ultra-personnalisée.
+
+PROSPECT :
+- nom : ${p.name}
+- adresse : ${p.address}
+- note google : ${p.rating}/5 (${p.reviews} avis)
+- score IA : ${p.score}/100
+- site web : ${p.website || 'non disponible'}
+
+MON PROFIL :
+- activité : ${profile.activite || 'commercial'}
+- société : ${profile.societe || 'ma société'}
+- valeur : ${profile.valeur || 'service de qualité'}
+
+Génère une analyse JSON avec exactement cette structure (sans markdown, sans backticks, juste le JSON brut) :
+{
+  "activite": "résumé 1 phrase de ce que fait ce prospect",
+  "accroche": "phrase d'accroche naturelle et personnalisée pour débuter l'appel (20-30 mots max, tutoyer si artisan)",
+  "douleurs": ["point de douleur 1 probable", "point de douleur 2", "point de douleur 3"],
+  "objections": [
+    {"obj": "objection probable 1", "rep": "réponse courte percutante"},
+    {"obj": "objection probable 2", "rep": "réponse courte percutante"},
+    {"obj": "objection probable 3", "rep": "réponse courte percutante"}
+  ],
+  "closing": "conseil clé pour conclure avec ce type de prospect (1-2 phrases)"
+}`;
+
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: getKeys().model,
+      max_tokens: 700,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'erreur api'); }
+  const d = await r.json();
+  const text = d.content[0].text.trim().replace(/```json|```/g, '').trim();
+  return JSON.parse(text);
+}
+
+function renderFicheInModal(fiche) {
+  const loading = document.getElementById('pm-fiche-loading');
+  const content = document.getElementById('pm-fiche-content');
+
+  document.getElementById('pm-fiche-accroche').textContent = fiche.accroche || '—';
+
+  document.getElementById('pm-fiche-douleurs').innerHTML = (fiche.douleurs || []).map(d =>
+    `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:rgba(217,119,6,0.06);border-radius:8px;border-left:2px solid #d97706">
+      <span class="msym" style="font-size:13px;color:#d97706;flex-shrink:0;margin-top:1px">warning</span>
+      <span style="font-size:12px;color:#1a1a2e;line-height:1.5">${d}</span>
+    </div>`
+  ).join('');
+
+  document.getElementById('pm-fiche-objections').innerHTML = (fiche.objections || []).map(o =>
+    `<div style="background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.5);border-radius:10px;overflow:hidden">
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-bottom:1px solid rgba(220,38,38,0.08)">
+        <span class="msym" style="font-size:13px;color:#dc2626;flex-shrink:0;margin-top:1px">report_problem</span>
+        <span style="font-size:12px;font-weight:700;color:#dc2626;line-height:1.5">${o.obj}</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px">
+        <span class="msym" style="font-size:13px;color:#059669;flex-shrink:0;margin-top:1px">reply</span>
+        <span style="font-size:12px;color:#1a1a2e;line-height:1.5">${o.rep}</span>
+      </div>
+    </div>`
+  ).join('');
+
+  document.getElementById('pm-fiche-closing').textContent = fiche.closing || '—';
+
+  loading.style.display = 'none';
+  content.style.display = 'block';
+}
+
+function renderFicheStandalone(fiche) {
+  const loading = document.getElementById('fiche-standalone-loading');
+  const content = document.getElementById('fiche-standalone-content');
+
+  document.getElementById('fs-activite').textContent = fiche.activite || '—';
+  document.getElementById('fs-accroche').textContent = fiche.accroche || '—';
+
+  document.getElementById('fs-douleurs').innerHTML = (fiche.douleurs || []).map(d =>
+    `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:rgba(217,119,6,0.06);border-radius:8px;border-left:2px solid #d97706">
+      <span class="msym" style="font-size:13px;color:#d97706;flex-shrink:0;margin-top:1px">warning</span>
+      <span style="font-size:12px;color:#1a1a2e;line-height:1.5">${d}</span>
+    </div>`
+  ).join('');
+
+  document.getElementById('fs-objections').innerHTML = (fiche.objections || []).map(o =>
+    `<div style="background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.5);border-radius:10px;overflow:hidden">
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-bottom:1px solid rgba(220,38,38,0.08)">
+        <span class="msym" style="font-size:13px;color:#dc2626;flex-shrink:0;margin-top:1px">report_problem</span>
+        <span style="font-size:12px;font-weight:700;color:#dc2626;line-height:1.5">${o.obj}</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px">
+        <span class="msym" style="font-size:13px;color:#059669;flex-shrink:0;margin-top:1px">reply</span>
+        <span style="font-size:12px;color:#1a1a2e;line-height:1.5">${o.rep}</span>
+      </div>
+    </div>`
+  ).join('');
+
+  document.getElementById('fs-closing').textContent = fiche.closing || '—';
+
+  loading.style.display = 'none';
+  content.style.display = 'block';
 }
 
 // ═══ EMAIL IA ═══
@@ -1845,8 +2082,196 @@ document.addEventListener('click',function(e){const navItem=e.target.closest('.n
 // ═══ LOGOUT ═══
 function confirmLogout(){if(confirm('se déconnecter de alma.+ ?')){localStorage.clear();window.location.href='/login';}}
 
+// ═══ FICHE PRÉ-APPEL IA ═══
+async function genFichePreAppel() {
+  const p = state.pipeline.find(x => x.id === currentPipelineId);
+  if (!p) return;
+  const key = getKeys().anthropic;
+  if (!key) { alert('clé anthropic non configurée.'); return; }
+
+  // Afficher le bloc fiche
+  const wrap = document.getElementById('pm-fiche-wrap');
+  wrap.style.display = 'flex';
+  wrap.style.flexDirection = 'column';
+  document.getElementById('pm-fiche-loading').style.display = 'block';
+  document.getElementById('pm-fiche-content').style.display = 'none';
+  showSpinner('pm-fiche-btn-spinner');
+  document.getElementById('pm-fiche-btn').disabled = true;
+
+  // Scroller vers la fiche
+  setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+
+  const profile = getProfile();
+  const steps = ['analyse de l\'activité...', 'identification des points de douleur...', 'préparation des réponses aux objections...', 'finalisation de la fiche...'];
+  let si = 0;
+  const interval = setInterval(() => {
+    si = (si + 1) % steps.length;
+    const el = document.getElementById('pm-fiche-loading-text');
+    if (el) el.textContent = steps[si];
+  }, 1800);
+
+  const websiteInfo = p.website ? `site web : ${p.website}` : 'pas de site web connu';
+  const ratingInfo = p.rating ? `note google : ${p.rating}/5 (${p.reviews} avis)` : 'pas de note google';
+
+  const prompt = `tu es un expert en vente terrain et cold calling. analyse ce prospect et génère une fiche pré-appel ultra-pratique pour un commercial.
+
+PROSPECT :
+- nom : ${p.name}
+- adresse : ${p.address}
+- ${ratingInfo}
+- ${websiteInfo}
+- score alma : ${p.score}/100
+
+COMMERCIAL :
+- prénom : ${profile.prenom || 'commercial'}
+- société : ${profile.societe || 'notre société'}
+- activité : ${profile.activite || 'prestataire de services'}
+- valeur : ${profile.valeur || 'solution de qualité'}
+
+GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
+{
+  "accroche": "phrase d'ouverture naturelle de 1-2 phrases pour démarrer l'appel, personnalisée à ce prospect précis, pas générique",
+  "douleurs": [
+    "point de douleur probable 1 (court, direct)",
+    "point de douleur probable 2",
+    "point de douleur probable 3"
+  ],
+  "objections": [
+    {"objection": "objection classique 1", "reponse": "réponse courte et percutante"},
+    {"objection": "objection classique 2", "reponse": "réponse courte et percutante"},
+    {"objection": "objection classique 3", "reponse": "réponse courte et percutante"}
+  ],
+  "closing": "conseil tactique de closing personnalisé pour ce type de prospect"
+}`;
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: getKeys().model, max_tokens: 800, messages: [{ role: 'user', content: prompt }] })
+    });
+    const d = await r.json();
+    const raw = d.content?.[0]?.text || '{}';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const fiche = JSON.parse(clean);
+
+    clearInterval(interval);
+
+    // Accroche
+    document.getElementById('pm-fiche-accroche').textContent = fiche.accroche || '—';
+
+    // Points de douleur
+    const douleursEl = document.getElementById('pm-fiche-douleurs');
+    douleursEl.innerHTML = (fiche.douleurs || []).map(d => `
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:rgba(217,119,6,0.06);border-radius:8px;border:1px solid rgba(217,119,6,0.12)">
+        <span style="color:#d97706;flex-shrink:0;font-size:14px;margin-top:1px">→</span>
+        <span style="font-size:12px;color:#1a1a2e;line-height:1.5">${d}</span>
+      </div>`).join('');
+
+    // Objections
+    const objectionsEl = document.getElementById('pm-fiche-objections');
+    objectionsEl.innerHTML = (fiche.objections || []).map(o => `
+      <div style="border-radius:10px;overflow:hidden;border:1px solid rgba(220,38,38,0.12)">
+        <div style="padding:8px 12px;background:rgba(220,38,38,0.06);display:flex;align-items:flex-start;gap:6px">
+          <span style="font-size:10px;font-weight:800;color:#dc2626;flex-shrink:0;margin-top:1px">OBJECTION</span>
+          <span style="font-size:12px;color:#dc2626;font-weight:600">${o.objection}</span>
+        </div>
+        <div style="padding:8px 12px;background:rgba(5,150,105,0.04);display:flex;align-items:flex-start;gap:6px">
+          <span style="font-size:10px;font-weight:800;color:#059669;flex-shrink:0;margin-top:1px">RÉPONSE</span>
+          <span style="font-size:12px;color:#059669;line-height:1.5">${o.reponse}</span>
+        </div>
+      </div>`).join('');
+
+    // Closing
+    document.getElementById('pm-fiche-closing').textContent = fiche.closing || '—';
+
+    document.getElementById('pm-fiche-loading').style.display = 'none';
+    document.getElementById('pm-fiche-content').style.display = 'block';
+
+    // Sauvegarder dans le prospect
+    p.fiche_preappel = fiche;
+    saveState();
+    addActivity('fiche pré-appel · ' + p.name, 'psychology', 'primary');
+
+  } catch (e) {
+    clearInterval(interval);
+    document.getElementById('pm-fiche-loading').style.display = 'none';
+    document.getElementById('pm-fiche-wrap').style.display = 'none';
+    alert('erreur génération fiche : ' + e.message);
+  }
+
+  hideSpinner('pm-fiche-btn-spinner');
+  document.getElementById('pm-fiche-btn').disabled = false;
+}
+
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCounter();});
 </script>
+
+<!-- Fiche Pré-Appel Modal (standalone pour résultats) -->
+<div class="modal-overlay" id="fiche-standalone-modal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header" style="background:linear-gradient(135deg,#004ced,#0038b8);border-radius:24px 24px 0 0">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="msym" style="color:#00d4ff;font-size:22px">psychology</span>
+        <div>
+          <div class="modal-title" id="fiche-standalone-name" style="color:white">fiche pré-appel</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px" id="fiche-standalone-addr">—</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('fiche-standalone-modal').classList.remove('open')" style="background:rgba(255,255,255,0.15);color:white"><span class="msym" style="font-size:16px">close</span></button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- Loading -->
+      <div id="fiche-standalone-loading" style="text-align:center;padding:40px 20px">
+        <div class="spinner spinner-dark" style="display:inline-block;margin-bottom:12px;width:20px;height:20px;border-width:3px"></div>
+        <div style="font-size:13px;color:#6b7280;font-weight:600">claude analyse ce prospect...</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:6px">note, avis, secteur, concurrents probables...</div>
+      </div>
+
+      <!-- Content -->
+      <div id="fiche-standalone-content" style="display:none;flex-direction:column;gap:16px">
+
+        <!-- Activité -->
+        <div style="padding:14px 16px;background:rgba(0,76,237,0.04);border-radius:12px;border:1px solid rgba(0,76,237,0.1)">
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#004ced;margin-bottom:6px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">business</span>activité du prospect</div>
+          <div id="fs-activite" style="font-size:13px;font-weight:600;color:#0a0a1a;line-height:1.6"></div>
+        </div>
+
+        <!-- Accroche -->
+        <div>
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#004ced;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">record_voice_over</span>accroche d'ouverture</div>
+          <div id="fs-accroche" style="font-size:14px;font-weight:700;color:#0a0a1a;line-height:1.65;padding:14px 16px;background:rgba(0,76,237,0.06);border-radius:12px;border-left:3px solid #004ced"></div>
+        </div>
+
+        <!-- Points de douleur -->
+        <div>
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#d97706;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">crisis_alert</span>points de douleur probables</div>
+          <div id="fs-douleurs" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+
+        <!-- Objections -->
+        <div>
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#dc2626;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">shield</span>objections + réponses</div>
+          <div id="fs-objections" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+
+        <!-- Closing -->
+        <div>
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#059669;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">emoji_events</span>conseil de closing</div>
+          <div id="fs-closing" style="font-size:13px;color:#1a1a2e;line-height:1.65;padding:14px 16px;background:rgba(5,150,105,0.06);border-radius:12px;border-left:3px solid #059669"></div>
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('fiche-standalone-modal').classList.remove('open')"><span class="msym">close</span>fermer</button>
+      <button class="btn btn-primary" onclick="addToPipeline(state.prospects.find(x=>x.id===state.currentFicheProspect));document.getElementById('fiche-standalone-modal').classList.remove('open')"><span class="msym">conversion_path</span>ajouter au pipeline</button>
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
