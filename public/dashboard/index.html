@@ -2353,41 +2353,33 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = '/login'; return; }
 
-  // 2. Vérifier plan dans localStorage d'abord
-  let plan = localStorage.getItem('alma_plan');
-
-  // 3. Si pas de plan en local → chercher dans Supabase
-  if (!plan || plan === 'null' || plan === 'undefined') {
-    try {
-      const { data: profile, error } = await sb
-        .from('profiles')
-        .select('plan, subscription_status')
-        .eq('id', session.user.id)
-        .maybeSingle();
-
-      if (!error && profile && profile.plan && profile.subscription_status === 'active') {
-        plan = profile.plan;
-        localStorage.setItem('alma_plan', plan);
-      } else {
-        // Pas de plan → pricing
-        window.location.href = '/pricing';
-        return;
-      }
-    } catch(e) {
-      // Erreur Supabase → pricing par sécurité
-      window.location.href = '/pricing';
-      return;
-    }
-  }
-
-  // 4. Mettre à jour nom sidebar
+  // 2. Mettre à jour nom sidebar
   const meta = session.user.user_metadata || {};
   const name = [meta.prenom, meta.nom].filter(Boolean).join(' ') || session.user.email;
   const nameEl = document.getElementById('sidebar-user-name');
   if (nameEl) nameEl.textContent = name.toLowerCase();
 
-  // 5. Mettre à jour badge plan
-  localStorage.setItem('alma_plan', plan);
+  // 3. Vérifier plan — localStorage d'abord
+  let plan = localStorage.getItem('alma_plan');
+
+  if (!plan || plan === 'null' || plan === 'undefined') {
+    // Chercher dans Supabase
+    const { data: profile } = await sb
+      .from('profiles')
+      .select('plan, subscription_status')
+      .eq('id', session.user.id)
+      .maybeSingle();
+
+    if (profile?.plan && profile?.subscription_status === 'active') {
+      plan = profile.plan;
+      localStorage.setItem('alma_plan', plan);
+    } else {
+      // Pas de plan → pricing
+      window.location.href = '/pricing';
+      return;
+    }
+  }
+
   updateQuotaUI();
 })();
 
