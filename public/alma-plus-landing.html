@@ -1,695 +1,687 @@
 <!DOCTYPE html>
-<html class="light" lang="fr">
+<html lang="fr">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>alma.+ — l'outil de prospection numéro 1 en france</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>alma.+ — prospection ia automatisée</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script>
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        primary: "#0052FF",
-        surface: "#F9FAFB",
-      },
-      fontFamily: { sans: ["Outfit", "sans-serif"] },
-      borderRadius: { DEFAULT: "1rem", xl: "2rem", "2xl": "3rem", full: "9999px" },
-      animation: {
-        'pulse-slow': 'pulse 4s cubic-bezier(0.4,0,0.6,1) infinite',
-        'float': 'float 6s ease-in-out infinite',
-        'float2': 'float2 4.5s ease-in-out infinite',
-        'ping-slow': 'ping 2s cubic-bezier(0,0,.2,1) infinite',
-        'ticker': 'ticker 40s linear infinite',
-      },
-      keyframes: {
-        float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-12px)' } },
-        float2: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(8px)' } },
-        ticker: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } },
-      }
-    }
-  }
-}
-</script>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:"#0052FF"},fontFamily:{sans:["Outfit","sans-serif"]}}}}</script>
 <style>
-  body { font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; letter-spacing: -0.03em; }
-  * { text-transform: lowercase !important; font-style: normal !important; }
-  .glass { background: rgba(255,255,255,0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); }
-  .glass-dark { background: rgba(0,0,0,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.06); }
-  .gradient-text { background: linear-gradient(135deg, #0052FF 0%, #00AAFF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(0.22,1,0.36,1), transform .9s cubic-bezier(0.22,1,0.36,1); }
-  .reveal.on { opacity: 1; transform: translateY(0); }
-  .reveal.d1 { transition-delay: .1s; }
-  .reveal.d2 { transition-delay: .2s; }
-  .reveal.d3 { transition-delay: .3s; }
-  .data-card { transition: transform .45s cubic-bezier(0.4,0,0.2,1), box-shadow .45s cubic-bezier(0.4,0,0.2,1); }
-  .data-card:hover { transform: scale(1.03); box-shadow: 0 32px 64px -16px rgba(0,82,255,.18); }
-  .bento-card { transition: transform .3s ease, box-shadow .3s ease; }
-  .bento-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(0,0,0,.08); }
-  @keyframes ticker {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  .ticker-wrap { overflow: hidden; position: relative; }
-  .ticker-track { display: flex; white-space: nowrap; animation: ticker 40s linear infinite; }
-  .ticker-track:hover { animation-play-state: paused; }
-  .msym { font-family: 'Material Symbols Outlined'; font-weight: normal; font-size: inherit; line-height: 1; letter-spacing: normal; text-transform: none !important; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
-  .msym.fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-  #mob-menu { display:none; position:fixed; top:0; right:0; width:75%; max-width:280px; height:100vh; background:#fff; z-index:400; padding:24px 20px; box-shadow:-4px 0 32px rgba(0,0,0,.1); flex-direction:column; gap:2px; }
-
-  /* ── Responsive type scale ── */
-  .t-hero  { font-size: clamp(2.4rem, 6vw, 5.2rem); line-height: 1.0; }
-  .t-h2    { font-size: clamp(2.1rem, 4.5vw, 4rem); line-height: 1.05; }
-  .t-h3    { font-size: clamp(1.4rem, 2.8vw, 2.4rem); line-height: 1.1; }
-  .t-price { font-size: clamp(3rem, 5.5vw, 4.5rem); }
-  .t-cta   { font-size: clamp(1.8rem, 4.5vw, 3.8rem); line-height: 1.05; }
-  .t-body  { font-size: clamp(.9rem, 1.5vw, 1.1rem); }
-
-  /* ── Section padding responsive ── */
-  @media (max-width: 768px) {
-    section, .py-40 { padding-top: 4rem !important; padding-bottom: 4rem !important; }
-    .py-24 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
-    .min-h-screen { min-height: auto !important; padding-top: 6rem !important; padding-bottom: 4rem !important; }
-    .p-12, .p-16 { padding: 1.75rem !important; }
-    .p-10 { padding: 1.5rem !important; }
-    .p-8  { padding: 1.25rem !important; }
-    .rounded-\[4rem\] { border-radius: 2rem !important; }
-    .rounded-\[3rem\] { border-radius: 1.75rem !important; }
-    .rounded-\[2\.5rem\] { border-radius: 1.5rem !important; }
-    .scale-\[1\.04\] { transform: none !important; }
-    .mb-24 { margin-bottom: 2rem !important; }
-    .mb-20 { margin-bottom: 1.75rem !important; }
-    .gap-20, .gap-16 { gap: 2rem !important; }
-    .data-card { aspect-ratio: auto !important; min-height: 140px; }
-    .aspect-\[4\/5\] { aspect-ratio: auto !important; min-height: 160px; }
-    .aspect-video { aspect-ratio: 4/3 !important; }
-    .min-h-\[460px\] { min-height: 300px !important; }
-  }
-  @media (max-width: 480px) {
-    section, .py-40 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
-    .p-12, .p-16 { padding: 1.25rem !important; }
-    .aspect-video { aspect-ratio: 1/1 !important; }
-  }
+*,*::before,*::after{box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-0.03em;background:#fff;color:#0a0a0a;overflow-x:hidden}
+*{text-transform:lowercase!important;font-style:normal!important}
+.msym{font-family:'Material Symbols Outlined';font-weight:normal;font-size:inherit;line-height:1;letter-spacing:normal;text-transform:none!important;display:inline-block;white-space:nowrap;direction:ltr;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24}
+.msym.fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .9s cubic-bezier(0.22,1,0.36,1),transform .9s cubic-bezier(0.22,1,0.36,1)}
+.reveal.on{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+.glass{background:rgba(255,255,255,.72);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.3)}
+#mob-menu{display:none;position:fixed;top:0;right:0;width:75%;max-width:280px;height:100vh;background:#fff;z-index:400;padding:24px 20px;box-shadow:-4px 0 32px rgba(0,0,0,.1);flex-direction:column;gap:2px}
+.ticker-track{display:flex;white-space:nowrap;animation:ticker 40s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.testim-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;align-items:start}
+.bar-chart{display:flex;align-items:flex-end;gap:.4rem;height:110px}
+.bar-c{flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem}
+.bar-v{width:100%;border-radius:4px 4px 0 0}
+.bar-lbl{font-size:8px;font-weight:700;color:rgba(0,0,0,.3);text-transform:uppercase!important;letter-spacing:.05em}
+@media(max-width:900px){
+  .feat-grid,.split,.testim-grid,.price-grid{grid-template-columns:1fr!important}
+  .hero-l{padding-top:7rem!important}
+  section{padding-top:4rem!important;padding-bottom:4rem!important}
+}
 </style>
 </head>
-<body class="bg-white text-black overflow-x-hidden">
+<body>
 
-<!-- ══════════ NAV ══════════ -->
-<nav class="fixed top-0 w-full z-[200] glass border-b border-black/[0.06]">
-  <div class="flex justify-between items-center px-6 md:px-12 py-5 max-w-[1440px] mx-auto">
-    <div class="text-2xl font-black tracking-tighter text-black">alma.<span class="text-primary">+</span></div>
-    <button id="mob-btn" class="lg:hidden p-2 rounded-xl">
-      <span class="msym text-[1.6rem]">menu</span>
-    </button>
-    <div class="hidden lg:flex gap-10 items-center">
-      <a class="text-[.85rem] font-medium opacity-40 hover:opacity-100 hover:text-primary transition-all" href="#product">produit</a>
-      <a class="text-[.85rem] font-medium opacity-40 hover:opacity-100 hover:text-primary transition-all" href="#data">données</a>
-      <a class="text-[.85rem] font-medium opacity-40 hover:opacity-100 hover:text-primary transition-all" href="#pricing">tarifs</a>
-      <a class="text-[.85rem] font-medium opacity-40 hover:opacity-100 hover:text-primary transition-all" href="#faq">faq</a>
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-[200] glass border-b border-black/[.06]">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:1.1rem 3rem;max-width:1400px;margin:0 auto">
+    <a href="/" style="font-size:1.5rem;font-weight:900;letter-spacing:-.04em;color:#0a0a0a;text-decoration:none">alma.<span style="color:#0052FF">+</span></a>
+    <button id="mob-btn" class="lg:hidden p-2"><span class="msym" style="font-size:1.6rem">menu</span></button>
+    <div class="hidden lg:flex" style="gap:2.5rem;align-items:center">
+      <a href="#features" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.4);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.4)'">produit</a>
+      <a href="#donnees" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.4);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.4)'">données</a>
+      <a href="#tarifs" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.4);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.4)'">tarifs</a>
+      <a href="#faq" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.4);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.4)'">faq</a>
     </div>
-    <div class="hidden lg:flex items-center gap-6">
-      <a href="/login" class="text-[.85rem] font-medium opacity-40 hover:opacity-100 transition-opacity">connexion</a>
-      <a href="/login" class="bg-black text-white px-8 py-3 rounded-full text-[.85rem] font-semibold hover:bg-primary transition-all shadow-lg shadow-black/10 active:scale-95">commencer</a>
+    <div class="hidden lg:flex" style="align-items:center;gap:1.5rem">
+      <a href="/login" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.4);text-decoration:none;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'">connexion</a>
+      <a href="/login" style="background:#0a0a0a;color:#fff;padding:.7rem 1.8rem;border-radius:99px;font-size:.85rem;font-weight:700;text-decoration:none;transition:all .2s" onmouseover="this.style.background='#0052FF'" onmouseout="this.style.background='#0a0a0a'">commencer →</a>
     </div>
   </div>
 </nav>
 
-<!-- Mobile overlay + menu -->
 <div id="mob-overlay" onclick="closeMob()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300"></div>
 <div id="mob-menu">
-  <div class="flex items-center justify-between mb-6">
-    <span class="text-2xl font-black tracking-tighter text-black">alma.<span class="text-primary">+</span></span>
-    <button onclick="closeMob()" class="p-1"><span class="msym text-[1.4rem]">close</span></button>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+    <span style="font-size:1.4rem;font-weight:900;letter-spacing:-.04em">alma.<span style="color:#0052FF">+</span></span>
+    <button onclick="closeMob()"><span class="msym">close</span></button>
   </div>
-  <a href="#product" onclick="closeMob()" class="block px-4 py-3 text-sm font-bold border-b border-black/5">produit</a>
-  <a href="#data" onclick="closeMob()" class="block px-4 py-3 text-sm font-bold border-b border-black/5">données</a>
-  <a href="#pricing" onclick="closeMob()" class="block px-4 py-3 text-sm font-bold border-b border-black/5">tarifs</a>
-  <a href="#faq" onclick="closeMob()" class="block px-4 py-3 text-sm font-bold">faq</a>
-  <div class="mt-6 flex flex-col gap-3">
-    <a href="/login" class="text-center py-3 rounded-full border border-black/10 text-sm font-bold">connexion</a>
-    <a href="/login" class="text-center py-3 rounded-full bg-primary text-white text-sm font-bold">commencer →</a>
+  <a href="#features" onclick="closeMob()" style="display:block;padding:.8rem 1rem;font-size:.9rem;font-weight:700;border-bottom:1px solid rgba(0,0,0,.05);text-decoration:none;color:#0a0a0a">produit</a>
+  <a href="#donnees" onclick="closeMob()" style="display:block;padding:.8rem 1rem;font-size:.9rem;font-weight:700;border-bottom:1px solid rgba(0,0,0,.05);text-decoration:none;color:#0a0a0a">données</a>
+  <a href="#tarifs" onclick="closeMob()" style="display:block;padding:.8rem 1rem;font-size:.9rem;font-weight:700;border-bottom:1px solid rgba(0,0,0,.05);text-decoration:none;color:#0a0a0a">tarifs</a>
+  <a href="#faq" onclick="closeMob()" style="display:block;padding:.8rem 1rem;font-size:.9rem;font-weight:700;text-decoration:none;color:#0a0a0a">faq</a>
+  <div style="margin-top:1.5rem;display:flex;flex-direction:column;gap:.7rem">
+    <a href="/login" style="text-align:center;padding:.8rem;border-radius:99px;border:1px solid rgba(0,0,0,.1);font-size:.9rem;font-weight:700;text-decoration:none;color:#0a0a0a">connexion</a>
+    <a href="/login" style="text-align:center;padding:.8rem;border-radius:99px;background:#0052FF;color:#fff;font-size:.9rem;font-weight:700;text-decoration:none">commencer →</a>
   </div>
 </div>
 
-<main>
+<!-- HERO SPLIT -->
+<section style="background:#fff">
+  <div style="max-width:1400px;margin:0 auto;padding:0 3rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;min-height:100vh" class="hero-l">
 
-<!-- ══════════ HERO ══════════ -->
-<section class="relative min-h-screen flex flex-col items-center justify-center pt-36 pb-48 px-6 text-center overflow-hidden">
-  <!-- BG blobs -->
-  <div class="absolute top-[-15%] left-[-12%] w-[55%] h-[55%] bg-primary/[0.06] rounded-full blur-[130px] animate-pulse-slow pointer-events-none"></div>
-  <div class="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-blue-300/[0.07] rounded-full blur-[110px] animate-pulse-slow pointer-events-none"></div>
+    <!-- Gauche -->
+    <div style="padding-top:6rem">
+      <div class="reveal on" style="display:inline-flex;align-items:center;gap:.6rem;padding:.4rem 1rem;border-radius:99px;border:1px solid rgba(0,0,0,.1);font-size:.7rem;font-weight:700;letter-spacing:.12em;margin-bottom:2rem;background:#fff">
+        <span style="display:flex;position:relative;width:8px;height:8px">
+          <span style="position:absolute;display:inline-flex;width:100%;height:100%;border-radius:50%;background:#22c55e;opacity:.75;animation:ping 2s infinite"></span>
+          <span style="position:relative;display:inline-flex;width:8px;height:8px;border-radius:50%;background:#22c55e"></span>
+        </span>
+        votre équipe commerciale disponible 24h/24
+      </div>
 
-  <!-- Badge -->
-  <div class="reveal on inline-flex items-center gap-2.5 px-5 py-2 mb-10 rounded-full glass-dark text-[.72rem] font-bold tracking-[.18em]">
-    <span class="relative flex h-2 w-2">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-      <span class="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
-    </span>
-    votre commercial disponible 24h/24
-  </div>
+      <h1 class="reveal on d1" style="font-size:clamp(3rem,5vw,5rem);font-weight:400;line-height:1.0;letter-spacing:-.04em;margin-bottom:1.5rem">
+        pendant que vous<br/>
+        <span style="color:#0052FF;font-weight:600">travaillez,</span><br/>
+        alma.+ prospecte<br/>
+        <span style="color:rgba(0,0,0,.25)">pour vous.</span>
+      </h1>
 
-  <!-- H1 -->
-  <h1 class="reveal on d1 font-normal leading-[1] tracking-tighter max-w-5xl mx-auto mb-10 t-hero">
-    dormez bien.<br/>
-    <span class="text-primary font-medium">alma.+ s'occupe du reste.</span>
-  </h1>
+      <p class="reveal on d2" style="font-size:1.05rem;color:rgba(0,0,0,.45);font-weight:300;line-height:1.75;max-width:460px;margin-bottom:2.5rem">
+        détection de signaux d'affaires, emails ia personnalisés, pipeline crm, relances automatiques — tout en automatique, sans effort.
+      </p>
 
-  <!-- Sub -->
-  <p class="reveal on d2 text-base text-black/50 max-w-2xl mx-auto mb-14 font-light leading-relaxed">
-    alma.+ automatise l'intégralité de votre prospection commerciale. de la détection de signaux d'affaires à la prise de rendez-vous qualifiés.
-  </p>
+      <div class="reveal on d3" style="display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:2.5rem">
+        <a href="/login" style="background:#0052FF;color:#fff;padding:.9rem 2.2rem;border-radius:99px;font-size:1rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;transition:all .2s;box-shadow:0 8px 32px rgba(0,82,255,.3)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 40px rgba(0,82,255,.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 32px rgba(0,82,255,.3)'">démarrer maintenant <span class="msym">arrow_forward</span></a>
+        <a href="#features" style="background:transparent;color:#0a0a0a;padding:.9rem 2rem;border-radius:99px;font-size:1rem;font-weight:600;text-decoration:none;border:1px solid rgba(0,0,0,.12);transition:all .2s" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">voir le produit</a>
+      </div>
 
-  <!-- CTAs -->
-  <div class="reveal on d3 flex flex-col sm:flex-row gap-4 items-center justify-center mb-6">
-    <a href="/login" class="bg-primary text-white px-12 py-5 rounded-full text-lg font-bold hover:scale-105 hover:shadow-2xl hover:shadow-primary/30 transition-all active:scale-95">
-      activer la croissance
-    </a>
-    <a href="#product" class="glass px-12 py-5 rounded-full text-lg font-semibold hover:bg-white transition-all">
-      voir le produit
-    </a>
-  </div>
-
-  <!-- Social proof -->
-  <div class="reveal on flex flex-wrap items-center justify-center gap-3 text-sm text-black/35 font-medium mb-28">
-    <span class="text-amber-400 tracking-wide">★★★★★</span>
-    <span>4.8/5</span>
-    <span class="w-1 h-1 rounded-full bg-black/15"></span>
-    <span><span id="live-counter">847</span> entrepreneurs actifs</span>
-    <span class="w-1 h-1 rounded-full bg-black/15"></span>
-    <span>sans engagement · résiliable à tout moment</span>
-  </div>
-
-  <!-- Hero dashboard mockup — exact same structure as file 3 -->
-  <div class="reveal on w-full max-w-6xl mx-auto aspect-video rounded-2xl md:rounded-[3rem] overflow-hidden shadow-2xl relative border border-black/[.06] group bg-zinc-100" id="product">
-    <div class="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent mix-blend-overlay group-hover:opacity-0 transition-opacity z-10 pointer-events-none"></div>
-    <!-- Fake app inside -->
-    <div class="absolute inset-0 flex flex-col">
-      <!-- Topbar -->
-      <div class="flex items-center gap-3 px-5 py-3.5 bg-white border-b border-black/[.06] flex-shrink-0 relative z-20">
-        <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-primary to-blue-400"></div>
-        <div class="w-5 h-5 rounded-md bg-primary flex items-center justify-center text-white text-[.5rem] font-black flex-shrink-0">A+</div>
-        <span class="text-sm font-black tracking-tighter">alma.<span class="text-primary">+</span></span>
-        <div class="flex gap-1 ml-2">
-          <span class="text-[.6rem] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-bold">prospection</span>
-          <span class="text-[.6rem] px-2.5 py-1 rounded-full text-black/25 font-medium hidden sm:inline">pipeline</span>
-          <span class="text-[.6rem] px-2.5 py-1 rounded-full text-black/25 font-medium hidden md:inline">séquences</span>
-          <span class="text-[.6rem] px-2.5 py-1 rounded-full text-black/25 font-medium hidden lg:inline">pilote auto</span>
+      <div class="reveal on d4" style="display:flex;align-items:center;gap:1rem">
+        <div style="display:flex">
+          <div style="width:34px;height:34px;border-radius:99px;border:2px solid #fff;background:#0052FF;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:900;margin-right:-8px">s.</div>
+          <div style="width:34px;height:34px;border-radius:99px;border:2px solid #fff;background:#7c3aed;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:900;margin-right:-8px">a.</div>
+          <div style="width:34px;height:34px;border-radius:99px;border:2px solid #fff;background:#d97706;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:900;margin-right:-8px">j.</div>
+          <div style="width:34px;height:34px;border-radius:99px;border:2px solid #fff;background:#059669;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:900">m.</div>
         </div>
-        <div class="ml-auto flex items-center gap-1.5 text-[.6rem] font-bold text-green-500 bg-green-50 border border-green-100 px-3 py-1 rounded-full">
-          <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping-slow"></span>
-          3 campagnes actives
+        <div>
+          <div style="font-size:.78rem;font-weight:700"><span id="live-counter">847</span>+ entrepreneurs actifs</div>
+          <div style="font-size:.72rem;color:rgba(0,0,0,.4);margin-top:1px">★★★★★ 4.8/5 · sans engagement</div>
         </div>
       </div>
-      <!-- Body -->
-      <div class="flex flex-1 overflow-hidden">
-        <!-- Sidebar -->
-        <div class="w-36 bg-white border-r border-black/[.05] p-2 flex-shrink-0 hidden sm:block">
-          <div class="text-[.5rem] font-black uppercase tracking-widest text-black/20 px-2 pt-2 pb-1">navigation</div>
-          <div class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-primary/8 text-primary font-bold text-[.6rem] mb-0.5"><div class="w-2 h-2 rounded-sm bg-primary/50 flex-shrink-0"></div>prospection b2b<span class="ml-auto bg-primary/15 px-1 rounded text-[.5rem]">12</span></div>
-          <div class="flex items-center gap-1.5 px-2 py-1.5 text-black/25 text-[.6rem] mb-0.5"><div class="w-2 h-2 rounded-sm bg-black/10 flex-shrink-0"></div>pipeline crm</div>
-          <div class="flex items-center gap-1.5 px-2 py-1.5 text-black/25 text-[.6rem]"><div class="w-2 h-2 rounded-sm bg-black/10 flex-shrink-0"></div>séquences auto</div>
-          <div class="text-[.5rem] font-black uppercase tracking-widest text-black/20 px-2 pt-3 pb-1">outils</div>
-          <div class="flex items-center gap-1.5 px-2 py-1.5 text-black/25 text-[.6rem] mb-0.5"><div class="w-2 h-2 rounded-sm bg-black/10 flex-shrink-0"></div>devis</div>
-          <div class="flex items-center gap-1.5 px-2 py-1.5 text-black/25 text-[.6rem] mb-0.5"><div class="w-2 h-2 rounded-sm bg-black/10 flex-shrink-0"></div>calendrier</div>
-          <div class="flex items-center gap-1.5 px-2 py-1.5 text-black/25 text-[.6rem]"><div class="w-2 h-2 rounded-sm bg-black/10 flex-shrink-0"></div>rapport</div>
+    </div>
+
+    <!-- Droite — dashboard mini -->
+    <div class="reveal on d2" style="padding-top:5rem;position:relative">
+      <div style="position:absolute;top:20%;right:-60px;width:280px;height:280px;background:rgba(0,82,255,.05);filter:blur(80px);border-radius:50%;pointer-events:none"></div>
+
+      <div style="background:#fff;border-radius:20px;border:1px solid rgba(0,0,0,.08);overflow:hidden;box-shadow:0 32px 80px -16px rgba(0,82,255,.12)">
+        <!-- topbar -->
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #f0f0f0;position:relative">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,#0052FF,#00AAFF)"></div>
+          <div style="width:20px;height:20px;background:#0052FF;border-radius:5px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:900;flex-shrink:0">A+</div>
+          <span style="font-size:11px;font-weight:900;letter-spacing:-.5px">alma.<span style="color:#0052FF">+</span></span>
+          <div style="margin-left:auto;font-size:8px;font-weight:700;color:#22c55e;background:#f0fdf4;border:1px solid #bbf7d0;padding:3px 8px;border-radius:99px;display:flex;align-items:center;gap:4px">
+            <span style="width:5px;height:5px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite"></span>pilote actif
+          </div>
         </div>
-        <!-- Main -->
-        <div class="flex-1 bg-zinc-50 p-4 overflow-hidden">
-          <div class="text-sm font-black tracking-tight mb-0.5">prospection</div>
-          <div class="text-[.6rem] text-black/30 mb-3">recherchez des pme/tpe réelles, enrichies et scorées</div>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-            <div class="bg-white rounded-xl p-2.5 border border-black/[.05] relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-[2px] bg-primary/40"></div><div class="text-[.5rem] text-black/30 uppercase tracking-wider mb-1">cette semaine</div><div class="text-lg font-normal tracking-tighter">48</div><div class="text-[.55rem] text-green-500 font-bold">↑ +12</div></div>
-            <div class="bg-white rounded-xl p-2.5 border border-black/[.05] relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-[2px] bg-primary/40"></div><div class="text-[.5rem] text-black/30 uppercase tracking-wider mb-1">emails envoyés</div><div class="text-lg font-normal tracking-tighter">124</div><div class="text-[.55rem] text-green-500 font-bold">↑ 34% rép.</div></div>
-            <div class="bg-white rounded-xl p-2.5 border border-black/[.05] relative overflow-hidden hidden md:block"><div class="absolute top-0 left-0 right-0 h-[2px] bg-primary/40"></div><div class="text-[.5rem] text-black/30 uppercase tracking-wider mb-1">en pipeline</div><div class="text-lg font-normal tracking-tighter">17</div><div class="text-[.55rem] text-green-500 font-bold">↑ 3 nvx</div></div>
-            <div class="bg-white rounded-xl p-2.5 border border-black/[.05] relative overflow-hidden hidden md:block"><div class="absolute top-0 left-0 right-0 h-[2px] bg-primary/40"></div><div class="text-[.5rem] text-black/30 uppercase tracking-wider mb-1">convertis</div><div class="text-lg font-normal tracking-tighter">4</div><div class="text-[.55rem] text-green-500 font-bold">↑ ce mois</div></div>
+        <!-- kpis -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #f0f0f0">
+          <div style="padding:10px 12px;border-right:1px solid #f0f0f0">
+            <div style="font-size:7px;color:rgba(0,0,0,.35);text-transform:uppercase!important;letter-spacing:.08em;margin-bottom:3px">prospects</div>
+            <div style="font-size:18px;font-weight:700;letter-spacing:-.05em">247</div>
+            <div style="font-size:8px;color:#22c55e;font-weight:700">↑ +48 auj.</div>
           </div>
-          <div class="flex gap-2 mb-3">
-            <div class="flex-1 bg-white rounded-lg px-3 py-2 text-[.65rem] text-black/25 border border-black/[.06]">plombiers chauffagistes lyon 3e…</div>
-            <button class="bg-primary text-white text-[.65rem] font-bold px-3 py-2 rounded-lg">rechercher</button>
+          <div style="padding:10px 12px;border-right:1px solid #f0f0f0">
+            <div style="font-size:7px;color:rgba(0,0,0,.35);text-transform:uppercase!important;letter-spacing:.08em;margin-bottom:3px">emails ia</div>
+            <div style="font-size:18px;font-weight:700;letter-spacing:-.05em">124</div>
+            <div style="font-size:8px;color:#22c55e;font-weight:700">↑ 34% rép.</div>
           </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div class="bg-white rounded-xl p-2.5 border border-black/[.05]"><div class="flex items-center gap-1.5 mb-1.5"><div class="w-6 h-6 rounded-md bg-primary text-white text-[.5rem] font-black flex items-center justify-center flex-shrink-0">PL</div><div><div class="text-[.65rem] font-bold">plomberie leclerc</div><div class="text-[.5rem] text-black/30">lyon 3e · 7 ans</div></div><span class="ml-auto text-[.55rem] font-black bg-red-50 text-red-500 px-1.5 py-0.5 rounded-md">96</span></div><div class="text-[.5rem] text-black/25 mb-1.5">☆ 4.8 · 124 avis · tél. vérifié</div><div class="flex gap-1"><button class="text-[.5rem] bg-primary text-white px-1.5 py-0.5 rounded-md font-bold">message</button><button class="text-[.5rem] border border-black/10 text-black/35 px-1.5 py-0.5 rounded-md">pipeline</button></div></div>
-            <div class="bg-white rounded-xl p-2.5 border border-black/[.05]"><div class="flex items-center gap-1.5 mb-1.5"><div class="w-6 h-6 rounded-md bg-indigo-500 text-white text-[.5rem] font-black flex items-center justify-center flex-shrink-0">SB</div><div><div class="text-[.65rem] font-bold">sb plomberie pro</div><div class="text-[.5rem] text-black/30">lyon 6e · 12 ans</div></div><span class="ml-auto text-[.55rem] font-black bg-red-50 text-red-500 px-1.5 py-0.5 rounded-md">91</span></div><div class="text-[.5rem] text-black/25 mb-1.5">☆ 4.6 · 89 avis · email trouvé</div><div class="flex gap-1"><button class="text-[.5rem] bg-primary text-white px-1.5 py-0.5 rounded-md font-bold">message</button><button class="text-[.5rem] border border-black/10 text-black/35 px-1.5 py-0.5 rounded-md">pipeline</button></div></div>
+          <div style="padding:10px 12px;border-right:1px solid #f0f0f0">
+            <div style="font-size:7px;color:rgba(0,0,0,.35);text-transform:uppercase!important;letter-spacing:.08em;margin-bottom:3px">pipeline</div>
+            <div style="font-size:18px;font-weight:700;letter-spacing:-.05em">17</div>
+            <div style="font-size:8px;color:#22c55e;font-weight:700">↑ 3 nvx</div>
           </div>
+          <div style="padding:10px 12px">
+            <div style="font-size:7px;color:rgba(0,0,0,.35);text-transform:uppercase!important;letter-spacing:.08em;margin-bottom:3px">convertis</div>
+            <div style="font-size:18px;font-weight:700;letter-spacing:-.05em;color:#0052FF">4</div>
+            <div style="font-size:8px;color:#22c55e;font-weight:700">↑ ce mois</div>
+          </div>
+        </div>
+        <!-- prospects -->
+        <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:7px;font-weight:900;text-transform:uppercase!important;letter-spacing:.1em;color:rgba(0,0,0,.3);margin-bottom:3px">derniers prospects trouvés</div>
+          <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f9f9fb;border-radius:9px">
+            <div style="width:22px;height:22px;border-radius:6px;background:#0052FF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:900;flex-shrink:0">pl</div>
+            <div style="flex:1"><div style="font-size:10px;font-weight:700">plomberie leclerc</div><div style="font-size:8px;color:rgba(0,0,0,.35)">lyon 3e · ☆ 4.8 · tél. vérifié</div></div>
+            <span style="font-size:8px;font-weight:900;background:#fef2f2;color:#ef4444;padding:2px 6px;border-radius:5px">96</span>
+            <button style="background:#0052FF;color:#fff;border:none;border-radius:5px;padding:3px 7px;font-size:8px;font-weight:700;cursor:pointer;font-family:inherit">email ia</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f9f9fb;border-radius:9px">
+            <div style="width:22px;height:22px;border-radius:6px;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:900;flex-shrink:0">sb</div>
+            <div style="flex:1"><div style="font-size:10px;font-weight:700">sb plomberie pro</div><div style="font-size:8px;color:rgba(0,0,0,.35)">lyon 6e · ☆ 4.6 · email trouvé</div></div>
+            <span style="font-size:8px;font-weight:900;background:#fef2f2;color:#ef4444;padding:2px 6px;border-radius:5px">91</span>
+            <button style="background:#0052FF;color:#fff;border:none;border-radius:5px;padding:3px 7px;font-size:8px;font-weight:700;cursor:pointer;font-family:inherit">email ia</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f9f9fb;border-radius:9px">
+            <div style="width:22px;height:22px;border-radius:6px;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:900;flex-shrink:0">bp</div>
+            <div style="flex:1"><div style="font-size:10px;font-weight:700">bâti pro sarl</div><div style="font-size:8px;color:rgba(0,0,0,.35)">bordeaux · ☆ 4.3 · 5 ans</div></div>
+            <span style="font-size:8px;font-weight:900;background:#fff7ed;color:#f97316;padding:2px 6px;border-radius:5px">78</span>
+            <button style="background:#0052FF;color:#fff;border:none;border-radius:5px;padding:3px 7px;font-size:8px;font-weight:700;cursor:pointer;font-family:inherit">email ia</button>
+          </div>
+        </div>
+        <!-- log -->
+        <div style="background:#0a0a1a;padding:10px 14px">
+          <div style="font-size:7px;font-weight:900;text-transform:uppercase!important;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:6px">pilote auto · journal temps réel</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e;flex-shrink:0"></span><span style="font-size:8px;color:rgba(255,255,255,.55)">email généré · chauffage martin · marseille</span><span style="margin-left:auto;font-size:7px;color:rgba(255,255,255,.2)">09:47</span></div>
+            <div style="display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:50%;background:#0052FF;flex-shrink:0"></span><span style="font-size:8px;color:rgba(255,255,255,.55)">ajouté pipeline · plomberie duval · montpellier</span><span style="margin-left:auto;font-size:7px;color:rgba(255,255,255,.2)">09:46</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- notif flottante -->
+      <div style="position:absolute;bottom:-16px;left:-16px;background:#fff;border-radius:14px;padding:10px 14px;box-shadow:0 8px 32px rgba(0,0,0,.1);border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;gap:10px">
+        <div style="width:30px;height:30px;border-radius:8px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span class="msym fill" style="font-size:16px;color:#22c55e">notifications_active</span>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:800">nouveau prospect répond !</div>
+          <div style="font-size:9px;color:rgba(0,0,0,.4)">plomberie leclerc · rdv demain 10h</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════ LOGO CLOUD (comme fichier 3) ══════════ -->
-<section class="py-24 border-y border-black/[.05]">
-  <div class="max-w-[1440px] mx-auto px-12">
-    <p class="text-[.7rem] font-bold tracking-[.3em] text-black/25 text-center mb-14">ils dominent avec alma.+</p>
-    <div class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-25 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
-      <div class="text-lg font-normal tracking-tight">BATIPRO</div>
-      <div class="text-lg font-normal italic underline decoration-primary">NEXOLAB</div>
-      <div class="text-lg font-normal border-2 border-black px-3 py-1">CORETECH</div>
-      <div class="text-lg font-normal">VELOCITY</div>
-      <div class="text-lg font-normal tracking-widest">GROWTHLY</div>
+<!-- STATS BAR -->
+<section style="padding:0;background:#f9f9fb;border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(0,0,0,.06)">
+  <div style="max-width:1400px;margin:0 auto;padding:0 3rem;display:flex;gap:3rem;flex-wrap:wrap;align-items:stretch">
+    <div style="display:flex;align-items:center;gap:1rem;padding:1.8rem 0;flex:1;min-width:120px">
+      <div style="font-size:2.2rem;font-weight:800;letter-spacing:-.06em;color:#0052FF" id="live-counter">847+</div>
+      <div style="font-size:.78rem;color:rgba(0,0,0,.45);line-height:1.4">entrepreneurs<br/>actifs</div>
+    </div>
+    <div style="width:1px;background:rgba(0,0,0,.08);align-self:stretch"></div>
+    <div style="display:flex;align-items:center;gap:1rem;padding:1.8rem 0;flex:1;min-width:120px">
+      <div style="font-size:2.2rem;font-weight:800;letter-spacing:-.06em;color:#0052FF">34%</div>
+      <div style="font-size:.78rem;color:rgba(0,0,0,.45);line-height:1.4">taux de réponse<br/>moyen</div>
+    </div>
+    <div style="width:1px;background:rgba(0,0,0,.08);align-self:stretch"></div>
+    <div style="display:flex;align-items:center;gap:1rem;padding:1.8rem 0;flex:1;min-width:120px">
+      <div style="font-size:2.2rem;font-weight:800;letter-spacing:-.06em;color:#0052FF">10</div>
+      <div style="font-size:.78rem;color:rgba(0,0,0,.45);line-height:1.4">sources de données<br/>officielles</div>
+    </div>
+    <div style="width:1px;background:rgba(0,0,0,.08);align-self:stretch"></div>
+    <div style="display:flex;align-items:center;gap:1rem;padding:1.8rem 0;flex:1;min-width:120px">
+      <div style="font-size:2.2rem;font-weight:800;letter-spacing:-.06em;color:#0052FF">4.8</div>
+      <div style="font-size:.78rem;color:rgba(0,0,0,.45);line-height:1.4">★★★★★<br/>note moyenne</div>
+    </div>
+    <div style="width:1px;background:rgba(0,0,0,.08);align-self:stretch"></div>
+    <div style="display:flex;align-items:center;gap:1rem;padding:1.8rem 0;flex:1;min-width:120px">
+      <div style="font-size:2.2rem;font-weight:800;letter-spacing:-.06em;color:#0052FF">5min</div>
+      <div style="font-size:.78rem;color:rgba(0,0,0,.45);line-height:1.4">pour être<br/>opérationnel</div>
     </div>
   </div>
 </section>
 
-<!-- ══════════ TICKER ══════════ -->
-<div class="py-4 overflow-hidden relative bg-zinc-50 border-b border-black/[.05]">
-  <div class="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-zinc-50 to-transparent z-10"></div>
-  <div class="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-zinc-50 to-transparent z-10"></div>
+<!-- LOGO CLOUD -->
+<section style="padding:2.5rem 0;border-bottom:1px solid rgba(0,0,0,.06)">
+  <div style="max-width:1400px;margin:0 auto;padding:0 3rem">
+    <p style="font-size:.68rem;font-weight:700;letter-spacing:.22em;color:rgba(0,0,0,.25);text-align:center;margin-bottom:2rem">ils dominent leur marché avec alma.+</p>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2.5rem;opacity:.2;filter:grayscale(1);transition:all .6s" onmouseover="this.style.opacity='.7';this.style.filter='grayscale(0)'" onmouseout="this.style.opacity='.2';this.style.filter='grayscale(1)'">
+      <div style="font-size:1.1rem;font-weight:800;letter-spacing:-.02em">BATIPRO</div>
+      <div style="font-size:1.1rem;font-weight:800;text-decoration:underline;text-decoration-color:#0052FF">NEXOLAB</div>
+      <div style="font-size:1.1rem;font-weight:800;border:2px solid #0a0a0a;padding:3px 12px;border-radius:5px">CORETECH</div>
+      <div style="font-size:1.1rem;font-weight:800;letter-spacing:.15em">VELOCITY</div>
+      <div style="font-size:1.1rem;font-weight:800">GROWTHLY</div>
+      <div style="font-size:1.1rem;font-weight:800">RENOVPRO</div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div style="padding:.75rem 0;background:#f5f5f7;border-bottom:1px solid rgba(0,0,0,.06);overflow:hidden;position:relative">
+  <div style="position:absolute;left:0;top:0;bottom:0;width:80px;background:linear-gradient(to right,#f5f5f7,transparent);z-index:1"></div>
+  <div style="position:absolute;right:0;top:0;bottom:0;width:80px;background:linear-gradient(to left,#f5f5f7,transparent);z-index:1"></div>
   <div class="ticker-track">
     <div style="display:flex;flex-shrink:0">
-      <span class="text-sm text-black/40 px-8">plombier · vaucluse · <strong class="font-bold text-primary">12 réponses cette semaine</strong></span><span class="text-black/15 px-3">·</span>
-      <span class="text-sm text-black/40 px-8">consultante rh · paris · <strong class="font-bold text-primary">agenda plein en 48h</strong></span><span class="text-black/15 px-3">·</span>
-      <span class="text-sm text-black/40 px-8">restaurateur · lyon · <strong class="font-bold text-primary">+40% de ca en 30 jours</strong></span><span class="text-black/15 px-3">·</span>
-      <span class="text-sm text-black/40 px-8">agence growth · nantes · <strong class="font-bold text-primary">roi dès le premier mois</strong></span><span class="text-black/15 px-3">·</span>
-      <span class="text-sm text-black/40 px-8">architecte · bordeaux · <strong class="font-bold text-primary">leads qualifiés chaque matin</strong></span><span class="text-black/15 px-3">·</span>
-      <span class="text-sm text-black/40 px-8">électricien · marseille · <strong class="font-bold text-primary">200 contactés en une nuit</strong></span><span class="text-black/15 px-3">·</span>
+      <span style="font-size:.85rem;color:rgba(0,0,0,.4);padding:0 2rem">plombier · vaucluse · <strong style="color:#0052FF;font-weight:700">12 réponses cette semaine</strong></span><span style="color:rgba(0,0,0,.15);padding:0 .5rem">·</span>
+      <span style="font-size:.85rem;color:rgba(0,0,0,.4);padding:0 2rem">consultante rh · paris · <strong style="color:#0052FF;font-weight:700">agenda plein en 48h</strong></span><span style="color:rgba(0,0,0,.15);padding:0 .5rem">·</span>
+      <span style="font-size:.85rem;color:rgba(0,0,0,.4);padding:0 2rem">restaurateur · lyon · <strong style="color:#0052FF;font-weight:700">+40% de ca en 30 jours</strong></span><span style="color:rgba(0,0,0,.15);padding:0 .5rem">·</span>
+      <span style="font-size:.85rem;color:rgba(0,0,0,.4);padding:0 2rem">artisan · marseille · <strong style="color:#0052FF;font-weight:700">200 contactés en une nuit</strong></span><span style="color:rgba(0,0,0,.15);padding:0 .5rem">·</span>
+      <span style="font-size:.85rem;color:rgba(0,0,0,.4);padding:0 2rem">architecte · bordeaux · <strong style="color:#0052FF;font-weight:700">leads qualifiés chaque matin</strong></span><span style="color:rgba(0,0,0,.15);padding:0 .5rem">·</span>
     </div>
     <div style="display:flex;flex-shrink:0" aria-hidden="true">
-      <span class="text-sm text-black/40 px-8">plombier · vaucluse · <strong class="font-bold text-primary">12 réponses cette semaine</strong></span><span class="text-black/15 px-3">·</span>
-      <span class="text-sm text-black/40 px-8">consultante rh · paris · <strong class="font-bold text-primary">agenda plein en 48h</strong></span><span class="text-black/15 px-3">·</span>
-      <span class="text-sm text-black/40 px-8">restaurateur · lyon · <strong class="font-bold text-primary">+40% de ca en 30 jours</strong></span><span class="text-black/15 px-3">·</span>
-      <span class="text-sm text-black/40 px-8">agence growth · nantes · <strong class="font-bold text-primary">roi dès le premier mois</strong></span><span class="text-black/15 px-3">·</span>
-      <span class="text-sm text-black/40 px-8">architecte · bordeaux · <strong class="font-bold text-primary">leads qualifiés chaque matin</strong></span><span class="text-black/15 px-3">·</span>
-      <span class="text-sm text-black/40 px-8">électricien · marseille · <strong class="font-bold text-primary">200 contactés en une nuit</strong></span><span class="text-black/15 px-3">·</span>
+      <span style="font-size:.85rem;color:rgba(0,0,0,.4);padding:0 2rem">plombier · vaucluse · <strong style="color:#0052FF;font-weight:700">12 réponses cette semaine</strong></span><span style="color:rgba(0,0,0,.15);padding:0 .5rem">·</span>
+      <span style="font-size:.85rem;color:rgba(0,0,0,.4);padding:0 2rem">consultante rh · paris · <strong style="color:#0052FF;font-weight:700">agenda plein en 48h</strong></span><span style="color:rgba(0,0,0,.15);padding:0 .5rem">·</span>
+      <span style="font-size:.85rem;color:rgba(0,0,0,.4);padding:0 2rem">restaurateur · lyon · <strong style="color:#0052FF;font-weight:700">+40% de ca en 30 jours</strong></span><span style="color:rgba(0,0,0,.15);padding:0 .5rem">·</span>
+      <span style="font-size:.85rem;color:rgba(0,0,0,.4);padding:0 2rem">artisan · marseille · <strong style="color:#0052FF;font-weight:700">200 contactés en une nuit</strong></span><span style="color:rgba(0,0,0,.15);padding:0 .5rem">·</span>
+      <span style="font-size:.85rem;color:rgba(0,0,0,.4);padding:0 2rem">architecte · bordeaux · <strong style="color:#0052FF;font-weight:700">leads qualifiés chaque matin</strong></span><span style="color:rgba(0,0,0,.15);padding:0 .5rem">·</span>
     </div>
   </div>
 </div>
 
-<!-- ══════════ DATA SOURCES (structure exacte fichier 3) ══════════ -->
-<section class="py-24 bg-white overflow-hidden reveal" id="data">
-  <div class="max-w-[1440px] mx-auto px-6 md:px-12">
-    <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-10">
-      <div class="max-w-2xl">
-        <h2 class="text-4xl md:text-5xl font-normal tracking-tighter mb-6 leading-[1.0]">on va chercher l'info <span class="text-primary font-medium">là où elle est.</span></h2>
-        <p class="text-black/45 text-sm font-light leading-relaxed">nous extrayons les signaux d'affaires les plus faibles pour les transformer en opportunités fortes. 10 sources officielles, agrégées en temps réel.</p>
+<!-- FEATURES 3 COLONNES -->
+<section style="padding:7rem 0;background:#fff" class="reveal" id="features">
+  <div style="max-width:1400px;margin:0 auto;padding:0 3rem">
+    <div style="text-align:center;margin-bottom:4rem">
+      <div style="display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.14em;color:#0052FF;background:rgba(0,82,255,.06);border:1px solid rgba(0,82,255,.12);padding:.4rem 1.1rem;border-radius:99px;margin-bottom:1.2rem">solutions avancées</div>
+      <h2 style="font-size:clamp(2rem,4vw,3.5rem);font-weight:400;letter-spacing:-.04em;line-height:1.05;margin-bottom:1rem">tout ce dont vous avez besoin.<br/><span style="color:#0052FF;font-weight:500">rien de superflu.</span></h2>
+      <p style="font-size:1rem;color:rgba(0,0,0,.45);font-weight:300;max-width:480px;margin:0 auto;line-height:1.7">de la recherche de prospects à la signature — en un seul outil, sans prise de tête.</p>
+    </div>
+    <div class="feat-grid">
+      <div style="background:#0a0a1a;border-radius:22px;padding:2.5rem;color:#fff;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(0,82,255,.2);filter:blur(60px);border-radius:50%"></div>
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(0,82,255,.25);display:flex;align-items:center;justify-content:center;margin-bottom:2rem;position:relative"><span class="msym" style="font-size:24px;color:#60a5fa">bolt</span></div>
+        <h3 style="font-size:1.4rem;font-weight:500;letter-spacing:-.03em;margin-bottom:.8rem;line-height:1.2;position:relative">automatisation chirurgicale</h3>
+        <p style="font-size:.9rem;color:rgba(255,255,255,.4);line-height:1.7;font-weight:300;margin-bottom:1.5rem;position:relative">34% de réponse vs 2% en manuel. alma.+ adapte chaque message au contexte exact de votre cible.</p>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.73rem;font-weight:700;color:rgba(255,255,255,.3);position:relative">
+          <span style="width:6px;height:6px;border-radius:50%;background:#22c55e"></span>actif pour 847 entrepreneurs
+        </div>
       </div>
-      <div class="flex gap-3 flex-shrink-0">
-        <button onclick="scrollCards(-1)" class="w-14 h-14 rounded-full border border-black/[.07] flex items-center justify-center hover:bg-black hover:text-white transition-all"><span class="msym text-[1.4rem]">west</span></button>
-        <button onclick="scrollCards(1)" class="w-14 h-14 rounded-full border border-black/[.07] flex items-center justify-center hover:bg-black hover:text-white transition-all"><span class="msym text-[1.4rem]">east</span></button>
+      <div style="background:#f5f5f7;border-radius:22px;padding:2.5rem">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(0,82,255,.08);display:flex;align-items:center;justify-content:center;margin-bottom:2rem"><span class="msym" style="font-size:24px;color:#0052FF">psychology</span></div>
+        <h3 style="font-size:1.4rem;font-weight:500;letter-spacing:-.03em;margin-bottom:.8rem;line-height:1.2">ia générative spécialisée</h3>
+        <p style="font-size:.9rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300">modèle ia entraîné sur le b2b français. vos emails sonnent vrai, pas comme un robot.</p>
+      </div>
+      <div style="background:#0052FF;border-radius:22px;padding:2.5rem;color:#fff;position:relative;overflow:hidden">
+        <div style="position:absolute;bottom:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.1);border-radius:50%"></div>
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:2rem"><span class="msym" style="font-size:24px;color:#fff">security</span></div>
+        <h3 style="font-size:1.4rem;font-weight:500;letter-spacing:-.03em;margin-bottom:.8rem;line-height:1.2">rgpd natif</h3>
+        <p style="font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.7;font-weight:300">sources publiques officielles, données hébergées en france, désinscription dans chaque email.</p>
       </div>
     </div>
-    <!-- Cards — exactly like file 3 grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-      <div class="data-card bg-[#4285F4] rounded-[2.5rem] p-8 aspect-[4/5] flex flex-col justify-between text-white shadow-xl shadow-blue-500/10">
-        <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center"><span class="msym text-3xl">location_on</span></div>
-        <div>
-          <h4 class="text-base font-bold mb-1">google maps</h4>
-          <p class="text-white/65 text-[.88rem] font-light leading-relaxed">commerces locaux, avis clients, numéros vérifiés en temps réel.</p>
-          <div class="mt-4 text-[.6rem] font-bold bg-white/20 inline-block px-3 py-1.5 rounded-full tracking-wider">places api · temps réel</div>
-        </div>
+    <div class="feat-grid" style="margin-top:1.5rem">
+      <div style="background:#f5f5f7;border-radius:22px;padding:2.5rem">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(0,82,255,.08);display:flex;align-items:center;justify-content:center;margin-bottom:2rem"><span class="msym" style="font-size:24px;color:#0052FF">bar_chart</span></div>
+        <h3 style="font-size:1.4rem;font-weight:500;letter-spacing:-.03em;margin-bottom:.8rem">analytics en live</h3>
+        <p style="font-size:.9rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300">pipeline en temps réel. taux de réponse, convertis, coût par lead — tout sous les yeux.</p>
       </div>
-      <div class="data-card bg-gradient-to-br from-[#3730a3] to-[#0052FF] rounded-[2.5rem] p-8 aspect-[4/5] flex flex-col justify-between text-white shadow-xl shadow-blue-600/15">
-        <div class="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center"><span class="msym text-3xl">analytics</span></div>
-        <div>
-          <h4 class="text-xl font-medium mb-1">insee / sirene</h4>
-          <div class="text-3xl font-black tracking-tighter leading-none mb-2">12m</div>
-          <p class="text-white/55 text-[.88rem] font-light">entreprises françaises certifiées par l'état.</p>
-        </div>
+      <div style="background:#f5f5f7;border-radius:22px;padding:2.5rem">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(0,82,255,.08);display:flex;align-items:center;justify-content:center;margin-bottom:2rem"><span class="msym" style="font-size:24px;color:#0052FF">phone_in_talk</span></div>
+        <h3 style="font-size:1.4rem;font-weight:500;letter-spacing:-.03em;margin-bottom:.8rem">assistant appel ia</h3>
+        <p style="font-size:.9rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300">script personnalisé, réponses aux objections en 1 clic, résumé automatique après chaque appel.</p>
       </div>
-      <div class="data-card bg-[#8E24AA] rounded-[2.5rem] p-8 aspect-[4/5] flex flex-col justify-between text-white shadow-xl shadow-purple-500/10">
-        <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center"><span class="msym text-3xl">gavel</span></div>
-        <div>
-          <h4 class="text-base font-bold mb-1">bodacc</h4>
-          <p class="text-white/65 text-[.88rem] font-light leading-relaxed">créations, cessions et procédures légales en temps réel.</p>
-        </div>
-      </div>
-      <div class="data-card bg-gradient-to-br from-[#059669] to-[#065f46] rounded-[2.5rem] p-8 aspect-[4/5] flex flex-col justify-between text-white shadow-xl shadow-green-500/10">
-        <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center"><span class="msym text-3xl">domain</span></div>
-        <div>
-          <h4 class="text-base font-bold mb-1">dvf & permis</h4>
-          <p class="text-white/65 text-[.88rem] font-light leading-relaxed">acheteurs immobiliers et propriétaires en rénovation.</p>
-        </div>
-      </div>
-      <div class="data-card bg-[#0077B5] rounded-[2.5rem] p-8 aspect-[4/5] flex flex-col justify-between text-white shadow-xl shadow-cyan-500/10">
-        <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center"><span class="msym text-3xl">person_search</span></div>
-        <div>
-          <h4 class="text-base font-bold mb-1">linkedin</h4>
-          <p class="text-white/65 text-[.88rem] font-light leading-relaxed">cartographie des décideurs et mouvements de carrière b2b.</p>
-        </div>
-      </div>
-    </div>
-    <!-- Extra row -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-      <div class="data-card bg-gradient-to-br from-[#d97706] to-[#f59e0b] rounded-[2rem] p-7 flex items-center gap-5 text-black shadow-lg shadow-amber-500/10">
-        <div class="w-12 h-12 rounded-2xl bg-black/10 flex items-center justify-center flex-shrink-0"><span class="msym text-2xl">menu_book</span></div>
-        <div><div class="text-base font-bold mb-1">pages jaunes</div><div class="text-sm text-black/50 font-light">annuaire professionnel complet</div></div>
-      </div>
-      <div class="data-card bg-gradient-to-br from-[#dc2626] to-[#991b1b] rounded-[2rem] p-7 flex items-center gap-5 text-white shadow-lg shadow-red-500/10">
-        <div class="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0"><span class="msym text-2xl">star</span></div>
-        <div><div class="text-base font-bold mb-1">google avis</div><div class="text-sm text-white/55 font-light">clients insatisfaits chez vos concurrents</div></div>
-      </div>
-      <div class="data-card bg-gradient-to-br from-[#3730a3] to-[#4f46e5] rounded-[2rem] p-7 flex items-center gap-5 text-white shadow-lg shadow-indigo-500/10">
-        <div class="w-12 h-12 rounded-2xl bg-white/12 flex items-center justify-center flex-shrink-0"><span class="msym text-2xl">check_circle</span></div>
-        <div><div class="text-base font-bold mb-1">boamp</div><div class="text-sm text-white/55 font-light">appels d'offres publics en temps réel</div></div>
+      <div style="background:#f5f5f7;border-radius:22px;padding:2.5rem">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(0,82,255,.08);display:flex;align-items:center;justify-content:center;margin-bottom:2rem"><span class="msym" style="font-size:24px;color:#0052FF">smart_toy</span></div>
+        <h3 style="font-size:1.4rem;font-weight:500;letter-spacing:-.03em;margin-bottom:.8rem">pilote 100% autonome</h3>
+        <p style="font-size:.9rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300">activez le pilote, partez travailler. alma.+ prospecte, score, génère les emails et alimente votre pipeline.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════ FEATURES BENTO (structure exacte fichier 3) ══════════ -->
-<section class="py-24 bg-zinc-50 reveal">
-  <div class="max-w-[1440px] mx-auto px-6 md:px-12">
-    <div class="text-center max-w-2xl mx-auto mb-20">
-      <h2 class="text-4xl md:text-5xl font-normal tracking-tighter mb-6 leading-[1.0]">tout ce dont vous avez besoin. <span class="text-primary font-medium">rien de superflu.</span></h2>
-      <p class="text-black/45 text-sm font-light">de la recherche de prospects à la signature — en un seul outil, sans prise de tête.</p>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-      <!-- Card large gauche -->
-      <div class="bento-card md:col-span-2 glass p-12 md:p-16 rounded-[3rem] border border-black/[.05] flex flex-col justify-between min-h-[460px]">
-        <div>
-          <span class="msym text-primary text-5xl mb-8 block">bolt</span>
-          <h3 class="text-3xl font-normal tracking-tighter mb-5 leading-tight">automatisation chirurgicale.</h3>
-          <p class="text-black/45 text-sm font-light max-w-md leading-relaxed">alma.+ ne fait pas que du "mailing". elle prospecte intelligemment en adaptant chaque message au contexte exact de votre cible. 34% de réponse vs 2% en manuel.</p>
+<!-- ANALYTICS SPLIT -->
+<section style="padding:7rem 0;background:#f5f5f7" class="reveal" id="donnees">
+  <div style="max-width:1400px;margin:0 auto;padding:0 3rem">
+    <div class="split">
+      <div>
+        <div style="display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.14em;color:#0052FF;background:rgba(0,82,255,.06);border:1px solid rgba(0,82,255,.12);padding:.4rem 1.1rem;border-radius:99px;margin-bottom:1.5rem">analytics temps réel</div>
+        <h2 style="font-size:clamp(1.8rem,3.5vw,3rem);font-weight:400;letter-spacing:-.04em;line-height:1.05;margin-bottom:1.5rem">vos performances,<br/><span style="color:#0052FF;font-weight:500">en temps réel.</span></h2>
+        <p style="font-size:1rem;color:rgba(0,0,0,.45);font-weight:300;line-height:1.7;margin-bottom:2.5rem">suivez chaque campagne, chaque prospect, chaque conversion. des données claires pour prendre les bonnes décisions au bon moment.</p>
+        <div style="display:flex;flex-direction:column;gap:.9rem">
+          <div style="display:flex;align-items:center;gap:.8rem"><div style="width:36px;height:36px;border-radius:9px;background:rgba(0,82,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="msym" style="font-size:18px;color:#0052FF">check_circle</span></div><span style="font-size:.95rem;font-weight:600">intégration transparente avec vos outils</span></div>
+          <div style="display:flex;align-items:center;gap:.8rem"><div style="width:36px;height:36px;border-radius:9px;background:rgba(0,82,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="msym" style="font-size:18px;color:#0052FF">check_circle</span></div><span style="font-size:.95rem;font-weight:600">interface pensée pour les non-techniciens</span></div>
+          <div style="display:flex;align-items:center;gap:.8rem"><div style="width:36px;height:36px;border-radius:9px;background:rgba(0,82,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="msym" style="font-size:18px;color:#0052FF">check_circle</span></div><span style="font-size:.95rem;font-weight:600">export csv · rapports auto · alertes temps réel</span></div>
         </div>
-        <div class="mt-10 flex items-center gap-5">
-          <div class="flex -space-x-3">
-            <div class="w-11 h-11 rounded-full border-2 border-white bg-primary flex items-center justify-center text-white text-xs font-black">S.</div>
-            <div class="w-11 h-11 rounded-full border-2 border-white bg-violet-600 flex items-center justify-center text-white text-xs font-black">A.</div>
-            <div class="w-11 h-11 rounded-full border-2 border-white bg-amber-500 flex items-center justify-center text-white text-xs font-black">J.</div>
+      </div>
+      <div style="background:#f0f4ff;border:1px solid rgba(0,82,255,.1);border-radius:20px;padding:1.8rem;overflow:hidden">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+          <div>
+            <div style="font-size:.72rem;font-weight:800;letter-spacing:.08em;color:rgba(0,0,0,.4);text-transform:uppercase!important;margin-bottom:4px">aperçu performances</div>
+            <div style="font-size:.82rem;color:rgba(0,0,0,.35)">mars 2024</div>
           </div>
-          <p class="text-[.72rem] font-bold uppercase tracking-widest opacity-35">+847 entrepreneurs actifs ce matin</p>
+          <div style="font-size:.72rem;font-weight:700;background:rgba(0,82,255,.08);color:#0052FF;padding:.3rem .8rem;border-radius:99px">ce mois</div>
         </div>
-      </div>
-
-      <!-- Card noire -->
-      <div class="bento-card bg-black text-white p-12 md:p-14 rounded-[3rem] flex flex-col justify-between hover:scale-[1.02] transition-all duration-500">
-        <span class="msym text-primary text-5xl mb-8 block">psychology</span>
-        <div>
-          <h3 class="text-lg font-normal tracking-tighter mb-4">ia générative v5.</h3>
-          <p class="text-white/35 text-[.9rem] font-light leading-relaxed">notre modèle de langage entraîné spécifiquement sur le b2b français. vos emails sonnent vrai.</p>
+        <div style="display:flex;align-items:flex-end;gap:.4rem;height:110px;margin-bottom:1rem;padding:0 .2rem">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem">
+            <div style="width:100%;height:49px;background:rgba(0,82,255,.12);border-radius:4px 4px 0 0"></div>
+            <div style="font-size:8px;font-weight:700;color:rgba(0,0,0,.3);text-transform:uppercase!important;letter-spacing:.05em">lun</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem">
+            <div style="width:100%;height:75px;background:rgba(0,82,255,.12);border-radius:4px 4px 0 0"></div>
+            <div style="font-size:8px;font-weight:700;color:rgba(0,0,0,.3);text-transform:uppercase!important;letter-spacing:.05em">mar</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem">
+            <div style="width:100%;height:97px;background:#0052FF;border-radius:4px 4px 0 0;box-shadow:0 0 12px rgba(0,82,255,.4)"></div>
+            <div style="font-size:8px;font-weight:900;color:#0052FF;text-transform:uppercase!important;letter-spacing:.05em">mer</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem">
+            <div style="width:100%;height:64px;background:rgba(0,82,255,.12);border-radius:4px 4px 0 0"></div>
+            <div style="font-size:8px;font-weight:700;color:rgba(0,0,0,.3);text-transform:uppercase!important;letter-spacing:.05em">jeu</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem">
+            <div style="width:100%;height:82px;background:rgba(0,82,255,.12);border-radius:4px 4px 0 0"></div>
+            <div style="font-size:8px;font-weight:700;color:rgba(0,0,0,.3);text-transform:uppercase!important;letter-spacing:.05em">ven</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem">
+            <div style="width:100%;height:38px;background:rgba(0,82,255,.07);border-radius:4px 4px 0 0"></div>
+            <div style="font-size:8px;font-weight:700;color:rgba(0,0,0,.3);text-transform:uppercase!important;letter-spacing:.05em">sam</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem">
+            <div style="width:100%;height:24px;background:rgba(0,82,255,.07);border-radius:4px 4px 0 0"></div>
+            <div style="font-size:8px;font-weight:700;color:rgba(0,0,0,.3);text-transform:uppercase!important;letter-spacing:.05em">dim</div>
+          </div>
         </div>
-      </div>
-
-      <!-- Card blanche analytics -->
-      <div class="bento-card bg-white p-12 md:p-14 rounded-[3rem] border border-black/[.05] shadow-sm flex flex-col justify-between hover:scale-[.98] transition-all duration-500">
-        <span class="msym text-primary text-5xl mb-8 block">bar_chart</span>
-        <div>
-          <h3 class="text-lg font-normal tracking-tighter mb-4">analytics en live.</h3>
-          <p class="text-black/35 text-[.9rem] font-light leading-relaxed">suivez votre pipeline en temps réel. du premier clic à la signature finale.</p>
-        </div>
-      </div>
-
-      <!-- Card large droite RGPD -->
-      <div class="bento-card md:col-span-2 glass p-12 md:p-16 rounded-[3rem] border border-black/[.05] flex flex-col md:flex-row gap-10 items-center">
-        <div class="flex-1">
-          <span class="msym text-primary text-5xl mb-8 block">security</span>
-          <h3 class="text-3xl font-normal tracking-tighter mb-5">rgpd natif.</h3>
-          <p class="text-black/45 text-sm font-light leading-relaxed">toutes nos données sont extraites légalement depuis des sources publiques officielles. données hébergées en france. lien de désinscription dans chaque email.</p>
-        </div>
-        <div class="w-full md:w-56 aspect-square bg-zinc-100 rounded-[2rem] flex items-center justify-center overflow-hidden relative flex-shrink-0">
-          <div class="absolute inset-0 bg-primary/[.04]"></div>
-          <span class="msym text-[5rem] text-primary/15 scale-[2.5]">verified_user</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ══════════ COMMENT ÇA MARCHE ══════════ -->
-<section class="py-24 bg-white reveal">
-  <div class="max-w-[1200px] mx-auto px-6 md:px-12">
-    <div class="text-center mb-20">
-      <h2 class="t-h2 font-normal tracking-tighter mb-6">opérationnel en <span class="text-primary font-medium">5 minutes.</span></h2>
-      <p class="text-black/45 text-sm font-light">pas de formation. pas de technicien. juste vous et vos nouveaux clients.</p>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bento-card bg-zinc-50 rounded-[2.5rem] p-10 border border-black/[.05] relative overflow-hidden">
-        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary to-blue-400"></div>
-        <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-black mb-8">1</div>
-        <h3 class="text-3xl font-normal tracking-tighter mb-4 leading-tight">décrivez votre cible</h3>
-        <p class="text-black/45 text-sm font-light leading-relaxed mb-6">"plombiers en occitanie", "drh de pme parisiennes" — en français, comme vous parlez.</p>
-        <div class="bg-white rounded-xl px-4 py-3 text-xs font-mono text-primary border border-black/[.06]">"200 électriciens à marseille"</div>
-      </div>
-      <div class="bento-card bg-black rounded-[2.5rem] p-10 relative overflow-hidden">
-        <div class="absolute -right-8 -top-8 w-36 h-36 bg-primary/15 rounded-full blur-2xl"></div>
-        <div class="w-9 h-9 rounded-full bg-white/15 text-white flex items-center justify-center text-sm font-black mb-8 relative z-10">2</div>
-        <h3 class="text-3xl font-normal tracking-tighter mb-4 text-white leading-tight relative z-10">alma.+ prospecte</h3>
-        <p class="text-white/35 text-sm font-light leading-relaxed mb-8 relative z-10">trouve les prospects, rédige un message unique pour chacun et les contacte automatiquement.</p>
-        <div class="space-y-2.5 relative z-10">
-          <div class="flex items-center gap-2.5 text-xs text-white/45 font-medium"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0"></span>recherche les prospects</div>
-          <div class="flex items-center gap-2.5 text-xs text-white/45 font-medium"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0"></span>rédige les messages</div>
-          <div class="flex items-center gap-2.5 text-xs text-white/45 font-medium"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0"></span>envoie et relance</div>
-        </div>
-      </div>
-      <div class="bento-card bg-zinc-50 rounded-[2.5rem] p-10 border border-black/[.05] relative overflow-hidden">
-        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-400 to-green-500"></div>
-        <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-black mb-8">3</div>
-        <h3 class="text-3xl font-normal tracking-tighter mb-4 leading-tight">vous signez</h3>
-        <p class="text-black/45 text-sm font-light leading-relaxed mb-6">vous recevez une alerte dès qu'un prospect répond. vous n'avez plus qu'à conclure.</p>
-        <div class="bg-green-50 rounded-xl px-4 py-3 text-xs font-bold text-green-600 flex items-center gap-2 border border-green-100">
-          <span class="msym text-[1rem]">check_circle</span>
-          nouveau prospect répond !
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem">
+          <div style="background:#fff;border-radius:12px;padding:.8rem;border:1px solid rgba(0,82,255,.08)">
+            <div style="font-size:1.5rem;font-weight:800;letter-spacing:-.06em;color:#0052FF">34%</div>
+            <div style="font-size:.68rem;color:rgba(0,0,0,.4);margin-top:2px">taux réponse</div>
+          </div>
+          <div style="background:#fff;border-radius:12px;padding:.8rem;border:1px solid rgba(0,82,255,.08)">
+            <div style="font-size:1.5rem;font-weight:800;letter-spacing:-.06em;color:#0052FF">8.2%</div>
+            <div style="font-size:.68rem;color:rgba(0,0,0,.4);margin-top:2px">conversion</div>
+          </div>
+          <div style="background:#fff;border-radius:12px;padding:.8rem;border:1px solid rgba(0,82,255,.08)">
+            <div style="font-size:1.5rem;font-weight:800;letter-spacing:-.06em;color:#0052FF">0.39€</div>
+            <div style="font-size:.68rem;color:rgba(0,0,0,.4);margin-top:2px">coût/lead</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════ TESTIMONIALS (structure 3 colonnes exacte fichier 3) ══════════ -->
-<section class="py-24 bg-white reveal">
-  <div class="max-w-[1440px] mx-auto px-6 md:px-12">
-    <h2 class="text-3xl md:text-3xl font-normal tracking-tighter mb-12 text-center leading-[1.0]">ils ont déjà activé le <span class="text-primary font-medium">mode turbo.</span></h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-      <div class="bento-card p-10 rounded-[2.5rem] bg-zinc-50 border border-black/[.05] flex flex-col justify-between hover:bg-white hover:shadow-2xl transition-all">
-        <div>
-          <div class="flex gap-1 mb-10 opacity-25">
-            <span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span>
-          </div>
-          <p class="text-xl font-light text-black/65 mb-12 leading-relaxed">"alma.+ a radicalement changé ma façon de voir la prospection. on ne cherche plus de leads, on les accueille simplement chaque matin."</p>
-        </div>
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white text-sm font-black">s.</div>
-          <div><p class="text-sm font-bold">sophie g.</p><p class="text-xs text-black/30 font-medium">consultante rh indépendante · paris</p></div>
-        </div>
+<!-- SOURCES DE DONNÉES -->
+<section style="padding:7rem 0;background:#fff" class="reveal">
+  <div style="max-width:1400px;margin:0 auto;padding:0 3rem">
+    <div style="margin-bottom:4rem">
+      <h2 style="font-size:clamp(2rem,4vw,3.5rem);font-weight:400;letter-spacing:-.04em;line-height:1.05;margin-bottom:1rem">on va chercher l'info<br/><span style="color:#0052FF;font-weight:500">là où elle est.</span></h2>
+      <p style="font-size:1rem;color:rgba(0,0,0,.45);font-weight:300;max-width:480px;line-height:1.7">10 sources officielles agrégées en temps réel. des données que vos concurrents n'ont pas.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1.2rem">
+      <div style="background:#4285F4;border-radius:18px;padding:1.6rem 1.4rem;color:#fff;display:flex;flex-direction:column;gap:.9rem">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><span class="msym" style="font-size:20px">location_on</span></div>
+        <div><div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem">google maps</div><div style="font-size:.72rem;color:rgba(255,255,255,.6);line-height:1.5">avis, numéros, établissements</div></div>
       </div>
-
-      <div class="bento-card p-10 rounded-[2.5rem] bg-zinc-50 border border-black/[.05] flex flex-col justify-between hover:bg-white hover:shadow-2xl transition-all">
-        <div>
-          <div class="flex gap-1 mb-10 opacity-25">
-            <span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span>
-          </div>
-          <p class="text-xl font-light text-black/65 mb-12 leading-relaxed">"3 chantiers signés la première semaine. alma.+ contacte les propriétaires avec permis de construire dans mon département. je me réveille avec des réponses."</p>
-        </div>
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-black">a.</div>
-          <div><p class="text-sm font-bold">antoine b.</p><p class="text-xs text-black/30 font-medium">artisan plombier · vaucluse</p></div>
-        </div>
+      <div style="background:linear-gradient(135deg,#3730a3,#0052FF);border-radius:18px;padding:1.6rem 1.4rem;color:#fff;display:flex;flex-direction:column;gap:.9rem">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center"><span class="msym" style="font-size:20px">analytics</span></div>
+        <div><div style="font-size:.85rem;font-weight:700;margin-bottom:.2rem">insee / sirene</div><div style="font-size:1.6rem;font-weight:900;letter-spacing:-.06em;line-height:1">12m</div><div style="font-size:.68rem;color:rgba(255,255,255,.5)">entreprises fr</div></div>
       </div>
-
-      <div class="bento-card p-10 rounded-[2.5rem] bg-zinc-50 border border-black/[.05] flex flex-col justify-between hover:bg-white hover:shadow-2xl transition-all">
-        <div>
-          <div class="flex gap-1 mb-10 opacity-25">
-            <span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span><span class="msym fill text-[1.3rem]">star</span>
-          </div>
-          <p class="text-xl font-light text-black/65 mb-12 leading-relaxed">"le roi est imbattable. j'ai multiplié mes rendez-vous par 4 en deux mois. je facture 3x le prix d'alma.+ à mes clients en marque blanche."</p>
-        </div>
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center text-white text-sm font-black">j.</div>
-          <div><p class="text-sm font-bold">julien t.</p><p class="text-xs text-black/30 font-medium">fondateur agence growth · nantes</p></div>
-        </div>
+      <div style="background:#8E24AA;border-radius:18px;padding:1.6rem 1.4rem;color:#fff;display:flex;flex-direction:column;gap:.9rem">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><span class="msym" style="font-size:20px">gavel</span></div>
+        <div><div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem">bodacc</div><div style="font-size:.72rem;color:rgba(255,255,255,.6);line-height:1.5">créations, cessions, procédures</div></div>
       </div>
-
+      <div style="background:linear-gradient(135deg,#059669,#065f46);border-radius:18px;padding:1.6rem 1.4rem;color:#fff;display:flex;flex-direction:column;gap:.9rem">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><span class="msym" style="font-size:20px">domain</span></div>
+        <div><div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem">dvf & permis</div><div style="font-size:.72rem;color:rgba(255,255,255,.6);line-height:1.5">acheteurs en rénovation</div></div>
+      </div>
+      <div style="background:#0077B5;border-radius:18px;padding:1.6rem 1.4rem;color:#fff;display:flex;flex-direction:column;gap:.9rem">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><span class="msym" style="font-size:20px">person_search</span></div>
+        <div><div style="font-size:.85rem;font-weight:700;margin-bottom:.3rem">linkedin</div><div style="font-size:.72rem;color:rgba(255,255,255,.6);line-height:1.5">décideurs b2b</div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:1.2rem">
+      <div style="background:linear-gradient(135deg,#d97706,#f59e0b);border-radius:14px;padding:1.1rem 1.4rem;display:flex;align-items:center;gap:.9rem">
+        <span class="msym" style="font-size:20px;color:#0a0a0a">menu_book</span>
+        <div><div style="font-size:.85rem;font-weight:700;color:#0a0a0a">pages jaunes</div><div style="font-size:.72rem;color:rgba(0,0,0,.5)">annuaire professionnel</div></div>
+      </div>
+      <div style="background:linear-gradient(135deg,#dc2626,#991b1b);border-radius:14px;padding:1.1rem 1.4rem;display:flex;align-items:center;gap:.9rem;color:#fff">
+        <span class="msym" style="font-size:20px">star</span>
+        <div><div style="font-size:.85rem;font-weight:700">google avis</div><div style="font-size:.72rem;color:rgba(255,255,255,.5)">clients insatisfaits</div></div>
+      </div>
+      <div style="background:linear-gradient(135deg,#3730a3,#4f46e5);border-radius:14px;padding:1.1rem 1.4rem;display:flex;align-items:center;gap:.9rem;color:#fff">
+        <span class="msym" style="font-size:20px">check_circle</span>
+        <div><div style="font-size:.85rem;font-weight:700">boamp</div><div style="font-size:.72rem;color:rgba(255,255,255,.5)">appels d'offres publics</div></div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════ PRICING (structure exacte fichier 3) ══════════ -->
-<section class="py-24 bg-zinc-50 reveal" id="pricing">
-  <div class="max-w-[1440px] mx-auto px-6 md:px-12">
-    <div class="text-center max-w-2xl mx-auto mb-20">
-      <h2 class="t-h2 font-normal tracking-tighter mb-6">le prix d'un café par jour.<br/><span class="text-primary font-medium">le ca d'un commercial.</span></h2>
-      <p class="text-black/45 text-sm font-light">sans engagement, résiliable à tout moment en un clic.</p>
+<!-- COMMENT ÇA MARCHE -->
+<section style="padding:7rem 0;background:#f5f5f7" class="reveal">
+  <div style="max-width:1400px;margin:0 auto;padding:0 3rem">
+    <div style="text-align:center;margin-bottom:4rem">
+      <h2 style="font-size:clamp(2rem,4vw,3.5rem);font-weight:400;letter-spacing:-.04em;line-height:1.05;margin-bottom:1rem">opérationnel en <span style="color:#0052FF;font-weight:500">5 minutes.</span></h2>
+      <p style="font-size:1rem;color:rgba(0,0,0,.45);font-weight:300">pas de formation. pas de technicien. juste vous et vos nouveaux clients.</p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-      <!-- Starter -->
-      <div class="bento-card bg-white p-12 rounded-[3rem] border border-black/[.05] flex flex-col justify-between hover:shadow-xl transition-all">
-        <div>
-          <p class="text-[.7rem] font-bold tracking-[.2em] text-black/30 mb-10">starter</p>
-          <div class="flex items-baseline gap-2 mb-10">
-            <span class="text-5xl font-black tracking-tighter">49€</span>
-            <span class="text-black/30 text-sm">/mois</span>
-          </div>
-          <ul class="space-y-5 mb-14">
-            <li class="flex items-center gap-3 text-sm font-medium text-black/55"><span class="msym text-primary text-[1.15rem]">check_circle</span>500 prospects / mois</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-black/55"><span class="msym text-primary text-[1.15rem]">check_circle</span>google maps · insee · bodacc</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-black/55"><span class="msym text-primary text-[1.15rem]">check_circle</span>emails + sms personnalisés</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-black/55"><span class="msym text-primary text-[1.15rem]">check_circle</span>alertes réponses temps réel</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-black/20"><span class="msym text-[1.15rem]">cancel</span>pilote automatique</li>
-          </ul>
-        </div>
-        <a href="/login" class="w-full py-5 rounded-full border border-black/10 text-sm font-bold text-center block hover:bg-black hover:text-white transition-all active:scale-95">démarrer le test</a>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem">
+      <div style="background:#fff;border-radius:20px;padding:2.5rem;border:1px solid rgba(0,0,0,.06);position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,#0052FF,#00AAFF)"></div>
+        <div style="width:36px;height:36px;border-radius:99px;background:rgba(0,82,255,.08);color:#0052FF;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;margin-bottom:2rem">1</div>
+        <h3 style="font-size:1.6rem;font-weight:400;letter-spacing:-.04em;margin-bottom:.9rem;line-height:1.2">décrivez votre cible</h3>
+        <p style="font-size:.9rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300;margin-bottom:1.5rem">"plombiers en occitanie", "drh de pme parisiennes" — en français, comme vous parlez.</p>
+        <div style="background:#f5f5f7;border-radius:10px;padding:.7rem 1rem;font-size:.8rem;color:#0052FF;font-weight:700">"200 électriciens à marseille"</div>
       </div>
-
-      <!-- Growth — highlighted like file 3 -->
-      <div class="bento-card bg-black text-white p-12 rounded-[3rem] flex flex-col justify-between shadow-2xl shadow-primary/25 scale-[1.04] relative z-10 overflow-hidden">
-        <div class="absolute top-0 right-0 bg-primary px-5 py-2 rounded-bl-[1.5rem] text-[.6rem] font-black tracking-widest">conseillé</div>
-        <div>
-          <p class="text-[.7rem] font-bold tracking-[.2em] text-white/35 mb-10">pro</p>
-          <div class="flex items-baseline gap-2 mb-10">
-            <span class="text-5xl font-black tracking-tighter">79€</span>
-            <span class="text-white/35 text-sm">/mois</span>
-          </div>
-          <ul class="space-y-5 mb-14">
-            <li class="flex items-center gap-3 text-sm font-medium text-white/75"><span class="msym text-primary text-[1.15rem]">check_circle</span>prospects illimités</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-white/75"><span class="msym text-primary text-[1.15rem]">check_circle</span>toutes les sources data</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-white/75"><span class="msym text-primary text-[1.15rem]">check_circle</span>emails + sms illimités</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-white/75"><span class="msym text-primary text-[1.15rem]">check_circle</span>pilote automatique complet</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-white/75"><span class="msym text-primary text-[1.15rem]">check_circle</span>analytics & rapports avancés</li>
-          </ul>
+      <div style="background:#0a0a1a;border-radius:20px;padding:2.5rem;position:relative;overflow:hidden">
+        <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:rgba(0,82,255,.15);filter:blur(40px);border-radius:50%"></div>
+        <div style="width:36px;height:36px;border-radius:99px;background:rgba(255,255,255,.1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;margin-bottom:2rem;position:relative">2</div>
+        <h3 style="font-size:1.6rem;font-weight:400;letter-spacing:-.04em;margin-bottom:.9rem;line-height:1.2;color:#fff;position:relative">alma.+ prospecte</h3>
+        <p style="font-size:.9rem;color:rgba(255,255,255,.35);line-height:1.7;font-weight:300;margin-bottom:2rem;position:relative">trouve, score, rédige, contacte et relance automatiquement.</p>
+        <div style="display:flex;flex-direction:column;gap:.7rem;position:relative">
+          <div style="display:flex;align-items:center;gap:.7rem;font-size:.82rem;color:rgba(255,255,255,.45);font-weight:500"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0"></span>recherche les prospects</div>
+          <div style="display:flex;align-items:center;gap:.7rem;font-size:.82rem;color:rgba(255,255,255,.45);font-weight:500"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0"></span>rédige les messages ia</div>
+          <div style="display:flex;align-items:center;gap:.7rem;font-size:.82rem;color:rgba(255,255,255,.45);font-weight:500"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0"></span>envoie et relance</div>
         </div>
-        <a href="/login" class="w-full py-5 rounded-full bg-primary text-white text-sm font-bold text-center block hover:bg-blue-600 transition-all active:scale-95 shadow-xl shadow-primary/40">choisir la croissance</a>
       </div>
-
-      <!-- Unlimited -->
-      <div class="bento-card bg-white p-12 rounded-[3rem] border border-black/[.05] flex flex-col justify-between hover:shadow-xl transition-all">
-        <div>
-          <p class="text-[.7rem] font-bold tracking-[.2em] text-black/30 mb-6">agence — à partir de</p>
-          <div class="flex items-baseline gap-2 mb-10">
-            <span class="text-5xl font-black tracking-tighter">199€</span>
-            <span class="text-black/30 text-sm">/mois</span>
-          </div>
-          <ul class="space-y-5 mb-14">
-            <li class="flex items-center gap-3 text-sm font-medium text-black/55"><span class="msym text-primary text-[1.15rem]">check_circle</span>tout le plan pro</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-black/55"><span class="msym text-primary text-[1.15rem]">check_circle</span>accès multi-utilisateurs</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-black/55"><span class="msym text-primary text-[1.15rem]">check_circle</span>marque blanche</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-black/55"><span class="msym text-primary text-[1.15rem]">check_circle</span>support dédié 24/7</li>
-            <li class="flex items-center gap-3 text-sm font-medium text-black/55"><span class="msym text-primary text-[1.15rem]">check_circle</span>onboarding personnalisé</li>
-          </ul>
+      <div style="background:#fff;border-radius:20px;padding:2.5rem;border:1px solid rgba(0,0,0,.06);position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,#00AAFF,#22c55e)"></div>
+        <div style="width:36px;height:36px;border-radius:99px;background:rgba(0,82,255,.08);color:#0052FF;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;margin-bottom:2rem">3</div>
+        <h3 style="font-size:1.6rem;font-weight:400;letter-spacing:-.04em;margin-bottom:.9rem;line-height:1.2">vous signez</h3>
+        <p style="font-size:.9rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300;margin-bottom:1.5rem">alerte dès qu'un prospect répond. vous n'avez plus qu'à conclure.</p>
+        <div style="background:#f0fdf4;border-radius:10px;padding:.7rem 1rem;font-size:.82rem;color:#16a34a;font-weight:700;border:1px solid #bbf7d0;display:flex;align-items:center;gap:.5rem">
+          <span class="msym" style="font-size:16px">check_circle</span>nouveau prospect répond !
         </div>
-        <a href="/login" class="w-full py-5 rounded-full border border-black/10 text-sm font-bold text-center block hover:bg-black hover:text-white transition-all active:scale-95">contacter le sales</a>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ══════════ FAQ (structure exacte fichier 3) ══════════ -->
-<section class="py-24 bg-white reveal" id="faq">
-  <div class="max-w-3xl mx-auto px-6 md:px-12">
-    <h2 class="text-4xl md:text-5xl font-normal tracking-tighter mb-12 text-center">vos questions. <span class="text-black/25">nos réponses.</span></h2>
-    <div class="space-y-4">
-      <details class="group glass p-8 rounded-[2rem] border border-black/[.05] hover:border-black/10 transition-all cursor-pointer">
-        <summary class="flex justify-between items-center text-[1.05rem] font-bold list-none">
-          je peux annuler quand je veux ?
-          <span class="msym group-open:rotate-180 transition-transform text-black/30 flex-shrink-0">expand_more</span>
-        </summary>
-        <div class="mt-5 text-black/45 font-light leading-relaxed">oui, sans condition ni pénalité. deux clics depuis votre espace client et c'est terminé. aucun prélèvement surprise.</div>
+<!-- TESTIMONIALS DARK -->
+<section style="padding:7rem 0;background:#0a0a1a" class="reveal">
+  <div style="max-width:1400px;margin:0 auto;padding:0 3rem">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4rem;flex-wrap:wrap;gap:1.5rem">
+      <h2 style="font-size:clamp(2rem,4vw,3.2rem);font-weight:400;letter-spacing:-.04em;line-height:1.05;color:#fff">ils ont déjà activé<br/><span style="color:#0052FF;font-weight:500">le mode turbo.</span></h2>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div style="text-align:right">
+          <div style="font-size:2.5rem;font-weight:800;letter-spacing:-.06em;color:#fff">4.8<span style="font-size:1rem;color:rgba(255,255,255,.3)">/5</span></div>
+          <div style="font-size:.72rem;color:rgba(255,255,255,.3)">847+ avis vérifiés</div>
+        </div>
+        <div style="display:flex;gap:2px">
+          <span style="color:#f59e0b;font-size:1.1rem">★</span><span style="color:#f59e0b;font-size:1.1rem">★</span><span style="color:#f59e0b;font-size:1.1rem">★</span><span style="color:#f59e0b;font-size:1.1rem">★</span><span style="color:#f59e0b;font-size:1.1rem">★</span>
+        </div>
+      </div>
+    </div>
+    <div class="testim-grid">
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:2.5rem;display:flex;flex-direction:column;gap:2rem">
+        <div>
+          <div style="display:flex;gap:3px;margin-bottom:1.2rem;opacity:.5"><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span></div>
+          <p style="font-size:1.05rem;font-weight:300;color:rgba(255,255,255,.6);line-height:1.7">"alma.+ a radicalement changé ma façon de voir la prospection. on ne cherche plus de leads, on les accueille simplement chaque matin."</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:.8rem">
+          <div style="width:40px;height:40px;border-radius:99px;background:#0052FF;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:900;flex-shrink:0">s.</div>
+          <div><div style="font-size:.88rem;font-weight:700;color:#fff">sophie g.</div><div style="font-size:.72rem;color:rgba(255,255,255,.35)">consultante rh · paris</div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:2.5rem;display:flex;flex-direction:column;gap:2rem">
+        <div>
+          <div style="display:flex;gap:3px;margin-bottom:1.2rem;opacity:.5"><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span></div>
+          <p style="font-size:1.05rem;font-weight:300;color:rgba(255,255,255,.6);line-height:1.7">"3 chantiers signés la première semaine. alma.+ contacte les propriétaires avec permis de construire dans mon département. je me réveille avec des réponses."</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:.8rem">
+          <div style="width:40px;height:40px;border-radius:99px;background:#7c3aed;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:900;flex-shrink:0">a.</div>
+          <div><div style="font-size:.88rem;font-weight:700;color:#fff">antoine b.</div><div style="font-size:.72rem;color:rgba(255,255,255,.35)">artisan plombier · vaucluse</div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:2.5rem;display:flex;flex-direction:column;gap:2rem">
+        <div>
+          <div style="display:flex;gap:3px;margin-bottom:1.2rem;opacity:.5"><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span><span style="color:#f59e0b">★</span></div>
+          <p style="font-size:1.05rem;font-weight:300;color:rgba(255,255,255,.6);line-height:1.7">"le roi est imbattable. j'ai multiplié mes rendez-vous par 4 en deux mois. je facture 3x le prix d'alma.+ à mes clients en marque blanche."</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:.8rem">
+          <div style="width:40px;height:40px;border-radius:99px;background:linear-gradient(135deg,#0052FF,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:900;flex-shrink:0">j.</div>
+          <div><div style="font-size:.88rem;font-weight:700;color:#fff">julien t.</div><div style="font-size:.72rem;color:rgba(255,255,255,.35)">fondateur agence growth · nantes</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section style="padding:7rem 0;background:#fff" class="reveal" id="tarifs">
+  <div style="max-width:1400px;margin:0 auto;padding:0 3rem">
+    <div style="text-align:center;margin-bottom:4rem">
+      <h2 style="font-size:clamp(2rem,4vw,3.5rem);font-weight:400;letter-spacing:-.04em;line-height:1.05;margin-bottom:1rem">le prix d'un café par jour.<br/><span style="color:#0052FF;font-weight:500">le <span style="text-transform:uppercase!important;font-style:normal!important">ca</span> d'un commercial.</span></h2>
+      <p style="font-size:1rem;color:rgba(0,0,0,.45);font-weight:300">sans engagement, résiliable à tout moment en un clic.</p>
+    </div>
+    <div class="price-grid">
+      <div style="background:#f9f9fb;border-radius:24px;padding:2.5rem;border:1px solid rgba(0,0,0,.06)">
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.15em;color:rgba(0,0,0,.3);margin-bottom:1.8rem">starter</div>
+        <div style="display:flex;align-items:baseline;gap:.4rem;margin-bottom:2.2rem"><span style="font-size:3rem;font-weight:800;letter-spacing:-.06em">49€</span><span style="color:rgba(0,0,0,.3);font-size:.9rem">/mois</span></div>
+        <ul style="display:flex;flex-direction:column;gap:.9rem;margin-bottom:2.2rem;list-style:none">
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(0,0,0,.6)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>500 prospects / mois</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(0,0,0,.6)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>300 emails ia / mois</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(0,0,0,.6)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>200 fiches pré-appel</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(0,0,0,.6)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>google maps · insee · bodacc</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(0,0,0,.2)"><span class="msym" style="font-size:1.1rem">cancel</span>pilote automatique</li>
+        </ul>
+        <a href="/pricing" style="display:block;text-align:center;padding:.85rem;border-radius:99px;border:1px solid rgba(0,0,0,.12);font-size:.88rem;font-weight:700;color:#0a0a0a;text-decoration:none;transition:all .2s" onmouseover="this.style.background='#0a0a0a';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#0a0a0a'">démarrer</a>
+      </div>
+      <div style="background:#0a0a1a;border-radius:24px;padding:2.5rem;color:#fff;position:relative;overflow:hidden;transform:scale(1.03);box-shadow:0 24px 80px rgba(0,82,255,.2)">
+        <div style="position:absolute;top:0;right:0;background:#0052FF;padding:.4rem 1.2rem;border-radius:0 24px 0 14px;font-size:.6rem;font-weight:900;letter-spacing:.1em">conseillé</div>
+        <div style="position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:rgba(0,82,255,.2);filter:blur(60px);border-radius:50%"></div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.15em;color:rgba(255,255,255,.3);margin-bottom:1.8rem;position:relative">pro</div>
+        <div style="display:flex;align-items:baseline;gap:.4rem;margin-bottom:2.2rem;position:relative"><span style="font-size:3rem;font-weight:800;letter-spacing:-.06em;color:#fff">129€</span><span style="color:rgba(255,255,255,.3);font-size:.9rem">/mois</span></div>
+        <ul style="display:flex;flex-direction:column;gap:.9rem;margin-bottom:2.2rem;list-style:none;position:relative">
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(255,255,255,.75)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>4 000 emails ia / mois</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(255,255,255,.75)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>1 000 fiches pré-appel</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(255,255,255,.75)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>pilote automatique complet</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(255,255,255,.75)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>prospects illimités</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(255,255,255,.75)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>assistant appel ia</li>
+        </ul>
+        <a href="/pricing" style="display:block;text-align:center;padding:.85rem;border-radius:99px;background:#0052FF;font-size:.88rem;font-weight:700;color:#fff;text-decoration:none;transition:all .2s;box-shadow:0 8px 24px rgba(0,82,255,.4);position:relative" onmouseover="this.style.background='#0042d1'" onmouseout="this.style.background='#0052FF'">choisir la croissance</a>
+      </div>
+      <div style="background:#f9f9fb;border-radius:24px;padding:2.5rem;border:1px solid rgba(0,0,0,.06)">
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.15em;color:rgba(0,0,0,.3);margin-bottom:1.8rem">ultra</div>
+        <div style="display:flex;align-items:baseline;gap:.4rem;margin-bottom:2.2rem"><span style="font-size:3rem;font-weight:800;letter-spacing:-.06em">290€</span><span style="color:rgba(0,0,0,.3);font-size:.9rem">/mois</span></div>
+        <ul style="display:flex;flex-direction:column;gap:.9rem;margin-bottom:2.2rem;list-style:none">
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(0,0,0,.6)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>tout illimité</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(0,0,0,.6)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>emails ia illimités</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(0,0,0,.6)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>fiches pré-appel illimitées</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(0,0,0,.6)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>pilote automatique ia</li>
+          <li style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;color:rgba(0,0,0,.6)"><span class="msym" style="color:#0052FF;font-size:1.1rem">check_circle</span>support prioritaire 7j/7</li>
+        </ul>
+        <a href="/pricing" style="display:block;text-align:center;padding:.85rem;border-radius:99px;border:1px solid rgba(0,0,0,.12);font-size:.88rem;font-weight:700;color:#0a0a0a;text-decoration:none;transition:all .2s" onmouseover="this.style.background='#0a0a0a';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#0a0a0a'">passer en ultra</a>
+      </div>
+    </div>
+    <div style="margin-top:2rem;max-width:680px;margin-left:auto;margin-right:auto;padding:1.1rem 1.6rem;background:rgba(0,82,255,.04);border:1px solid rgba(0,82,255,.12);border-radius:14px;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+      <div style="width:34px;height:34px;border-radius:9px;background:rgba(0,82,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="msym" style="font-size:18px;color:#0052FF">business</span></div>
+      <div style="flex:1;min-width:180px">
+        <div style="font-size:.85rem;font-weight:800">vous gérez plusieurs comptes clients ?</div>
+        <div style="font-size:.74rem;color:rgba(0,0,0,.4);margin-top:2px">plan agence sur devis — multi-comptes, onboarding dédié, support 7j/7</div>
+      </div>
+      <a href="mailto:contact@alma-plus.fr?subject=Plan%20Agence" style="font-size:.8rem;font-weight:800;color:#0052FF;text-decoration:none;background:rgba(0,82,255,.08);border:1px solid rgba(0,82,255,.2);padding:.6rem 1.2rem;border-radius:99px;white-space:nowrap;transition:all .15s" onmouseover="this.style.background='rgba(0,82,255,.15)'" onmouseout="this.style.background='rgba(0,82,255,.08)'">nous contacter →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding:7rem 0;background:#f5f5f7" class="reveal" id="faq">
+  <div style="max-width:720px;margin:0 auto;padding:0 1.5rem">
+    <h2 style="font-size:clamp(2rem,4vw,3rem);font-weight:400;letter-spacing:-.04em;margin-bottom:3rem;text-align:center">vos questions.<br/><span style="color:rgba(0,0,0,.25)">nos réponses.</span></h2>
+    <div style="display:flex;flex-direction:column;gap:.7rem">
+      <details style="background:#fff;border-radius:16px;padding:1.4rem 1.6rem;border:1px solid rgba(0,0,0,.06);cursor:pointer">
+        <summary style="display:flex;justify-content:space-between;align-items:center;font-size:.95rem;font-weight:700;list-style:none">je peux annuler quand je veux ?<span class="msym" style="font-size:1.3rem;color:rgba(0,0,0,.3);flex-shrink:0">expand_more</span></summary>
+        <div style="margin-top:.9rem;font-size:.88rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300">oui, sans condition ni pénalité. deux clics depuis votre espace client et c'est terminé. aucun prélèvement surprise.</div>
       </details>
-      <details class="group glass p-8 rounded-[2rem] border border-black/[.05] hover:border-black/10 transition-all cursor-pointer">
-        <summary class="flex justify-between items-center text-[1.05rem] font-bold list-none">
-          combien de temps pour voir les premiers résultats ?
-          <span class="msym group-open:rotate-180 transition-transform text-black/30 flex-shrink-0">expand_more</span>
-        </summary>
-        <div class="mt-5 text-black/45 font-light leading-relaxed">la majorité de nos clients voient leurs premières réponses dans les 24 à 72h après avoir activé leur première campagne.</div>
+      <details style="background:#fff;border-radius:16px;padding:1.4rem 1.6rem;border:1px solid rgba(0,0,0,.06);cursor:pointer">
+        <summary style="display:flex;justify-content:space-between;align-items:center;font-size:.95rem;font-weight:700;list-style:none">combien de temps pour les premiers résultats ?<span class="msym" style="font-size:1.3rem;color:rgba(0,0,0,.3);flex-shrink:0">expand_more</span></summary>
+        <div style="margin-top:.9rem;font-size:.88rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300">la majorité de nos clients voient leurs premières réponses dans les 24 à 72h après avoir activé leur première campagne.</div>
       </details>
-      <details class="group glass p-8 rounded-[2rem] border border-black/[.05] hover:border-black/10 transition-all cursor-pointer">
-        <summary class="flex justify-between items-center text-[1.05rem] font-bold list-none">
-          c'est conforme au rgpd ?
-          <span class="msym group-open:rotate-180 transition-transform text-black/30 flex-shrink-0">expand_more</span>
-        </summary>
-        <div class="mt-5 text-black/45 font-light leading-relaxed">absolument. alma.+ n'utilise que des sources de données publiques. données hébergées en france, lien de désinscription dans chaque email.</div>
+      <details style="background:#fff;border-radius:16px;padding:1.4rem 1.6rem;border:1px solid rgba(0,0,0,.06);cursor:pointer">
+        <summary style="display:flex;justify-content:space-between;align-items:center;font-size:.95rem;font-weight:700;list-style:none">c'est conforme au rgpd ?<span class="msym" style="font-size:1.3rem;color:rgba(0,0,0,.3);flex-shrink:0">expand_more</span></summary>
+        <div style="margin-top:.9rem;font-size:.88rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300">absolument. alma.+ n'utilise que des sources de données publiques. données hébergées en france, lien de désinscription dans chaque email.</div>
       </details>
-      <details class="group glass p-8 rounded-[2rem] border border-black/[.05] hover:border-black/10 transition-all cursor-pointer">
-        <summary class="flex justify-between items-center text-[1.05rem] font-bold list-none">
-          quelle différence avec waalaxy ou lemlist ?
-          <span class="msym group-open:rotate-180 transition-transform text-black/30 flex-shrink-0">expand_more</span>
-        </summary>
-        <div class="mt-5 text-black/45 font-light leading-relaxed">waalaxy et lemlist visent les commerciaux b2b sur linkedin. alma.+ va chercher les prospects sur google maps, insee, dvf, ma prime rénov — pour tous les entrepreneurs français, pas seulement les sales.</div>
+      <details style="background:#fff;border-radius:16px;padding:1.4rem 1.6rem;border:1px solid rgba(0,0,0,.06);cursor:pointer">
+        <summary style="display:flex;justify-content:space-between;align-items:center;font-size:.95rem;font-weight:700;list-style:none">quelle différence avec waalaxy ou lemlist ?<span class="msym" style="font-size:1.3rem;color:rgba(0,0,0,.3);flex-shrink:0">expand_more</span></summary>
+        <div style="margin-top:.9rem;font-size:.88rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300">waalaxy et lemlist visent les commerciaux b2b sur linkedin. alma.+ va chercher les prospects sur google maps, insee, dvf, bodacc — pour tous les entrepreneurs français, pas seulement les sales.</div>
       </details>
-      <details class="group glass p-8 rounded-[2rem] border border-black/[.05] hover:border-black/10 transition-all cursor-pointer">
-        <summary class="flex justify-between items-center text-[1.05rem] font-bold list-none">
-          besoin de compétences techniques ?
-          <span class="msym group-open:rotate-180 transition-transform text-black/30 flex-shrink-0">expand_more</span>
-        </summary>
-        <div class="mt-5 text-black/45 font-light leading-relaxed">aucune. si vous savez utiliser whatsapp, vous saurez utiliser alma.+. opérationnel en 5 minutes, sans formation.</div>
+      <details style="background:#fff;border-radius:16px;padding:1.4rem 1.6rem;border:1px solid rgba(0,0,0,.06);cursor:pointer">
+        <summary style="display:flex;justify-content:space-between;align-items:center;font-size:.95rem;font-weight:700;list-style:none">besoin de compétences techniques ?<span class="msym" style="font-size:1.3rem;color:rgba(0,0,0,.3);flex-shrink:0">expand_more</span></summary>
+        <div style="margin-top:.9rem;font-size:.88rem;color:rgba(0,0,0,.45);line-height:1.7;font-weight:300">aucune. si vous savez utiliser whatsapp, vous saurez utiliser alma.+. opérationnel en 5 minutes, sans formation.</div>
       </details>
     </div>
   </div>
 </section>
 
-<!-- ══════════ FINAL CTA (structure exacte fichier 3) ══════════ -->
-<section class="py-24 px-6 reveal">
-  <div class="max-w-[1440px] mx-auto bg-black rounded-[4rem] p-16 md:p-32 text-center relative overflow-hidden group shadow-2xl shadow-primary/20">
-    <div class="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent group-hover:opacity-70 transition-opacity pointer-events-none"></div>
-    <div class="absolute -top-20 -right-20 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none"></div>
-    <h2 class="relative z-10 t-h2 font-normal text-white tracking-tighter mb-8 leading-[1.05]" style="font-size: clamp(2.4rem, 5.5vw, 4.2rem);">
-      laissez alma.+ remplir<br/>
-      <span class="text-primary font-medium">votre agenda.</span>
-    </h2>
-    <p class="relative z-10 text-white/40 text-base max-w-xl mx-auto mb-14 font-light leading-relaxed">
-      rejoignez les 847+ entrepreneurs qui se réveillent avec des prospects qualifiés chaque matin grâce à alma.+
-    </p>
-    <div class="relative z-10 flex flex-col sm:flex-row gap-5 justify-center items-stretch max-w-md mx-auto mb-5">
-      <input type="email" placeholder="votre@email.com" class="flex-1 px-6 py-5 rounded-full bg-white/10 border border-white/15 text-white text-sm font-medium placeholder-white/30 outline-none focus:border-white/40 transition-all min-w-0"/>
-      <a href="/login" class="bg-white text-black px-10 py-5 rounded-full text-lg font-black hover:bg-primary hover:text-white transition-all active:scale-95 shadow-2xl whitespace-nowrap">
-        je lance ma machine
-      </a>
-    </div>
-    <p class="relative z-10 text-white/20 text-xs">sans engagement · résiliable à tout moment</p>
-    <div class="relative z-10 flex flex-wrap items-center justify-center gap-8 mt-12">
-      <div class="flex items-center gap-2 text-xs text-white/25 font-medium"><span class="msym text-[1rem]">star</span>données hébergées en france</div>
-      <div class="flex items-center gap-2 text-xs text-white/25 font-medium"><span class="msym text-[1rem]">lock</span>paiement sécurisé stripe</div>
-      <div class="flex items-center gap-2 text-xs text-white/25 font-medium"><span class="msym text-[1rem]">verified</span>rgpd conforme</div>
-      <div class="flex items-center gap-2 text-xs text-white/25 font-medium"><span class="msym text-[1rem]">schedule</span>annulable en 2 clics</div>
+<!-- CTA FINAL -->
+<section style="padding:5rem 1.5rem;background:#fff">
+  <div style="max-width:1400px;margin:0 auto">
+    <div style="background:#0a0a1a;border-radius:32px;padding:5rem 4rem;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,82,255,.25),transparent);pointer-events:none"></div>
+      <div style="position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:rgba(0,82,255,.15);filter:blur(80px);border-radius:50%;pointer-events:none"></div>
+      <h2 style="font-size:clamp(2.2rem,5vw,4rem);font-weight:400;color:#fff;letter-spacing:-.04em;line-height:1.05;margin-bottom:1.2rem;position:relative">
+        laissez alma.+ remplir<br/><span style="color:#0052FF;font-weight:500">votre agenda.</span>
+      </h2>
+      <p style="font-size:1rem;color:rgba(255,255,255,.4);max-width:500px;margin:0 auto 3rem;line-height:1.7;position:relative">rejoignez les 847+ entrepreneurs qui se réveillent avec des prospects qualifiés chaque matin.</p>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;max-width:480px;margin:0 auto 1.5rem;position:relative">
+        <div style="display:flex;gap:.7rem;width:100%">
+          <input type="email" placeholder="votre@email.com" style="flex:1;padding:.9rem 1.2rem;border-radius:99px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:.9rem;font-family:'Outfit',sans-serif;outline:none;min-width:0;text-transform:lowercase!important" />
+          <a href="/login" style="background:#fff;color:#0a0a0a;padding:.9rem 1.8rem;border-radius:99px;font-size:.95rem;font-weight:900;text-decoration:none;white-space:nowrap;transition:all .2s" onmouseover="this.style.background='#0052FF';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#0a0a0a'">je lance ma machine</a>
+        </div>
+        <p style="font-size:.75rem;color:rgba(255,255,255,.2)">sans engagement · résiliable à tout moment</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:2rem;position:relative">
+        <div style="display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:rgba(255,255,255,.25);font-weight:500"><span class="msym" style="font-size:16px">star</span>données en france</div>
+        <div style="display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:rgba(255,255,255,.25);font-weight:500"><span class="msym" style="font-size:16px">lock</span>paiement sécurisé stripe</div>
+        <div style="display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:rgba(255,255,255,.25);font-weight:500"><span class="msym" style="font-size:16px">verified</span>rgpd conforme</div>
+        <div style="display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:rgba(255,255,255,.25);font-weight:500"><span class="msym" style="font-size:16px">schedule</span>annulable en 2 clics</div>
+      </div>
     </div>
   </div>
 </section>
 
-</main>
-
-<!-- ══════════ FOOTER (structure 5 colonnes exacte fichier 3) ══════════ -->
-<footer class="bg-white border-t border-black/[.05] py-24">
-  <div class="max-w-[1440px] mx-auto px-6 md:px-12">
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-16 lg:gap-10 mb-20">
-      <div class="lg:col-span-2">
-        <div class="text-3xl font-black tracking-tighter mb-6">alma.<span class="text-primary">+</span></div>
-        <p class="text-black/35 max-w-xs text-sm font-light leading-relaxed mb-10">l'intelligence augmentée au service des entrepreneurs qui veulent des clients sans perdre leur temps à les chercher.</p>
-        <div class="flex gap-3">
-          <div class="w-10 h-10 rounded-full glass-dark flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer"><span class="msym text-[1.1rem]">group</span></div>
-          <div class="w-10 h-10 rounded-full glass-dark flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer"><span class="msym text-[1.1rem]">share</span></div>
-          <div class="w-10 h-10 rounded-full glass-dark flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer"><span class="msym text-[1.1rem]">mail</span></div>
+<!-- FOOTER -->
+<footer style="background:#fff;border-top:1px solid rgba(0,0,0,.06);padding:5rem 0 3rem">
+  <div style="max-width:1400px;margin:0 auto;padding:0 3rem">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:4rem;flex-wrap:wrap">
+      <div>
+        <div style="font-size:1.6rem;font-weight:900;letter-spacing:-.04em;margin-bottom:1rem">alma.<span style="color:#0052FF">+</span></div>
+        <p style="font-size:.85rem;color:rgba(0,0,0,.4);max-width:280px;line-height:1.7;font-weight:300;margin-bottom:1.5rem">l'intelligence augmentée au service des entrepreneurs qui veulent des clients sans perdre leur temps à les chercher.</p>
+        <div style="display:flex;gap:.6rem">
+          <div style="width:36px;height:36px;border-radius:99px;background:#f5f5f7;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#0a0a0a';this.querySelector('span').style.color='#fff'" onmouseout="this.style.background='#f5f5f7';this.querySelector('span').style.color='#0a0a0a'"><span class="msym" style="font-size:16px;color:#0a0a0a">group</span></div>
+          <div style="width:36px;height:36px;border-radius:99px;background:#f5f5f7;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#0a0a0a';this.querySelector('span').style.color='#fff'" onmouseout="this.style.background='#f5f5f7';this.querySelector('span').style.color='#0a0a0a'"><span class="msym" style="font-size:16px;color:#0a0a0a">mail</span></div>
         </div>
       </div>
       <div>
-        <h5 class="text-[.65rem] font-bold tracking-[.2em] text-black/30 mb-8">produit</h5>
-        <ul class="space-y-4">
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">fonctionnalités</a></li>
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">sources de données</a></li>
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">tarifs</a></li>
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">changelog</a></li>
-        </ul>
+        <div style="font-size:.65rem;font-weight:700;letter-spacing:.18em;color:rgba(0,0,0,.3);margin-bottom:1.5rem">produit</div>
+        <div style="display:flex;flex-direction:column;gap:.9rem">
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">fonctionnalités</a>
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">sources de données</a>
+          <a href="/pricing" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">tarifs</a>
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">changelog</a>
+        </div>
       </div>
       <div>
-        <h5 class="text-[.65rem] font-bold tracking-[.2em] text-black/30 mb-8">société</h5>
-        <ul class="space-y-4">
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">à propos</a></li>
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">blog</a></li>
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">carrières</a></li>
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">contact</a></li>
-        </ul>
+        <div style="font-size:.65rem;font-weight:700;letter-spacing:.18em;color:rgba(0,0,0,.3);margin-bottom:1.5rem">société</div>
+        <div style="display:flex;flex-direction:column;gap:.9rem">
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">à propos</a>
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">blog</a>
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">carrières</a>
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">contact</a>
+        </div>
       </div>
       <div>
-        <h5 class="text-[.65rem] font-bold tracking-[.2em] text-black/30 mb-8">légal</h5>
-        <ul class="space-y-4">
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">mentions légales</a></li>
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">confidentialité</a></li>
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">rgpd</a></li>
-          <li><a class="text-sm font-medium text-black/55 hover:text-primary transition-colors" href="#">sécurité</a></li>
-        </ul>
+        <div style="font-size:.65rem;font-weight:700;letter-spacing:.18em;color:rgba(0,0,0,.3);margin-bottom:1.5rem">légal</div>
+        <div style="display:flex;flex-direction:column;gap:.9rem">
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">mentions légales</a>
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">confidentialité</a>
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">rgpd</a>
+          <a href="#" style="font-size:.85rem;font-weight:500;color:rgba(0,0,0,.55);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#0052FF'" onmouseout="this.style.color='rgba(0,0,0,.55)'">sécurité</a>
+        </div>
       </div>
     </div>
-    <div class="pt-10 border-t border-black/[.05] flex flex-col md:flex-row justify-between items-center gap-5">
-      <p class="text-[.7rem] text-black/25 font-medium">© 2026 alma.+ technologie sas. tous droits réservés.</p>
-      <div class="flex items-center gap-3">
-        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-        <span class="text-[.7rem] text-black/25 font-bold tracking-widest">système opérationnel</span>
+    <div style="padding-top:2rem;border-top:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+      <p style="font-size:.7rem;color:rgba(0,0,0,.25);font-weight:500">© 2026 alma.+ technologie sas. tous droits réservés.</p>
+      <div style="display:flex;align-items:center;gap:.7rem">
+        <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite"></span>
+        <span style="font-size:.7rem;color:rgba(0,0,0,.25);font-weight:700;letter-spacing:.1em">système opérationnel</span>
       </div>
     </div>
   </div>
@@ -697,41 +689,38 @@ tailwind.config = {
 
 <script>
 // Mobile menu
-document.getElementById('mob-btn').addEventListener('click', () => {
-  document.getElementById('mob-menu').style.display = 'flex';
-  document.getElementById('mob-overlay').style.display = 'block';
+document.getElementById('mob-btn').addEventListener('click',()=>{
+  document.getElementById('mob-menu').style.display='flex';
+  document.getElementById('mob-overlay').style.display='block';
 });
-function closeMob() {
-  document.getElementById('mob-menu').style.display = 'none';
-  document.getElementById('mob-overlay').style.display = 'none';
+function closeMob(){
+  document.getElementById('mob-menu').style.display='none';
+  document.getElementById('mob-overlay').style.display='none';
 }
 
 // Scroll reveal
-const obs = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
-}, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')});
+},{threshold:0.08,rootMargin:'0px 0px -60px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
 // Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const t = document.querySelector(a.getAttribute('href'));
-    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'})}
   });
 });
 
 // Live counter
-(function() {
-  const el = document.getElementById('live-counter');
-  if (!el) return;
-  let n = 847;
-  setInterval(() => {
-    if (Math.random() > .7) { n += Math.floor(Math.random() * 3) + 1; el.textContent = n.toLocaleString('fr-FR'); }
-  }, 3000);
+(function(){
+  const el=document.getElementById('live-counter');
+  if(!el)return;
+  let n=847;
+  setInterval(()=>{
+    if(Math.random()>.7){n+=Math.floor(Math.random()*3)+1;el.textContent=n.toLocaleString('fr-FR')+'+';}
+  },3000);
 })();
-
-// Data cards scroll buttons (no-op visually)
-function scrollCards(dir) {}
 </script>
 </body>
 </html>
