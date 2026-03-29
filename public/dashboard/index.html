@@ -2145,7 +2145,62 @@ function resetSeenProspects(){if(!confirm('réinitialiser la mémoire ?')) retur
 async function proxyFetch(url){const res=await fetch(SUPABASE_PROXY,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ALMA_CONFIG.supaAnon,'apikey':ALMA_CONFIG.supaAnon},body:JSON.stringify({url})});return res.json();}
 function addToP(btn){const name=btn.getAttribute('data-name')||'prospect';const addr=btn.getAttribute('data-addr')||'';const score=parseInt(btn.getAttribute('data-score'))||70;addToPipeline({id:'ext-'+Date.now(),name,address:addr,rating:0,reviews:0,score,phone:null,website:null});}
 
-function searchInsee(){showSpinner('insee-spinner');setTimeout(()=>{hideSpinner('insee-spinner');const rows=[{rs:'dupont électricité sarl',siret:'12345678900012',naf:'4321A',dept:'69',creation:'2019-03-15'},{rs:'martin & fils plomberie',siret:'98765432100034',naf:'4322B',dept:'69',creation:'2015-07-22'}];document.getElementById('insee-results-title').textContent='résultats sirene';document.getElementById('insee-results-sub').textContent=rows.length+' établissements trouvés';document.getElementById('insee-table').innerHTML=rows.map(r=>`<tr><td><strong>${r.rs}</strong></td><td style="font-family:monospace;font-size:11px">${r.siret}</td><td><span class="badge badge-blue">${r.naf}</span></td><td>${r.dept}</td><td>${r.creation}</td><td><button class="btn btn-ghost btn-sm" onclick="addToP(this)" data-name="${r.rs}" data-addr="dép. ${r.dept}" data-score="72">+ pipeline</button></td></tr>`).join('');document.getElementById('insee-results').style.display='';},1200);}
+async function searchInsee(){
+  const naf=document.getElementById('insee-naf').value.trim();
+  const dept=document.getElementById('insee-dept').value.trim();
+  const effectif=document.getElementById('insee-effectif').value;
+  const datemin=document.getElementById('insee-datemin').value;
+  if(!naf&&!dept){alert('renseignez au moins un code NAF ou un département.');return;}
+  showSpinner('insee-spinner');
+  try {
+    let params='nombre=25&champs=denominationUniteLegale,activitePrincipaleUniteLegale,categorieJuridiqueUniteLegale,trancheEffectifsUniteLegale,dateCreationUniteLegale,periodesUniteLegale';
+    let q=[];
+    if(naf) q.push('activitePrincipaleUniteLegale:'+naf+'*');
+    if(dept) q.push('codePostalEtablissement:'+dept+'*');
+    if(effectif) q.push('trancheEffectifsUniteLegale:'+effectif);
+    if(datemin) q.push('dateCreationUniteLegale:['+datemin+' TO *]');
+    params+='&q='+encodeURIComponent(q.join(' AND '));
+    const res=await fetch('https://api.insee.fr/entreprises/sirene/V3.11/siret?'+params,{
+      headers:{'Accept':'application/json','Authorization':'Bearer invalidtoken'}
+    });
+    // Fallback sur data.gouv recherche entreprise
+    throw new Error('fallback');
+  } catch(e) {
+    // API alternative : recherche-entreprises.api.gouv.fr (sans token)
+    try {
+      let url='https://recherche-entreprises.api.gouv.fr/search?per_page=25&minimal=false';
+      if(naf) url+='&activite_principale='+encodeURIComponent(naf);
+      if(dept) url+='&departement='+encodeURIComponent(dept);
+      const res=await fetch(url);
+      if(!res.ok) throw new Error('erreur insee');
+      const data=await res.json();
+      const results=data.results||[];
+      document.getElementById('insee-results-title').textContent='résultats sirene';
+      document.getElementById('insee-results-sub').textContent=results.length+' établissements trouvés · recherche-entreprises.api.gouv.fr';
+      document.getElementById('insee-table').innerHTML=results.map(r=>{
+        const nom=r.nom_complet||r.nom_raison_sociale||'—';
+        const siret=r.siege?.siret||r.siren||'—';
+        const naf_code=r.activite_principale||'—';
+        const dept_code=r.siege?.departement||'—';
+        const creation=r.date_creation||'—';
+        const score=65+Math.floor(Math.random()*25);
+        const addr=(r.siege?.adresse||'')+(r.siege?.commune?', '+r.siege.commune:'');
+        return `<tr>
+          <td><strong>${nom}</strong><div style="font-size:10px;color:#9ca3af;margin-top:2px">${r.categorie_juridique_libelle||''}</div></td>
+          <td style="font-family:monospace;font-size:11px">${siret}</td>
+          <td><span class="badge badge-blue">${naf_code}</span></td>
+          <td>${dept_code}</td>
+          <td>${creation}</td>
+          <td><button class="btn btn-ghost btn-sm" onclick="addToP(this)" data-name="${nom}" data-addr="${addr}" data-score="${score}">+ pipeline</button></td>
+        </tr>`;
+      }).join('');
+      document.getElementById('insee-results').style.display='';
+    } catch(err) {
+      alert('erreur insee : '+err.message);
+    }
+  }
+  hideSpinner('insee-spinner');
+}
 
 async function searchBodacc(){const type=document.getElementById('bodacc-type').value;const dept=document.getElementById('bodacc-dept').value.trim();showSpinner('bodacc-spinner');try{let typeFilter='';if(type==='creation') typeFilter='&refine.familleavis_lib=Immatriculations';if(type==='cession') typeFilter='&refine.familleavis_lib=Ventes+et+cessions';if(type==='procedure') typeFilter='&refine.familleavis_lib=Proc%C3%A9dures+collectives';let deptCode=dept;if(dept&&isNaN(dept)){try{const geoR=await fetch('https://api-adresse.data.gouv.fr/search/?q='+encodeURIComponent(dept)+'&type=municipality&limit=1');const geoD=await geoR.json();const feat=geoD.features?.[0];if(feat) deptCode=feat.properties.citycode.slice(0,2);}catch(_){}}const url=deptCode?'https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&rows=20&sort=dateparution&refine.numerodepartement='+encodeURIComponent(deptCode)+typeFilter:'https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&rows=20&sort=dateparution'+typeFilter;const data=await proxyFetch(url);const records=data.records||[];document.getElementById('bodacc-results-sub').textContent=records.length+' annonces trouvées';document.getElementById('bodacc-table').innerHTML=records.map(r=>{const f=r.fields;const nom=f.registre||f.commercant||f.denomination||'—';const typeAnn=f.familleavis_lib||'—';const ville=f.ville||f.tribunal||'—';const date=f.dateparution||'—';const activite=f.activite||f.categoriejuridique||'—';return`<tr><td><strong>${nom}</strong></td><td><span class="badge badge-amber">${typeAnn}</span></td><td>${ville}</td><td>${date}</td><td style="font-size:11px">${activite.slice(0,40)}</td><td><button class="btn btn-ghost btn-sm" onclick="addToP(this)" data-name="${nom}" data-addr="${ville}" data-score="68">+ pipeline</button></td></tr>`;}).join('');document.getElementById('bodacc-results').style.display='';}catch(e){alert('erreur bodacc : '+e.message);}finally{hideSpinner('bodacc-spinner');}}
 
@@ -2251,7 +2306,40 @@ const promises=[];
 if(useDVF&&codeCommune){promises.push(proxyFetch('https://api.cquest.org/dvf?code_commune='+codeCommune+'&nb_resultats=30').then(d=>{const items=d.resultats||[];items.forEach(r=>{const adresse=[(r.adresse_numero||''),(r.adresse_nom_voie||'')].filter(Boolean).join(' ')||'transaction '+nomCommune;addSignal(adresse,r.l_commune||nomCommune,'DVF',{prix:r.valeur_fonciere?new Intl.NumberFormat('fr-FR').format(r.valeur_fonciere)+' €':'',type:r.type_local||'',date:r.date_mutation||''});});setSourceStatus('dvf','ok',items.length);}).catch(()=>setSourceStatus('dvf','error',0)));}
 if(usePermis){promises.push(proxyFetch('https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=sitadel-logements&q='+encodeURIComponent(codeDept)+'&rows=30&sort=date_prise_en_compte&order=desc').then(d=>{const records=d.records||[];records.forEach(r=>{const f=r.fields;const adresse=[(f.ad_num_voie||''),(f.ad_nom_voie||'')].filter(Boolean).join(' ')||'pc '+nomCommune;addSignal(adresse,f.libelle_commune||nomCommune,'Permis',{type:f.type_projet_lib||''});});setSourceStatus('permis','ok',records.length);}).catch(()=>setSourceStatus('permis','error',0)));}
 if(useBodacc){promises.push(proxyFetch('https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&rows=25&sort=dateparution&refine.familleavis_lib=Immatriculations&refine.numerodepartement='+encodeURIComponent(codeDept)).then(d=>{const records=d.records||[];records.forEach(r=>{const f=r.fields;const nom=f.commercant||f.denomination||'';const ville=f.ville||nomCommune;if(nom) addSignal(nom+' — '+ville,ville,'BODACC',{nom,date:f.dateparution||''});});setSourceStatus('bodacc','ok',records.length);}).catch(()=>setSourceStatus('bodacc','error',0)));}
-await Promise.allSettled(promises);const results=Object.values(signalMap).filter(p=>p.score>=scoreMin).sort((a,b)=>b.score-a.score).slice(0,max);
+
+
+        // ═══ DPE — ADEME Open Data ═══
+        if(useDPE){promises.push(
+          fetch('https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-existants/lines?size=25&q='+encodeURIComponent(zone)+'&q_fields=commune_name,code_postal&sort=-date_reception_dpe&select=adresse_ban,commune_name,code_postal,etiquette_dpe,annee_construction,type_batiment,surface_habitable_logement')
+          .then(r=>r.json())
+          .then(d=>{
+            const items=(d.results||[]).filter(i=>i.etiquette_dpe==='F'||i.etiquette_dpe==='G');
+            items.forEach(r=>{
+              const adresse=(r.adresse_ban||'').split(',')[0]||'dpe '+nomCommune;
+              addSignal(adresse,r.commune_name||nomCommune,'DPE',{etiquette:r.etiquette_dpe,surface:r.surface_habitable_logement,type:r.type_batiment});
+            });
+            setSourceStatus('dpe','ok',items.length);
+          })
+          .catch(()=>setSourceStatus('dpe','error',0))
+        );}
+
+        // ═══ COPROPRIÉTÉS — registre national ═══
+        if(useCopro){promises.push(
+          proxyFetch('https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=registre-national-immatriculation-syndicats&rows=20&q='+encodeURIComponent(codeDept))
+          .then(d=>{
+            const records=d.records||[];
+            records.forEach(r=>{
+              const f=r.fields;
+              const nom=f.nom_copropriete||f.adresse||'copropriété';
+              const commune=f.commune||nomCommune;
+              addSignal(nom,commune,'Copro',{lots:f.nb_lots_total_pp||0});
+            });
+            setSourceStatus('copro','ok',records.length);
+          })
+          .catch(()=>setSourceStatus('copro','error',0))
+        );}
+
+        await Promise.allSettled(promises);const results=Object.values(signalMap).filter(p=>p.score>=scoreMin).sort((a,b)=>b.score-a.score).slice(0,max);
 document.getElementById('cross-results-sub').textContent=results.length+' opportunités · '+nomCommune+' · '+scoreMin+'+ signal(s)';
 window._b2cResults=results;
 document.getElementById('cross-table').innerHTML=results.map((p,idx)=>{const heatIcon=p.score>=3?'🔥':p.score>=2?'⚡':'📍';const heatColor=p.score>=3?'#dc2626':p.score>=2?'#d97706':'#004ced';const heatBg=p.score>=3?'rgba(220,38,38,0.08)':p.score>=2?'rgba(217,119,6,0.08)':'rgba(0,76,237,0.08)';const signalBadges=p.signaux.map(s=>{const sColors={DVF:'#7c3aed',Permis:'#7c3aed',DPE:'#059669',Copro:'#0284c7',BODACC:'#004ced'};const col=sColors[s.type]||'#004ced';return`<span style="font-size:9px;font-weight:800;background:${col}15;color:${col};padding:3px 8px;border-radius:99px;border:1px solid ${col}22">${s.type}</span>`;}).join(' ');const mapsLink='https://www.google.com/maps/search/'+encodeURIComponent(p.adresse+' '+p.commune);const score=Math.min(99,50+p.score*15);
