@@ -233,9 +233,6 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 .dot-off { width: 7px; height: 7px; border-radius: 50%; background: #d1d5db; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
 </style>
-<style id="auth-hide">
-  body { visibility: hidden !important; opacity: 0 !important; }
-</style>
 </head>
 <body>
 <div class="app">
@@ -962,6 +959,9 @@ tr:hover td { background: rgba(255,255,255,0.3); }
           <div style="display:flex;gap:8px;align-items:center">
             <select class="form-input" id="cc-kpi-filter" onchange="updateCCStats()" style="font-size:11px;width:auto;padding:7px 12px;border-radius:99px"><option value="today">aujourd'hui</option><option value="week">cette semaine</option><option value="month">ce mois</option><option value="all">tout</option></select>
             <button class="btn btn-ghost" onclick="exportCC()"><span class="msym">download</span>csv</button>
+            <button class="btn btn-primary" onclick="toggleAssistantAppel()" id="btn-assistant-appel">
+              <span class="msym">mic</span>assistant appel ia
+            </button>
           </div>
         </div>
 
@@ -990,6 +990,133 @@ tr:hover td { background: rgba(255,255,255,0.3); }
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;color:#dc2626">
             <span style="font-size:28px;font-weight:800;letter-spacing:-1px" id="kpi-refus">—</span>
             <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">taux refus</span>
+          </div>
+        </div>
+
+
+        <!-- ═══ ASSISTANT APPEL IA ═══ -->
+        <div id="assistant-appel" style="display:none;margin-bottom:20px">
+          <div style="background:#0a0a1a;border-radius:20px;overflow:hidden;border:1px solid rgba(0,76,237,0.3);box-shadow:0 0 40px rgba(0,76,237,0.15)">
+
+            <!-- Header assistant -->
+            <div style="padding:16px 24px;background:linear-gradient(135deg,#004ced,#0038b8);display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div id="assistant-mic-indicator" style="width:10px;height:10px;border-radius:50%;background:#9ca3af;transition:all .3s"></div>
+                <span style="font-size:14px;font-weight:800;color:white;letter-spacing:-.5px">assistant appel ia</span>
+                <span id="assistant-status-label" style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:600">inactif</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div id="assistant-timer" style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.5);font-family:monospace">00:00</div>
+                <button onclick="toggleAssistantAppel()" style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;width:28px;height:28px;cursor:pointer;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">✕</button>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+
+              <!-- Colonne gauche - Script + transcription -->
+              <div style="padding:20px;border-right:1px solid rgba(255,255,255,0.06)">
+
+                <!-- Prospect sélectionné -->
+                <div style="margin-bottom:16px">
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.3);margin-bottom:8px">prospect</div>
+                  <select id="assistant-prospect-select" class="form-input" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:white;font-size:12px" onchange="loadAssistantScript()">
+                    <option value="">— sélectionnez un prospect —</option>
+                  </select>
+                </div>
+
+                <!-- Script d'ouverture -->
+                <div style="margin-bottom:16px">
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(0,212,255,0.7);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+                    <span class="msym" style="font-size:13px">record_voice_over</span>script d'ouverture
+                    <button onclick="genScript()" id="btn-gen-script" style="margin-left:auto;font-size:9px;font-weight:800;background:rgba(0,212,255,0.15);color:#00d4ff;border:1px solid rgba(0,212,255,0.2);padding:3px 10px;border-radius:99px;cursor:pointer;font-family:inherit;transition:all .12s">
+                      <span id="script-spinner" style="display:none" class="spinner" style="width:8px;height:8px"></span>générer
+                    </button>
+                  </div>
+                  <div id="assistant-script" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.7;min-height:80px;font-style:italic">
+                    sélectionnez un prospect pour générer le script...
+                  </div>
+                  <button onclick="copyScript()" style="margin-top:6px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:color .12s" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+                    <span class="msym" style="font-size:13px">content_copy</span>copier le script
+                  </button>
+                </div>
+
+                <!-- Transcription micro -->
+                <div>
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.3);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+                    <span class="msym" style="font-size:13px">mic</span>transcription temps réel
+                    <button onclick="toggleMic()" id="btn-mic" style="margin-left:auto;font-size:9px;font-weight:800;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);padding:3px 10px;border-radius:99px;cursor:pointer;font-family:inherit;transition:all .12s">
+                      activer le micro
+                    </button>
+                  </div>
+                  <div id="transcription-box" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.7;min-height:70px;max-height:120px;overflow-y:auto">
+                    activez le micro pour transcrire la conversation...
+                  </div>
+                </div>
+              </div>
+
+              <!-- Colonne droite - Objections + réponses IA -->
+              <div style="padding:20px">
+                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.3);margin-bottom:12px">objections fréquentes — cliquez pour la réponse ia</div>
+
+                <!-- Boutons objections -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+                  <button onclick="handleObjection('trop cher')" class="obj-btn" style="background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.2);color:#fca5a5;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(220,38,38,0.2)'" onmouseout="this.style.background='rgba(220,38,38,0.1)'"><span class="msym" style="font-size:14px">money_off</span>trop cher</button>
+                  <button onclick="handleObjection('pas intéressé')" class="obj-btn" style="background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.2);color:#fca5a5;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(220,38,38,0.2)'" onmouseout="this.style.background='rgba(220,38,38,0.1)'"><span class="msym" style="font-size:14px">thumb_down</span>pas intéressé</button>
+                  <button onclick="handleObjection('j ai déjà quelqu un')" class="obj-btn" style="background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);color:#fcd34d;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(217,119,6,0.2)'" onmouseout="this.style.background='rgba(217,119,6,0.1)'"><span class="msym" style="font-size:14px">group</span>déjà équipé</button>
+                  <button onclick="handleObjection('pas le temps')" class="obj-btn" style="background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);color:#fcd34d;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(217,119,6,0.2)'" onmouseover="this.style.background='rgba(217,119,6,0.2)'" onmouseout="this.style.background='rgba(217,119,6,0.1)'"><span class="msym" style="font-size:14px">schedule</span>pas le temps</button>
+                  <button onclick="handleObjection('envoyez moi par email')" class="obj-btn" style="background:rgba(0,76,237,0.1);border:1px solid rgba(0,76,237,0.2);color:#93c5fd;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(0,76,237,0.2)'" onmouseout="this.style.background='rgba(0,76,237,0.1)'"><span class="msym" style="font-size:14px">mail</span>par email</button>
+                  <button onclick="handleObjection('rappeler plus tard')" class="obj-btn" style="background:rgba(0,76,237,0.1);border:1px solid rgba(0,76,237,0.2);color:#93c5fd;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(0,76,237,0.2)'" onmouseout="this.style.background='rgba(0,76,237,0.1)'"><span class="msym" style="font-size:14px">phone_callback</span>rappeler</button>
+                  <button onclick="handleObjection('c est quoi alma')" class="obj-btn" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);color:#c4b5fd;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(124,58,237,0.2)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'"><span class="msym" style="font-size:14px">help</span>c'est quoi ?</button>
+                  <button onclick="handleObjection('le patron est absent')" class="obj-btn" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);color:#c4b5fd;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(124,58,237,0.2)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'"><span class="msym" style="font-size:14px">person_off</span>patron absent</button>
+                </div>
+
+                <!-- Réponse IA -->
+                <div id="objection-response-wrap" style="display:none">
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(0,212,255,0.7);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+                    <span class="msym" style="font-size:13px;animation:pulse 1s infinite" id="resp-icon">auto_awesome</span>
+                    réponse suggérée
+                  </div>
+                  <div id="objection-response" style="background:rgba(0,76,237,0.12);border:1px solid rgba(0,76,237,0.25);border-radius:12px;padding:16px;font-size:13px;color:white;line-height:1.75;min-height:60px;position:relative">
+                    <div id="resp-loading" style="color:rgba(255,255,255,0.4);font-style:italic;display:flex;align-items:center;gap:8px">
+                      <div class="spinner" style="display:inline-block;border-color:rgba(0,212,255,0.3);border-top-color:#00d4ff"></div>
+                      génération en cours...
+                    </div>
+                    <div id="resp-text" style="display:none"></div>
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:8px">
+                    <button onclick="copyResponse()" style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:color .12s" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+                      <span class="msym" style="font-size:13px">content_copy</span>copier
+                    </button>
+                    <button onclick="regenResponse()" style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:color .12s" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+                      <span class="msym" style="font-size:13px">refresh</span>regénérer
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Questions suggérées -->
+                <div style="margin-top:16px">
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.3);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+                    <span class="msym" style="font-size:13px">psychology</span>questions à poser
+                  </div>
+                  <div id="questions-list" style="display:flex;flex-direction:column;gap:6px">
+                    <div style="font-size:11px;color:rgba(255,255,255,0.25);font-style:italic">génération du script pour afficher les questions...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer — fin appel -->
+            <div style="padding:14px 24px;background:rgba(255,255,255,0.03);border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:12px">
+              <button onclick="finirAppel()" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.25);color:#fca5a5;border-radius:10px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s" onmouseover="this.style.background='rgba(220,38,38,0.25)'" onmouseout="this.style.background='rgba(220,38,38,0.15)'">
+                <span class="msym" style="font-size:15px">call_end</span>terminer l'appel
+              </button>
+              <button onclick="genResume()" id="btn-resume" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);color:#00d4ff;border-radius:10px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s" onmouseover="this.style.background='rgba(0,212,255,0.2)'" onmouseout="this.style.background='rgba(0,212,255,0.1)'">
+                <span id="resume-spinner" style="display:none" class="spinner"></span>
+                <span class="msym" style="font-size:15px">summarize</span>résumé ia
+              </button>
+              <div style="flex:1"></div>
+              <div id="assistant-objection-count" style="font-size:11px;color:rgba(255,255,255,0.25)">0 objection traitée</div>
+            </div>
           </div>
         </div>
 
@@ -2385,6 +2512,315 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
 
   updateQuotaUI();
 })();
+
+
+// ═══ ASSISTANT APPEL IA ═══
+const assistantState = {
+  active: false,
+  timerInterval: null,
+  seconds: 0,
+  recognition: null,
+  micActive: false,
+  transcript: '',
+  objectionCount: 0,
+  currentObjection: null,
+  currentProspect: null,
+};
+
+function toggleAssistantAppel() {
+  const panel = document.getElementById('assistant-appel');
+  const isVisible = panel.style.display !== 'none';
+  if (isVisible) {
+    panel.style.display = 'none';
+    stopTimer();
+    stopMic();
+  } else {
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    startTimer();
+    populateProspectSelect();
+  }
+}
+
+function startTimer() {
+  assistantState.seconds = 0;
+  assistantState.active = true;
+  const indicator = document.getElementById('assistant-mic-indicator');
+  const statusLabel = document.getElementById('assistant-status-label');
+  if (indicator) { indicator.style.background = '#059669'; indicator.style.boxShadow = '0 0 8px rgba(5,150,105,0.6)'; }
+  if (statusLabel) statusLabel.textContent = 'appel en cours';
+  assistantState.timerInterval = setInterval(() => {
+    assistantState.seconds++;
+    const m = String(Math.floor(assistantState.seconds / 60)).padStart(2, '0');
+    const s = String(assistantState.seconds % 60).padStart(2, '0');
+    const timer = document.getElementById('assistant-timer');
+    if (timer) timer.textContent = m + ':' + s;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(assistantState.timerInterval);
+  assistantState.active = false;
+  const indicator = document.getElementById('assistant-mic-indicator');
+  const statusLabel = document.getElementById('assistant-status-label');
+  if (indicator) { indicator.style.background = '#9ca3af'; indicator.style.boxShadow = 'none'; }
+  if (statusLabel) statusLabel.textContent = 'inactif';
+}
+
+function populateProspectSelect() {
+  const sel = document.getElementById('assistant-prospect-select');
+  if (!sel) return;
+  const all = [...state.pipeline, ...state.prospects].filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i);
+  sel.innerHTML = '<option value="">— sélectionnez un prospect —</option>';
+  all.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.name + (p.address ? ' · ' + p.address.split(',')[0] : '');
+    sel.appendChild(opt);
+  });
+}
+
+async function loadAssistantScript() {
+  const pid = document.getElementById('assistant-prospect-select').value;
+  if (!pid) return;
+  const p = [...state.pipeline, ...state.prospects].find(x => x.id === pid);
+  if (!p) return;
+  assistantState.currentProspect = p;
+  await genScript();
+}
+
+async function genScript() {
+  const p = assistantState.currentProspect;
+  if (!p) { alert("sélectionnez un prospect d'abord."); return; }
+  const profile = getProfile();
+  showSpinner('script-spinner');
+  document.getElementById('btn-gen-script').disabled = true;
+  document.getElementById('assistant-script').style.fontStyle = 'italic';
+  document.getElementById('assistant-script').style.color = 'rgba(255,255,255,0.3)';
+  document.getElementById('assistant-script').textContent = 'génération en cours...';
+
+  const prompt = `tu es un expert en cold call B2B. génère un script d'ouverture téléphonique ultra-court et percutant.
+
+prospect : ${p.name}
+adresse : ${p.address || '—'}
+note google : ${p.rating ? p.rating + '/5 (' + p.reviews + ' avis)' : 'non disponible'}
+score ia : ${p.score || '—'}/100
+
+commercial : ${profile.prenom || 'prénom'} ${profile.nom || ''} — ${profile.societe || 'alma.+'}
+activité : ${profile.activite || 'solutions de prospection ia'}
+valeur : ${profile.valeur || 'outil ia de prospection'}
+
+consignes :
+- 40-60 mots max
+- commencer par "bonjour, je suis [prénom] de [société]..."
+- accrocher avec un bénéfice concret lié au prospect
+- finir par une question ouverte courte
+- tutoyer si artisan/TPE, vouvoyer sinon
+- naturel et humain, pas corporate
+- texte brut uniquement`;
+
+  try {
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 300);
+    const script = d.content[0].text;
+    const scriptEl = document.getElementById('assistant-script');
+    scriptEl.textContent = script;
+    scriptEl.style.fontStyle = 'normal';
+    scriptEl.style.color = 'rgba(255,255,255,0.9)';
+    // Générer questions suggérées
+    await genQuestions(p, profile);
+  } catch(e) {
+    document.getElementById('assistant-script').textContent = 'erreur : ' + e.message;
+  }
+  hideSpinner('script-spinner');
+  document.getElementById('btn-gen-script').disabled = false;
+}
+
+async function genQuestions(p, profile) {
+  const prompt = `génère 4 questions courtes à poser pendant un cold call pour qualifier ce prospect.
+prospect : ${p.name} — ${p.address || ''}
+note : ${p.rating || '?'}/5
+activité du commercial : ${profile.activite || 'prospection ia'}
+format : 4 questions numérotées, max 15 mots chacune, texte brut.`;
+
+  try {
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 200);
+    const questions = d.content[0].text.trim().split('\n').filter(q => q.trim());
+    const container = document.getElementById('questions-list');
+    container.innerHTML = questions.map(q => `
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:all .12s" onclick="this.style.background='rgba(0,76,237,0.15)';this.style.borderColor='rgba(0,76,237,0.3)'">
+        <span class="msym" style="font-size:13px;color:rgba(0,212,255,0.6);flex-shrink:0;margin-top:1px">help_outline</span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5">${q.replace(/^[\d\.\-\*]\s*/, '')}</span>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+let _currentObjectionText = '';
+async function handleObjection(objection) {
+  if (!checkQuota('appels')) return;
+  _currentObjectionText = objection;
+  assistantState.objectionCount++;
+  const countEl = document.getElementById('assistant-objection-count');
+  if (countEl) countEl.textContent = assistantState.objectionCount + ' objection' + (assistantState.objectionCount > 1 ? 's traitées' : ' traitée');
+
+  const wrap = document.getElementById('objection-response-wrap');
+  const respText = document.getElementById('resp-text');
+  const respLoading = document.getElementById('resp-loading');
+  wrap.style.display = 'block';
+  respLoading.style.display = 'flex';
+  respText.style.display = 'none';
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  const p = assistantState.currentProspect;
+  const profile = getProfile();
+  const prompt = `tu es un expert en cold call B2B. génère une réponse courte et percutante à cette objection.
+
+objection : "${objection}"
+prospect : ${p ? p.name + ' (' + (p.address || '') + ')' : 'prospect inconnu'}
+commercial : ${profile.prenom || ''} ${profile.nom || ''} — ${profile.societe || 'alma.+'}
+activité : ${profile.activite || 'solutions ia'}
+valeur : ${profile.valeur || ''}
+
+consignes :
+- 30-50 mots max
+- naturel, humain, pas agressif
+- rebondir positivement sur l'objection
+- garder le prospect en ligne
+- finir par une mini-question pour relancer
+- texte brut uniquement`;
+
+  try {
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 200);
+    const response = d.content[0].text;
+    respText.textContent = response;
+    respLoading.style.display = 'none';
+    respText.style.display = 'block';
+    incrementUsage('appels');
+  } catch(e) {
+    respText.textContent = 'erreur : ' + e.message;
+    respLoading.style.display = 'none';
+    respText.style.display = 'block';
+  }
+}
+
+async function regenResponse() {
+  if (_currentObjectionText) await handleObjection(_currentObjectionText);
+}
+
+function copyResponse() {
+  const text = document.getElementById('resp-text').textContent;
+  if (text) navigator.clipboard.writeText(text);
+}
+
+function copyScript() {
+  const text = document.getElementById('assistant-script').textContent;
+  if (text) navigator.clipboard.writeText(text);
+}
+
+// Micro - Web Speech API
+function toggleMic() {
+  if (assistantState.micActive) { stopMic(); } else { startMic(); }
+}
+
+function startMic() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('transcription non supportée sur ce navigateur. utilisez chrome.');
+    return;
+  }
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  assistantState.recognition = new SpeechRecognition();
+  assistantState.recognition.continuous = true;
+  assistantState.recognition.interimResults = true;
+  assistantState.recognition.lang = 'fr-FR';
+
+  assistantState.recognition.onresult = (event) => {
+    let interim = '';
+    let final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) final += event.results[i][0].transcript + ' ';
+      else interim += event.results[i][0].transcript;
+    }
+    assistantState.transcript += final;
+    const box = document.getElementById('transcription-box');
+    if (box) {
+      box.innerHTML = '<span style="color:rgba(255,255,255,0.7)">' + assistantState.transcript + '</span>' +
+        (interim ? '<span style="color:rgba(255,255,255,0.3);font-style:italic">' + interim + '</span>' : '');
+      box.scrollTop = box.scrollHeight;
+    }
+  };
+
+  assistantState.recognition.onerror = () => stopMic();
+  assistantState.recognition.onend = () => { if (assistantState.micActive) assistantState.recognition.start(); };
+  assistantState.recognition.start();
+  assistantState.micActive = true;
+
+  const btn = document.getElementById('btn-mic');
+  const indicator = document.getElementById('assistant-mic-indicator');
+  if (btn) { btn.textContent = 'stopper le micro'; btn.style.background = 'rgba(220,38,38,0.2)'; btn.style.color = '#fca5a5'; btn.style.borderColor = 'rgba(220,38,38,0.3)'; }
+  if (indicator) { indicator.style.background = '#dc2626'; indicator.style.boxShadow = '0 0 8px rgba(220,38,38,0.6)'; indicator.style.animation = 'pulse 1s infinite'; }
+}
+
+function stopMic() {
+  if (assistantState.recognition) { assistantState.recognition.stop(); assistantState.recognition = null; }
+  assistantState.micActive = false;
+  const btn = document.getElementById('btn-mic');
+  const indicator = document.getElementById('assistant-mic-indicator');
+  if (btn) { btn.textContent = 'activer le micro'; btn.style.background = 'rgba(255,255,255,0.08)'; btn.style.color = 'rgba(255,255,255,0.5)'; btn.style.borderColor = 'rgba(255,255,255,0.1)'; }
+  if (indicator) { indicator.style.background = '#059669'; indicator.style.boxShadow = '0 0 8px rgba(5,150,105,0.6)'; indicator.style.animation = ''; }
+}
+
+async function genResume() {
+  const transcript = assistantState.transcript;
+  const p = assistantState.currentProspect;
+  const duration = document.getElementById('assistant-timer')?.textContent || '—';
+  showSpinner('resume-spinner');
+  document.getElementById('btn-resume').disabled = true;
+
+  const prompt = `génère un résumé structuré de cet appel commercial.
+prospect : ${p ? p.name : 'inconnu'}
+durée : ${duration}
+transcription : ${transcript || 'non disponible'}
+objections traitées : ${assistantState.objectionCount}
+
+format :
+- résultat de l'appel (1 ligne)
+- points clés discutés (3 max)
+- prochaine action recommandée
+- texte brut, concis`;
+
+  try {
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 300);
+    const resume = d.content[0].text;
+    // Afficher dans une modal
+    const modal = document.getElementById('email-modal');
+    document.getElementById('modal-prospect-name').textContent = 'résumé appel — ' + (p ? p.name : '');
+    document.getElementById('modal-email-text').value = resume;
+    modal.classList.add('open');
+  } catch(e) {
+    alert('erreur résumé : ' + e.message);
+  }
+  hideSpinner('resume-spinner');
+  document.getElementById('btn-resume').disabled = false;
+}
+
+function finirAppel() {
+  stopMic();
+  stopTimer();
+  // Logger l'appel dans le tracker
+  const note = assistantState.currentProspect ? assistantState.currentProspect.name : '';
+  document.getElementById('cc-note').value = note;
+  // Reset
+  assistantState.transcript = '';
+  assistantState.objectionCount = 0;
+  const countEl = document.getElementById('assistant-objection-count');
+  if (countEl) countEl.textContent = '0 objection traitée';
+  const box = document.getElementById('transcription-box');
+  if (box) box.innerHTML = 'activez le micro pour transcrire la conversation...';
+  document.getElementById('objection-response-wrap').style.display = 'none';
+  // Fermer le panel
+  document.getElementById('assistant-appel').style.display = 'none';
+  // Scroller vers les boutons de résultat
+  document.querySelector('.cc-main').scrollIntoView({ behavior: 'smooth' });
+}
 
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCounter();});
