@@ -833,7 +833,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
       <div style="max-width:900px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
           <div>
-            <h2 style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">🔥 alertes du jour</h2>
+            <h2 style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">alertes du jour</h2>
             <p style="font-size:11px;color:#9ca3af;margin-top:4px">signaux détectés automatiquement · mis à jour à 6h</p>
           </div>
           <div style="display:flex;gap:8px">
@@ -849,9 +849,9 @@ tr:hover td { background: rgba(255,255,255,0.3); }
         </div>
         <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
           <button class="chip" onclick="filterAlertes('all',this)" style="background:rgba(0,76,237,0.08);color:#004ced;border-color:rgba(0,76,237,0.2);font-weight:800">tous</button>
-          <button class="chip" onclick="filterAlertes('GMAPS',this)">🗺️ google maps</button>
-          <button class="chip" onclick="filterAlertes('phone',this)">📞 avec téléphone</button>
-          <button class="chip" onclick="filterAlertes('unseen',this)">🔴 non lus</button>
+          <button class="chip" onclick="filterAlertes('GMAPS',this)">google maps</button>
+          <button class="chip" onclick="filterAlertes('phone',this)">avec téléphone</button>
+          <button class="chip" onclick="filterAlertes('unseen',this)">non lus</button>
         </div>
         <div id="alertes-list" style="display:flex;flex-direction:column;gap:10px">
           <div style="text-align:center;padding:60px;color:#9ca3af"><span class="msym" style="font-size:48px;display:block;margin-bottom:12px;opacity:.2">notifications_active</span>chargement...</div>
@@ -1969,7 +1969,7 @@ function renderProspectsTable(prospects,type,city,minScore){
         ?`<a href="${p.website}" target="_blank" style="font-size:11px;color:#004ced;text-decoration:none;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:4px"><span class="msym" style="font-size:13px">language</span>${p.website.replace(/^https?:\/\//,'').slice(0,32)}</a>`
         :`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#d1d5db;font-style:italic"><span class="msym" style="font-size:13px">language</span>pas de site web</div>`
       }
-      <div style="font-size:11px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📍 ${p.address}</div>
+      <div style="font-size:11px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.address}</div>
       <div style="display:flex;gap:6px;margin-top:4px">
         <button id="email-cell-${p.id}" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center" onclick="openEmailModal('${p.id}')"><span class="msym">auto_awesome</span>email ia</button>
         <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="addToPipeline(state.prospects.find(x=>x.id==='${p.id}'))"><span class="msym">conversion_path</span>pipeline</button>
@@ -2252,7 +2252,7 @@ function refreshPipeline() {
         <span class="msym" style="font-size:14px;color:${hasPhone?'#059669':'#9ca3af'}">${hasPhone?'phone':'phone_disabled'}</span>
         <span style="font-size:12px;font-weight:${hasPhone?'800':'400'};color:${hasPhone?'#059669':'#9ca3af'}">${hasPhone?p.phone:'numéro non disponible'}</span>
       </div>
-      <div style="font-size:11px;color:#9ca3af;margin-top:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📍 ${p.address||'—'}</div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.address||'—'}</div>
       ${p.email_generated?'<span class="badge badge-green" style="margin-top:8px;display:inline-flex">✓ email prêt</span>':''}
     </div>`;
   }).join('');
@@ -2378,7 +2378,7 @@ async function searchInsee(){
         <td>
           <strong style="font-size:13px">${nom}</strong>
           <div style="font-size:10px;color:#9ca3af;margin-top:2px">${r.categorie_juridique_libelle||'—'} · ${effectifLabel}</div>
-          ${hasWeb?`<a href="${r.siege.site_web}" target="_blank" style="font-size:10px;color:#004ced;text-decoration:none">🌐 site web</a>`:''}
+          ${hasWeb?`<a href="${r.siege.site_web}" target="_blank" style="font-size:10px;color:#004ced;text-decoration:none">site web</a>`:''}
         </td>
         <td style="font-family:monospace;font-size:10px">${siret}</td>
         <td><span class="badge badge-blue">${nafCode}</span></td>
@@ -2662,7 +2662,7 @@ async function searchAO(){
         </td>
         <td>
           <div style="font-size:12px;font-weight:700">${acheteur}</div>
-          ${telAcheteur?`<a href="tel:${telAcheteur}" style="font-size:11px;color:#059669;text-decoration:none;font-weight:700">📞 ${telAcheteur}</a>`:''}
+          ${telAcheteur?`<a href="tel:${telAcheteur}" style="font-size:11px;color:#059669;text-decoration:none;font-weight:700">${telAcheteur}</a>`:''}
           ${emailAcheteur?`<div><a href="mailto:${emailAcheteur}" style="font-size:10px;color:#004ced;text-decoration:none">✉ ${emailAcheteur.slice(0,30)}</a></div>`:''}
         </td>
         <td><span class="badge ${typeColor}" style="white-space:nowrap;font-size:9px">${typeLib}</span></td>
@@ -2821,7 +2821,7 @@ if(useBodacc){promises.push(proxyFetch('https://bodacc-datadila.opendatasoft.com
         await Promise.allSettled(promises);const results=Object.values(signalMap).filter(p=>p.score>=scoreMin).sort((a,b)=>b.score-a.score).slice(0,max);
 document.getElementById('cross-results-sub').textContent=results.length+' opportunités · '+nomCommune+' · '+scoreMin+'+ signal(s)';
 window._b2cResults=results;
-document.getElementById('cross-table').innerHTML=results.map((p,idx)=>{const heatIcon=p.score>=3?'🔥':p.score>=2?'⚡':'📍';const heatColor=p.score>=3?'#dc2626':p.score>=2?'#d97706':'#004ced';const heatBg=p.score>=3?'rgba(220,38,38,0.08)':p.score>=2?'rgba(217,119,6,0.08)':'rgba(0,76,237,0.08)';const signalBadges=p.signaux.map(s=>{const sColors={DVF:'#7c3aed',Permis:'#7c3aed',DPE:'#059669',Copro:'#0284c7',BODACC:'#004ced'};const col=sColors[s.type]||'#004ced';return`<span style="font-size:9px;font-weight:800;background:${col}15;color:${col};padding:3px 8px;border-radius:99px;border:1px solid ${col}22">${s.type}</span>`;}).join(' ');const mapsLink='https://www.google.com/maps/search/'+encodeURIComponent(p.adresse+' '+p.commune);const score=Math.min(99,50+p.score*15);
+document.getElementById('cross-table').innerHTML=results.map((p,idx)=>{const heatIcon=p.score>=3?'+++':p.score>=2?'++':'+';const heatColor=p.score>=3?'#dc2626':p.score>=2?'#d97706':'#004ced';const heatBg=p.score>=3?'rgba(220,38,38,0.08)':p.score>=2?'rgba(217,119,6,0.08)':'rgba(0,76,237,0.08)';const signalBadges=p.signaux.map(s=>{const sColors={DVF:'#7c3aed',Permis:'#7c3aed',DPE:'#059669',Copro:'#0284c7',BODACC:'#004ced'};const col=sColors[s.type]||'#004ced';return`<span style="font-size:9px;font-weight:800;background:${col}15;color:${col};padding:3px 8px;border-radius:99px;border:1px solid ${col}22">${s.type}</span>`;}).join(' ');const mapsLink='https://www.google.com/maps/search/'+encodeURIComponent(p.adresse+' '+p.commune);const score=Math.min(99,50+p.score*15);
 return`<div class="pipeline-card" style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;align-items:center;justify-content:space-between"><span style="padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800;background:${heatBg};color:${heatColor}">${heatIcon} ${p.score} signal${p.score>1?'s':''}</span><span style="font-size:9px;color:#9ca3af">score ${score}</span></div><div><div style="display:flex;align-items:flex-start;gap:8px"><span class="msym" style="font-size:16px;color:#004ced;flex-shrink:0;margin-top:1px">location_on</span><div><div style="font-size:13px;font-weight:800;color:#0a0a1a;line-height:1.3">${p.adresse}</div><div style="font-size:11px;color:#9ca3af;margin-top:2px">${p.commune}</div></div></div></div><div style="display:flex;gap:4px;flex-wrap:wrap">${signalBadges}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><a href="${mapsLink}" target="_blank" class="btn btn-ghost btn-sm" style="justify-content:center;text-decoration:none"><span class="msym">map</span>maps</a><button class="btn btn-ghost btn-sm" style="justify-content:center" onclick="genCourrierB2C(${idx})"><span class="msym">auto_awesome</span>courrier</button><button class="btn btn-ghost btn-sm" style="justify-content:center;grid-column:span 2" onclick="addToP(this)" data-name="${p.adresse}" data-addr="${p.commune}" data-score="${score}"><span class="msym">conversion_path</span>ajouter au pipeline</button></div></div>`;}).join('');
 hide('cross-progress');hide('cross-spinner');show('cross-results');addActivity('croisement b2c : '+zone+' ('+results.length+' opportunités)','hub','primary');}catch(e){alert('erreur : '+e.message);hide('cross-progress');hide('cross-spinner');}}
 
@@ -3439,7 +3439,7 @@ async function searchLinkedinProfiles() {
 
   try {
     // Construire la requête Google ciblée LinkedIn
-    let query = `"${secteur}"`;
+    let query = `site:linkedin.com/in "${secteur}"`;
     if (region) query += ` "${region}"`;
     if (company) query += ` "${company}"`;
 
