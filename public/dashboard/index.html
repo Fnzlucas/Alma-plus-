@@ -676,69 +676,87 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 
         <!-- ═══ ONGLET LINKEDIN ═══ -->
         <div id="b2b-linkedin" style="display:none">
+
           <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,119,181,0.2)">
             <div class="card-header" style="background:rgba(0,119,181,0.04)">
               <div>
                 <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#0077b5">
-                  <span class="msym" style="font-size:18px">person_search</span>
-                  leads linkedin — extension alma.+
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
+                  prospection linkedin
                 </div>
-                <div style="font-size:10px;color:#9ca3af;margin-top:2px">leads capturés depuis linkedin via l'extension chrome · synchronisation en temps réel</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">recherchez des profils linkedin directement depuis alma.+</div>
               </div>
-              <button class="btn btn-ghost btn-sm" onclick="loadLinkedinLeads()"><span class="msym">refresh</span>actualiser</button>
+              <span class="badge badge-green" id="li-api-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> api active</span>
             </div>
             <div class="card-body">
-              <!-- Banner install -->
-              <div id="li-install-banner" class="alert" style="background:rgba(0,119,181,0.06);border:1px solid rgba(0,119,181,0.2);color:#0077b5;margin-bottom:16px">
-                <span class="msym" style="font-size:20px">extension</span>
+
+              <!-- Alerte clé manquante -->
+              <div id="li-no-key-banner" class="alert alert-amber" style="margin-bottom:16px">
+                <span class="msym">key</span>
                 <div style="flex:1">
-                  <div style="font-weight:700;margin-bottom:2px">installez l'extension chrome alma.+</div>
-                  <div style="font-size:11px;opacity:.8">l'extension capture vos leads directement sur linkedin et les synchronise ici automatiquement.</div>
+                  <strong>clé google search api requise</strong>
+                  <div style="font-size:11px;margin-top:2px">gratuite · 100 recherches/jour · configurez-la dans paramètres → linkedin api</div>
                 </div>
-                <a href="https://alma-plus.vercel.app" target="_blank" class="btn btn-ghost btn-sm" style="flex-shrink:0;border-color:rgba(0,119,181,0.3);color:#0077b5">télécharger →</a>
+                <button class="btn btn-ghost btn-sm" onclick="goPage('settings',document.querySelector('[onclick*=settings]'));setTimeout(()=>switchSettingsTab('tab-linkedin',null),200)">configurer →</button>
               </div>
 
-              <!-- Filtres -->
-              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="li-filters">
-                <button class="chip" onclick="filterLinkedin('all',this)" style="background:rgba(0,119,181,0.08);color:#0077b5;border-color:rgba(0,119,181,0.2);font-weight:800">tous</button>
-                <button class="chip" onclick="filterLinkedin('new',this)">🆕 nouveaux</button>
-                <button class="chip" onclick="filterLinkedin('linkedin_profile',this)">👤 profils</button>
-                <button class="chip" onclick="filterLinkedin('linkedin_search',this)">🔍 recherche</button>
-                <button class="chip" onclick="filterLinkedin('linkedin_company',this)">🏢 entreprises</button>
-                <div style="margin-left:auto;display:flex;gap:8px">
+              <!-- Formulaire -->
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">poste / secteur cible *</label>
+                  <input class="form-input" id="li-secteur" placeholder="ex: directeur commercial, plombier, drh..."/>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">ville / région</label>
+                  <input class="form-input" id="li-region" placeholder="ex: lyon, paris, bordeaux..."/>
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:16px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">entreprise (optionnel)</label>
+                  <input class="form-input" id="li-company" placeholder="ex: bouygues, renault..."/>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">nombre de résultats</label>
+                  <select class="form-input" id="li-max">
+                    <option value="5">5 profils</option>
+                    <option value="10" selected>10 profils</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Chips rapides -->
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+                <span style="font-size:10px;font-weight:700;color:#9ca3af;padding-top:6px">raccourcis :</span>
+                <button class="chip" onclick="fillLiSearch('directeur commercial','paris')">dir. commercial paris</button>
+                <button class="chip" onclick="fillLiSearch('gérant','lyon')">gérant lyon</button>
+                <button class="chip" onclick="fillLiSearch('responsable achats','france')">achats france</button>
+                <button class="chip" onclick="fillLiSearch('drh','bordeaux')">drh bordeaux</button>
+                <button class="chip" onclick="fillLiSearch('ceo','marseille')">ceo marseille</button>
+              </div>
+
+              <button class="btn btn-primary" onclick="searchLinkedinProfiles()" id="btn-li-search" style="background:#0077b5;box-shadow:0 4px 16px rgba(0,119,181,0.3)">
+                <span id="li-search-spinner" style="display:none" class="spinner"></span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="white"/></svg>
+                rechercher des profils linkedin
+              </button>
+            </div>
+          </div>
+
+          <!-- Résultats -->
+          <div id="li-results" style="display:none">
+            <div class="glass card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title" id="li-results-title">profils trouvés</div>
+                  <div style="font-size:10px;color:#9ca3af;margin-top:2px" id="li-results-sub"></div>
+                </div>
+                <div style="display:flex;gap:8px">
                   <button class="btn btn-ghost btn-sm" onclick="exportLinkedinCSV()"><span class="msym">download</span>csv</button>
                   <button class="btn btn-primary btn-sm" onclick="addAllLinkedinToPipeline()"><span class="msym">conversion_path</span>tout en pipeline</button>
                 </div>
               </div>
-
-              <!-- Stats rapides -->
-              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px" id="li-stats">
-                <div class="glass" style="border-radius:12px;padding:12px;text-align:center">
-                  <div style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0077b5" id="li-stat-total">—</div>
-                  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-top:2px">capturés</div>
-                </div>
-                <div class="glass" style="border-radius:12px;padding:12px;text-align:center">
-                  <div style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#004ced" id="li-stat-new">—</div>
-                  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-top:2px">nouveaux</div>
-                </div>
-                <div class="glass" style="border-radius:12px;padding:12px;text-align:center">
-                  <div style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#059669" id="li-stat-today">—</div>
-                  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-top:2px">aujourd'hui</div>
-                </div>
-                <div class="glass" style="border-radius:12px;padding:12px;text-align:center">
-                  <div style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#d97706" id="li-stat-score">—</div>
-                  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-top:2px">score moy.</div>
-                </div>
-              </div>
-
-              <!-- Liste leads -->
-              <div id="li-leads-container">
-                <div style="text-align:center;padding:48px 20px;color:#9ca3af">
-                  <span class="msym" style="font-size:48px;display:block;margin-bottom:12px;opacity:.2;color:#0077b5">person_search</span>
-                  <div style="font-size:14px;font-weight:600;color:#6b7280;margin-bottom:6px">aucun lead linkedin</div>
-                  <div style="font-size:12px">installez l'extension et capturez des profils sur linkedin</div>
-                </div>
-              </div>
+              <div id="li-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;padding:16px"></div>
             </div>
           </div>
         </div>
@@ -1287,9 +1305,10 @@ tr:hover td { background: rgba(255,255,255,0.3); }
         </div>
         <div class="alert alert-success" id="settings-saved" style="display:none"><span class="msym">check_circle</span>paramètres enregistrés.</div>
 
-        <div style="display:flex;gap:8px;margin-bottom:20px">
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
           <button class="tab active" onclick="switchSettingsTab('tab-profile',this)">mon profil</button>
           <button class="tab" onclick="switchSettingsTab('tab-email',this)">email d'envoi</button>
+          <button class="tab" onclick="switchSettingsTab('tab-linkedin',this)">linkedin api</button>
           <button class="tab" onclick="switchSettingsTab('tab-plan',this)">abonnement</button>
         </div>
 
@@ -1317,6 +1336,64 @@ tr:hover td { background: rgba(255,255,255,0.3); }
               <div style="display:flex;gap:10px">
                 <button class="btn btn-primary" onclick="saveEmail()"><span class="msym">save</span>enregistrer</button>
                 <button class="btn btn-ghost" onclick="sendTestEmail()"><span class="msym">send</span>email test</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-linkedin" style="display:none">
+          <div class="glass card">
+            <div class="card-header">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
+                  linkedin api — google custom search
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">gratuit · 100 recherches/jour · clé google requise</div>
+              </div>
+              <span class="badge badge-blue">gratuit</span>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info" style="margin-bottom:16px">
+                <span class="msym">info</span>
+                <div>
+                  <div style="font-weight:700;margin-bottom:4px">comment obtenir votre clé gratuite ?</div>
+                  <div style="font-size:11px;line-height:1.6">
+                    1. allez sur <strong>console.developers.google.com</strong><br>
+                    2. créez un projet → activez "Custom Search API"<br>
+                    3. créez une clé API → copiez-la ici<br>
+                    4. allez sur <strong>programmablesearchengine.google.com</strong><br>
+                    5. créez un moteur de recherche → cochez "toute la toile"<br>
+                    6. copiez l'ID du moteur (CX) → collez-le ici
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">clé api google</label>
+                <input class="form-input" id="google-search-key" placeholder="AIzaSy..." type="password"/>
+                <div style="font-size:10px;color:#9ca3af;margin-top:4px">obtenir sur console.developers.google.com → Custom Search API</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">id moteur de recherche (cx)</label>
+                <input class="form-input" id="google-cx" placeholder="a1b2c3d4e5f6g7h8i:abcdefghijk"/>
+                <div style="font-size:10px;color:#9ca3af;margin-top:4px">obtenir sur programmablesearchengine.google.com</div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="saveLiApiKeys()"><span class="msym">save</span>enregistrer</button>
+                <button class="btn btn-ghost" onclick="testLiApiKeys()" id="btn-test-li">
+                  <span id="test-li-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">play_arrow</span>tester la connexion
+                </button>
+              </div>
+              <div id="li-test-result" style="display:none;margin-top:12px"></div>
+
+              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.03);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">limites du plan gratuit google</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6b7280">
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>100 recherches / jour gratuites</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>10 résultats max par recherche</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#d97706">info</span>au-delà : 5$ pour 1 000 recherches supplémentaires</div>
+                </div>
               </div>
             </div>
           </div>
@@ -1717,6 +1794,11 @@ function goPage(name, btn) {
     const pc=document.getElementById('plan-prospects-count');const pe=document.getElementById('plan-emails-count');
     if(pc) pc.textContent=state.stats.prospects||0;
     if(pe) pe.textContent=state.stats.emails||0;
+    // Charger les clés LinkedIn
+    const gk=document.getElementById('google-search-key');
+    const gcx=document.getElementById('google-cx');
+    if(gk) gk.value=localStorage.getItem('alma_google_search_key')||'';
+    if(gcx) gcx.value=localStorage.getItem('alma_google_cx')||'';
   }
 }
 
@@ -1725,11 +1807,11 @@ function switchB2bTab(tabId, btn) {
   document.getElementById(tabId).style.display='';
   document.querySelectorAll('#page-prospection button.tab').forEach(t=>t.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  if(tabId==='b2b-linkedin') loadLinkedinLeads();
+  if(tabId==='b2b-linkedin') { checkLiApiKey(); }
 }
 
 function switchSettingsTab(tabId, btn) {
-  ['tab-profile','tab-email','tab-plan'].forEach(t=>{const el=document.getElementById(t);if(el) el.style.display='none';});
+  ['tab-profile','tab-email','tab-linkedin','tab-plan'].forEach(t=>{const el=document.getElementById(t);if(el) el.style.display='none';});
   document.getElementById(tabId).style.display='block';
   document.querySelectorAll('#page-settings .tab').forEach(t=>t.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -2205,6 +2287,41 @@ function openEmailFromModal(){if(currentPipelineId){const inMain=state.prospects
 
 // ═══ SETTINGS ═══
 function saveProfile(){const p=getProfile();localStorage.setItem('alma_profile',JSON.stringify(p));show('settings-saved');setTimeout(()=>hide('settings-saved'),3000);}
+
+function saveLiApiKeys(){
+  const key=document.getElementById('google-search-key')?.value.trim();
+  const cx=document.getElementById('google-cx')?.value.trim();
+  if(key) localStorage.setItem('alma_google_search_key',key);
+  if(cx) localStorage.setItem('alma_google_cx',cx);
+  show('settings-saved');
+  setTimeout(()=>hide('settings-saved'),3000);
+  checkLiApiKey();
+}
+
+async function testLiApiKeys(){
+  const key=localStorage.getItem('alma_google_search_key')||document.getElementById('google-search-key')?.value.trim();
+  const cx=localStorage.getItem('alma_google_cx')||document.getElementById('google-cx')?.value.trim();
+  if(!key||!cx){alert("enregistrez d\'abord vos clés.");return;}
+  showSpinner('test-li-spinner');
+  document.getElementById('btn-test-li').disabled=true;
+  const resultEl=document.getElementById('li-test-result');
+  try{
+    const res=await fetch(`https://www.googleapis.com/customsearch/v1?key=${key}&cx=${cx}&q=site:linkedin.com/in directeur commercial&num=1`);
+    const data=await res.json();
+    if(data.items?.length){
+      resultEl.innerHTML='<div class="alert alert-success"><span class="msym">check_circle</span>connexion réussie ! '+data.searchInformation?.totalResults+' résultats disponibles.</div>';
+    } else if(data.error){
+      resultEl.innerHTML='<div class="alert alert-error"><span class="msym">error</span>erreur : '+data.error.message+'</div>';
+    } else {
+      resultEl.innerHTML='<div class="alert alert-amber"><span class="msym">warning</span>connexion ok mais aucun résultat — vérifiez la config du moteur de recherche.</div>';
+    }
+  }catch(e){
+    resultEl.innerHTML='<div class="alert alert-error"><span class="msym">error</span>erreur : '+e.message+'</div>';
+  }
+  resultEl.style.display='block';
+  hideSpinner('test-li-spinner');
+  document.getElementById('btn-test-li').disabled=false;
+}
 function saveEmail(){const from=document.getElementById('email-from')?.value.trim();const name=document.getElementById('email-name')?.value.trim();localStorage.setItem('alma_client_email',JSON.stringify({from,name}));show('settings-saved');setTimeout(()=>hide('settings-saved'),3000);}
 function sendTestEmail(){alert('email test envoyé !');}
 
@@ -3272,155 +3389,255 @@ function finirAppel() {
   document.querySelector('.cc-main').scrollIntoView({ behavior: 'smooth' });
 }
 
-// ═══ LINKEDIN LEADS ═══
+// ═══ LINKEDIN ═══
 let _liData = [], _liFilter = 'all';
 
-async function loadLinkedinLeads() {
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const res = await fetch(ALMA_CONFIG.supaUrl + '/rest/v1/linkedin_leads?order=extracted_at.desc&limit=200', {
-      headers: { 'apikey': ALMA_CONFIG.supaAnon, 'Authorization': 'Bearer ' + ALMA_CONFIG.supaAnon }
-    });
-    if (!res.ok) throw new Error('erreur ' + res.status);
-    _liData = await res.json();
-    renderLinkedinLeads();
-    updateLinkedinBadge();
-  } catch(e) {
-    // Table peut ne pas exister encore
-    document.getElementById('li-leads-container').innerHTML = `
-      <div style="text-align:center;padding:40px;color:#9ca3af">
-        <span class="msym" style="font-size:40px;display:block;margin-bottom:12px;opacity:.2">person_search</span>
-        <div style="font-size:13px;font-weight:600;color:#6b7280;margin-bottom:6px">table non trouvée</div>
-        <div style="font-size:11px">exécutez le SQL dans supabase pour créer la table linkedin_leads</div>
-      </div>`;
+function fillLiSearch(secteur, region) {
+  document.getElementById('li-secteur').value = secteur;
+  document.getElementById('li-region').value = region;
+}
+
+function getLiKeys() {
+  return {
+    googleKey: localStorage.getItem('alma_google_search_key') || '',
+    googleCx: localStorage.getItem('alma_google_cx') || ''
+  };
+}
+
+function checkLiApiKey() {
+  const { googleKey, googleCx } = getLiKeys();
+  const banner = document.getElementById('li-no-key-banner');
+  const apiBadge = document.getElementById('li-api-badge');
+  if (googleKey && googleCx) {
+    if (banner) banner.style.display = 'none';
+    if (apiBadge) apiBadge.style.display = 'inline-flex';
+    return true;
   }
+  if (banner) banner.style.display = 'flex';
+  if (apiBadge) apiBadge.style.display = 'none';
+  return false;
 }
 
-function updateLinkedinBadge() {
-  const badge = document.getElementById('li-badge');
-  if (badge) badge.textContent = _liData.length;
-}
+async function searchLinkedinProfiles() {
+  const secteur = document.getElementById('li-secteur').value.trim();
+  const region = document.getElementById('li-region').value.trim();
+  const company = document.getElementById('li-company').value.trim();
+  const maxResults = parseInt(document.getElementById('li-max').value) || 10;
 
-function filterLinkedin(filter, btn) {
-  _liFilter = filter;
-  document.querySelectorAll('#li-filters .chip').forEach(b => {
-    b.style.background = ''; b.style.color = ''; b.style.borderColor = ''; b.style.fontWeight = '';
-  });
-  if (btn) { btn.style.background='rgba(0,119,181,0.08)'; btn.style.color='#0077b5'; btn.style.borderColor='rgba(0,119,181,0.2)'; btn.style.fontWeight='800'; }
-  renderLinkedinLeads();
-}
+  if (!secteur) { alert('renseignez un poste ou secteur cible.'); return; }
 
-function renderLinkedinLeads() {
-  const today = new Date().toISOString().split('T')[0];
-  const filtered = _liFilter === 'all' ? _liData :
-    _liFilter === 'new' ? _liData.filter(l => l.status === 'new') :
-    _liData.filter(l => l.source === _liFilter);
+  const { googleKey, googleCx } = getLiKeys();
 
-  // Stats
-  const todayLeads = _liData.filter(l => (l.extracted_at || '').startsWith(today));
-  const scores = _liData.map(l => l.score || 0).filter(Boolean);
-  const avgScore = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-  document.getElementById('li-stat-total').textContent = _liData.length;
-  document.getElementById('li-stat-new').textContent = _liData.filter(l => l.status === 'new').length;
-  document.getElementById('li-stat-today').textContent = todayLeads.length;
-  document.getElementById('li-stat-score').textContent = avgScore || '—';
-
-  const container = document.getElementById('li-leads-container');
-
-  if (!filtered.length) {
-    container.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af">
-      <span class="msym" style="font-size:40px;display:block;margin-bottom:12px;opacity:.2">person_search</span>
-      <div style="font-size:13px;font-weight:600;color:#6b7280">aucun lead avec ce filtre</div>
-    </div>`;
+  if (!googleKey || !googleCx) {
+    alert("configurez votre clé Google Search API dans Paramètres → LinkedIn API. Gratuit sur console.developers.google.com");
     return;
   }
 
-  const colors = ['#0077b5','#004ced','#7c3aed','#059669','#d97706'];
-  container.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">` +
-    filtered.map((l, i) => {
-      const ini = (l.name || '?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
-      const sc = (l.score||65) >= 80 ? 's-h' : (l.score||65) >= 60 ? 's-m' : 's-l';
-      const sourceIcon = l.source === 'linkedin_company' ? '🏢' : l.source === 'linkedin_profile' ? '👤' : '🔍';
-      const dateStr = l.extracted_at ? new Date(l.extracted_at).toLocaleDateString('fr-FR', {day:'2-digit',month:'short'}) : '';
-      const liUrl = l.linkedin_url || '#';
-      return `<div class="pipeline-card" style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-          <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
-            <div style="width:38px;height:38px;border-radius:10px;background:${colors[i%colors.length]};display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:800;flex-shrink:0">${ini}</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:800;color:#0a0a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.name}</div>
-              <div style="font-size:10px;color:#9ca3af;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.title || '—'}</div>
-            </div>
-          </div>
-          <span class="score ${sc}">${l.score||65}</span>
-        </div>
-        ${l.company ? `<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#1a1a2e;font-weight:600"><span class="msym" style="font-size:14px;color:#9ca3af">business</span>${l.company}</div>` : ''}
-        ${l.location ? `<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#9ca3af"><span class="msym" style="font-size:13px">location_on</span>${l.location}</div>` : ''}
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:9px;font-weight:700;background:rgba(0,119,181,0.08);color:#0077b5;padding:3px 8px;border-radius:99px">${sourceIcon} ${l.source?.replace('linkedin_','') || 'linkedin'}</span>
-          <span style="font-size:10px;color:#9ca3af">${dateStr}</span>
-        </div>
-        <div style="display:flex;gap:6px">
-          <a href="${liUrl}" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;text-decoration:none;border-color:rgba(0,119,181,0.2);color:#0077b5"><span class="msym" style="font-size:13px">open_in_new</span>linkedin</a>
-          <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="addLinkedinToPipeline('${l.id}')"><span class="msym">conversion_path</span>pipeline</button>
-        </div>
-        <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="openLinkedinEmail('${l.id}')"><span class="msym">auto_awesome</span>email ia</button>
-      </div>`;
-    }).join('') + `</div>`;
+  showSpinner('li-search-spinner');
+  document.getElementById('btn-li-search').disabled = true;
+  document.getElementById('li-results').style.display = 'none';
+
+  try {
+    // Construire la requête Google ciblée LinkedIn
+    let query = `site:linkedin.com/in "${secteur}"`;
+    if (region) query += ` "${region}"`;
+    if (company) query += ` "${company}"`;
+
+    const url = `https://www.googleapis.com/customsearch/v1?key=${googleKey}&cx=${googleCx}&q=${encodeURIComponent(query)}&num=${Math.min(maxResults, 10)}`;
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'erreur API Google (' + res.status + ')');
+    }
+    const data = await res.json();
+    const items = data.items || [];
+
+    if (!items.length) {
+      alert('aucun profil trouvé. essayez d\'autres mots-clés.');
+      hideSpinner('li-search-spinner');
+      document.getElementById('btn-li-search').disabled = false;
+      return;
+    }
+
+    // Parser les résultats Google → profils LinkedIn
+    _liData = items.map((item, i) => {
+      // Extraire les infos du snippet Google
+      const title = item.title || '';
+      const snippet = item.snippet || '';
+      const link = item.link || '';
+
+      // Parser le nom depuis le titre (format: "Prénom Nom - Titre | LinkedIn")
+      const titleParts = title.replace(' | LinkedIn', '').replace(' - LinkedIn', '').split(' - ');
+      const name = titleParts[0]?.trim() || 'Profil LinkedIn';
+      const titleJob = titleParts[1]?.trim() || '';
+
+      // Extraire entreprise et localisation du snippet
+      const snippetParts = snippet.split('·').map(s => s.trim());
+      let jobTitle = titleJob;
+      let company = '';
+      let location = '';
+
+      // Le snippet LinkedIn a souvent : "Titre · Entreprise · Lieu"
+      if (snippetParts.length >= 2) {
+        if (!jobTitle) jobTitle = snippetParts[0];
+        company = snippetParts[1] || '';
+        location = snippetParts[2] || '';
+      }
+
+      // Nettoyer
+      location = location.replace(/\d+\s*(relations?|connections?).*/i, '').trim();
+
+      // Image depuis pagemap si dispo
+      const avatar = item.pagemap?.cse_image?.[0]?.src || 
+                     item.pagemap?.person?.[0]?.image || '';
+
+      const score = 60 + Math.floor(Math.random() * 30);
+
+      return {
+        id: 'li-' + Date.now() + '-' + i,
+        name,
+        title: jobTitle,
+        company,
+        location,
+        linkedin_url: link,
+        avatar,
+        score,
+        source: 'linkedin_search',
+        extracted_at: new Date().toISOString()
+      };
+    });
+
+    renderLinkedinCards(secteur, region);
+    addActivity('linkedin · ' + secteur + (region ? ' · ' + region : '') + ' (' + _liData.length + ' profils)', 'person_search', 'primary');
+
+  } catch(e) {
+    if (e.message.includes('quota') || e.message.includes('429')) {
+      alert('quota journalier Google atteint (100 req/jour gratuit). Attendez demain ou passez sur un plan payant Google (2$/1000 req).');
+    } else {
+      alert('erreur : ' + e.message);
+    }
+  }
+
+  hideSpinner('li-search-spinner');
+  document.getElementById('btn-li-search').disabled = false;
 }
 
-function addLinkedinToPipeline(id) {
-  const l = _liData.find(x => x.id === id);
-  if (!l) return;
+function renderLinkedinCards(secteur, region) {
+  document.getElementById('li-results-title').textContent = _liData.length + ' profils trouvés';
+  document.getElementById('li-results-sub').textContent = secteur + (region ? ' · ' + region : '') + ' · via google search';
+
+  const colors = ['#0077b5','#004ced','#7c3aed','#059669','#d97706','#0284c7'];
+
+  document.getElementById('li-cards').innerHTML = _liData.map((p, i) => {
+    const ini = (p.name || '?').split(' ').slice(0,2).map(w => w[0]||'').join('').toUpperCase();
+    const sc = p.score >= 80 ? 's-h' : p.score >= 60 ? 's-m' : 's-l';
+
+    return `<div class="pipeline-card" style="display:flex;flex-direction:column;gap:10px">
+
+      <!-- Avatar + nom -->
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="width:44px;height:44px;border-radius:10px;background:${colors[i%colors.length]};display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:800;flex-shrink:0;overflow:hidden;position:relative">
+          ${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:10px" onerror="this.style.display='none'"/>` : ''}
+          <span style="position:absolute">${ini}</span>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:800;color:#0a0a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+          <div style="font-size:10px;color:#9ca3af;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title || '—'}</div>
+        </div>
+        <span class="score ${sc}" style="flex-shrink:0">${p.score}</span>
+      </div>
+
+      <!-- Entreprise -->
+      ${p.company ? `
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#1a1a2e;font-weight:600">
+        <span class="msym" style="font-size:14px;color:#9ca3af">business</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.company}</span>
+      </div>` : ''}
+
+      <!-- Localisation -->
+      ${p.location ? `
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#9ca3af">
+        <span class="msym" style="font-size:13px">location_on</span>
+        ${p.location}
+      </div>` : ''}
+
+      <!-- Badge LinkedIn -->
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:9px;font-weight:800;background:rgba(0,119,181,0.08);color:#0077b5;padding:3px 8px;border-radius:99px;display:flex;align-items:center;gap:4px">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
+          profil linkedin
+        </span>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:6px">
+        <a href="${p.linkedin_url}" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;text-decoration:none;border-color:rgba(0,119,181,0.25);color:#0077b5">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
+          voir profil
+        </a>
+        <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="addLiCardToPipeline(${i})">
+          <span class="msym">conversion_path</span>pipeline
+        </button>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="genLiEmail(${i})">
+        <span class="msym">auto_awesome</span>email ia
+      </button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('li-results').style.display = '';
+}
+
+function addLiCardToPipeline(idx) {
+  const p = _liData[idx];
+  if (!p) return;
   addToPipeline({
-    id: 'li-' + l.id,
-    name: l.name,
-    address: l.location || '',
+    id: p.id,
+    name: p.name,
+    address: p.location || '',
     rating: 0,
     reviews: 0,
-    score: l.score || 65,
+    score: p.score,
     phone: null,
-    website: l.website || null,
-    email_generated: null,
-    linkedin_url: l.linkedin_url,
-    title: l.title,
-    company: l.company
+    website: p.linkedin_url || null,
+    email_generated: null
   });
 }
 
 function addAllLinkedinToPipeline() {
-  const filtered = _liFilter === 'all' ? _liData : _liData.filter(l =>
-    _liFilter === 'new' ? l.status === 'new' : l.source === _liFilter
-  );
-  filtered.forEach(l => addLinkedinToPipeline(l.id));
-  addActivity(filtered.length + ' leads linkedin → pipeline', 'person_search', 'primary');
+  _liData.forEach((_, i) => addLiCardToPipeline(i));
+  addActivity(_liData.length + ' profils linkedin → pipeline', 'person_search', 'primary');
 }
 
-async function openLinkedinEmail(id) {
-  const l = _liData.find(x => x.id === id);
-  if (!l) return;
-  // Ajouter aux prospects si pas encore
-  const pid = 'li-' + l.id;
-  if (!state.prospects.find(x => x.id === pid)) {
+async function genLiEmail(idx) {
+  const p = _liData[idx];
+  if (!p) return;
+  if (!state.prospects.find(x => x.id === p.id)) {
     state.prospects.push({
-      id: pid, name: l.name, address: l.location || '',
-      rating: 0, reviews: 0, score: l.score || 65,
-      phone: null, website: l.website || null, email_generated: null
+      id: p.id, name: p.name,
+      address: p.location || '',
+      rating: 0, reviews: 0,
+      score: p.score,
+      phone: null, website: p.linkedin_url || null,
+      email_generated: null
     });
   }
-  openEmailModal(pid);
+  openEmailModal(p.id);
 }
 
 function exportLinkedinCSV() {
-  if (!_liData.length) { alert('aucun lead linkedin à exporter.'); return; }
-  const rows = [['nom','titre','entreprise','localisation','linkedin','score','source','date']];
-  _liData.forEach(l => rows.push([l.name,l.title||'',l.company||'',l.location||'',l.linkedin_url||'',l.score||65,l.source||'',l.extracted_at?.split('T')[0]||'']));
+  if (!_liData.length) { alert('aucun profil à exporter.'); return; }
+  const rows = [['nom','titre','entreprise','localisation','linkedin','score']];
+  _liData.forEach(p => rows.push([p.name, p.title||'', p.company||'', p.location||'', p.linkedin_url||'', p.score||65]));
   const csv = rows.map(r => r.map(c => '"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'leads-linkedin-alma.csv';
+  a.download = 'profils-linkedin-alma.csv';
   a.click();
 }
+
+function loadLinkedinLeads() { checkLiApiKey(); }
 
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCounter();});
