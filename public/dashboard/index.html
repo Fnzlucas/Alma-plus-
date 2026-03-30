@@ -3439,7 +3439,7 @@ async function searchLinkedinProfiles() {
 
   try {
     // Construire la requête Google ciblée LinkedIn
-    let query = `site:linkedin.com/in "${secteur}"`;
+    let query = `"${secteur}"`;
     if (region) query += ` "${region}"`;
     if (company) query += ` "${company}"`;
 
