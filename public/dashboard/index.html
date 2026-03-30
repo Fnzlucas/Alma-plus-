@@ -674,17 +674,17 @@ tr:hover td { background: rgba(255,255,255,0.3); }
           <div id="permis-results" style="display:none"><div class="glass card"><div class="card-header"><div><div class="card-title">permis de construire</div><div id="permis-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div></div></div><table><thead><tr><th>référence</th><th>adresse</th><th>type</th><th>surface</th><th>date</th><th>actions</th></tr></thead><tbody id="permis-table"></tbody></table></div></div>
         </div>
 
-        <!-- ═══ ONGLET LINKEDIN ═══ -->
+        <!-- ═══ ONGLET LINKEDIN — MOTEUR DÉCIDEURS MULTI-SOURCES ═══ -->
         <div id="b2b-linkedin" style="display:none">
 
-          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,119,181,0.2)">
-            <div class="card-header" style="background:rgba(0,119,181,0.04)">
+          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,76,237,0.2)">
+            <div class="card-header" style="background:rgba(0,76,237,0.04)">
               <div>
-                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#0077b5">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
-                  prospection linkedin
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#004ced">
+                  <span class="msym" style="font-size:18px">manage_search</span>
+                  moteur décideurs multi-sources
                 </div>
-                <div style="font-size:10px;color:#9ca3af;margin-top:2px">recherchez des profils linkedin directement depuis alma.+</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">pages jaunes · societe.com · kompass · annuaires pro · sites d'entreprises — via votre clé google</div>
               </div>
               <span class="badge badge-green" id="li-api-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> api active</span>
             </div>
@@ -700,46 +700,83 @@ tr:hover td { background: rgba(255,255,255,0.3); }
                 <button class="btn btn-ghost btn-sm" onclick="goPage('settings',document.querySelector('[onclick*=settings]'));setTimeout(()=>switchSettingsTab('tab-linkedin',null),200)">configurer →</button>
               </div>
 
+              <!-- Sources -->
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+                <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280">
+                  <input type="checkbox" id="src-pj" checked style="accent-color:#004ced">
+                  <span class="msym" style="font-size:14px;color:#f97316">book</span>pages jaunes
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280">
+                  <input type="checkbox" id="src-societe" checked style="accent-color:#004ced">
+                  <span class="msym" style="font-size:14px;color:#004ced">business</span>societe.com
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280">
+                  <input type="checkbox" id="src-annuaire" checked style="accent-color:#004ced">
+                  <span class="msym" style="font-size:14px;color:#059669">contacts</span>annuaires pro
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280">
+                  <input type="checkbox" id="src-kompass" checked style="accent-color:#004ced">
+                  <span class="msym" style="font-size:14px;color:#7c3aed">hub</span>kompass
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280">
+                  <input type="checkbox" id="src-site" checked style="accent-color:#004ced">
+                  <span class="msym" style="font-size:14px;color:#0284c7">language</span>sites entreprises
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280">
+                  <input type="checkbox" id="src-pdf" style="accent-color:#004ced">
+                  <span class="msym" style="font-size:14px;color:#dc2626">description</span>annuaires pdf
+                </label>
+              </div>
+
               <!-- Formulaire -->
               <div class="form-row" style="margin-bottom:12px">
                 <div class="form-group" style="margin:0">
-                  <label class="form-label">poste / secteur cible *</label>
-                  <input class="form-input" id="li-secteur" placeholder="ex: directeur commercial, plombier, drh..."/>
+                  <label class="form-label">poste / fonction cible *</label>
+                  <input class="form-input" id="li-secteur" placeholder="ex: gérant, directeur commercial, pdg..."/>
                 </div>
                 <div class="form-group" style="margin:0">
-                  <label class="form-label">ville / région</label>
-                  <input class="form-input" id="li-region" placeholder="ex: lyon, paris, bordeaux..."/>
+                  <label class="form-label">secteur d'activité</label>
+                  <input class="form-input" id="li-activite" placeholder="ex: plomberie, restaurant, btp..."/>
                 </div>
               </div>
               <div class="form-row" style="margin-bottom:16px">
                 <div class="form-group" style="margin:0">
-                  <label class="form-label">entreprise (optionnel)</label>
-                  <input class="form-input" id="li-company" placeholder="ex: bouygues, renault..."/>
+                  <label class="form-label">ville / région</label>
+                  <input class="form-input" id="li-region" placeholder="ex: lyon, paris, bordeaux..."/>
                 </div>
                 <div class="form-group" style="margin:0">
                   <label class="form-label">nombre de résultats</label>
                   <select class="form-input" id="li-max">
                     <option value="5">5 profils</option>
                     <option value="10" selected>10 profils</option>
+                    <option value="20">20 profils</option>
                   </select>
                 </div>
               </div>
 
-              <!-- Chips rapides -->
+              <!-- Raccourcis -->
               <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
                 <span style="font-size:10px;font-weight:700;color:#9ca3af;padding-top:6px">raccourcis :</span>
-                <button class="chip" onclick="fillLiSearch('directeur commercial','paris')">dir. commercial paris</button>
-                <button class="chip" onclick="fillLiSearch('gérant','lyon')">gérant lyon</button>
-                <button class="chip" onclick="fillLiSearch('responsable achats','france')">achats france</button>
-                <button class="chip" onclick="fillLiSearch('drh','bordeaux')">drh bordeaux</button>
-                <button class="chip" onclick="fillLiSearch('ceo','marseille')">ceo marseille</button>
+                <button class="chip" onclick="fillLiDecideurSearch('gérant','plomberie','lyon')">gérants plombiers lyon</button>
+                <button class="chip" onclick="fillLiDecideurSearch('directeur','restaurant','paris')">directeurs restaurants paris</button>
+                <button class="chip" onclick="fillLiDecideurSearch('pdg','btp','marseille')">pdg btp marseille</button>
+                <button class="chip" onclick="fillLiDecideurSearch('responsable','agence immobilière','bordeaux')">resp. immo bordeaux</button>
               </div>
 
-              <button class="btn btn-primary" onclick="searchLinkedinProfiles()" id="btn-li-search" style="background:#0077b5;box-shadow:0 4px 16px rgba(0,119,181,0.3)">
+              <button class="btn btn-primary" onclick="searchDecideurs()" id="btn-li-search">
                 <span id="li-search-spinner" style="display:none" class="spinner"></span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="white"/></svg>
-                rechercher des profils linkedin
+                <span class="msym">manage_search</span>rechercher les décideurs
               </button>
+            </div>
+          </div>
+
+          <!-- Progression -->
+          <div id="li-progress" style="display:none;margin-bottom:16px">
+            <div class="glass card">
+              <div class="card-body">
+                <div style="font-size:12px;font-weight:700;color:#0a0a1a;margin-bottom:12px" id="li-progress-text">interrogation des sources...</div>
+                <div style="display:flex;flex-direction:column;gap:8px" id="li-sources-status"></div>
+              </div>
             </div>
           </div>
 
@@ -748,7 +785,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
             <div class="glass card">
               <div class="card-header">
                 <div>
-                  <div class="card-title" id="li-results-title">profils trouvés</div>
+                  <div class="card-title" id="li-results-title">décideurs trouvés</div>
                   <div style="font-size:10px;color:#9ca3af;margin-top:2px" id="li-results-sub"></div>
                 </div>
                 <div style="display:flex;gap:8px">
@@ -759,9 +796,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
               <div id="li-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;padding:16px"></div>
             </div>
           </div>
-        </div>
-
-        <div id="b2b-ao" style="display:none">
+        </div> style="display:none">
           <div class="glass card" style="margin-bottom:16px">
             <div class="card-header"><div><div class="card-title">appels d'offres — boamp</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">marchés publics · data.gouv.fr</div></div></div>
             <div class="card-body">
@@ -3389,200 +3424,246 @@ function finirAppel() {
   document.querySelector('.cc-main').scrollIntoView({ behavior: 'smooth' });
 }
 
-// ═══ LINKEDIN ═══
-let _liData = [], _liFilter = 'all';
+// ═══ LINKEDIN — MOTEUR DÉCIDEURS MULTI-SOURCES ═══
+let _liData = [];
 
+function fillLiDecideurSearch(poste, activite, region) {
+  const p = document.getElementById('li-secteur');
+  const a = document.getElementById('li-activite');
+  const r = document.getElementById('li-region');
+  if(p) p.value = poste;
+  if(a) a.value = activite;
+  if(r) r.value = region;
+}
+
+// Rétrocompatibilité avec les chips existants
 function fillLiSearch(secteur, region) {
-  document.getElementById('li-secteur').value = secteur;
-  document.getElementById('li-region').value = region;
+  fillLiDecideurSearch(secteur, '', region);
 }
 
 function getLiKeys() {
   return {
     googleKey: localStorage.getItem('alma_google_search_key') || '',
-    googleCx: localStorage.getItem('alma_google_cx') || ''
+    googleCx:  localStorage.getItem('alma_google_cx') || ''
   };
 }
 
 function checkLiApiKey() {
   const { googleKey, googleCx } = getLiKeys();
-  const banner = document.getElementById('li-no-key-banner');
+  const banner   = document.getElementById('li-no-key-banner');
   const apiBadge = document.getElementById('li-api-badge');
   if (googleKey && googleCx) {
-    if (banner) banner.style.display = 'none';
+    if (banner)   banner.style.display = 'none';
     if (apiBadge) apiBadge.style.display = 'inline-flex';
     return true;
   }
-  if (banner) banner.style.display = 'flex';
+  if (banner)   banner.style.display = 'flex';
   if (apiBadge) apiBadge.style.display = 'none';
   return false;
 }
 
-async function searchLinkedinProfiles() {
-  const secteur = document.getElementById('li-secteur').value.trim();
-  const region = document.getElementById('li-region').value.trim();
-  const company = document.getElementById('li-company').value.trim();
-  const maxResults = parseInt(document.getElementById('li-max').value) || 10;
+async function googleSearch(query, googleKey, googleCx) {
+  const url = `https://www.googleapis.com/customsearch/v1?key=${googleKey}&cx=${googleCx}&q=${encodeURIComponent(query)}&num=10`;
+  const res  = await fetch(url);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || 'erreur Google ' + res.status);
+  }
+  const data = await res.json();
+  return data.items || [];
+}
 
-  if (!secteur) { alert('renseignez un poste ou secteur cible.'); return; }
+function parseDecideur(item, source, poste, activite, region) {
+  const title   = item.title   || '';
+  const snippet = item.snippet || '';
+  const link    = item.link    || '';
+
+  let name = '', company = '', phone = '', email = '';
+
+  // Nom : 2 mots commençant par majuscule
+  const nameMatch = title.match(/^([A-ZÀ-Ÿ][a-zà-ÿ\-]+ [A-ZÀ-Ÿ][a-zà-ÿ\-]+)/);
+  if (nameMatch) name = nameMatch[1];
+
+  // Nom entreprise entre tirets ou pipes
+  const companyMatch = title.match(/[-–]\s*([^|–\-]{3,40})\s*[|]/);
+  if (companyMatch) company = companyMatch[1].trim();
+
+  // Téléphone dans le snippet
+  const phoneMatch = snippet.match(/0[1-9][\s.\-]?(\d{2}[\s.\-]?){4}/);
+  if (phoneMatch) phone = phoneMatch[0].replace(/[\s.\-]/g, '');
+
+  // Email dans le snippet
+  const emailMatch = snippet.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
+  if (emailMatch) email = emailMatch[0];
+
+  if (!name) name = title.replace(/\|.*/, '').replace(/[-–].*/, '').trim().slice(0, 40) || 'Contact';
+
+  const score = Math.min(99,
+    50 + (phone ? 20 : 0) + (email ? 15 : 0) + (company ? 10 : 0) + Math.floor(Math.random() * 10)
+  );
+
+  return {
+    id: 'dec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+    name, company, poste: poste || '', activite: activite || '',
+    location: region || '', phone, email, source, url: link,
+    snippet: snippet.slice(0, 120), score,
+    extracted_at: new Date().toISOString()
+  };
+}
+
+async function searchDecideurs() {
+  const poste    = (document.getElementById('li-secteur')?.value  || '').trim();
+  const activite = (document.getElementById('li-activite')?.value || '').trim();
+  const region   = (document.getElementById('li-region')?.value   || '').trim();
+  const maxRes   = parseInt(document.getElementById('li-max')?.value) || 10;
+
+  if (!poste && !activite) { alert("renseignez au moins un poste ou un secteur d'activité."); return; }
 
   const { googleKey, googleCx } = getLiKeys();
-
   if (!googleKey || !googleCx) {
-    alert("configurez votre clé Google Search API dans Paramètres → LinkedIn API. Gratuit sur console.developers.google.com");
+    alert('configurez votre clé Google Search API dans Paramètres → LinkedIn API.');
     return;
   }
+
+  const usePJ       = document.getElementById('src-pj')?.checked;
+  const useSociete  = document.getElementById('src-societe')?.checked;
+  const useAnnuaire = document.getElementById('src-annuaire')?.checked;
+  const useKompass  = document.getElementById('src-kompass')?.checked;
+  const useSite     = document.getElementById('src-site')?.checked;
+  const usePdf      = document.getElementById('src-pdf')?.checked;
 
   showSpinner('li-search-spinner');
   document.getElementById('btn-li-search').disabled = true;
   document.getElementById('li-results').style.display = 'none';
 
-  try {
-    // Construire la requête Google ciblée LinkedIn
-    let query = `site:linkedin.com/in "${secteur}"`;
-    if (region) query += ` "${region}"`;
-    if (company) query += ` "${company}"`;
+  const sources = [];
+  if (usePJ)       sources.push({ id:'pj',       label:'pages jaunes',     icon:'book',        color:'#f97316' });
+  if (useSociete)  sources.push({ id:'societe',   label:'societe.com',      icon:'business',    color:'#004ced' });
+  if (useAnnuaire) sources.push({ id:'annuaire',  label:'annuaires pro',    icon:'contacts',    color:'#059669' });
+  if (useKompass)  sources.push({ id:'kompass',   label:'kompass',          icon:'hub',         color:'#7c3aed' });
+  if (useSite)     sources.push({ id:'site',      label:'sites entreprises',icon:'language',    color:'#0284c7' });
+  if (usePdf)      sources.push({ id:'pdf',       label:'annuaires pdf',    icon:'description', color:'#dc2626' });
 
-    const url = `https://www.googleapis.com/customsearch/v1?key=${googleKey}&cx=${googleCx}&q=${encodeURIComponent(query)}&num=${Math.min(maxResults, 10)}`;
-
-    const res = await fetch(url);
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error?.message || 'erreur API Google (' + res.status + ')');
-    }
-    const data = await res.json();
-    const items = data.items || [];
-
-    if (!items.length) {
-      alert('aucun profil trouvé. essayez d\'autres mots-clés.');
-      hideSpinner('li-search-spinner');
-      document.getElementById('btn-li-search').disabled = false;
-      return;
-    }
-
-    // Parser les résultats Google → profils LinkedIn
-    _liData = items.map((item, i) => {
-      // Extraire les infos du snippet Google
-      const title = item.title || '';
-      const snippet = item.snippet || '';
-      const link = item.link || '';
-
-      // Parser le nom depuis le titre (format: "Prénom Nom - Titre | LinkedIn")
-      const titleParts = title.replace(' | LinkedIn', '').replace(' - LinkedIn', '').split(' - ');
-      const name = titleParts[0]?.trim() || 'Profil LinkedIn';
-      const titleJob = titleParts[1]?.trim() || '';
-
-      // Extraire entreprise et localisation du snippet
-      const snippetParts = snippet.split('·').map(s => s.trim());
-      let jobTitle = titleJob;
-      let company = '';
-      let location = '';
-
-      // Le snippet LinkedIn a souvent : "Titre · Entreprise · Lieu"
-      if (snippetParts.length >= 2) {
-        if (!jobTitle) jobTitle = snippetParts[0];
-        company = snippetParts[1] || '';
-        location = snippetParts[2] || '';
-      }
-
-      // Nettoyer
-      location = location.replace(/\d+\s*(relations?|connections?).*/i, '').trim();
-
-      // Image depuis pagemap si dispo
-      const avatar = item.pagemap?.cse_image?.[0]?.src || 
-                     item.pagemap?.person?.[0]?.image || '';
-
-      const score = 60 + Math.floor(Math.random() * 30);
-
-      return {
-        id: 'li-' + Date.now() + '-' + i,
-        name,
-        title: jobTitle,
-        company,
-        location,
-        linkedin_url: link,
-        avatar,
-        score,
-        source: 'linkedin_search',
-        extracted_at: new Date().toISOString()
-      };
-    });
-
-    renderLinkedinCards(secteur, region);
-    addActivity('linkedin · ' + secteur + (region ? ' · ' + region : '') + ' (' + _liData.length + ' profils)', 'person_search', 'primary');
-
-  } catch(e) {
-    if (e.message.includes('quota') || e.message.includes('429')) {
-      alert('quota journalier Google atteint (100 req/jour gratuit). Attendez demain ou passez sur un plan payant Google (2$/1000 req).');
-    } else {
-      alert('erreur : ' + e.message);
-    }
+  if (!sources.length) {
+    alert('cochez au moins une source.');
+    hideSpinner('li-search-spinner');
+    document.getElementById('btn-li-search').disabled = false;
+    return;
   }
 
+  // Progression
+  const progressDiv = document.getElementById('li-progress');
+  const statusDiv   = document.getElementById('li-sources-status');
+  progressDiv.style.display = '';
+  statusDiv.innerHTML = sources.map(s =>
+    `<div style="display:flex;align-items:center;gap:10px;font-size:12px">
+      <span class="msym" style="font-size:14px;color:${s.color}">${s.icon}</span>
+      <span style="flex:1;font-weight:600">${s.label}</span>
+      <span id="src-status-dec-${s.id}" style="color:#9ca3af">⏳ en cours...</span>
+    </div>`
+  ).join('');
+
+  const queries = {
+    pj:       `site:pagesjaunes.fr "${poste}" ${activite} ${region}`.trim(),
+    societe:  `site:societe.com "${poste}" ${activite} ${region}`.trim(),
+    annuaire: `"${poste}" "${activite}" ${region} contact téléphone email annuaire`.trim(),
+    kompass:  `site:fr.kompass.com "${poste}" ${activite} ${region}`.trim(),
+    site:     `"${poste}" "${activite}" ${region} "nous contacter" dirigeant`.trim(),
+    pdf:      `"${poste}" "${activite}" ${region} filetype:pdf annuaire dirigeants`.trim(),
+  };
+
+  const setStatus = (id, ok, count) => {
+    const el = document.getElementById('src-status-dec-' + id);
+    if (el) el.innerHTML = ok
+      ? `<span style="color:#059669">✓ ${count} résultat${count > 1 ? 's' : ''}</span>`
+      : `<span style="color:#dc2626">✗ aucun résultat</span>`;
+  };
+
+  const allDecideurs = [];
+  const seenUrls = new Set();
+
+  // Lancer par lots de 3
+  for (let i = 0; i < sources.length; i += 3) {
+    const chunk = sources.slice(i, i + 3);
+    await Promise.all(chunk.map(async (src) => {
+      try {
+        document.getElementById('li-progress-text').textContent = `interrogation : ${src.label}...`;
+        const items = await googleSearch(queries[src.id], googleKey, googleCx);
+        const decideurs = items
+          .map(item => parseDecideur(item, src.label, poste, activite, region))
+          .filter(d => { if (seenUrls.has(d.url)) return false; seenUrls.add(d.url); return true; });
+        allDecideurs.push(...decideurs);
+        setStatus(src.id, true, decideurs.length);
+      } catch(e) {
+        console.warn('erreur source', src.id, e.message);
+        setStatus(src.id, false, 0);
+      }
+    }));
+    await new Promise(r => setTimeout(r, 200));
+  }
+
+  _liData = allDecideurs.sort((a, b) => b.score - a.score).slice(0, maxRes);
+
+  progressDiv.style.display = 'none';
   hideSpinner('li-search-spinner');
   document.getElementById('btn-li-search').disabled = false;
+
+  if (!_liData.length) {
+    alert('aucun décideur trouvé. essayez des termes plus génériques (ex: "gérant" au lieu de "directeur général").');
+    return;
+  }
+
+  renderDecideurCards(poste, activite, region);
+  addActivity(`décideurs : ${[poste,activite,region].filter(Boolean).join(' ')} (${_liData.length} trouvés)`, 'manage_search', 'primary');
 }
 
-function renderLinkedinCards(secteur, region) {
-  document.getElementById('li-results-title').textContent = _liData.length + ' profils trouvés';
-  document.getElementById('li-results-sub').textContent = secteur + (region ? ' · ' + region : '') + ' · via google search';
+function renderDecideurCards(poste, activite, region) {
+  const colors   = ['#004ced','#7c3aed','#0284c7','#059669','#d97706','#dc2626'];
+  const srcColors = {
+    'pages jaunes':     '#f97316',
+    'societe.com':      '#004ced',
+    'annuaires pro':    '#059669',
+    'kompass':          '#7c3aed',
+    'sites entreprises':'#0284c7',
+    'annuaires pdf':    '#dc2626',
+  };
 
-  const colors = ['#0077b5','#004ced','#7c3aed','#059669','#d97706','#0284c7'];
+  document.getElementById('li-results-title').textContent = _liData.length + ' décideurs trouvés';
+  document.getElementById('li-results-sub').textContent   =
+    [poste, activite, region].filter(Boolean).join(' · ') + ' · multi-sources';
 
   document.getElementById('li-cards').innerHTML = _liData.map((p, i) => {
-    const ini = (p.name || '?').split(' ').slice(0,2).map(w => w[0]||'').join('').toUpperCase();
-    const sc = p.score >= 80 ? 's-h' : p.score >= 60 ? 's-m' : 's-l';
+    const ini      = (p.name || '?').split(' ').slice(0,2).map(w => w[0]||'').join('').toUpperCase();
+    const sc       = p.score >= 80 ? 's-h' : p.score >= 60 ? 's-m' : 's-l';
+    const hasPhone = p.phone && p.phone.length >= 10;
+    const hasEmail = p.email && p.email.includes('@');
+    const srcColor = srcColors[p.source] || '#9ca3af';
 
     return `<div class="pipeline-card" style="display:flex;flex-direction:column;gap:10px">
-
-      <!-- Avatar + nom -->
       <div style="display:flex;align-items:flex-start;gap:10px">
-        <div style="width:44px;height:44px;border-radius:10px;background:${colors[i%colors.length]};display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:800;flex-shrink:0;overflow:hidden;position:relative">
-          ${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:10px" onerror="this.style.display='none'"/>` : ''}
-          <span style="position:absolute">${ini}</span>
-        </div>
+        <div style="width:44px;height:44px;border-radius:10px;background:${colors[i%colors.length]};display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:800;flex-shrink:0">${ini}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:800;color:#0a0a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-          <div style="font-size:10px;color:#9ca3af;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title || '—'}</div>
+          <div style="font-size:10px;color:#9ca3af;margin-top:1px">${p.poste || p.activite || '—'}</div>
         </div>
         <span class="score ${sc}" style="flex-shrink:0">${p.score}</span>
       </div>
-
-      <!-- Entreprise -->
-      ${p.company ? `
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#1a1a2e;font-weight:600">
-        <span class="msym" style="font-size:14px;color:#9ca3af">business</span>
-        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.company}</span>
-      </div>` : ''}
-
-      <!-- Localisation -->
-      ${p.location ? `
-      <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#9ca3af">
-        <span class="msym" style="font-size:13px">location_on</span>
-        ${p.location}
-      </div>` : ''}
-
-      <!-- Badge LinkedIn -->
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:9px;font-weight:800;background:rgba(0,119,181,0.08);color:#0077b5;padding:3px 8px;border-radius:99px;display:flex;align-items:center;gap:4px">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
-          profil linkedin
-        </span>
+      ${p.company ? `<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#1a1a2e;font-weight:600"><span class="msym" style="font-size:13px;color:#9ca3af">business</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.company}</span></div>` : ''}
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid ${hasPhone?'rgba(5,150,105,0.2)':'rgba(255,255,255,0.4)'};background:${hasPhone?'rgba(5,150,105,0.06)':'rgba(255,255,255,0.4)'}">
+        <span class="msym" style="font-size:14px;color:${hasPhone?'#059669':'#9ca3af'}">${hasPhone?'phone':'phone_disabled'}</span>
+        ${hasPhone ? `<a href="tel:${p.phone}" style="font-size:13px;font-weight:800;color:#059669;text-decoration:none">${p.phone}</a>` : `<span style="font-size:11px;color:#9ca3af">numéro non détecté</span>`}
       </div>
-
-      <!-- Actions -->
+      ${hasEmail ? `<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#004ced;font-weight:600"><span class="msym" style="font-size:13px">mail</span><a href="mailto:${p.email}" style="color:#004ced;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.email}</a></div>` : ''}
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        ${p.location ? `<div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#9ca3af"><span class="msym" style="font-size:12px">location_on</span>${p.location}</div>` : '<div></div>'}
+        <span style="font-size:9px;font-weight:800;background:${srcColor}15;color:${srcColor};padding:3px 8px;border-radius:99px;border:1px solid ${srcColor}22">${p.source}</span>
+      </div>
+      <div style="font-size:10px;color:#9ca3af;line-height:1.5;max-height:40px;overflow:hidden">${p.snippet}</div>
       <div style="display:flex;gap:6px">
-        <a href="${p.linkedin_url}" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;text-decoration:none;border-color:rgba(0,119,181,0.25);color:#0077b5">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
-          voir profil
-        </a>
-        <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="addLiCardToPipeline(${i})">
-          <span class="msym">conversion_path</span>pipeline
-        </button>
+        <a href="${p.url}" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;text-decoration:none"><span class="msym">open_in_new</span>voir</a>
+        <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="addLiCardToPipeline(${i})"><span class="msym">conversion_path</span>pipeline</button>
       </div>
-      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="genLiEmail(${i})">
-        <span class="msym">auto_awesome</span>email ia
-      </button>
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="genLiEmail(${i})"><span class="msym">auto_awesome</span>email ia</button>
     </div>`;
   }).join('');
 
@@ -3593,21 +3674,16 @@ function addLiCardToPipeline(idx) {
   const p = _liData[idx];
   if (!p) return;
   addToPipeline({
-    id: p.id,
-    name: p.name,
-    address: p.location || '',
-    rating: 0,
-    reviews: 0,
-    score: p.score,
-    phone: null,
-    website: p.linkedin_url || null,
-    email_generated: null
+    id: p.id, name: p.name,
+    address: [p.company, p.location].filter(Boolean).join(', '),
+    rating: 0, reviews: 0, score: p.score,
+    phone: p.phone || null, website: p.url || null, email_generated: null
   });
 }
 
 function addAllLinkedinToPipeline() {
   _liData.forEach((_, i) => addLiCardToPipeline(i));
-  addActivity(_liData.length + ' profils linkedin → pipeline', 'person_search', 'primary');
+  addActivity(_liData.length + ' décideurs → pipeline', 'manage_search', 'primary');
 }
 
 async function genLiEmail(idx) {
@@ -3616,29 +3692,32 @@ async function genLiEmail(idx) {
   if (!state.prospects.find(x => x.id === p.id)) {
     state.prospects.push({
       id: p.id, name: p.name,
-      address: p.location || '',
-      rating: 0, reviews: 0,
-      score: p.score,
-      phone: null, website: p.linkedin_url || null,
-      email_generated: null
+      address: [p.company, p.location].filter(Boolean).join(', '),
+      rating: 0, reviews: 0, score: p.score,
+      phone: p.phone || null, website: p.url || null, email_generated: null
     });
   }
   openEmailModal(p.id);
 }
 
 function exportLinkedinCSV() {
-  if (!_liData.length) { alert('aucun profil à exporter.'); return; }
-  const rows = [['nom','titre','entreprise','localisation','linkedin','score']];
-  _liData.forEach(p => rows.push([p.name, p.title||'', p.company||'', p.location||'', p.linkedin_url||'', p.score||65]));
+  if (!_liData.length) { alert('aucun décideur à exporter.'); return; }
+  const rows = [['nom','poste','entreprise','téléphone','email','localisation','source','url','score']];
+  _liData.forEach(p => rows.push([
+    p.name, p.poste||'', p.company||'', p.phone||'', p.email||'',
+    p.location||'', p.source||'', p.url||'', p.score||''
+  ]));
   const csv = rows.map(r => r.map(c => '"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'profils-linkedin-alma.csv';
+  a.download = 'decideurs-alma-' + new Date().toISOString().split('T')[0] + '.csv';
   a.click();
 }
 
 function loadLinkedinLeads() { checkLiApiKey(); }
 
+// Compat : ancienne fonction toujours appelable
+async function searchLinkedinProfiles() { await searchDecideurs(); }
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCounter();});
 </script>
