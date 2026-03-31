@@ -2789,7 +2789,7 @@ if(useBodacc){promises.push(proxyFetch('https://bodacc-datadila.opendatasoft.com
 
         // ═══ DPE — ADEME Open Data ═══
         if(useDPE){promises.push(
-          fetch('https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-existants/lines?size=25&q='+encodeURIComponent(zone)+'&q_fields=commune_name,code_postal&sort=-date_reception_dpe&select=adresse_ban,commune_name,code_postal,etiquette_dpe,annee_construction,type_batiment,surface_habitable_logement')
+          fetch('https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-neufs-et-existants/lines?size=25&q='+encodeURIComponent(zone)+'&q_fields=commune_name,code_postal&sort=-date_reception_dpe&select=adresse_ban,commune_name,code_postal,etiquette_dpe,annee_construction,type_batiment,surface_habitable_logement')
           .then(r=>r.json())
           .then(d=>{
             const items=(d.results||[]).filter(i=>i.etiquette_dpe==='F'||i.etiquette_dpe==='G');
