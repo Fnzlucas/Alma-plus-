@@ -2767,11 +2767,122 @@ async function searchAO(){
   }
 }
 
-// ═══ VEILLE & DEVIS ═══
-async function runVeille(){const secteur=document.getElementById('veille-secteur').value.trim();if(!secteur) return;if(!checkQuota('veille')) return;showSpinner('veille-spinner');document.getElementById('btn-veille').disabled=true;try{const d=await claudeAPI([{role:'user',content:'analyse le marché du secteur "'+secteur+'" en france. fournis : 1. tendances 2. points de douleur 3. arguments commerciaux 4. meilleure approche. réponse concise en français.'}],600);incrementUsage('veille');document.getElementById('veille-text').textContent=d.content[0].text;show('veille-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('veille-spinner');document.getElementById('btn-veille').disabled=false;}
+let _veilleData = [];
 
-async function generateDevis(){const client=document.getElementById('devis-client').value.trim();const desc=document.getElementById('devis-desc').value.trim();if(!client||!desc){alert('renseignez le client et la prestation.');return;}if(!checkQuota('devis')) return;showSpinner('devis-spinner');document.getElementById('btn-devis').disabled=true;try{const d=await claudeAPI([{role:'user',content:'génère un devis professionnel en français pour :\nclient : '+client+'\nprestataire : '+document.getElementById('devis-activite').value+'\nprestation : '+desc+'\nbudget : '+(document.getElementById('devis-budget').value||'à définir')+'€\ndélai : '+(document.getElementById('devis-delai').value||'à définir')+'\n\nformat : devis structuré, texte brut, pas de markdown.'}],800);incrementUsage('devis');document.getElementById('devis-text').textContent=d.content[0].text;show('devis-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('devis-spinner');document.getElementById('btn-devis').disabled=false;}
+async function runVeille(){
+  const secteur = document.getElementById('veille-secteur').value.trim();
+  const ville = document.getElementById('veille-ville')?.value.trim() || '';
+  if(!secteur) return alert('renseignez votre secteur.');
+  if(!ville) return alert('renseignez une ville.');
+  if(!checkQuota('veille')) return;
 
+  showSpinner('veille-spinner');
+  document.getElementById('btn-veille').disabled = true;
+  document.getElementById('veille-result').style.display = 'none';
+  document.getElementById('veille-progress').style.display = '';
+  document.getElementById('veille-progress-fill').style.width = '10%';
+  document.getElementById('veille-progress-text').textContent = 'recherche des concurrents sur google maps...';
+  _veilleData = [];
+
+  try {
+    const service = new google.maps.places.PlacesService(document.createElement('div'));
+    document.getElementById('veille-progress-fill').style.width = '25%';
+
+    const places = await new Promise(resolve => {
+      service.textSearch({query: secteur + ' ' + ville, language: 'fr', region: 'fr'},
+        (results, status) => resolve(status === google.maps.places.PlacesServiceStatus.OK ? results : []));
+    });
+
+    if (!places.length) {
+      alert('aucun concurrent trouvé.');
+      hideSpinner('veille-spinner');
+      document.getElementById('btn-veille').disabled = false;
+      document.getElementById('veille-progress').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('veille-progress-fill').style.width = '50%';
+    document.getElementById('veille-progress-text').textContent = 'enrichissement des données...';
+
+    const concurrents = [];
+    for (const p of places.slice(0, 15)) {
+      const details = await new Promise(resolve => {
+        service.getDetails({placeId: p.place_id, fields: ['formatted_phone_number','website','url']},
+          (place, status) => resolve(status === google.maps.places.PlacesServiceStatus.OK ? place : null));
+      });
+      concurrents.push({
+        id: p.place_id, name: p.name,
+        address: p.formatted_address || p.vicinity || '',
+        rating: p.rating || 0, reviews: p.user_ratings_total || 0,
+        phone: details?.formatted_phone_number || null,
+        website: details?.website || null,
+        mapsUrl: details?.url || 'https://www.google.com/maps/search/' + encodeURIComponent(p.name + ' ' + ville)
+      });
+    }
+    _veilleData = concurrents;
+
+    document.getElementById('veille-progress-fill').style.width = '75%';
+    document.getElementById('veille-progress-text').textContent = 'analyse ia en cours...';
+
+    const avgRating = concurrents.filter(c => c.rating > 0).reduce((a,b) => a + b.rating, 0) / (concurrents.filter(c => c.rating > 0).length || 1);
+    const weakOnes = concurrents.filter(c => c.rating > 0 && c.rating < 4).map(c => c.name + ' (' + c.rating + '/5)');
+    const noPhone = concurrents.filter(c => !c.phone).length;
+    const noWebsite = concurrents.filter(c => !c.website).length;
+
+    const prompt = `tu es un expert en stratégie commerciale. analyse ce marché local.\n\nSECTEUR : ${secteur}\nVILLE : ${ville}\nCONCURRENTS : ${concurrents.length}\nNOTE MOYENNE : ${avgRating.toFixed(1)}/5\nMAL NOTÉS (<4) : ${weakOnes.join(', ') || 'aucun'}\nSANS TÉLÉPHONE : ${noPhone}\nSANS SITE WEB : ${noWebsite}\n\nTOP 5 :\n${concurrents.slice(0,5).map(c => '- ' + c.name + ' : ' + c.rating + '/5 (' + c.reviews + ' avis)' + (c.phone ? '' : ' · pas de tél') + (c.website ? '' : ' · pas de site')).join('\n')}\n\ngénère une analyse en 4 parties :\n1. 🎯 OPPORTUNITÉS DU MARCHÉ\n2. 💬 VOS ARGUMENTS CLÉS\n3. ⚡ DIFFÉRENCIATEURS\n4. 📞 SCRIPT D'ACCROCHE\n\nmax 300 mots, direct et actionnable.`;
+
+    const d = await claudeAPI([{role:'user', content: prompt}], 600);
+    incrementUsage('veille');
+
+    document.getElementById('veille-kpis').innerHTML = `
+      <div class="glass" style="border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:6px">concurrents</div><div style="font-size:28px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">${concurrents.length}</div></div>
+      <div style="background:rgba(217,119,6,0.06);border:1px solid rgba(217,119,6,0.12);border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#d97706;margin-bottom:6px">note moyenne</div><div style="font-size:28px;font-weight:800;letter-spacing:-1px;color:#d97706">${avgRating.toFixed(1)}/5</div></div>
+      <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.12);border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#059669;margin-bottom:6px">avec tél</div><div style="font-size:28px;font-weight:800;letter-spacing:-1px;color:#059669">${concurrents.filter(c=>c.phone).length}/${concurrents.length}</div></div>
+      <div style="background:rgba(0,76,237,0.06);border:1px solid rgba(0,76,237,0.12);border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#004ced;margin-bottom:6px">sans site web</div><div style="font-size:28px;font-weight:800;letter-spacing:-1px;color:#004ced">${noWebsite}</div></div>`;
+
+    document.getElementById('veille-analyse').textContent = d.content[0].text;
+    document.getElementById('veille-concurrents-title').textContent = concurrents.length + ' concurrents — ' + secteur + ' · ' + ville;
+    document.getElementById('veille-concurrents-grid').innerHTML = concurrents.map(c => {
+      const sc = c.rating >= 4.5 ? 's-h' : c.rating >= 3.5 ? 's-m' : 's-l';
+      const stars = c.rating ? '★'.repeat(Math.round(c.rating)) + '☆'.repeat(5-Math.round(c.rating)) : '—';
+      return `<div class="pipeline-card" style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div style="font-size:13px;font-weight:800;color:#0a0a1a;line-height:1.3;flex:1">${c.name}</div>
+          ${c.rating ? '<span class="score ' + sc + '">' + c.rating + '/5</span>' : ''}
+        </div>
+        <div style="font-size:12px;color:#d97706">${stars} <span style="color:#9ca3af;font-size:10px">(${c.reviews} avis)</span></div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid ${c.phone?'rgba(5,150,105,0.2)':'rgba(255,255,255,0.4)'};background:${c.phone?'rgba(5,150,105,0.06)':'rgba(255,255,255,0.4)'}">
+          <span class="msym" style="font-size:14px;color:${c.phone?'#059669':'#9ca3af'}">${c.phone?'phone':'phone_disabled'}</span>
+          <span style="font-size:12px;font-weight:${c.phone?'800':'400'};color:${c.phone?'#059669':'#9ca3af'}">${c.phone||'pas de téléphone'}</span>
+        </div>
+        ${c.website?'<a href="'+c.website+'" target="_blank" style="font-size:11px;color:#004ced;text-decoration:none;font-weight:600;display:flex;align-items:center;gap:4px"><span class="msym" style="font-size:13px">language</span>'+c.website.replace(/^https?:\/\//,'').slice(0,30)+'</a>':'<div style="font-size:11px;color:#d1d5db;font-style:italic;display:flex;align-items:center;gap:4px"><span class="msym" style="font-size:13px">language</span>pas de site web</div>'}
+        <div style="font-size:11px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.address}</div>
+        <a href="${c.mapsUrl}" target="_blank" class="btn btn-ghost btn-sm" style="justify-content:center;text-decoration:none"><span class="msym">map</span>voir sur maps</a>
+      </div>`;
+    }).join('');
+
+    document.getElementById('veille-progress').style.display = 'none';
+    document.getElementById('veille-result').style.display = '';
+    addActivity('radar · ' + secteur + ' · ' + ville + ' (' + concurrents.length + ' concurrents)', 'radar', 'primary');
+
+  } catch(e) {
+    alert('erreur : ' + e.message);
+    document.getElementById('veille-progress').style.display = 'none';
+  }
+  hideSpinner('veille-spinner');
+  document.getElementById('btn-veille').disabled = false;
+}
+
+function exportVeilleCSV() {
+  if (!_veilleData.length) { alert('lancez d\'abord une analyse.'); return; }
+  const rows = [['nom','adresse','note','avis','téléphone','site web']];
+  _veilleData.forEach(c => rows.push([c.name, c.address, c.rating, c.reviews, c.phone||'', c.website||'']));
+  const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'concurrents-alma.csv';
+  a.click();
+}
 // ═══ SÉQUENCES ═══
 function saveSequence(){alert('séquence enregistrée !');}
 
