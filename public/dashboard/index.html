@@ -1751,7 +1751,46 @@ function loadState() {
   updateSeenCounter();
   updateQuotaUI();
 }
-function saveState() { try { localStorage.setItem('alma_state', JSON.stringify(state)); } catch(_) {} }
+function saveState() { 
+  try { localStorage.setItem('alma_state', JSON.stringify(state)); } catch(_) {}
+  syncToSupabase();
+}
+
+async function syncToSupabase() {
+  try {
+    const { createClient } = supabase;
+    const sb = createClient(ALMA_CONFIG.supaUrl, ALMA_CONFIG.supaAnon);
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const uid = session.user.id;
+    if (state.prospects.length) {
+      await sb.from('prospects').upsert(state.prospects.map(p => ({ ...p, user_id: uid })), { onConflict: 'id' });
+    }
+    if (state.pipeline.length) {
+      await sb.from('pipeline').upsert(state.pipeline.map(p => ({ ...p, user_id: uid, prospect_id: p.id })), { onConflict: 'id' });
+    }
+  } catch(e) { console.warn('sync:', e.message); }
+}
+
+async function loadFromSupabase() {
+  try {
+    const { createClient } = supabase;
+    const sb = createClient(ALMA_CONFIG.supaUrl, ALMA_CONFIG.supaAnon);
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const [{ data: prospects }, { data: pipeline }] = await Promise.all([
+      sb.from('prospects').select('*').order('created_at', { ascending: false }),
+      sb.from('pipeline').select('*').order('created_at', { ascending: false })
+    ]);
+    if (prospects?.length) state.prospects = prospects;
+    if (pipeline?.length) state.pipeline = pipeline;
+    state.stats.prospects = state.prospects.length;
+    state.stats.pipeline = state.pipeline.length;
+    state.stats.emails = state.prospects.filter(p => p.email_generated).length;
+    try { localStorage.setItem('alma_state', JSON.stringify(state)); } catch(_) {}
+    refreshAll();
+  } catch(e) { console.warn('load:', e.message); }
+}
 
 function getKeys() {
   const ce = localStorage.getItem('alma_client_email') ? JSON.parse(localStorage.getItem('alma_client_email')) : {};
@@ -3640,7 +3679,11 @@ function exportLinkedinCSV() {
 function loadLinkedinLeads() { checkLiApiKey(); }
 
 // ═══ INIT ═══
-document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCounter();});
+document.addEventListener('DOMContentLoaded', async function(){
+  loadState();
+  await loadFromSupabase();
+  updateSeenCounter();
+});
 </script>
 
 <!-- Fiche Pré-Appel Modal (standalone pour résultats) -->
