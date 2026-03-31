@@ -1019,19 +1019,60 @@ tr:hover td { background: rgba(255,255,255,0.3); }
       </div>
     </div>
 
-    <!-- ═══ VEILLE ═══ -->
+   <!-- ═══ VEILLE ═══ -->
     <div class="page" id="page-veille">
-      <div style="max-width:640px">
-        <div class="glass card">
-          <div class="card-header"><div><div class="card-title">veille ia concurrentielle</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">analyse de marché propulsée par claude</div></div></div>
+      <div style="max-width:900px">
+        <div style="margin-bottom:20px">
+          <h2 style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">radar concurrents</h2>
+          <p style="font-size:12px;color:#9ca3af;margin-top:4px">analysez vos concurrents locaux · identifiez leurs faiblesses · démarquez-vous</p>
+        </div>
+        <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,76,237,0.15)">
+          <div class="card-header" style="background:rgba(0,76,237,0.04)">
+            <div>
+              <div class="card-title" style="color:#004ced;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:16px">radar</span>scanner le marché local</div>
+              <div style="font-size:10px;color:#9ca3af;margin-top:2px">google maps × ia — données temps réel</div>
+            </div>
+          </div>
           <div class="card-body">
-            <div class="form-group"><label class="form-label">secteur à analyser</label><input class="form-input" id="veille-secteur" placeholder="plomberie lyon, marketing digital paris..."/></div>
-            <button class="btn btn-primary" id="btn-veille" onclick="runVeille()"><span id="veille-spinner" style="display:none" class="spinner"></span><span class="msym">radar</span>analyser le marché</button>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">votre secteur d'activité</label>
+                <input class="form-input" id="veille-secteur" placeholder="ex: plombier, agence immobilière..."/>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">ville / zone</label>
+                <input class="form-input" id="veille-ville" placeholder="ex: lyon, paris 15e..."/>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="btn-veille" onclick="runVeille()" style="width:100%;justify-content:center;padding:14px">
+              <span id="veille-spinner" style="display:none" class="spinner"></span>
+              <span class="msym">radar</span>lancer le radar concurrents
+            </button>
           </div>
         </div>
-        <div id="veille-result" style="display:none;margin-top:16px" class="glass card">
-          <div class="card-header"><div class="card-title">analyse du marché</div></div>
-          <div class="card-body"><div id="veille-text" style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:#1a1a2e"></div></div>
+        <div id="veille-progress" style="display:none;margin-bottom:16px">
+          <div class="glass card"><div class="card-body">
+            <div style="font-size:12px;font-weight:700;color:#0a0a1a;margin-bottom:6px" id="veille-progress-text">scan en cours...</div>
+            <div class="progress-bar"><div class="progress-fill" id="veille-progress-fill" style="width:0%"></div></div>
+          </div></div>
+        </div>
+        <div id="veille-result" style="display:none">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="veille-kpis"></div>
+          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,76,237,0.15)">
+            <div class="card-header" style="background:rgba(0,76,237,0.04)">
+              <div class="card-title" style="color:#004ced;display:flex;align-items:center;gap:6px"><span class="msym">auto_awesome</span>analyse ia — vos arguments de vente</div>
+            </div>
+            <div class="card-body">
+              <div id="veille-analyse" style="font-size:13px;line-height:1.8;color:#1a1a2e;white-space:pre-wrap"></div>
+            </div>
+          </div>
+          <div class="glass card">
+            <div class="card-header">
+              <div class="card-title" id="veille-concurrents-title">concurrents trouvés</div>
+              <button class="btn btn-ghost btn-sm" onclick="exportVeilleCSV()"><span class="msym">download</span>csv</button>
+            </div>
+            <div id="veille-concurrents-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding:16px"></div>
+          </div>
         </div>
       </div>
     </div>
