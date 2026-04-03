@@ -1713,10 +1713,35 @@ function updateQuotaUI(){
 }
 
 // ═══ CLAUDE API PROXY ═══
-async function claudeAPI(messages, max_tokens=800) {
-  const res = await fetch('/api/claude', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+async function claudeAPI(messages, max_tokens=800, quota_type=null) {
+  const { createClient } = supabase;
+  const sb = createClient(ALMA_CONFIG.supaUrl, ALMA_CONFIG.supaAnon);
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) throw new Error('non authentifié');
+
+  const res = await fetch(
+    ALMA_CONFIG.supaUrl + '/functions/v1/claude-proxy',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token,
+      },
+      body: JSON.stringify({ messages, max_tokens, quota_type }),
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.json();
+    if (err.error === 'quota_exceeded') {
+      showUpgradeModal(quota_type, err.used, err.limit);
+      throw new Error('quota_exceeded');
+    }
+    throw new Error(err.error || 'erreur serveur');
+  }
+
+  return res.json();
+},
     body: JSON.stringify({ messages, max_tokens })
   });
   if (!res.ok) {
@@ -1728,7 +1753,6 @@ async function claudeAPI(messages, max_tokens=800) {
 
 // ═══ CONFIG ═══
 const ALMA_CONFIG = {
-  anthropic: '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',
   gmaps: 'AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A',
   brevo: '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',
   emailFrom: 'noreply@huntly.fr',
@@ -2085,7 +2109,7 @@ Génère une analyse JSON avec exactement cette structure (sans markdown, sans b
   "closing": "conseil clé pour conclure avec ce type de prospect (1-2 phrases)"
 }`;
 
-  const d = await claudeAPI([{ role: 'user', content: prompt }], 700);
+  const d = await claudeAPI([{ role: 'user', content: prompt }], 700, 'fiches');
   const text = d.content[0].text.trim().replace(/```json|```/g, '').trim();
   incrementUsage('fiches');
   return JSON.parse(text);
@@ -2162,7 +2186,7 @@ async function generateEmail(prospectId) {
   if(!checkQuota('emails')) return null;
   const profile=getProfile();
   const prompt=`tu es un expert en prospection commerciale. rédige un email de prospection court.\n\nprospect :\n- entreprise : ${p.name}\n- note google : ${p.rating}/5 (${p.reviews} avis)\n- adresse : ${p.address}\n\nexpéditeur :\n- prénom : ${profile.prenom||'prénom'}\n- nom : ${profile.nom||'nom'}\n- société : ${profile.societe||'ma société'}\n- activité : ${profile.activite||'consultant'}\n- valeur : ${profile.valeur||'je peux vous aider'}\n- ton : ${profile.ton||'professionnel'}\n\nconsignes :\n- 150-200 mots max\n- objet accrocheur ligne 1\n- personnalisé\n- appel à l'action clair\n- signature complète\n- français, texte brut`;
-  const d=await claudeAPI([{role:'user',content:prompt}],500);
+  const d=await claudeAPI([{role:'user',content:prompt}],500, 'emails');
   incrementUsage('emails');
   return d.content[0].text;
 }
@@ -2756,7 +2780,7 @@ génère une analyse en 3 parties (sans bullet points avec tirets ou astérisque
 3. ACCROCHE RECOMMANDÉE (1 phrase)
 max 180 mots.`;
 
-    const dGlobal = await claudeAPI([{role:'user', content: promptGlobal}], 400);
+    const dGlobal = await claudeAPI([{role:'user', content: promptGlobal}], 400, 'veille');
     incrementUsage('veille');
     document.getElementById('veille-analyse').textContent = dGlobal.content[0].text;
 
@@ -2770,7 +2794,7 @@ max 180 mots.`;
 {"forces":["force 1 (max 7 mots)","force 2"],"faiblesses":["faiblesse 1 (max 7 mots)","faiblesse 2"],"pitch":"phrase pour voler ses clients (max 12 mots)"}
 concurrent : ${cc.name} · ${cc.rating}/5 (${cc.reviews} avis) · tél: ${cc.phone ? 'oui' : 'non'} · site: ${cc.website ? 'oui' : 'non'}${reviewsText}`;
       try {
-        const d = await claudeAPI([{role:'user', content: prompt}], 200);
+        const d = await claudeAPI([{role:'user', content: prompt}], 200, 'veille');
         const raw = d.content[0].text.replace(/```json|```/g,'').trim();
         cc.analysis = JSON.parse(raw);
       } catch(e) { cc.analysis = null; }
@@ -2916,7 +2940,7 @@ async function launchAutopilot(){
       for(let i=0;i<prospects.length;i++){
         if(_apStop) break;
         const p=prospects[i];apSetProgress(65+Math.round(i/prospects.length*25),'email '+(i+1)+'/'+prospects.length+' — '+p.name);
-        try{const profile=getProfile();const prompt='rédige un email de prospection en 150 mots max.\nprospect: '+p.name+' ('+p.address+')\nnote: '+p.rating+'/5 ('+p.reviews+' avis)\nexpéditeur: '+profile.prenom+' '+profile.nom+', '+profile.societe+'\nactivité: '+profile.activite+'\nvaleur: '+profile.valeur;const d=await claudeAPI([{role:'user',content:prompt}],400);p.email_generated=d.content?.[0]?.text||null;totalEmails++;apUpdateCounters(totalProspects,totalEmails,totalPipeline);apLog('email','email généré pour <strong>'+p.name+'</strong>');}
+        try{const profile=getProfile();const prompt='rédige un email de prospection en 150 mots max.\nprospect: '+p.name+' ('+p.address+')\nnote: '+p.rating+'/5 ('+p.reviews+' avis)\nexpéditeur: '+profile.prenom+' '+profile.nom+', '+profile.societe+'\nactivité: '+profile.activite+'\nvaleur: '+profile.valeur;const d=await claudeAPI([{role:'user',content:prompt}],400, 'emails');p.email_generated=d.content?.[0]?.text||null;totalEmails++;apUpdateCounters(totalProspects,totalEmails,totalPipeline);apLog('email','email généré pour <strong>'+p.name+'</strong>');}
         catch(e){apLog('error','erreur email '+p.name);}
         await sleep(400);
       }
@@ -3007,7 +3031,7 @@ function genAllCourrierB2C(){alert('sélectionnez un prospect pour générer son
 
 // ═══ COURRIER B2C ═══
 let _currentCourrierIdx=null;
-async function genCourrierB2C(idx){_currentCourrierIdx=idx;const results=window._b2cResults||[];const p=results[idx];if(!p) return;document.getElementById('courrier-adresse-title').textContent=p.adresse+' — '+p.commune;document.getElementById('courrier-loading').style.display='block';document.getElementById('courrier-text').style.display='none';document.getElementById('courrier-modal').classList.add('open');const profile=getProfile();const prompt='tu es un expert en prospection locale. rédige un courrier physique court.\nadresse : '+p.adresse+', '+p.commune+'\nsignaux : '+p.signaux.map(s=>s.type).join(', ')+'\nexpéditeur : '+profile.prenom+' '+profile.nom+', '+(profile.societe||'mon entreprise')+'\nactivité : '+(profile.activite||'prestataire local')+'\nvaleur : '+(profile.valeur||'service de qualité')+'\nconsignes : 150-200 mots, commencer par madame/monsieur, ton professionnel, proposer rdv gratuit, texte brut.';try{const d=await claudeAPI([{role:'user',content:prompt}],500);document.getElementById('courrier-text').value=d.content?.[0]?.text||'erreur de génération';}catch(e){document.getElementById('courrier-text').value='erreur : '+e.message;}document.getElementById('courrier-loading').style.display='none';document.getElementById('courrier-text').style.display='block';}
+async function genCourrierB2C(idx){_currentCourrierIdx=idx;const results=window._b2cResults||[];const p=results[idx];if(!p) return;document.getElementById('courrier-adresse-title').textContent=p.adresse+' — '+p.commune;document.getElementById('courrier-loading').style.display='block';document.getElementById('courrier-text').style.display='none';document.getElementById('courrier-modal').classList.add('open');const profile=getProfile();const prompt='tu es un expert en prospection locale. rédige un courrier physique court.\nadresse : '+p.adresse+', '+p.commune+'\nsignaux : '+p.signaux.map(s=>s.type).join(', ')+'\nexpéditeur : '+profile.prenom+' '+profile.nom+', '+(profile.societe||'mon entreprise')+'\nactivité : '+(profile.activite||'prestataire local')+'\nvaleur : '+(profile.valeur||'service de qualité')+'\nconsignes : 150-200 mots, commencer par madame/monsieur, ton professionnel, proposer rdv gratuit, texte brut.';try{const d=await claudeAPI([{role:'user',content:prompt}],500,'emails');document.getElementById('courrier-text').value=d.content?.[0]?.text||'erreur de génération';}catch(e){document.getElementById('courrier-text').value='erreur : '+e.message;}document.getElementById('courrier-loading').style.display='none';document.getElementById('courrier-text').style.display='block';}
 async function regenCourrier(){if(_currentCourrierIdx!==null) await genCourrierB2C(_currentCourrierIdx);}
 
 // ═══ CANCELLATION ═══
@@ -3161,7 +3185,7 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
 }`;
 
   try {
-    const d = await claudeAPI([{ role: 'user', content: prompt }], 800);
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 800, 'fiches');
     const raw = d.content?.[0]?.text || '{}';
     const clean = raw.replace(/```json|```/g, '').trim();
     const fiche = JSON.parse(clean);
@@ -3364,7 +3388,7 @@ consignes :
 - texte brut uniquement`;
 
   try {
-    const d = await claudeAPI([{ role: 'user', content: prompt }], 300);
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 300, 'emails');
     const script = d.content[0].text;
     const scriptEl = document.getElementById('assistant-script');
     scriptEl.textContent = script;
@@ -3387,7 +3411,7 @@ activité du commercial : ${profile.activite || 'prospection ia'}
 format : 4 questions numérotées, max 15 mots chacune, texte brut.`;
 
   try {
-    const d = await claudeAPI([{ role: 'user', content: prompt }], 200);
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 200, 'appels');
     const questions = d.content[0].text.trim().split('\n').filter(q => q.trim());
     const container = document.getElementById('questions-list');
     container.innerHTML = questions.map(q => `
@@ -3433,7 +3457,7 @@ consignes :
 - texte brut uniquement`;
 
   try {
-    const d = await claudeAPI([{ role: 'user', content: prompt }], 200);
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 200, 'appels');
     const response = d.content[0].text;
     respText.textContent = response;
     respLoading.style.display = 'none';
@@ -3532,7 +3556,7 @@ format :
 - texte brut, concis`;
 
   try {
-    const d = await claudeAPI([{ role: 'user', content: prompt }], 300);
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 300, 'appels');
     const resume = d.content[0].text;
     // Afficher dans une modal
     const modal = document.getElementById('email-modal');
