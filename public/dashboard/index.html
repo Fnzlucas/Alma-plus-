@@ -254,10 +254,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 
     <div class="nav-section">prospection</div>
     <button class="nav-item" onclick="goPage('prospection',this)">
-      <span class="msym">hub</span>prospection b2b
-    </button>
-    <button class="nav-item" onclick="goPage('prospection-b2c',this)">
-      <span class="msym">radar</span>prospection b2c
+      <span class="msym">hub</span>prospection
     </button>
     <button class="nav-item" onclick="goPage('alertes',this)" id="nav-alertes">
       <span class="msym">notification_important</span>alertes du jour
@@ -280,7 +277,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
       <span style="margin-left:auto;width:6px;height:6px;border-radius:50%;background:#00d4ff;flex-shrink:0"></span>
     </button>
     <button class="nav-item" onclick="goPage('devis',this)">
-      <span class="msym">description</span>devis ia
+      <span class="msym">description</span>devis
     </button>
     <button class="nav-item" onclick="goPage('calendrier',this)">
       <span class="msym">calendar_month</span>calendrier
@@ -291,7 +288,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
       <span class="msym">analytics</span>rapport
     </button>
     <button class="nav-item" onclick="goPage('veille',this)">
-      <span class="msym">visibility</span>veille ia
+      <span class="msym">visibility</span>veille concurrentielle
     </button>
     <button class="nav-item" onclick="goPage('coldcall',this)">
       <span class="msym">settings_phone</span>tracker appel
@@ -537,7 +534,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
       </div>
     </div>
 
-    <!-- ═══ PROSPECTION B2B ═══ -->
+    <!-- ═══ prospection ═══ -->
     <div class="page" id="page-prospection">
       <div style="max-width:860px">
         <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap" id="b2b-tabs-wrap">
@@ -776,57 +773,6 @@ tr:hover td { background: rgba(255,255,255,0.3); }
       </div>
     </div>
 
-    <!-- ═══ PROSPECTION B2C ═══ -->
-    <div class="page" id="page-prospection-b2c">
-      <div style="max-width:900px">
-        <div style="margin-bottom:20px">
-          <h2 style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">prospection b2c — moteur de signaux croisés</h2>
-          <p style="font-size:12px;color:#9ca3af;margin-top:4px">croisement de 5 sources open data pour identifier les prospects à fort potentiel</p>
-        </div>
-
-        <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,76,237,0.15)">
-          <div class="card-header" style="background:rgba(0,76,237,0.04)">
-            <div>
-              <div class="card-title" style="color:#004ced;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:16px">hub</span>moteur de croisement intelligent</div>
-              <div style="font-size:10px;color:#9ca3af;margin-top:2px">dvf × permis × dpe × copropriétés × bodacc</div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="alert alert-info" style="margin-bottom:16px"><span class="msym">auto_awesome</span><span>l'ia croise les 5 sources et attribue un <strong>score de chaleur</strong> à chaque adresse selon le nombre de signaux détectés.</span></div>
-            <div class="form-row" style="margin-bottom:12px">
-              <div class="form-group" style="margin:0"><label class="form-label">zone de recherche *</label><input class="form-input" id="cross-zone" placeholder="ex: lyon, 69003, avignon..."/></div>
-              <div class="form-group" style="margin:0"><label class="form-label">secteur client</label><select class="form-input" id="cross-secteur"><option value="renovation">rénovation / btp</option><option value="immo">immobilier</option><option value="energie">énergie / isolation</option><option value="assurance">assurance</option><option value="finance">financement</option></select></div>
-            </div>
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
-              <div class="form-group" style="margin:0;min-width:160px"><label class="form-label">score minimum</label><select class="form-input" id="cross-score-min"><option value="1">1 signal min</option><option value="2" selected>2 signaux (recommandé)</option><option value="3">3 signaux (très chaud)</option></select></div>
-              <div class="form-group" style="margin:0;min-width:140px"><label class="form-label">max résultats</label><select class="form-input" id="cross-max"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select></div>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
-              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280"><input type="checkbox" id="cross-dvf" checked style="accent-color:#004ced"><span class="msym" style="font-size:14px;color:#004ced">real_estate_agent</span>dvf</label>
-              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280"><input type="checkbox" id="cross-permis" checked style="accent-color:#004ced"><span class="msym" style="font-size:14px;color:#004ced">construction</span>permis</label>
-              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280"><input type="checkbox" id="cross-dpe" checked style="accent-color:#004ced"><span class="msym" style="font-size:14px;color:#d97706">eco</span>dpe f/g</label>
-              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280"><input type="checkbox" id="cross-copro" checked style="accent-color:#004ced"><span class="msym" style="font-size:14px;color:#004ced">apartment</span>copros</label>
-              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280"><input type="checkbox" id="cross-bodacc" checked style="accent-color:#004ced"><span class="msym" style="font-size:14px;color:#004ced">gavel</span>bodacc</label>
-              <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280"><input type="checkbox" id="cross-artisans" style="accent-color:#004ced"><span class="msym" style="font-size:14px;color:#059669">map</span>artisans</label>
-            </div>
-            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="searchCrossB2C()">
-              <span id="cross-spinner" style="display:none" class="spinner"></span>
-              <span class="msym">hub</span>lancer le croisement des sources
-            </button>
-          </div>
-        </div>
-        <div id="cross-progress" style="display:none;margin-bottom:16px">
-          <div class="glass card"><div class="card-body"><div style="font-size:12px;font-weight:700;color:#0a0a1a;margin-bottom:12px" id="cross-progress-text">interrogation des sources...</div><div style="display:flex;flex-direction:column;gap:8px" id="cross-sources-status"></div></div></div>
-        </div>
-        <div id="cross-results" style="display:none">
-          <div class="glass card">
-            <div class="card-header"><div><div class="card-title">prospects b2c — signaux croisés</div><div id="cross-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div></div><div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="exportCrossCSV()"><span class="msym">download</span>csv</button><button class="btn btn-primary btn-sm" onclick="genAllCourrierB2C()"><span class="msym">auto_awesome</span>courriers ia</button></div></div>
-            <div id="cross-table" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:16px"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- ═══ ALERTES ═══ -->
     <div class="page" id="page-alertes">
       <div style="max-width:900px">
@@ -980,12 +926,12 @@ tr:hover td { background: rgba(255,255,255,0.3); }
     <div class="page" id="page-devis">
       <div style="max-width:680px">
         <div class="glass card" style="margin-bottom:16px">
-          <div class="card-header"><div><div class="card-title">générateur de devis ia</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">créez un devis professionnel en quelques secondes</div></div></div>
+          <div class="card-header"><div><div class="card-title">générateur de devis</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">créez un devis professionnel en quelques secondes</div></div></div>
           <div class="card-body">
             <div class="form-row"><div class="form-group"><label class="form-label">nom du client</label><input class="form-input" id="devis-client" placeholder="plomberie leclerc"/></div><div class="form-group"><label class="form-label">votre activité</label><input class="form-input" id="devis-activite" placeholder="agence de communication"/></div></div>
             <div class="form-group"><label class="form-label">description de la prestation</label><textarea class="form-input" id="devis-desc" placeholder="création d'un site web vitrine..."></textarea></div>
             <div class="form-row"><div class="form-group"><label class="form-label">budget estimé (€)</label><input class="form-input" id="devis-budget" type="number" placeholder="2500"/></div><div class="form-group"><label class="form-label">délai de réalisation</label><input class="form-input" id="devis-delai" placeholder="4 semaines"/></div></div>
-            <button class="btn btn-primary" id="btn-devis" onclick="generateDevis()"><span id="devis-spinner" style="display:none" class="spinner"></span><span class="msym">auto_awesome</span>générer le devis ia</button>
+            <button class="btn btn-primary" id="btn-devis" onclick="generateDevis()"><span id="devis-spinner" style="display:none" class="spinner"></span><span class="msym">auto_awesome</span>générer le devis</button>
           </div>
         </div>
         <div id="devis-result" style="display:none" class="glass card">
@@ -1022,7 +968,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
     <div class="page" id="page-veille">
       <div style="max-width:640px">
         <div class="glass card">
-          <div class="card-header"><div><div class="card-title">veille ia concurrentielle</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">analyse de marché propulsée par claude</div></div></div>
+          <div class="card-header"><div><div class="card-title">veille concurrentielle concurrentielle</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">analyse de marché propulsée par claude</div></div></div>
           <div class="card-body">
             <div class="form-group"><label class="form-label">secteur à analyser</label><input class="form-input" id="veille-secteur" placeholder="plomberie lyon, marketing digital paris..."/></div>
             <button class="btn btn-primary" id="btn-veille" onclick="runVeille()"><span id="veille-spinner" style="display:none" class="spinner"></span><span class="msym">radar</span>analyser le marché</button>
@@ -1433,11 +1379,11 @@ tr:hover td { background: rgba(255,255,255,0.3); }
                     <div class="progress-bar"><div class="progress-fill" id="quota-appels-bar" style="width:0%"></div></div>
                   </div>
                   <div style="display:flex;justify-content:space-between">
-                    <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#004ced">description</span>devis ia</span>
+                    <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#004ced">description</span>devis</span>
                     <span style="font-size:11px;font-weight:800;color:#004ced" id="quota-devis-label">0 / 20</span>
                   </div>
                   <div style="display:flex;justify-content:space-between">
-                    <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#004ced">radar</span>veille ia</span>
+                    <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#004ced">radar</span>veille concurrentielle</span>
                     <span style="font-size:11px;font-weight:800;color:#004ced" id="quota-veille-label">0 / 3</span>
                   </div>
                 </div>
@@ -1482,7 +1428,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
         &nbsp; <a id="pm-email-finder" href="#" target="_blank" style="font-size:10px;font-weight:800;background:#004ced;color:#fff;padding:3px 10px;border-radius:99px;text-decoration:none">✉ trouver email</a>
       </div>
       <div class="form-group" style="margin:0"><label class="form-label">statut</label>
-        <select class="form-input" id="pm-status" onchange="updateStatusFromModal()"><option value="new">🆕 nouveau</option><option value="contacted">📤 contacté</option><option value="replied">💬 répondu</option><option value="converted">✅ converti</option></select>
+        <select class="form-input" id="pm-status" onchange="updateStatusFromModal()"><option value="new">nouveau</option><option value="contacted">contacté</option><option value="replied">répondu</option><option value="converted">converti</option></select>
       </div>
       <div class="form-group" style="margin:0"><label class="form-label">notes</label><textarea class="form-input" id="pm-notes" placeholder="notes sur ce prospect..." oninput="saveProspectNotes()"></textarea></div>
       <div id="pm-email-preview" style="display:none;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;padding:12px;font-size:12px;color:#6b7280;white-space:pre-wrap;max-height:140px;overflow-y:auto;line-height:1.6"></div>
@@ -1650,7 +1596,7 @@ function checkAutopilot(){
 }
 
 function showUpgradeModal(type, used, limit){
-  const labels={emails:'emails ia',fiches:'fiches pré-appel',appels:'appels assistés ia',devis:'devis ia',veille:'analyses de marché',autopilot:'pilote automatique',prospects:'prospects'};
+  const labels={emails:'emails ia',fiches:'fiches pré-appel',appels:'appels assistés ia',devis:'devis',veille:'analyses de marché',autopilot:'pilote automatique',prospects:'prospects'};
   const plan=getCurrentPlan();
   const nextPlan=plan==='starter'?'pro':plan==='pro'?'ultra':'agence';
   const nextPrice=plan==='starter'?'129€/mois':plan==='pro'?'290€/mois':'sur devis';
@@ -1769,17 +1715,17 @@ function goPage(name, btn) {
   if(btn) btn.classList.add('active');
   const titles = {
     dashboard:['tableau de bord','flux de données synchronisé'],
-    prospection:['prospection b2b','google maps · insee · bodacc · permis · appels d\'offres'],
-    'prospection-b2c':['prospection b2c','dvf · dpe · copros · bodacc'],
+    prospection:['prospection','google maps · insee · bodacc · permis · appels d\'offres'],
+    
     alertes:['alertes du jour','signaux détectés automatiquement'],
     pipeline:['pipeline crm','gérez vos leads'],
     messagerie:['messagerie','conversations temps réel'],
     sequences:['séquences','relances automatiques'],
     autopilot:['pilote auto','prospection autonome'],
-    devis:['devis ia','génération rapide'],
+    devis:['devis','génération rapide'],
     calendrier:['calendrier','planification'],
     rapport:['rapport','vos performances'],
-    veille:['veille ia','analyse concurrentielle'],
+    veille:['veille concurrentielle','analyse concurrentielle'],
     coldcall:['tracker appel','enregistrez vos appels'],
     settings:['paramètres','configuration'],
   };
@@ -2160,7 +2106,7 @@ async function generateEmail(prospectId) {
   const p=state.prospects.find(x=>x.id===prospectId);if(!p) return null;
   if(!checkQuota('emails')) return null;
   const profile=getProfile();
-  const prompt=`tu es un expert en prospection commerciale. rédige un email de prospection b2b court.\n\nprospect :\n- entreprise : ${p.name}\n- note google : ${p.rating}/5 (${p.reviews} avis)\n- adresse : ${p.address}\n\nexpéditeur :\n- prénom : ${profile.prenom||'prénom'}\n- nom : ${profile.nom||'nom'}\n- société : ${profile.societe||'ma société'}\n- activité : ${profile.activite||'consultant'}\n- valeur : ${profile.valeur||'je peux vous aider'}\n- ton : ${profile.ton||'professionnel'}\n\nconsignes :\n- 150-200 mots max\n- objet accrocheur ligne 1\n- personnalisé\n- appel à l'action clair\n- signature complète\n- français, texte brut`;
+  const prompt=`tu es un expert en prospection commerciale. rédige un email de prospection court.\n\nprospect :\n- entreprise : ${p.name}\n- note google : ${p.rating}/5 (${p.reviews} avis)\n- adresse : ${p.address}\n\nexpéditeur :\n- prénom : ${profile.prenom||'prénom'}\n- nom : ${profile.nom||'nom'}\n- société : ${profile.societe||'ma société'}\n- activité : ${profile.activite||'consultant'}\n- valeur : ${profile.valeur||'je peux vous aider'}\n- ton : ${profile.ton||'professionnel'}\n\nconsignes :\n- 150-200 mots max\n- objet accrocheur ligne 1\n- personnalisé\n- appel à l'action clair\n- signature complète\n- français, texte brut`;
   const d=await claudeAPI([{role:'user',content:prompt}],500);
   incrementUsage('emails');
   return d.content[0].text;
@@ -2727,7 +2673,7 @@ async function launchAutopilot(){
       if(score<minScore) continue;
       const prospect={id:p.place_id,name:p.name,address:p.formatted_address||'',rating,reviews,score,phone:details?.formatted_phone_number||null,website:details?.website||null,email_generated:null};
       prospects.push(prospect);totalProspects++;
-      apLog('info','📍 <strong>'+p.name+'</strong>'+(prospect.phone?' — <span style="color:#059669">📞 '+prospect.phone+'</span>':'')+(+' (score '+score+')'));
+      apLog('info','<strong>'+p.name+'</strong>'+(prospect.phone?' — <span style="color:#059669">📞 '+prospect.phone+'</span>':'')+(+' (score '+score+')'));
       apUpdateCounters(totalProspects,totalEmails,totalPipeline);apSetProgress(30+Math.round(prospects.length/Math.min(nb,places.length)*30),'enrichissement...');
       await sleep(150);
     }
@@ -2738,7 +2684,7 @@ async function launchAutopilot(){
       for(let i=0;i<prospects.length;i++){
         if(_apStop) break;
         const p=prospects[i];apSetProgress(65+Math.round(i/prospects.length*25),'email '+(i+1)+'/'+prospects.length+' — '+p.name);
-        try{const profile=getProfile();const prompt='rédige un email de prospection b2b en 150 mots max.\nprospect: '+p.name+' ('+p.address+')\nnote: '+p.rating+'/5 ('+p.reviews+' avis)\nexpéditeur: '+profile.prenom+' '+profile.nom+', '+profile.societe+'\nactivité: '+profile.activite+'\nvaleur: '+profile.valeur;const d=await claudeAPI([{role:'user',content:prompt}],400);p.email_generated=d.content?.[0]?.text||null;totalEmails++;apUpdateCounters(totalProspects,totalEmails,totalPipeline);apLog('email','✉ email généré pour <strong>'+p.name+'</strong>');}
+        try{const profile=getProfile();const prompt='rédige un email de prospection en 150 mots max.\nprospect: '+p.name+' ('+p.address+')\nnote: '+p.rating+'/5 ('+p.reviews+' avis)\nexpéditeur: '+profile.prenom+' '+profile.nom+', '+profile.societe+'\nactivité: '+profile.activite+'\nvaleur: '+profile.valeur;const d=await claudeAPI([{role:'user',content:prompt}],400);p.email_generated=d.content?.[0]?.text||null;totalEmails++;apUpdateCounters(totalProspects,totalEmails,totalPipeline);apLog('email','email généré pour <strong>'+p.name+'</strong>');}
         catch(e){apLog('error','erreur email '+p.name);}
         await sleep(400);
       }
@@ -2747,7 +2693,7 @@ async function launchAutopilot(){
     for(const p of prospects){if(!state.pipeline.find(x=>x.id===p.id)){state.pipeline.push({...p,status:'new'});totalPipeline++;apLog('pipeline','<strong>'+p.name+'</strong> ajouté au pipeline');apUpdateCounters(totalProspects,totalEmails,totalPipeline);await sleep(80);}}
     state.prospects=[...prospects,...state.prospects.filter(p=>!prospects.find(n=>n.id===p.id))];
     state.stats.prospects=state.prospects.length;state.stats.pipeline=state.pipeline.length;state.stats.emails+=totalEmails;saveState();refreshAll();
-    apSetProgress(100,'terminé !');apFinish('✅ '+totalProspects+' prospects · '+totalEmails+' emails · '+totalPipeline+' pipeline');
+    apSetProgress(100,'terminé !');apFinish(''+totalProspects+' prospects · '+totalEmails+' emails · '+totalPipeline+' pipeline');
   }catch(e){apLog('error','erreur : '+e.message);apFinish('erreur — '+e.message);}
 }
 
