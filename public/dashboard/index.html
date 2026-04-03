@@ -778,7 +778,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
       <div style="max-width:900px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
           <div>
-            <h2 style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">🔥 alertes du jour</h2>
+            <h2 style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0a0a1a"> alertes du jour</h2>
             <p style="font-size:11px;color:#9ca3af;margin-top:4px">signaux détectés automatiquement · mis à jour à 6h</p>
           </div>
           <div style="display:flex;gap:8px">
@@ -794,9 +794,9 @@ tr:hover td { background: rgba(255,255,255,0.3); }
         </div>
         <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
           <button class="chip" onclick="filterAlertes('all',this)" style="background:rgba(0,76,237,0.08);color:#004ced;border-color:rgba(0,76,237,0.2);font-weight:800">tous</button>
-          <button class="chip" onclick="filterAlertes('GMAPS',this)">🗺️ google maps</button>
-          <button class="chip" onclick="filterAlertes('phone',this)">📞 avec téléphone</button>
-          <button class="chip" onclick="filterAlertes('unseen',this)">🔴 non lus</button>
+          <button class="chip" onclick="filterAlertes('GMAPS',this)"> google maps</button>
+          <button class="chip" onclick="filterAlertes('phone',this)"> avec téléphone</button>
+          <button class="chip" onclick="filterAlertes('unseen',this)"> non lus</button>
         </div>
         <div id="alertes-list" style="display:flex;flex-direction:column;gap:10px">
           <div style="text-align:center;padding:60px;color:#9ca3af"><span class="msym" style="font-size:48px;display:block;margin-bottom:12px;opacity:.2">notifications_active</span>chargement...</div>
@@ -894,7 +894,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
                 <div class="form-group" style="margin:0"><label class="form-label">action automatique</label><select class="form-input" id="auto-action"><option value="pipeline">pipeline uniquement</option><option value="email">email ia + pipeline</option><option value="email-send">envoyer email + pipeline</option><option value="full" selected>tout (email + sms + pipeline)</option></select></div>
               </div>
             </div>
-            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="launchAutopilot()" id="btn-autopilot"><span class="msym">rocket_launch</span>lancer le pilote</button>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="launchAutopilot()" id="btn-autopilot">lancer le pilote</button>
             <button class="btn btn-ghost" style="width:100%;justify-content:center;display:none" onclick="stopAutopilot()" id="btn-stop-autopilot"><span class="msym">stop_circle</span>arrêter</button>
           </div>
 
@@ -993,7 +993,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
             <select class="form-input" id="cc-kpi-filter" onchange="updateCCStats()" style="font-size:11px;width:auto;padding:7px 12px;border-radius:99px"><option value="today">aujourd'hui</option><option value="week">cette semaine</option><option value="month">ce mois</option><option value="all">tout</option></select>
             <button class="btn btn-ghost" onclick="exportCC()"><span class="msym">download</span>csv</button>
             <button class="btn btn-primary" onclick="toggleAssistantAppel()" id="btn-assistant-appel">
-              <span class="msym">mic</span>assistant appel ia
+              <span class="msym">mic</span>assistant appel
             </button>
           </div>
         </div>
@@ -1027,7 +1027,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
         </div>
 
 
-        <!-- ═══ ASSISTANT APPEL IA ═══ -->
+        <!-- ═══ assistant appel ═══ -->
         <div id="assistant-appel" style="display:none;margin-bottom:20px">
           <div style="background:#0a0a1a;border-radius:20px;overflow:hidden;border:1px solid rgba(0,76,237,0.3);box-shadow:0 0 40px rgba(0,76,237,0.15)">
 
@@ -1035,12 +1035,12 @@ tr:hover td { background: rgba(255,255,255,0.3); }
             <div style="padding:16px 24px;background:linear-gradient(135deg,#004ced,#0038b8);display:flex;align-items:center;justify-content:space-between">
               <div style="display:flex;align-items:center;gap:12px">
                 <div id="assistant-mic-indicator" style="width:10px;height:10px;border-radius:50%;background:#9ca3af;transition:all .3s"></div>
-                <span style="font-size:14px;font-weight:800;color:white;letter-spacing:-.5px">assistant appel ia</span>
+                <span style="font-size:14px;font-weight:800;color:white;letter-spacing:-.5px">assistant appel</span>
                 <span id="assistant-status-label" style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:600">inactif</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px">
                 <div id="assistant-timer" style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.5);font-family:monospace">00:00</div>
-                <button onclick="toggleAssistantAppel()" style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;width:28px;height:28px;cursor:pointer;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">✕</button>
+                <button onclick="toggleAssistantAppel()" style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;width:28px;height:28px;cursor:pointer;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'"></button>
               </div>
             </div>
 
@@ -1424,8 +1424,8 @@ tr:hover td { background: rgba(255,255,255,0.3); }
         <div style="background:rgba(255,255,255,0.5);border-radius:12px;padding:14px;text-align:center;border:1px solid rgba(255,255,255,0.5)"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:4px">score ia</div><div id="pm-score" style="font-size:22px;font-weight:800;color:#004ced">—</div></div>
       </div>
       <div id="pm-web-wrap" style="display:none;padding:10px 14px;background:rgba(0,76,237,0.06);border-radius:10px;border:1px solid rgba(0,76,237,0.12)">
-        🌐 <a id="pm-website" href="#" target="_blank" style="font-size:12px;color:#004ced;font-weight:600;text-decoration:none">—</a>
-        &nbsp; <a id="pm-email-finder" href="#" target="_blank" style="font-size:10px;font-weight:800;background:#004ced;color:#fff;padding:3px 10px;border-radius:99px;text-decoration:none">✉ trouver email</a>
+         <a id="pm-website" href="#" target="_blank" style="font-size:12px;color:#004ced;font-weight:600;text-decoration:none">—</a>
+        &nbsp; <a id="pm-email-finder" href="#" target="_blank" style="font-size:10px;font-weight:800;background:#004ced;color:#fff;padding:3px 10px;border-radius:99px;text-decoration:none"> trouver email</a>
       </div>
       <div class="form-group" style="margin:0"><label class="form-label">statut</label>
         <select class="form-input" id="pm-status" onchange="updateStatusFromModal()"><option value="new">nouveau</option><option value="contacted">contacté</option><option value="replied">répondu</option><option value="converted">converti</option></select>
@@ -1442,7 +1442,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
             <div style="font-size:12px;font-weight:800;color:white;letter-spacing:-.3px">fiche pré-appel ia</div>
             <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:1px">analyse générée par claude</div>
           </div>
-          <button onclick="document.getElementById('pm-fiche-wrap').style.display='none'" style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;width:26px;height:26px;cursor:pointer;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:14px">✕</button>
+          <button onclick="document.getElementById('pm-fiche-wrap').style.display='none'" style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;width:26px;height:26px;cursor:pointer;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:14px"></button>
         </div>
         <!-- Loading state -->
         <div id="pm-fiche-loading" style="padding:32px;text-align:center;background:rgba(0,76,237,0.03)">
@@ -1545,7 +1545,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
       <div class="modal-body">
         <p style="font-size:13px;color:#6b7280;margin-bottom:16px;line-height:1.65">tapez exactement <strong style="color:#dc2626;font-family:monospace">ANNULER MON COMPTE</strong> pour confirmer.</p>
         <div class="form-group" style="margin-bottom:16px"><input class="form-input" id="cancel-confirm-text" placeholder="tapez : ANNULER MON COMPTE" oninput="checkCancelConfirm()" style="border-color:rgba(220,38,38,0.3);font-family:monospace"/></div>
-        <div style="background:rgba(255,255,255,0.5);border-radius:10px;padding:12px 14px;font-size:12px;color:#6b7280;border:1px solid rgba(255,255,255,0.5);line-height:1.9">✓ abonnement annulé immédiatement<br>✓ mois de <strong id="cancel-month-reminder"></strong> facturé intégralement<br>✓ données supprimées dans 30 jours</div>
+        <div style="background:rgba(255,255,255,0.5);border-radius:10px;padding:12px 14px;font-size:12px;color:#6b7280;border:1px solid rgba(255,255,255,0.5);line-height:1.9"> abonnement annulé immédiatement<br> mois de <strong id="cancel-month-reminder"></strong> facturé intégralement<br> données supprimées dans 30 jours</div>
       </div>
       <div class="modal-footer"><button class="btn btn-ghost" onclick="cancelStep(2)">← retour</button><button class="btn" id="cancel-final-btn" style="background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.15)" onclick="confirmCancellation()">confirmer l'annulation</button></div>
     </div>
@@ -1817,7 +1817,7 @@ function refreshDashProspects() {
     const ini=p.name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
     return `<div class="prospect-row">
       <div class="avatar" style="background:${colors[i%colors.length]}">${ini}</div>
-      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div><div style="font-size:10px;color:#9ca3af;margin-top:1px">${p.address.slice(0,40)} · ★ ${p.rating}</div></div>
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div><div style="font-size:10px;color:#9ca3af;margin-top:1px">${p.address.slice(0,40)} ·  ${p.rating}</div></div>
       <span class="score ${sc}">${p.score}</span>
       <button class="btn btn-ghost btn-sm" style="opacity:0;transition:opacity .12s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0" onclick="openEmailModal('${p.id}')"><span class="msym">auto_awesome</span>email</button>
     </div>`;
@@ -1899,7 +1899,7 @@ function renderProspectsTable(prospects,type,city,minScore){
   const colors=['#004ced','#7c3aed','#0284c7','#059669','#d97706','#dc2626'];
   document.getElementById('results-table').innerHTML=prospects.map((p,i)=>{
     const sc=p.score>=80?'s-h':p.score>=60?'s-m':'s-l';
-    const stars=p.rating?'★'.repeat(Math.round(p.rating))+'☆'.repeat(5-Math.round(p.rating)):'—';
+    const stars=p.rating?''.repeat(Math.round(p.rating))+''.repeat(5-Math.round(p.rating)):'—';
     return `<div id="card-${p.id}" class="pipeline-card" style="display:flex;flex-direction:column;gap:10px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
         <div style="font-size:13px;font-weight:800;color:#0a0a1a;line-height:1.3;flex:1">${p.name}</div>
@@ -1914,7 +1914,7 @@ function renderProspectsTable(prospects,type,city,minScore){
         ?`<a href="${p.website}" target="_blank" style="font-size:11px;color:#004ced;text-decoration:none;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:4px"><span class="msym" style="font-size:13px">language</span>${p.website.replace(/^https?:\/\//,'').slice(0,32)}</a>`
         :`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#d1d5db;font-style:italic"><span class="msym" style="font-size:13px">language</span>pas de site web</div>`
       }
-      <div style="font-size:11px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📍 ${p.address}</div>
+      <div style="font-size:11px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"> ${p.address}</div>
       <div style="display:flex;gap:6px;margin-top:4px">
         <button id="email-cell-${p.id}" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center" onclick="openEmailModal('${p.id}')"><span class="msym">auto_awesome</span>email ia</button>
         <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="addToPipeline(state.prospects.find(x=>x.id==='${p.id}'))"><span class="msym">conversion_path</span>pipeline</button>
@@ -2183,7 +2183,7 @@ function refreshPipeline() {
   if(!filtered.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#9ca3af;padding:40px">aucun prospect avec ce statut.</div>';return;}
   const sConfig={new:{label:'nouveau',bg:'rgba(0,76,237,0.08)',color:'#004ced',icon:'fiber_new'},contacted:{label:'contacté',bg:'rgba(217,119,6,0.08)',color:'#d97706',icon:'send'},replied:{label:'répondu',bg:'rgba(2,132,199,0.08)',color:'#0284c7',icon:'forum'},converted:{label:'converti',bg:'rgba(5,150,105,0.08)',color:'#059669',icon:'emoji_events'}};
   grid.innerHTML=filtered.map(p=>{
-    const sc=p.score>=80?'s-h':p.score>=60?'s-m':'s-l';const st=sConfig[p.status]||sConfig.new;const stars=p.rating?'★'.repeat(Math.round(p.rating))+'☆'.repeat(5-Math.round(p.rating)):'';const hasPhone=p.phone&&p.phone!=='null';
+    const sc=p.score>=80?'s-h':p.score>=60?'s-m':'s-l';const st=sConfig[p.status]||sConfig.new;const stars=p.rating?''.repeat(Math.round(p.rating))+''.repeat(5-Math.round(p.rating)):'';const hasPhone=p.phone&&p.phone!=='null';
     return `<div class="pipeline-card" onclick="openProspectModal('${p.id}')">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px">
         <div style="font-size:13px;font-weight:800;color:#0a0a1a;line-height:1.3;flex:1">${p.name}</div>
@@ -2197,8 +2197,8 @@ function refreshPipeline() {
         <span class="msym" style="font-size:14px;color:${hasPhone?'#059669':'#9ca3af'}">${hasPhone?'phone':'phone_disabled'}</span>
         <span style="font-size:12px;font-weight:${hasPhone?'800':'400'};color:${hasPhone?'#059669':'#9ca3af'}">${hasPhone?p.phone:'numéro non disponible'}</span>
       </div>
-      <div style="font-size:11px;color:#9ca3af;margin-top:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📍 ${p.address||'—'}</div>
-      ${p.email_generated?'<span class="badge badge-green" style="margin-top:8px;display:inline-flex">✓ email prêt</span>':''}
+      <div style="font-size:11px;color:#9ca3af;margin-top:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"> ${p.address||'—'}</div>
+      ${p.email_generated?'<span class="badge badge-green" style="margin-top:8px;display:inline-flex"> email prêt</span>':''}
     </div>`;
   }).join('');
 }
@@ -2210,7 +2210,7 @@ function openProspectModal(pid) {
   currentPipelineId=pid;
   document.getElementById('pm-name').textContent=p.name;
   document.getElementById('pm-address').textContent=p.address||'';
-  document.getElementById('pm-rating').textContent=p.rating?'★ '+p.rating:'—';
+  document.getElementById('pm-rating').textContent=p.rating?' '+p.rating:'—';
   document.getElementById('pm-score').textContent=p.score||'—';
   document.getElementById('pm-status').value=p.status||'new';
   document.getElementById('pm-notes').value=p.notes||'';
@@ -2323,7 +2323,7 @@ async function searchInsee(){
         <td>
           <strong style="font-size:13px">${nom}</strong>
           <div style="font-size:10px;color:#9ca3af;margin-top:2px">${r.categorie_juridique_libelle||'—'} · ${effectifLabel}</div>
-          ${hasWeb?`<a href="${r.siege.site_web}" target="_blank" style="font-size:10px;color:#004ced;text-decoration:none">🌐 site web</a>`:''}
+          ${hasWeb?`<a href="${r.siege.site_web}" target="_blank" style="font-size:10px;color:#004ced;text-decoration:none"> site web</a>`:''}
         </td>
         <td style="font-family:monospace;font-size:10px">${siret}</td>
         <td><span class="badge badge-blue">${nafCode}</span></td>
@@ -2607,14 +2607,14 @@ async function searchAO(){
         </td>
         <td>
           <div style="font-size:12px;font-weight:700">${acheteur}</div>
-          ${telAcheteur?`<a href="tel:${telAcheteur}" style="font-size:11px;color:#059669;text-decoration:none;font-weight:700">📞 ${telAcheteur}</a>`:''}
-          ${emailAcheteur?`<div><a href="mailto:${emailAcheteur}" style="font-size:10px;color:#004ced;text-decoration:none">✉ ${emailAcheteur.slice(0,30)}</a></div>`:''}
+          ${telAcheteur?`<a href="tel:${telAcheteur}" style="font-size:11px;color:#059669;text-decoration:none;font-weight:700"> ${telAcheteur}</a>`:''}
+          ${emailAcheteur?`<div><a href="mailto:${emailAcheteur}" style="font-size:10px;color:#004ced;text-decoration:none"> ${emailAcheteur.slice(0,30)}</a></div>`:''}
         </td>
         <td><span class="badge ${typeColor}" style="white-space:nowrap;font-size:9px">${typeLib}</span></td>
         <td style="font-size:12px;font-weight:700">${dept}</td>
         <td style="white-space:nowrap">
           <div style="font-size:12px;font-weight:800;color:${dateUrgent?'#dc2626':'#d97706'}">${dateLimiteFmt}</div>
-          ${dateUrgent?'<div style="font-size:9px;color:#dc2626;font-weight:800">⚡ urgent</div>':''}
+          ${dateUrgent?'<div style="font-size:9px;color:#dc2626;font-weight:800"> urgent</div>':''}
         </td>
         <td>
           <div style="display:flex;flex-direction:column;gap:4px">
@@ -2673,7 +2673,7 @@ async function launchAutopilot(){
       if(score<minScore) continue;
       const prospect={id:p.place_id,name:p.name,address:p.formatted_address||'',rating,reviews,score,phone:details?.formatted_phone_number||null,website:details?.website||null,email_generated:null};
       prospects.push(prospect);totalProspects++;
-      apLog('info','<strong>'+p.name+'</strong>'+(prospect.phone?' — <span style="color:#059669">📞 '+prospect.phone+'</span>':'')+(+' (score '+score+')'));
+      apLog('info','<strong>'+p.name+'</strong>'+(prospect.phone?' — <span style="color:#059669"> '+prospect.phone+'</span>':'')+(+' (score '+score+')'));
       apUpdateCounters(totalProspects,totalEmails,totalPipeline);apSetProgress(30+Math.round(prospects.length/Math.min(nb,places.length)*30),'enrichissement...');
       await sleep(150);
     }
@@ -2725,7 +2725,7 @@ async function manualScan(){try{const res=await fetch(ALMA_CONFIG.supaUrl+'/func
 
 // ═══ B2C CROSS SEARCH ═══
 async function searchCrossB2C(){const zone=document.getElementById('cross-zone').value.trim();if(!zone){alert('renseignez une zone.');return;}show('cross-spinner');show('cross-progress');hide('cross-results');const scoreMin=parseInt(document.getElementById('cross-score-min').value)||2;const max=parseInt(document.getElementById('cross-max').value)||20;const useDVF=document.getElementById('cross-dvf').checked,usePermis=document.getElementById('cross-permis').checked,useDPE=document.getElementById('cross-dpe').checked,useCopro=document.getElementById('cross-copro').checked,useBodacc=document.getElementById('cross-bodacc').checked;const sources=[];if(useDVF) sources.push({id:'dvf',label:'dvf',icon:'real_estate_agent'});if(usePermis) sources.push({id:'permis',label:'permis',icon:'construction'});if(useDPE) sources.push({id:'dpe',label:'dpe f/g',icon:'eco'});if(useCopro) sources.push({id:'copro',label:'copros',icon:'apartment'});if(useBodacc) sources.push({id:'bodacc',label:'bodacc',icon:'gavel'});document.getElementById('cross-sources-status').innerHTML=sources.map(s=>`<div style="display:flex;align-items:center;gap:10px;font-size:12px"><span class="msym" style="font-size:14px;color:#004ced">${s.icon}</span><span style="flex:1;font-weight:600">${s.label}</span><span id="src-status-${s.id}" style="color:#9ca3af">⏳ chargement...</span></div>`).join('');document.getElementById('cross-progress-text').textContent='interrogation des '+sources.length+' sources...';
-try{const geoRes=await fetch('https://api-adresse.data.gouv.fr/search/?q='+encodeURIComponent(zone)+'&type=municipality&limit=1');const geoData=await geoRes.json();const feat=geoData.features?.[0];const codeCommune=feat?.properties?.citycode;const nomCommune=feat?.properties?.city||zone;const codeDept=codeCommune?codeCommune.slice(0,2):zone;const signalMap={};function addSignal(adresse,commune,type,data){const key=adresse+'|'+commune;if(!signalMap[key]) signalMap[key]={adresse,commune,signaux:[],score:0};signalMap[key].signaux.push({type,data});signalMap[key].score++;}function setSourceStatus(id,status,count){const el=document.getElementById('src-status-'+id);if(el) el.innerHTML=status==='ok'?`<span style="color:#059669">✓ ${count} résultats</span>`:'<span style="color:#dc2626">✗ indisponible</span>';}
+try{const geoRes=await fetch('https://api-adresse.data.gouv.fr/search/?q='+encodeURIComponent(zone)+'&type=municipality&limit=1');const geoData=await geoRes.json();const feat=geoData.features?.[0];const codeCommune=feat?.properties?.citycode;const nomCommune=feat?.properties?.city||zone;const codeDept=codeCommune?codeCommune.slice(0,2):zone;const signalMap={};function addSignal(adresse,commune,type,data){const key=adresse+'|'+commune;if(!signalMap[key]) signalMap[key]={adresse,commune,signaux:[],score:0};signalMap[key].signaux.push({type,data});signalMap[key].score++;}function setSourceStatus(id,status,count){const el=document.getElementById('src-status-'+id);if(el) el.innerHTML=status==='ok'?`<span style="color:#059669"> ${count} résultats</span>`:'<span style="color:#dc2626"> indisponible</span>';}
 const promises=[];
 if(useDVF&&codeCommune){promises.push(proxyFetch('https://api.cquest.org/dvf?code_commune='+codeCommune+'&nb_resultats=30').then(d=>{const items=d.resultats||[];items.forEach(r=>{const adresse=[(r.adresse_numero||''),(r.adresse_nom_voie||'')].filter(Boolean).join(' ')||'transaction '+nomCommune;addSignal(adresse,r.l_commune||nomCommune,'DVF',{prix:r.valeur_fonciere?new Intl.NumberFormat('fr-FR').format(r.valeur_fonciere)+' €':'',type:r.type_local||'',date:r.date_mutation||''});});setSourceStatus('dvf','ok',items.length);}).catch(()=>setSourceStatus('dvf','error',0)));}
 if(usePermis){promises.push(proxyFetch('https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=sitadel-logements&q='+encodeURIComponent(codeDept)+'&rows=30&sort=date_prise_en_compte&order=desc').then(d=>{const records=d.records||[];records.forEach(r=>{const f=r.fields;const adresse=[(f.ad_num_voie||''),(f.ad_nom_voie||'')].filter(Boolean).join(' ')||'pc '+nomCommune;addSignal(adresse,f.libelle_commune||nomCommune,'Permis',{type:f.type_projet_lib||''});});setSourceStatus('permis','ok',records.length);}).catch(()=>setSourceStatus('permis','error',0)));}
@@ -2766,7 +2766,7 @@ if(useBodacc){promises.push(proxyFetch('https://bodacc-datadila.opendatasoft.com
         await Promise.allSettled(promises);const results=Object.values(signalMap).filter(p=>p.score>=scoreMin).sort((a,b)=>b.score-a.score).slice(0,max);
 document.getElementById('cross-results-sub').textContent=results.length+' opportunités · '+nomCommune+' · '+scoreMin+'+ signal(s)';
 window._b2cResults=results;
-document.getElementById('cross-table').innerHTML=results.map((p,idx)=>{const heatIcon=p.score>=3?'🔥':p.score>=2?'⚡':'📍';const heatColor=p.score>=3?'#dc2626':p.score>=2?'#d97706':'#004ced';const heatBg=p.score>=3?'rgba(220,38,38,0.08)':p.score>=2?'rgba(217,119,6,0.08)':'rgba(0,76,237,0.08)';const signalBadges=p.signaux.map(s=>{const sColors={DVF:'#7c3aed',Permis:'#7c3aed',DPE:'#059669',Copro:'#0284c7',BODACC:'#004ced'};const col=sColors[s.type]||'#004ced';return`<span style="font-size:9px;font-weight:800;background:${col}15;color:${col};padding:3px 8px;border-radius:99px;border:1px solid ${col}22">${s.type}</span>`;}).join(' ');const mapsLink='https://www.google.com/maps/search/'+encodeURIComponent(p.adresse+' '+p.commune);const score=Math.min(99,50+p.score*15);
+document.getElementById('cross-table').innerHTML=results.map((p,idx)=>{const heatIcon=p.score>=3?'':p.score>=2?'':'';const heatColor=p.score>=3?'#dc2626':p.score>=2?'#d97706':'#004ced';const heatBg=p.score>=3?'rgba(220,38,38,0.08)':p.score>=2?'rgba(217,119,6,0.08)':'rgba(0,76,237,0.08)';const signalBadges=p.signaux.map(s=>{const sColors={DVF:'#7c3aed',Permis:'#7c3aed',DPE:'#059669',Copro:'#0284c7',BODACC:'#004ced'};const col=sColors[s.type]||'#004ced';return`<span style="font-size:9px;font-weight:800;background:${col}15;color:${col};padding:3px 8px;border-radius:99px;border:1px solid ${col}22">${s.type}</span>`;}).join(' ');const mapsLink='https://www.google.com/maps/search/'+encodeURIComponent(p.adresse+' '+p.commune);const score=Math.min(99,50+p.score*15);
 return`<div class="pipeline-card" style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;align-items:center;justify-content:space-between"><span style="padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800;background:${heatBg};color:${heatColor}">${heatIcon} ${p.score} signal${p.score>1?'s':''}</span><span style="font-size:9px;color:#9ca3af">score ${score}</span></div><div><div style="display:flex;align-items:flex-start;gap:8px"><span class="msym" style="font-size:16px;color:#004ced;flex-shrink:0;margin-top:1px">location_on</span><div><div style="font-size:13px;font-weight:800;color:#0a0a1a;line-height:1.3">${p.adresse}</div><div style="font-size:11px;color:#9ca3af;margin-top:2px">${p.commune}</div></div></div></div><div style="display:flex;gap:4px;flex-wrap:wrap">${signalBadges}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><a href="${mapsLink}" target="_blank" class="btn btn-ghost btn-sm" style="justify-content:center;text-decoration:none"><span class="msym">map</span>maps</a><button class="btn btn-ghost btn-sm" style="justify-content:center" onclick="genCourrierB2C(${idx})"><span class="msym">auto_awesome</span>courrier</button><button class="btn btn-ghost btn-sm" style="justify-content:center;grid-column:span 2" onclick="addToP(this)" data-name="${p.adresse}" data-addr="${p.commune}" data-score="${score}"><span class="msym">conversion_path</span>ajouter au pipeline</button></div></div>`;}).join('');
 hide('cross-progress');hide('cross-spinner');show('cross-results');addActivity('croisement b2c : '+zone+' ('+results.length+' opportunités)','hub','primary');}catch(e){alert('erreur : '+e.message);hide('cross-progress');hide('cross-spinner');}}
 
@@ -2795,7 +2795,7 @@ function filterCC(filter){const all=getCCData();const now=new Date();const today
 function logCC(type){const note=(document.getElementById('cc-note')?.value||'').trim();saveCCData([{id:Date.now(),type,note,ts:new Date().toISOString()},...getCCData()]);document.getElementById('cc-note').value='';const el=document.getElementById('cc-c-'+type);if(el){el.textContent=parseInt(el.textContent||0)+1;el.style.transform='scale(1.4)';setTimeout(()=>el.style.transform='scale(1)',180);}updateCCStats();renderCCHistory();renderCCCharts();}
 function updateCCStats(){const filter=document.getElementById('cc-kpi-filter')?.value||'today';const data=filterCC(filter);const T=data.length;const nr=data.filter(d=>d.type==='non_repondu').length;const rd=data.filter(d=>d.type==='rdv').length;const cv=data.filter(d=>d.type==='converti').length;const rp=data.filter(d=>d.type==='rappel').length;const rc=data.filter(d=>d.type==='raccroche').length;const ni=data.filter(d=>d.type==='non_interesse').length;const contacted=T-nr;const pContact=T>0?Math.round(contacted/T*100):0;const pRefus=contacted>0?Math.round((rc+ni)/contacted*100):0;const setV=(id,val)=>{const e=document.getElementById(id);if(e){e.textContent=val;}};setV('kpi-total',T);setV('kpi-contact',pContact+'%');setV('kpi-rdv',rd);setV('kpi-conv',cv);setV('kpi-rappel',rp);setV('kpi-refus',pRefus+'%');const todayData=filterCC('today');const s=document.getElementById('cc-session');if(s) s.textContent="aujourd'hui · "+todayData.length+' appel'+(todayData.length!==1?'s':'');Object.keys(CC_CFG).forEach(type=>{const el=document.getElementById('cc-c-'+type);if(el) el.textContent=filterCC(filter).filter(d=>d.type===type).length;});updateCCGoal();const breakdown=document.getElementById('cc-breakdown');if(breakdown&&T>0){breakdown.innerHTML=Object.keys(CC_CFG).map(type=>{const count=data.filter(d=>d.type===type).length;if(!count) return '';const pct=Math.round(count/T*100);const cfg=CC_CFG[type];return`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:10px;font-weight:700;color:${cfg.color};flex-shrink:0;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cfg.label}</span><div style="flex:1;height:3px;background:rgba(0,0,0,0.06);border-radius:99px;overflow:hidden"><div style="height:100%;background:${cfg.color};border-radius:99px;width:${pct}%"></div></div><span style="font-size:10px;font-weight:800;color:${cfg.color};flex-shrink:0">${count}</span></div>`;}).join('');}else if(breakdown){breakdown.innerHTML='<div style="text-align:center;padding:20px;color:#9ca3af;font-size:12px">aucune donnée</div>';}}
 function updateCCGoal(){const goal=parseInt(document.getElementById('cc-goal')?.value)||50;const today=filterCC('today').length;const pct=Math.min(100,Math.round(today/goal*100));const bar=document.getElementById('cc-goal-bar');if(bar) bar.style.width=pct+'%';const lbl=document.getElementById('cc-goal-label');if(lbl) lbl.textContent=today+' / '+goal;const pctEl=document.getElementById('cc-goal-pct');if(pctEl) pctEl.textContent=pct+'%';}
-function renderCCHistory(){const filter=document.getElementById('cc-hist-filter')?.value||'today';const data=filterCC(filter);const container=document.getElementById('cc-history');if(!container) return;if(!data.length){container.innerHTML='<div style="text-align:center;padding:28px;color:#9ca3af;font-size:12px">aucun appel enregistré.</div>';return;}container.innerHTML=data.map(d=>{const cfg=CC_CFG[d.type]||{label:d.type,color:'#9ca3af',icon:'call'};const t=new Date(d.ts);const time=t.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});const date=t.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});return`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.3)"><span class="msym" style="font-size:15px;color:${cfg.color};flex-shrink:0">${cfg.icon}</span><span style="font-size:12px;font-weight:700;color:${cfg.color};flex-shrink:0">${cfg.label}</span>${d.note?`<span style="font-size:11px;color:#9ca3af;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">— ${d.note}</span>`:'<span style="flex:1"></span>'}<span style="font-size:10px;color:#9ca3af;flex-shrink:0">${date} ${time}</span><button onclick="deleteCC(${d.id})" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;padding:2px 4px;opacity:.4;transition:opacity .1s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.4">✕</button></div>`;}).join('');}
+function renderCCHistory(){const filter=document.getElementById('cc-hist-filter')?.value||'today';const data=filterCC(filter);const container=document.getElementById('cc-history');if(!container) return;if(!data.length){container.innerHTML='<div style="text-align:center;padding:28px;color:#9ca3af;font-size:12px">aucun appel enregistré.</div>';return;}container.innerHTML=data.map(d=>{const cfg=CC_CFG[d.type]||{label:d.type,color:'#9ca3af',icon:'call'};const t=new Date(d.ts);const time=t.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});const date=t.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});return`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.3)"><span class="msym" style="font-size:15px;color:${cfg.color};flex-shrink:0">${cfg.icon}</span><span style="font-size:12px;font-weight:700;color:${cfg.color};flex-shrink:0">${cfg.label}</span>${d.note?`<span style="font-size:11px;color:#9ca3af;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">— ${d.note}</span>`:'<span style="flex:1"></span>'}<span style="font-size:10px;color:#9ca3af;flex-shrink:0">${date} ${time}</span><button onclick="deleteCC(${d.id})" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;padding:2px 4px;opacity:.4;transition:opacity .1s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.4"></button></div>`;}).join('');}
 function deleteCC(id){saveCCData(getCCData().filter(d=>d.id!==id));updateCCStats();renderCCHistory();}
 function resetCCToday(){if(!confirm('supprimer tous les appels du jour ?')) return;const today=new Date().toISOString().split('T')[0];saveCCData(getCCData().filter(d=>!d.ts.startsWith(today)));updateCCStats();renderCCHistory();renderCCCharts();}
 function exportCC(){const data=getCCData();if(!data.length){alert('aucun appel à exporter.');return;}const rows=[['date','heure','résultat','note']];data.forEach(d=>{const t=new Date(d.ts);rows.push([t.toLocaleDateString('fr-FR'),t.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),CC_CFG[d.type]?.label||d.type,d.note||'']);});const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='tracker-appels-'+new Date().toISOString().split('T')[0]+'.csv';a.click();}
@@ -3026,7 +3026,7 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
 })();
 
 
-// ═══ ASSISTANT APPEL IA ═══
+// ═══ assistant appel ═══
 const assistantState = {
   active: false,
   timerInterval: null,
