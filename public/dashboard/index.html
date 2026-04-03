@@ -1714,9 +1714,7 @@ function updateQuotaUI(){
 
 // ═══ CLAUDE API PROXY ═══
 async function claudeAPI(messages, max_tokens=800, quota_type=null) {
-  const { createClient } = supabase;
-  const sb = createClient(ALMA_CONFIG.supaUrl, ALMA_CONFIG.supaAnon);
-  const { data: { session } } = await sb.auth.getSession();
+  const { data: { session } } = await _sb.auth.getSession();
   if (!session) throw new Error('non authentifié');
 
   const res = await fetch(
@@ -1741,14 +1739,6 @@ async function claudeAPI(messages, max_tokens=800, quota_type=null) {
   }
 
   return res.json();
-},
-    body: JSON.stringify({ messages, max_tokens })
-  });
-  if (!res.ok) {
-    const e = await res.json();
-    throw new Error(e.error || 'erreur api claude');
-  }
-  return res.json();
 }
 
 // ═══ CONFIG ═══
@@ -1764,6 +1754,10 @@ const ALMA_CONFIG = {
   resendFrom: 'onboarding@resend.dev',
 };
 const SUPABASE_PROXY = 'https://tzrtptpzbrszibuifzns.supabase.co/functions/v1/proxy';
+
+// ═══ CLIENT SUPABASE GLOBAL ═══
+const _sb = supabase.createClient(ALMA_CONFIG.supaUrl, ALMA_CONFIG.supaAnon);
+
 
 // ═══ STATE ═══
 const state = { prospects: [], pipeline: [], activity: [], stats: { prospects:0,emails:0,pipeline:0,converted:0 }, searchHistory: [] };
@@ -3114,8 +3108,7 @@ document.addEventListener('click',function(e){const navItem=e.target.closest('.n
 // ═══ LOGOUT ═══
 async function confirmLogout(){
   if(confirm('se déconnecter de Huntly. ?')){
-    const { createClient } = supabase;
-    const sb = createClient('https://tzrtptpzbrszibuifzns.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk');
+    const sb = _sb;
     await sb.auth.signOut();
     localStorage.clear();
     window.location.href='/login';
@@ -3242,10 +3235,7 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
 
 // ═══ AUTH & PLAN CHECK ═══
 (async function() {
-  const SUPA_URL = 'https://tzrtptpzbrszibuifzns.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk';
-  const { createClient } = supabase;
-  const sb = createClient(SUPA_URL, SUPA_KEY);
+  const sb = _sb;
 
   // 1. Vérifier session
   const { data: { session } } = await sb.auth.getSession();
