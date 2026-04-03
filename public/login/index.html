@@ -10,14 +10,14 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 *{text-transform:lowercase!important}
 :root{
-  --blue:#0052FF;
-  --blue-dim:#0042d1;
+  --blue:#0055D4;
+  --blue-dim:#0047B8;
   --dark:#0a0a0a;
   --text:rgba(0,0,0,0.85);
   --text-muted:rgba(0,0,0,0.42);
   --text-faint:rgba(0,0,0,0.25);
   --border:rgba(0,0,0,0.08);
-  --border-focus:rgba(0,82,255,0.35);
+  --border-focus:rgba(0,85,212,0.35);
   --surface:#f9f9fb;
   --card:#ffffff;
   --input-bg:#f3f3f6;
@@ -45,8 +45,8 @@ body::before{
   content:'';
   position:fixed;inset:0;
   background:
-    radial-gradient(ellipse 70% 50% at 20% 0%, rgba(0,82,255,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 85% 90%, rgba(0,82,255,0.03) 0%, transparent 60%);
+    radial-gradient(ellipse 70% 50% at 20% 0%, rgba(0,85,212,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 90%, rgba(0,85,212,0.03) 0%, transparent 60%);
   pointer-events:none;
   z-index:0;
 }
@@ -123,7 +123,7 @@ input::placeholder{color:var(--text-faint)}
 input:focus,select:focus{
   background:var(--input-bg-focus);
   border-color:var(--border-focus);
-  box-shadow:0 0 0 4px rgba(0,82,255,0.08);
+  box-shadow:0 0 0 4px rgba(0,85,212,0.08);
 }
 select{
   background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -154,7 +154,7 @@ select{
   transition:all .2s;
   margin-top:.2rem;
 }
-.btn-primary:hover{background:var(--blue-dim);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,82,255,0.28)}
+.btn-primary:hover{background:var(--blue-dim);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,85,212,0.28)}
 .btn-primary:active{transform:translateY(0)}
 .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
@@ -253,7 +253,7 @@ select{
   background:var(--surface);color:var(--text-faint);
   transition:all .25s;
 }
-.step-circle.active{border-color:var(--blue);background:rgba(0,82,255,0.08);color:var(--blue)}
+.step-circle.active{border-color:var(--blue);background:rgba(0,85,212,0.08);color:var(--blue)}
 .step-circle.done{border-color:var(--blue);background:var(--blue);color:#fff}
 .step-label{font-size:.62rem;font-weight:600;margin-top:.4rem;color:var(--text-faint);transition:color .25s;letter-spacing:.04em}
 .step-label.active,.step-label.done{color:var(--blue)}
@@ -298,7 +298,7 @@ select{
 
 <!-- Logo -->
 <a href="/" class="logo">
-  <svg viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;flex-shrink:0"><rect width="66" height="66" rx="14" fill="#0052FF"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg>
+  <svg viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;flex-shrink:0"><rect width="66" height="66" rx="14" fill="#0055D4"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg>
   <span class="logo-text">Huntly.</span>
 </a>
 
