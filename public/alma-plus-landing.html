@@ -8,8 +8,8 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --blue:#0052FF;
-  --blue-light:#4d85ff;
+  --blue:#0055D4;
+  --blue-light:#5588E8;
   --dark:#0a0a1a;
   --glass-white:rgba(255,255,255,0.72);
   --glass-border:rgba(255,255,255,0.45);
@@ -37,13 +37,13 @@ body{
 /* BACKGROUNDS */
 .bg-mesh{
   background:
-    radial-gradient(ellipse 80% 60% at 20% -10%, rgba(0,82,255,0.09) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 110%, rgba(0,82,255,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 20% -10%, rgba(0,85,212,0.09) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 110%, rgba(0,85,212,0.05) 0%, transparent 60%),
     #ffffff;
 }
 .bg-dark-mesh{
   background:
-    radial-gradient(ellipse 70% 60% at 10% 20%, rgba(0,82,255,0.25) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 10% 20%, rgba(0,85,212,0.25) 0%, transparent 55%),
     radial-gradient(ellipse 60% 50% at 90% 80%, rgba(100,60,255,0.2) 0%, transparent 55%),
     #050510;
 }
@@ -86,7 +86,7 @@ nav{
   font-size:.84rem;font-weight:600;text-decoration:none;
   transition:all .2s;
 }
-.nav-cta:hover{background:#0042d1;transform:translateY(-1px)}
+.nav-cta:hover{background:#0047B8;transform:translateY(-1px)}
 
 /* HERO */
 .hero{
@@ -151,9 +151,9 @@ nav{
   font-size:.95rem;font-weight:600;text-decoration:none;
   display:inline-flex;align-items:center;gap:.4rem;
   transition:all .25s;
-  box-shadow:0 4px 20px rgba(0,82,255,0.3);
+  box-shadow:0 4px 20px rgba(0,85,212,0.3);
 }
-.btn-primary:hover{background:#0042d1;transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,82,255,0.4)}
+.btn-primary:hover{background:#0047B8;transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,85,212,0.4)}
 .btn-secondary{
   background:rgba(255,255,255,0.75);
   backdrop-filter:blur(20px);
@@ -174,7 +174,7 @@ nav{
   overflow:hidden;
   box-shadow:
     0 2px 0 0 rgba(255,255,255,0.8) inset,
-    0 40px 100px -20px rgba(0,82,255,0.18),
+    0 40px 100px -20px rgba(0,85,212,0.18),
     0 20px 40px -10px rgba(0,0,0,0.12);
   position:relative;
 }
@@ -260,8 +260,8 @@ section{padding:7rem 2rem}
 .section-eyebrow{
   display:inline-flex;align-items:center;gap:.5rem;
   font-size:.72rem;font-weight:600;letter-spacing:.12em;
-  color:var(--blue);background:rgba(0,82,255,0.07);
-  border:1px solid rgba(0,82,255,0.13);
+  color:var(--blue);background:rgba(0,85,212,0.07);
+  border:1px solid rgba(0,85,212,0.13);
   padding:.35rem .9rem;border-radius:980px;margin-bottom:1.2rem;
 }
 .section-title{
@@ -278,7 +278,7 @@ section{padding:7rem 2rem}
 .feat-card:hover{transform:translateY(-4px)}
 .feat-card-dark{background:rgba(10,10,26,0.88);backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.15)}
 .feat-card-glass{background:rgba(255,255,255,0.7);backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.8);box-shadow:0 8px 32px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.9)}
-.feat-card-blue{background:linear-gradient(135deg,#0052FF,#0038cc);border:1px solid rgba(255,255,255,0.2);box-shadow:0 20px 60px rgba(0,82,255,0.35),inset 0 1px 0 rgba(255,255,255,0.2)}
+.feat-card-blue{background:linear-gradient(135deg,#0055D4,#0038cc);border:1px solid rgba(255,255,255,0.2);box-shadow:0 20px 60px rgba(0,85,212,0.35),inset 0 1px 0 rgba(255,255,255,0.2)}
 .feat-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:1.6rem;backdrop-filter:blur(10px)}
 .feat-title{font-size:1.1rem;font-weight:600;letter-spacing:-0.03em;margin-bottom:.7rem;line-height:1.25}
 .feat-desc{font-size:.88rem;line-height:1.7;font-weight:400}
@@ -286,7 +286,7 @@ section{padding:7rem 2rem}
 
 /* ANALYTICS SPLIT */
 .split-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
-.analytics-inner{background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:24px;padding:1.6rem;box-shadow:0 4px 24px rgba(0,82,255,0.08)}
+.analytics-inner{background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:24px;padding:1.6rem;box-shadow:0 4px 24px rgba(0,85,212,0.08)}
 .bar-chart{display:flex;align-items:flex-end;gap:.5rem;height:110px;margin-bottom:1.2rem}
 .bar-c{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem}
 .bar-v{width:100%;border-radius:5px 5px 0 0;transition:all .3s}
@@ -297,7 +297,7 @@ section{padding:7rem 2rem}
 .analytics-kpi-label{font-size:.66rem;color:rgba(0,0,0,0.38);margin-top:2px}
 .checklist{display:flex;flex-direction:column;gap:.9rem}
 .check-item{display:flex;align-items:center;gap:.8rem}
-.check-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,82,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.check-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,85,212,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
 /* SOURCES */
 .sources-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:1rem}
@@ -323,7 +323,7 @@ section{padding:7rem 2rem}
 .price-card{border-radius:24px;padding:2.2rem;transition:transform .3s}
 .price-card:hover{transform:translateY(-4px)}
 .price-card-glass{background:#fff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 4px 20px rgba(0,0,0,0.06)}
-.price-card-featured{background:rgba(10,10,26,0.88);backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.12);box-shadow:0 30px 80px rgba(0,82,255,0.25),inset 0 1px 0 rgba(255,255,255,0.12);transform:scale(1.03)}
+.price-card-featured{background:rgba(10,10,26,0.88);backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.12);box-shadow:0 30px 80px rgba(0,85,212,0.25),inset 0 1px 0 rgba(255,255,255,0.12);transform:scale(1.03)}
 .price-card-featured:hover{transform:scale(1.03) translateY(-4px)}
 .price-tier{font-size:.68rem;font-weight:700;letter-spacing:.18em;margin-bottom:1.6rem}
 .price-amount{font-size:2rem;font-weight:700;letter-spacing:-0.06em;font-style:normal}
@@ -334,7 +334,7 @@ section{padding:7rem 2rem}
 
 /* FAQ */
 .faq-item{background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:18px;padding:1.4rem 1.6rem;margin-bottom:.7rem;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
-.faq-item:hover{background:#f9f9fb;border-color:rgba(0,82,255,0.15)}
+.faq-item:hover{background:#f9f9fb;border-color:rgba(0,85,212,0.15)}
 .faq-summary{display:flex;justify-content:space-between;align-items:center;font-size:.94rem;font-weight:600;list-style:none}
 .faq-summary::-webkit-details-marker{display:none}
 .faq-body{margin-top:.9rem;font-size:.86rem;color:rgba(0,0,0,0.45);line-height:1.75}
@@ -412,9 +412,9 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
   transition:all .4s;cursor:default;
 }
 .src-pill.active{
-  background:rgba(0,82,255,0.14);
-  border-color:rgba(0,82,255,0.35);
-  box-shadow:0 0 20px rgba(0,82,255,0.15);
+  background:rgba(0,85,212,0.14);
+  border-color:rgba(0,85,212,0.35);
+  box-shadow:0 0 20px rgba(0,85,212,0.15);
 }
 .src-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.18);transition:all .3s;flex-shrink:0}
 .src-pill.active .src-dot{background:#30d158;box-shadow:0 0 8px rgba(48,209,88,0.7)}
@@ -428,9 +428,9 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
   border-radius:24px;
   overflow:hidden;
   box-shadow:
-    0 0 0 1px rgba(0,82,255,0.08),
+    0 0 0 1px rgba(0,85,212,0.08),
     0 40px 100px rgba(0,0,0,0.6),
-    0 0 80px rgba(0,82,255,0.06) inset;
+    0 0 80px rgba(0,85,212,0.06) inset;
 }
 
 /* Terminal topbar */
@@ -497,7 +497,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
   display:flex;align-items:center;gap:12px;
 }
 .pilot-progress-track{flex:1;height:2px;background:rgba(255,255,255,0.05);border-radius:99px;overflow:hidden}
-.pilot-progress-bar{height:100%;background:linear-gradient(to right,#0052FF,#30d158);border-radius:99px;width:0%;transition:width .7s ease}
+.pilot-progress-bar{height:100%;background:linear-gradient(to right,#0055D4,#30d158);border-radius:99px;width:0%;transition:width .7s ease}
 .pilot-pct{font-size:.65rem;font-weight:700;color:rgba(255,255,255,0.2);min-width:26px;font-style:normal}
 .pilot-replay{font-size:.65rem;font-weight:600;color:rgba(255,255,255,0.2);background:none;border:none;cursor:pointer;font-family:var(--sf);transition:color .2s;padding:0}
 .pilot-replay:hover{color:rgba(255,255,255,0.55)}
@@ -524,7 +524,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
 .veille-bar{background:rgba(255,255,255,0.03);border-radius:10px;padding:9px 11px;margin-top:.9rem}
 .veille-bar-row{display:flex;justify-content:space-between;margin-bottom:5px}
 .veille-bar-track{height:2px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;margin-bottom:5px}
-.veille-bar-fill{height:100%;width:68%;background:linear-gradient(to right,#0052FF,#30d158);border-radius:99px}
+.veille-bar-fill{height:100%;width:68%;background:linear-gradient(to right,#0055D4,#30d158);border-radius:99px}
 
 /* Bottom stats strip */
 .pilot-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:.8rem;margin-top:1rem}
@@ -582,7 +582,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="/" class="nav-logo" style="display:flex;align-items:center;gap:.45rem"><svg viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:34px;height:34px;flex-shrink:0"><rect width="66" height="66" rx="14" fill="#0052FF"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg>
+    <a href="/" class="nav-logo" style="display:flex;align-items:center;gap:.45rem"><svg viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:34px;height:34px;flex-shrink:0"><rect width="66" height="66" rx="14" fill="#0055D4"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg>
       <span style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:-0.03em;color:#0a0a1a">Huntly.</span></a>
     <button id="mob-btn" onclick="openMob()"><span class="msym" style="font-size:1.4rem">menu</span></button>
     <div class="nav-links">
@@ -601,7 +601,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
 <div id="mob-overlay" onclick="closeMob()"></div>
 <div id="mob-menu">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem">
-    <span style="display:flex;align-items:center;gap:.4rem;font-size:1.3rem;font-weight:700;letter-spacing:-0.03em"><svg viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:34px;height:34px;flex-shrink:0"><rect width="66" height="66" rx="14" fill="#0052FF"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg></span>
+    <span style="display:flex;align-items:center;gap:.4rem;font-size:1.3rem;font-weight:700;letter-spacing:-0.03em"><svg viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:34px;height:34px;flex-shrink:0"><rect width="66" height="66" rx="14" fill="#0055D4"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg></span>
     <button onclick="closeMob()" style="background:none;border:none;cursor:pointer"><span class="msym">close</span></button>
   </div>
   <a href="#features" onclick="closeMob()" style="display:block;padding:.9rem 1rem;font-size:.95rem;font-weight:600;text-decoration:none;color:#0a0a0a;border-bottom:1px solid rgba(0,0,0,0.06)">produit</a>
@@ -616,7 +616,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
 
 <!-- HERO -->
 <div class="bg-mesh" style="position:relative">
-  <div class="hero-orb" style="width:500px;height:500px;top:-100px;left:-150px;background:rgba(0,82,255,0.07)"></div>
+  <div class="hero-orb" style="width:500px;height:500px;top:-100px;left:-150px;background:rgba(0,85,212,0.07)"></div>
   <div class="hero-orb" style="width:400px;height:400px;top:30%;right:-100px;background:rgba(100,60,255,0.06)"></div>
 
   <section class="hero" style="padding-top:90px;background:transparent">
@@ -634,7 +634,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
         </div>
         <div class="hero-social-proof reveal on d4">
           <div class="avatars">
-            <div class="avatar-sm" style="background:#0052FF">s.</div>
+            <div class="avatar-sm" style="background:#0055D4">s.</div>
             <div class="avatar-sm" style="background:#7c3aed">a.</div>
             <div class="avatar-sm" style="background:#d97706">j.</div>
             <div class="avatar-sm" style="background:#059669;margin-right:0">m.</div>
@@ -671,7 +671,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
           <div class="hc-list">
             <div style="font-size:7.5px;font-weight:700;color:rgba(0,0,0,0.3);text-transform:uppercase!important;letter-spacing:.1em;margin-bottom:3px">derniers prospects trouvés</div>
             <div class="hc-row">
-              <div class="hc-av" style="background:#0052FF">pl</div>
+              <div class="hc-av" style="background:#0055D4">pl</div>
               <div style="flex:1"><div class="hc-name">plomberie leclerc</div><div class="hc-addr">lyon 3e · ★ 4.8 · tél. vérifié</div></div>
               <span class="hc-score" style="background:rgba(239,68,68,0.1);color:#ef4444">96</span>
               <button style="background:var(--blue);color:#fff;border:none;border-radius:7px;padding:3px 8px;font-size:8px;font-weight:700;cursor:pointer;font-family:var(--sf);font-style:italic">email ia</button>
@@ -746,7 +746,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
      ============================================= -->
 <section id="puissance">
   <!-- Ambient orbs -->
-  <div class="pilot-bg-orb" style="width:700px;height:400px;top:-150px;left:50%;transform:translateX(-50%);background:rgba(0,82,255,0.1)"></div>
+  <div class="pilot-bg-orb" style="width:700px;height:400px;top:-150px;left:50%;transform:translateX(-50%);background:rgba(0,85,212,0.1)"></div>
   <div class="pilot-bg-orb" style="width:300px;height:300px;bottom:-50px;left:10%;background:rgba(100,60,255,0.12)"></div>
   <div class="pilot-bg-orb" style="width:250px;height:250px;top:30%;right:5%;background:rgba(48,209,88,0.06)"></div>
 
@@ -824,7 +824,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
     <div class="pilot-cards">
       <!-- Card 1 : données chaudes -->
       <div class="pilot-card">
-        <div class="pilot-card-icon" style="background:rgba(0,82,255,0.18)">
+        <div class="pilot-card-icon" style="background:rgba(0,85,212,0.18)">
           <span class="msym" style="font-size:17px;color:#60a5fa">bolt</span>
         </div>
         <div class="pilot-card-title">données chaudes · 0 base froide</div>
@@ -833,7 +833,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
 
       <!-- Card 2 : scoring -->
       <div class="pilot-card">
-        <div class="pilot-card-icon" style="background:rgba(0,82,255,0.18)">
+        <div class="pilot-card-icon" style="background:rgba(0,85,212,0.18)">
           <span class="msym" style="font-size:17px;color:#60a5fa">analytics</span>
         </div>
         <div class="pilot-card-title">qualification automatique</div>
@@ -843,12 +843,12 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
             <span style="color:rgba(255,255,255,0.35)">plomberie leclerc</span>
             <span style="font-weight:800;color:#30d158">96 / 100</span>
           </div>
-          <div style="height:3px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden"><div style="width:96%;height:100%;background:linear-gradient(to right,#0052FF,#30d158);border-radius:99px"></div></div>
+          <div style="height:3px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden"><div style="width:96%;height:100%;background:linear-gradient(to right,#0055D4,#30d158);border-radius:99px"></div></div>
           <div style="display:flex;align-items:center;justify-content:space-between;font-size:.65rem;margin-top:.3rem">
             <span style="color:rgba(255,255,255,0.35)">menuiserie martin</span>
             <span style="font-weight:800;color:#f59e0b">74 / 100</span>
           </div>
-          <div style="height:3px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden"><div style="width:74%;height:100%;background:linear-gradient(to right,#0052FF,#f59e0b);border-radius:99px"></div></div>
+          <div style="height:3px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden"><div style="width:74%;height:100%;background:linear-gradient(to right,#0055D4,#f59e0b);border-radius:99px"></div></div>
         </div>
       </div>
 
@@ -861,7 +861,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
         <p class="pilot-card-desc" style="margin-bottom:.8rem">en l'absence de réponse, Huntly. relance à intervalles calculés avec un message adapté, dans le respect des bonnes pratiques d'email.</p>
         <div style="margin-top:.8rem;display:flex;flex-direction:column;gap:.5rem">
           <div style="display:flex;align-items:center;gap:.6rem;font-size:.64rem;color:rgba(255,255,255,0.3)">
-            <span style="width:5px;height:5px;border-radius:50%;background:#0052FF;flex-shrink:0"></span>j+0 · email de prospection
+            <span style="width:5px;height:5px;border-radius:50%;background:#0055D4;flex-shrink:0"></span>j+0 · email de prospection
           </div>
           <div style="display:flex;align-items:center;gap:.6rem;font-size:.64rem;color:rgba(255,255,255,0.3)">
             <span style="width:5px;height:5px;border-radius:50%;background:#7c3aed;flex-shrink:0"></span>j+3 · relance
@@ -891,7 +891,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
         <div class="pilot-stat-val" style="color:#f59e0b">34%</div>
         <div class="pilot-stat-label">taux réponse<br/>vs 2% manuel</div>
       </div>
-      <div class="pilot-stat" style="background:rgba(0,82,255,0.07);border-color:rgba(0,82,255,0.18)">
+      <div class="pilot-stat" style="background:rgba(0,85,212,0.07);border-color:rgba(0,85,212,0.18)">
         <div class="pilot-stat-val" style="color:#fff">5min</div>
         <div class="pilot-stat-label">opérationnel<br/>zéro formation</div>
       </div>
@@ -905,16 +905,16 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
 var PEV = [
   {d:800,  src:"gmaps",  tag:"scan",     col:"#4285F4", txt:"scan google maps · plombiers · lyon 3e · 23 résultats",            kpi:"detected"},
   {d:1700, src:"insee",  tag:"scan",     col:"#3730a3", txt:"insee · 3 nouvelles immatriculations détectées · rhône",           kpi:"detected"},
-  {d:2500, src:null,     tag:"score",    col:"#0052FF", txt:"score ia · plomberie leclerc · <b style=\"color:#ef4444\">96 / 100</b>", kpi:null},
+  {d:2500, src:null,     tag:"score",    col:"#0055D4", txt:"score ia · plomberie leclerc · <b style=\"color:#ef4444\">96 / 100</b>", kpi:null},
   {d:3300, src:null,     tag:"email",    col:"#7c3aed", txt:"email généré et envoyé · plomberie leclerc · lyon",                kpi:"emails"},
   {d:4200, src:"bodacc", tag:"scan",     col:"#7c3aed", txt:"bodacc · cession détectée · menuiserie martin · grenoble",        kpi:"detected"},
   {d:5000, src:null,     tag:"email",    col:"#7c3aed", txt:"email généré et envoyé · menuiserie martin · grenoble",           kpi:"emails"},
   {d:5900, src:"dvf",    tag:"scan",     col:"#059669", txt:"dvf · permis déposé · 14 rue voltaire · lyon 7e",                 kpi:"detected"},
-  {d:6700, src:null,     tag:"score",    col:"#0052FF", txt:"score ia · artisan rénovation arnaud · <b style=\"color:#f59e0b\">84 / 100</b>", kpi:null},
+  {d:6700, src:null,     tag:"score",    col:"#0055D4", txt:"score ia · artisan rénovation arnaud · <b style=\"color:#f59e0b\">84 / 100</b>", kpi:null},
   {d:7500, src:null,     tag:"email",    col:"#7c3aed", txt:"email généré et envoyé · artisan rénovation · lyon",              kpi:"emails"},
   {d:8400, src:"veille", tag:"veille",   col:"#d97706", txt:"veille · 3 concurrents sans site détectés · opportunité forte",  kpi:null},
   {d:9500, src:null,     tag:"réponse",  col:"#30d158", txt:"réponse reçue · plomberie leclerc · <b style=\"color:#30d158\">intéressé — rappeler demain</b>", kpi:"replies"},
-  {d:10600,src:null,     tag:"appel",    col:"#0052FF", txt:"tracker appel · objection trop cher · réponse soufflée en direct",kpi:null},
+  {d:10600,src:null,     tag:"appel",    col:"#0055D4", txt:"tracker appel · objection trop cher · réponse soufflée en direct",kpi:null},
   {d:11700,src:null,     tag:"converti", col:"#f59e0b", txt:"converti · plomberie leclerc · <b style=\"color:#f59e0b\">rdv signé · lundi 9h</b>", kpi:"conv"},
   {d:12800,src:"gmaps",  tag:"scan",     col:"#4285F4", txt:"nouveau scan · électriciens · marseille · 40 résultats",          kpi:"detected"},
   {d:13600,src:null,     tag:"email",    col:"#7c3aed", txt:"4 emails générés · électriciens · marseille",                    kpi:"emails"},
@@ -923,10 +923,10 @@ var PEV = [
 
 var TAG_STYLE = {
   scan:     "background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.25)",
-  score:    "background:rgba(0,82,255,0.12);border:1px solid rgba(0,82,255,0.25)",
+  score:    "background:rgba(0,85,212,0.12);border:1px solid rgba(0,85,212,0.25)",
   email:    "background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25)",
   "réponse":"background:rgba(48,209,88,0.12);border:1px solid rgba(48,209,88,0.28)",
-  appel:    "background:rgba(0,82,255,0.12);border:1px solid rgba(0,82,255,0.25)",
+  appel:    "background:rgba(0,85,212,0.12);border:1px solid rgba(0,85,212,0.25)",
   converti: "background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.28)",
   veille:   "background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.25)"
 };
@@ -1024,8 +1024,8 @@ pstartPilot();
     </div>
     <div class="feat-grid">
       <div class="feat-card feat-card-dark reveal">
-        <div class="feat-shine" style="background:rgba(0,82,255,0.2)"></div>
-        <div class="feat-icon" style="background:rgba(0,82,255,0.2)"><span class="msym" style="font-size:22px;color:#60a5fa">bolt</span></div>
+        <div class="feat-shine" style="background:rgba(0,85,212,0.2)"></div>
+        <div class="feat-icon" style="background:rgba(0,85,212,0.2)"><span class="msym" style="font-size:22px;color:#60a5fa">bolt</span></div>
         <h3 class="feat-title" style="color:#fff">personnalisation à grande échelle</h3>
         <p class="feat-desc" style="color:rgba(255,255,255,0.42)">Huntly. personnalise chaque message selon le contexte du prospect — secteur, actualité récente, signal détecté. taux de réponse moyen : 34%.</p>
         <div style="margin-top:1.5rem;display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:600;color:rgba(255,255,255,0.28)">
@@ -1033,7 +1033,7 @@ pstartPilot();
         </div>
       </div>
       <div class="feat-card feat-card-glass reveal d1">
-        <div class="feat-icon" style="background:rgba(0,82,255,0.07)"><span class="msym" style="font-size:22px;color:var(--blue)">psychology</span></div>
+        <div class="feat-icon" style="background:rgba(0,85,212,0.07)"><span class="msym" style="font-size:22px;color:var(--blue)">psychology</span></div>
         <h3 class="feat-title">ia générative spécialisée</h3>
         <p class="feat-desc" style="color:rgba(0,0,0,0.44)">modèle ia entraîné sur le b2b français. vos emails sonnent vrai, pas comme un robot.</p>
       </div>
@@ -1046,17 +1046,17 @@ pstartPilot();
     </div>
     <div class="feat-grid" style="margin-top:1.2rem">
       <div class="feat-card feat-card-glass reveal">
-        <div class="feat-icon" style="background:rgba(0,82,255,0.07)"><span class="msym" style="font-size:22px;color:var(--blue)">bar_chart</span></div>
+        <div class="feat-icon" style="background:rgba(0,85,212,0.07)"><span class="msym" style="font-size:22px;color:var(--blue)">bar_chart</span></div>
         <h3 class="feat-title">analytics en live</h3>
         <p class="feat-desc" style="color:rgba(0,0,0,0.44)">pipeline en temps réel. taux de réponse, convertis, coût par lead — tout sous les yeux.</p>
       </div>
       <div class="feat-card feat-card-glass reveal d1">
-        <div class="feat-icon" style="background:rgba(0,82,255,0.07)"><span class="msym" style="font-size:22px;color:var(--blue)">phone_in_talk</span></div>
+        <div class="feat-icon" style="background:rgba(0,85,212,0.07)"><span class="msym" style="font-size:22px;color:var(--blue)">phone_in_talk</span></div>
         <h3 class="feat-title">assistant appel ia</h3>
         <p class="feat-desc" style="color:rgba(0,0,0,0.44)">script personnalisé, réponses aux objections en 1 clic, résumé automatique après chaque appel.</p>
       </div>
       <div class="feat-card feat-card-dark reveal d2">
-        <div class="feat-shine" style="background:rgba(0,82,255,0.15)"></div>
+        <div class="feat-shine" style="background:rgba(0,85,212,0.15)"></div>
         <div class="feat-icon" style="background:rgba(255,255,255,0.08)"><span class="msym" style="font-size:22px;color:#a78bfa">smart_toy</span></div>
         <h3 class="feat-title" style="color:#fff">fonctionnement en autonomie</h3>
         <p class="feat-desc" style="color:rgba(255,255,255,0.42)">une fois configuré, Huntly. fonctionne en continu sans intervention. votre pipeline se remplit pendant que vous vous concentrez sur votre métier.</p>
@@ -1095,16 +1095,16 @@ pstartPilot();
               <div style="font-size:.7rem;font-weight:700;color:rgba(0,0,0,0.35);text-transform:uppercase!important;letter-spacing:.09em;margin-bottom:3px">aperçu performances</div>
               <div style="font-size:.8rem;color:rgba(0,0,0,0.3)">mars 2024</div>
             </div>
-            <div style="font-size:.7rem;font-weight:600;background:rgba(0,82,255,0.07);color:var(--blue);padding:.3rem .8rem;border-radius:980px;border:1px solid rgba(0,82,255,0.12)">ce mois</div>
+            <div style="font-size:.7rem;font-weight:600;background:rgba(0,85,212,0.07);color:var(--blue);padding:.3rem .8rem;border-radius:980px;border:1px solid rgba(0,85,212,0.12)">ce mois</div>
           </div>
           <div class="bar-chart">
-            <div class="bar-c"><div class="bar-v" style="height:49px;background:rgba(0,82,255,0.12)"></div><span class="bar-lbl">lun</span></div>
-            <div class="bar-c"><div class="bar-v" style="height:75px;background:rgba(0,82,255,0.12)"></div><span class="bar-lbl">mar</span></div>
-            <div class="bar-c"><div class="bar-v" style="height:97px;background:var(--blue);box-shadow:0 0 16px rgba(0,82,255,0.4)"></div><span class="bar-lbl" style="color:var(--blue);font-weight:800">mer</span></div>
-            <div class="bar-c"><div class="bar-v" style="height:64px;background:rgba(0,82,255,0.12)"></div><span class="bar-lbl">jeu</span></div>
-            <div class="bar-c"><div class="bar-v" style="height:82px;background:rgba(0,82,255,0.12)"></div><span class="bar-lbl">ven</span></div>
-            <div class="bar-c"><div class="bar-v" style="height:38px;background:rgba(0,82,255,0.06)"></div><span class="bar-lbl">sam</span></div>
-            <div class="bar-c"><div class="bar-v" style="height:24px;background:rgba(0,82,255,0.06)"></div><span class="bar-lbl">dim</span></div>
+            <div class="bar-c"><div class="bar-v" style="height:49px;background:rgba(0,85,212,0.12)"></div><span class="bar-lbl">lun</span></div>
+            <div class="bar-c"><div class="bar-v" style="height:75px;background:rgba(0,85,212,0.12)"></div><span class="bar-lbl">mar</span></div>
+            <div class="bar-c"><div class="bar-v" style="height:97px;background:var(--blue);box-shadow:0 0 16px rgba(0,85,212,0.4)"></div><span class="bar-lbl" style="color:var(--blue);font-weight:800">mer</span></div>
+            <div class="bar-c"><div class="bar-v" style="height:64px;background:rgba(0,85,212,0.12)"></div><span class="bar-lbl">jeu</span></div>
+            <div class="bar-c"><div class="bar-v" style="height:82px;background:rgba(0,85,212,0.12)"></div><span class="bar-lbl">ven</span></div>
+            <div class="bar-c"><div class="bar-v" style="height:38px;background:rgba(0,85,212,0.06)"></div><span class="bar-lbl">sam</span></div>
+            <div class="bar-c"><div class="bar-v" style="height:24px;background:rgba(0,85,212,0.06)"></div><span class="bar-lbl">dim</span></div>
           </div>
           <div class="analytics-kpis">
             <div class="analytics-kpi"><div class="analytics-kpi-val">34%</div><div class="analytics-kpi-label">taux réponse</div></div>
@@ -1127,7 +1127,7 @@ pstartPilot();
         <div class="source-icon"><span class="msym" style="font-size:19px;color:#fff">location_on</span></div>
         <div><div class="source-name">google maps</div><div class="source-desc">avis, numéros, établissements</div></div>
       </div>
-      <div class="source-card" style="background:linear-gradient(145deg,#3730a3,#0052FF)">
+      <div class="source-card" style="background:linear-gradient(145deg,#3730a3,#0055D4)">
         <div class="source-icon"><span class="msym" style="font-size:19px;color:#fff">analytics</span></div>
         <div><div class="source-name">insee · sirene</div><div style="font-size:1.5rem;font-weight:700;letter-spacing:-0.06em;color:#fff;line-height:1">12m</div><div class="source-desc">entreprises fr</div></div>
       </div>
@@ -1171,13 +1171,13 @@ pstartPilot();
     <div class="steps-grid">
       <div class="step-card feat-card-glass reveal">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--blue),#00AAFF);border-radius:22px 22px 0 0"></div>
-        <div class="step-num" style="background:rgba(0,82,255,0.08);color:var(--blue)">1</div>
+        <div class="step-num" style="background:rgba(0,85,212,0.08);color:var(--blue)">1</div>
         <h3 style="font-size:1.25rem;font-weight:600;letter-spacing:-0.04em;margin-bottom:.9rem;line-height:1.2">décrivez votre cible</h3>
         <p style="font-size:.88rem;color:rgba(0,0,0,0.44);line-height:1.75;margin-bottom:1.5rem">"plombiers en occitanie", "drh de pme parisiennes" — en français, comme vous parlez.</p>
-        <div style="background:rgba(0,82,255,0.06);border:1px solid rgba(0,82,255,0.12);border-radius:11px;padding:.65rem 1rem;font-size:.78rem;color:var(--blue);font-weight:600">"200 électriciens à marseille"</div>
+        <div style="background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.12);border-radius:11px;padding:.65rem 1rem;font-size:.78rem;color:var(--blue);font-weight:600">"200 électriciens à marseille"</div>
       </div>
       <div class="step-card feat-card-dark reveal d1">
-        <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:rgba(0,82,255,0.15);filter:blur(40px);border-radius:50%"></div>
+        <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:rgba(0,85,212,0.15);filter:blur(40px);border-radius:50%"></div>
         <div class="step-num" style="background:rgba(255,255,255,0.1);color:#fff;position:relative">2</div>
         <h3 style="font-size:1.25rem;font-weight:600;letter-spacing:-0.04em;margin-bottom:.9rem;line-height:1.2;color:#fff;position:relative">Huntly. prospecte</h3>
         <p style="font-size:.88rem;color:rgba(255,255,255,0.35);line-height:1.75;margin-bottom:2rem;position:relative">trouve, score, rédige, contacte et relance automatiquement.</p>
@@ -1189,7 +1189,7 @@ pstartPilot();
       </div>
       <div class="step-card feat-card-glass reveal d2">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,#00AAFF,#30d158);border-radius:22px 22px 0 0"></div>
-        <div class="step-num" style="background:rgba(0,82,255,0.08);color:var(--blue)">3</div>
+        <div class="step-num" style="background:rgba(0,85,212,0.08);color:var(--blue)">3</div>
         <h3 style="font-size:1.25rem;font-weight:600;letter-spacing:-0.04em;margin-bottom:.9rem;line-height:1.2">vous signez</h3>
         <p style="font-size:.88rem;color:rgba(0,0,0,0.44);line-height:1.75;margin-bottom:1.5rem">alerte dès qu'un prospect répond. vous n'avez plus qu'à conclure.</p>
         <div style="background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.2);border-radius:11px;padding:.65rem 1rem;font-size:.82rem;color:#30d158;font-weight:600;display:flex;align-items:center;gap:.5rem">
@@ -1258,7 +1258,7 @@ pstartPilot();
                 <div style="font-size:.55rem;color:rgba(255,255,255,0.22);margin-bottom:3px">ca estimé</div>
                 <div style="font-size:.75rem;font-weight:600;color:#fff">250k – 500k €</div>
               </div>
-              <div style="background:rgba(0,82,255,0.08);border:1px solid rgba(0,82,255,0.18);border-radius:10px;padding:.7rem;grid-column:1/-1">
+              <div style="background:rgba(0,85,212,0.08);border:1px solid rgba(0,85,212,0.18);border-radius:10px;padding:.7rem;grid-column:1/-1">
                 <div style="font-size:.55rem;color:rgba(255,255,255,0.3);margin-bottom:3px">signal détecté</div>
                 <div style="font-size:.72rem;color:rgba(255,255,255,0.6);line-height:1.5">permis de construire déposé le 12/03 · 3 appartements · lyon 6e</div>
               </div>
@@ -1270,7 +1270,7 @@ pstartPilot();
               <span style="font-size:.65rem;font-weight:700;color:#fca5a5">"c'est trop cher pour moi."</span>
             </div>
             <div style="font-size:.55rem;font-weight:700;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:.2em;margin-bottom:6px">réponse suggérée</div>
-            <div style="background:rgba(0,82,255,0.09);border:1px solid rgba(0,82,255,0.2);border-radius:10px;padding:.7rem .9rem">
+            <div style="background:rgba(0,85,212,0.09);border:1px solid rgba(0,85,212,0.2);border-radius:10px;padding:.7rem .9rem">
               <span style="font-size:.7rem;color:rgba(255,255,255,0.55);line-height:1.6">"un seul client signé via Huntly. couvre 6 mois d'abonnement. avec le permis que vous avez déposé en mars, le timing est parfait."</span>
             </div>
           </div>
@@ -1285,7 +1285,7 @@ pstartPilot();
   <div class="section-inner">
     <div class="split-grid">
       <div class="reveal d2" style="order:2">
-        <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:24px;overflow:hidden;box-shadow:0 8px 40px rgba(0,82,255,0.06)">
+        <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:24px;overflow:hidden;box-shadow:0 8px 40px rgba(0,85,212,0.06)">
           <div style="padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between">
             <div style="font-size:.72rem;font-weight:700;color:rgba(0,0,0,0.4);text-transform:uppercase;letter-spacing:.1em">veille · plombiers · lyon</div>
             <div style="font-size:.65rem;font-weight:600;color:#30d158;background:rgba(48,209,88,0.07);border:1px solid rgba(48,209,88,0.18);padding:3px 9px;border-radius:980px">mise à jour il y a 2h</div>
@@ -1313,7 +1313,7 @@ pstartPilot();
               <div><div style="font-size:.78rem;font-weight:700;color:#0a0a0a">chauffage martin</div><div style="font-size:.62rem;color:rgba(0,0,0,0.35)">lyon 6e · aucun site</div></div>
               <div style="text-align:right"><div style="font-size:.72rem;font-weight:700;color:#30d158">cible facile</div><div style="font-size:.58rem;color:rgba(0,0,0,0.28);margin-top:2px">0 présence digitale</div></div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .9rem;background:rgba(0,82,255,0.04);border-radius:10px;border:1px solid rgba(0,82,255,0.1)">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .9rem;background:rgba(0,85,212,0.04);border-radius:10px;border:1px solid rgba(0,85,212,0.1)">
               <div><div style="font-size:.78rem;font-weight:700;color:#0a0a0a">sanitaires dupont</div><div style="font-size:.62rem;color:rgba(0,0,0,0.35)">lyon 2e · 12 avis</div></div>
               <div style="text-align:right"><div style="font-size:.72rem;font-weight:700;color:#ef4444">★ 2.9</div><div style="font-size:.58rem;color:var(--blue);font-weight:700;margin-top:2px">à contacter maintenant</div></div>
             </div>
@@ -1425,7 +1425,7 @@ pstartPilot();
       </div>
       <div class="price-card price-card-featured reveal d1">
         <div style="position:absolute;top:0;right:0;background:var(--blue);padding:.4rem 1.2rem;border-radius:0 24px 0 14px;font-size:.6rem;font-weight:700;letter-spacing:.1em;color:#fff">conseillé</div>
-        <div style="position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:rgba(0,82,255,0.2);filter:blur(60px);border-radius:50%"></div>
+        <div style="position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:rgba(0,85,212,0.2);filter:blur(60px);border-radius:50%"></div>
         <div class="price-tier" style="color:rgba(255,255,255,0.3);position:relative">pro</div>
         <div style="display:flex;align-items:baseline;gap:.4rem;margin-bottom:.4rem;position:relative">
           <span class="price-amount" style="color:#fff">129€</span><span class="price-period" style="color:rgba(255,255,255,0.3)">/mois</span>
@@ -1437,7 +1437,7 @@ pstartPilot();
           <div class="price-item" style="color:rgba(255,255,255,0.75)"><span class="msym" style="color:var(--blue);font-size:1rem">check_circle</span>prospects illimités</div>
           <div class="price-item" style="color:rgba(255,255,255,0.75)"><span class="msym" style="color:var(--blue);font-size:1rem">check_circle</span>assistant appel ia</div>
         </div>
-        <a href="/pricing" class="price-cta" style="background:var(--blue);color:#fff;position:relative;box-shadow:0 8px 24px rgba(0,82,255,0.4)" onmouseover="this.style.background='#0042d1'" onmouseout="this.style.background='var(--blue)'">choisir la croissance</a>
+        <a href="/pricing" class="price-cta" style="background:var(--blue);color:#fff;position:relative;box-shadow:0 8px 24px rgba(0,85,212,0.4)" onmouseover="this.style.background='#0047B8'" onmouseout="this.style.background='var(--blue)'">choisir la croissance</a>
       </div>
       <div class="price-card price-card-glass reveal d2">
         <div class="price-tier" style="color:rgba(0,0,0,0.3)">ultra</div>
@@ -1456,12 +1456,12 @@ pstartPilot();
     </div>
     <div class="reveal" style="margin-top:2rem">
       <div style="background:rgba(255,255,255,0.65);backdrop-filter:blur(32px);border:1px solid rgba(255,255,255,0.75);border-radius:18px;padding:1.2rem 1.6rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;max-width:700px;margin:0 auto">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,82,255,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="msym" style="font-size:18px;color:var(--blue)">business</span></div>
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="msym" style="font-size:18px;color:var(--blue)">business</span></div>
         <div style="flex:1;min-width:160px">
           <div style="font-size:.85rem;font-weight:700">vous gérez plusieurs comptes clients ?</div>
           <div style="font-size:.74rem;color:rgba(0,0,0,0.4);margin-top:2px">plan agence sur devis — multi-comptes, onboarding dédié, support 7j/7</div>
         </div>
-        <a href="#" style="font-size:.8rem;font-weight:700;color:var(--blue);text-decoration:none;background:rgba(0,82,255,0.07);border:1px solid rgba(0,82,255,0.15);padding:.5rem 1.1rem;border-radius:980px;white-space:nowrap">nous contacter →</a>
+        <a href="#" style="font-size:.8rem;font-weight:700;color:var(--blue);text-decoration:none;background:rgba(0,85,212,0.07);border:1px solid rgba(0,85,212,0.15);padding:.5rem 1.1rem;border-radius:980px;white-space:nowrap">nous contacter →</a>
       </div>
     </div>
   </div>
@@ -1497,7 +1497,7 @@ pstartPilot();
 <!-- CTA FINAL -->
 <div class="cta-section bg-mesh">
   <div class="cta-card">
-    <div class="cta-orb" style="width:350px;height:350px;top:-100px;right:-80px;background:rgba(0,82,255,0.2)"></div>
+    <div class="cta-orb" style="width:350px;height:350px;top:-100px;right:-80px;background:rgba(0,85,212,0.2)"></div>
     <div class="cta-orb" style="width:250px;height:250px;bottom:-60px;left:-60px;background:rgba(100,60,255,0.15)"></div>
     <div style="position:relative">
       <h2 style="font-size:clamp(1.8rem,3.5vw,3.2rem);font-weight:400;color:#fff;letter-spacing:-0.03em;line-height:1.08;margin-bottom:1.2rem">
