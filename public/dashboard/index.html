@@ -966,17 +966,66 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 
     <!-- ═══ VEILLE ═══ -->
     <div class="page" id="page-veille">
-      <div style="max-width:640px">
-        <div class="glass card">
-          <div class="card-header"><div><div class="card-title">veille concurrentielle concurrentielle</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">analyse de marché propulsée par claude</div></div></div>
+      <div style="max-width:960px">
+        <div style="margin-bottom:20px">
+          <h2 style="font-size:20px;font-weight:700;letter-spacing:-0.04em;color:#0a0a1a">veille concurrentielle</h2>
+          <p style="font-size:12px;color:#9ca3af;margin-top:4px">analysez vos concurrents locaux · forces, faiblesses et opportunités</p>
+        </div>
+
+        <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,82,255,0.15)">
+          <div class="card-header" style="background:rgba(0,82,255,0.04)">
+            <div>
+              <div class="card-title" style="color:#0052FF;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:16px">radar</span>scanner le marché local</div>
+              <div style="font-size:10px;color:#9ca3af;margin-top:2px">google maps · analyse ia par concurrent</div>
+            </div>
+          </div>
           <div class="card-body">
-            <div class="form-group"><label class="form-label">secteur à analyser</label><input class="form-input" id="veille-secteur" placeholder="plomberie lyon, marketing digital paris..."/></div>
-            <button class="btn btn-primary" id="btn-veille" onclick="runVeille()"><span id="veille-spinner" style="display:none" class="spinner"></span><span class="msym">radar</span>analyser le marché</button>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">votre secteur d'activité</label>
+                <input class="form-input" id="veille-secteur" placeholder="ex: plombier, agence immobilière..."/>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">ville / zone</label>
+                <input class="form-input" id="veille-ville" placeholder="ex: lyon, paris 15e..."/>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="btn-veille" onclick="runVeille()" style="width:100%;justify-content:center;padding:14px">
+              <span id="veille-spinner" style="display:none" class="spinner"></span>
+              <span class="msym">radar</span>lancer le radar concurrents
+            </button>
           </div>
         </div>
-        <div id="veille-result" style="display:none;margin-top:16px" class="glass card">
-          <div class="card-header"><div class="card-title">analyse du marché</div></div>
-          <div class="card-body"><div id="veille-text" style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:#1a1a2e"></div></div>
+
+        <div id="veille-progress" style="display:none;margin-bottom:16px">
+          <div class="glass card"><div class="card-body">
+            <div style="font-size:12px;font-weight:600;color:#0a0a1a;margin-bottom:6px" id="veille-progress-text">scan en cours...</div>
+            <div class="progress-bar"><div class="progress-fill" id="veille-progress-fill" style="width:0%"></div></div>
+          </div></div>
+        </div>
+
+        <div id="veille-result" style="display:none">
+          <!-- KPIs -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="veille-kpis"></div>
+
+          <!-- Analyse IA globale -->
+          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,82,255,0.15)">
+            <div class="card-header" style="background:rgba(0,82,255,0.04)">
+              <div class="card-title" style="color:#0052FF;display:flex;align-items:center;gap:6px"><span class="msym">auto_awesome</span>synthèse ia — vos arguments de vente</div>
+            </div>
+            <div class="card-body">
+              <div id="veille-analyse" style="font-size:13px;line-height:1.8;color:#1a1a2e;white-space:pre-wrap"></div>
+            </div>
+          </div>
+
+          <!-- Cards concurrents -->
+          <div class="glass card">
+            <div class="card-header">
+              <div class="card-title" id="veille-concurrents-title">principaux concurrents</div>
+              <button class="btn btn-ghost btn-sm" onclick="exportVeilleCSV()"><span class="msym">download</span>csv</button>
+            </div>
+            <div id="veille-concurrents-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:16px"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -2633,7 +2682,196 @@ async function searchAO(){
 }
 
 // ═══ VEILLE & DEVIS ═══
-async function runVeille(){const secteur=document.getElementById('veille-secteur').value.trim();if(!secteur) return;if(!checkQuota('veille')) return;showSpinner('veille-spinner');document.getElementById('btn-veille').disabled=true;try{const d=await claudeAPI([{role:'user',content:'analyse le marché du secteur "'+secteur+'" en france. fournis : 1. tendances 2. points de douleur 3. arguments commerciaux 4. meilleure approche. réponse concise en français.'}],600);incrementUsage('veille');document.getElementById('veille-text').textContent=d.content[0].text;show('veille-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('veille-spinner');document.getElementById('btn-veille').disabled=false;}
+let _veilleData = [];
+
+async function runVeille(){
+  const secteur = document.getElementById('veille-secteur').value.trim();
+  const ville = document.getElementById('veille-ville')?.value.trim() || '';
+  if(!secteur) return alert('renseignez votre secteur.');
+  if(!ville) return alert('renseignez une ville.');
+  if(!checkQuota('veille')) return;
+
+  showSpinner('veille-spinner');
+  document.getElementById('btn-veille').disabled = true;
+  document.getElementById('veille-result').style.display = 'none';
+  document.getElementById('veille-progress').style.display = '';
+  document.getElementById('veille-progress-fill').style.width = '10%';
+  document.getElementById('veille-progress-text').textContent = 'recherche des concurrents sur google maps...';
+  _veilleData = [];
+
+  try {
+    const service = new google.maps.places.PlacesService(document.createElement('div'));
+    document.getElementById('veille-progress-fill').style.width = '25%';
+
+    const places = await new Promise(resolve => {
+      service.textSearch({query: secteur + ' ' + ville, language: 'fr', region: 'fr'},
+        (results, status) => resolve(status === google.maps.places.PlacesServiceStatus.OK ? results : []));
+    });
+
+    if (!places.length) { alert('aucun concurrent trouvé.'); throw new Error('no results'); }
+
+    document.getElementById('veille-progress-fill').style.width = '40%';
+    document.getElementById('veille-progress-text').textContent = 'enrichissement des données...';
+
+    const concurrents = [];
+    for (const p of places.slice(0, 12)) {
+      const details = await new Promise(resolve => {
+        service.getDetails({placeId: p.place_id, fields: ['formatted_phone_number','website','url','reviews']},
+          (place, status) => resolve(status === google.maps.places.PlacesServiceStatus.OK ? place : null));
+      });
+      concurrents.push({
+        id: p.place_id, name: p.name,
+        address: p.formatted_address || p.vicinity || '',
+        rating: p.rating || 0, reviews: p.user_ratings_total || 0,
+        phone: details?.formatted_phone_number || null,
+        website: details?.website || null,
+        mapsUrl: details?.url || 'https://www.google.com/maps/search/' + encodeURIComponent(p.name + ' ' + ville),
+        topReviews: (details?.reviews || []).slice(0,3).map(r => r.text).filter(Boolean)
+      });
+    }
+    _veilleData = concurrents;
+
+    document.getElementById('veille-progress-fill').style.width = '60%';
+    document.getElementById('veille-progress-text').textContent = 'analyse ia des concurrents...';
+
+    const avgRating = concurrents.filter(c => c.rating > 0).reduce((a,b) => a + b.rating, 0) / (concurrents.filter(c => c.rating > 0).length || 1);
+    const weakOnes = concurrents.filter(c => c.rating > 0 && c.rating < 4).map(c => c.name + ' (' + c.rating + '/5)');
+    const noPhone = concurrents.filter(c => !c.phone).length;
+    const noWebsite = concurrents.filter(c => !c.website).length;
+
+    // Analyse globale
+    const promptGlobal = `tu es un expert en stratégie commerciale. analyse ce marché local.
+SECTEUR : ${secteur}
+VILLE : ${ville}
+CONCURRENTS : ${concurrents.length}
+NOTE MOYENNE : ${avgRating.toFixed(1)}/5
+MAL NOTÉS (<4) : ${weakOnes.join(', ') || 'aucun'}
+SANS TÉLÉPHONE : ${noPhone}
+SANS SITE WEB : ${noWebsite}
+TOP 5 : ${concurrents.slice(0,5).map(c => '- ' + c.name + ' : ' + c.rating + '/5 (' + c.reviews + ' avis)' + (c.phone ? '' : ' · pas de tél') + (c.website ? '' : ' · pas de site')).join('\n')}
+
+génère une analyse en 3 parties :
+1. OPPORTUNITÉS DU MARCHÉ (2-3 lignes)
+2. VOS ARGUMENTS CLÉS face à ces concurrents (2-3 points)
+3. SCRIPT D'ACCROCHE recommandé (1-2 phrases)
+
+max 200 mots, direct et actionnable, pas de bullet points avec symboles spéciaux.`;
+
+    const dGlobal = await claudeAPI([{role:'user', content: promptGlobal}], 500);
+    incrementUsage('veille');
+
+    document.getElementById('veille-progress-fill').style.width = '75%';
+    document.getElementById('veille-progress-text').textContent = 'analyse ia individuelle des concurrents...';
+
+    // Analyse individuelle pour chaque concurrent
+    const topConcurrents = concurrents.slice(0, 8);
+    for (const cc of topConcurrents) {
+      const reviewsText = cc.topReviews.length ? '\navis clients : ' + cc.topReviews.slice(0,2).join(' / ').slice(0,200) : '';
+      const promptIndiv = `tu es un expert commercial. analyse ce concurrent en 80 mots max.
+concurrent : ${cc.name}
+note google : ${cc.rating}/5 (${cc.reviews} avis)
+téléphone : ${cc.phone ? 'oui' : 'non renseigné'}
+site web : ${cc.website ? 'oui' : 'non'}${reviewsText}
+secteur : ${secteur} à ${ville}
+
+réponds UNIQUEMENT en JSON sans markdown :
+{"forces":["force 1 (max 8 mots)","force 2"],"faiblesses":["faiblesse 1 (max 8 mots)","faiblesse 2"],"pitch":"1 phrase d'accroche pour voler ce client (max 15 mots)"}`;
+      try {
+        const dIndiv = await claudeAPI([{role:'user', content: promptIndiv}], 250);
+        const raw = dIndiv.content[0].text.replace(/```json|```/g,'').trim();
+        cc.analysis = JSON.parse(raw);
+      } catch(e) {
+        cc.analysis = null;
+      }
+    }
+
+    document.getElementById('veille-progress-fill').style.width = '95%';
+
+    // KPIs
+    document.getElementById('veille-kpis').innerHTML = `
+      <div class="glass" style="border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:6px">concurrents</div><div style="font-size:28px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a">${concurrents.length}</div></div>
+      <div style="background:rgba(217,119,6,0.06);border:1px solid rgba(217,119,6,0.12);border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#d97706;margin-bottom:6px">note moyenne</div><div style="font-size:28px;font-weight:800;letter-spacing:-0.04em;color:#d97706">${avgRating.toFixed(1)}/5</div></div>
+      <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.12);border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#059669;margin-bottom:6px">avec tél</div><div style="font-size:28px;font-weight:800;letter-spacing:-0.04em;color:#059669">${concurrents.filter(c=>c.phone).length}/${concurrents.length}</div></div>
+      <div style="background:rgba(0,82,255,0.06);border:1px solid rgba(0,82,255,0.12);border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#0052FF;margin-bottom:6px">sans site web</div><div style="font-size:28px;font-weight:800;letter-spacing:-0.04em;color:#0052FF">${noWebsite}</div></div>`;
+
+    document.getElementById('veille-analyse').textContent = dGlobal.content[0].text;
+    document.getElementById('veille-concurrents-title').textContent = concurrents.length + ' concurrents — ' + secteur + ' · ' + ville;
+
+    document.getElementById('veille-concurrents-grid').innerHTML = topConcurrents.map(cc => {
+      const ratingColor = cc.rating >= 4.5 ? '#dc2626' : cc.rating >= 3.5 ? '#d97706' : '#059669';
+      const ratingBg = cc.rating >= 4.5 ? 'rgba(220,38,38,0.08)' : cc.rating >= 3.5 ? 'rgba(217,119,6,0.08)' : 'rgba(5,150,105,0.08)';
+      const ratingLabel = cc.rating >= 4.5 ? 'bien noté' : cc.rating >= 3.5 ? 'moyen' : 'mal noté';
+      const stars = cc.rating ? Math.round(cc.rating) + '/5' : '—';
+      const a = cc.analysis;
+
+      return `<div class="pipeline-card" style="display:flex;flex-direction:column;gap:12px">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div style="font-size:13px;font-weight:700;color:#0a0a1a;line-height:1.3;flex:1">${cc.name}</div>
+          ${cc.rating ? `<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span style="font-size:13px;font-weight:800;color:${ratingColor}">${stars}</span>
+            <span style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:${ratingColor};background:${ratingBg};padding:2px 6px;border-radius:99px">${ratingLabel}</span>
+          </div>` : ''}
+        </div>
+
+        <!-- Avis count + contact -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          ${cc.reviews ? `<span style="font-size:10px;color:#9ca3af;font-weight:600">${cc.reviews} avis</span>` : ''}
+          ${cc.phone ? `<a href="tel:${cc.phone}" style="font-size:11px;font-weight:700;color:#059669;text-decoration:none;display:flex;align-items:center;gap:3px"><span class="msym" style="font-size:13px">phone</span>${cc.phone}</a>` : '<span style="font-size:11px;color:#d1d5db;display:flex;align-items:center;gap:3px"><span class="msym" style="font-size:13px">phone_disabled</span>pas de tél</span>'}
+        </div>
+
+        ${a ? `
+        <!-- Forces -->
+        <div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#dc2626;margin-bottom:5px;display:flex;align-items:center;gap:4px"><span class="msym" style="font-size:12px">shield</span>leurs forces</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            ${(a.forces||[]).map(f => `<div style="font-size:11px;color:#1a1a2e;padding:5px 9px;background:rgba(220,38,38,0.05);border-left:2px solid rgba(220,38,38,0.3);border-radius:0 6px 6px 0;line-height:1.4">${f}</div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Faiblesses -->
+        <div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#059669;margin-bottom:5px;display:flex;align-items:center;gap:4px"><span class="msym" style="font-size:12px">crisis_alert</span>leurs faiblesses</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            ${(a.faiblesses||[]).map(f => `<div style="font-size:11px;color:#1a1a2e;padding:5px 9px;background:rgba(5,150,105,0.05);border-left:2px solid rgba(5,150,105,0.3);border-radius:0 6px 6px 0;line-height:1.4">${f}</div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Pitch -->
+        <div style="padding:10px 12px;background:rgba(0,82,255,0.06);border:1px solid rgba(0,82,255,0.12);border-radius:10px">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#0052FF;margin-bottom:4px;display:flex;align-items:center;gap:4px"><span class="msym" style="font-size:12px">record_voice_over</span>accroche pour leur voler des clients</div>
+          <div style="font-size:12px;font-weight:600;color:#0a0a1a;line-height:1.5;font-style:italic">"${a.pitch || '—'}"</div>
+        </div>
+        ` : `<div style="padding:16px;text-align:center;color:#9ca3af;font-size:11px">analyse non disponible</div>`}
+
+        <!-- Actions -->
+        <div style="display:flex;gap:6px;margin-top:2px">
+          <a href="${cc.mapsUrl}" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;text-decoration:none"><span class="msym">map</span>maps</a>
+          <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="addToPipeline({id:'veille-${cc.id}',name:'${cc.name.replace(/'/g,"\'")}',address:'${cc.address.replace(/'/g,"\'").slice(0,60)}',rating:${cc.rating},reviews:${cc.reviews},score:${Math.min(99,40+Math.round(cc.rating*10))},phone:${cc.phone ? "'" + cc.phone + "'" : null},website:${cc.website ? "'" + cc.website.replace(/'/g,"\'") + "'" : null}})"><span class="msym">conversion_path</span>pipeline</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('veille-progress').style.display = 'none';
+    document.getElementById('veille-result').style.display = '';
+    addActivity('veille · ' + secteur + ' · ' + ville + ' (' + concurrents.length + ' concurrents)', 'radar', 'primary');
+
+  } catch(e) {
+    if (e.message !== 'no results') alert('erreur : ' + e.message);
+    document.getElementById('veille-progress').style.display = 'none';
+  }
+  hideSpinner('veille-spinner');
+  document.getElementById('btn-veille').disabled = false;
+}
+
+function exportVeilleCSV() {
+  if (!_veilleData.length) { alert('lancez d\'abord une analyse.'); return; }
+  const rows = [['nom','adresse','note','avis','téléphone','site web','forces','faiblesses']];
+  _veilleData.forEach(c => rows.push([c.name, c.address, c.rating, c.reviews, c.phone||'', c.website||'', (c.analysis?.forces||[]).join(' / '), (c.analysis?.faiblesses||[]).join(' / ')]));
+  const csv = rows.map(r => r.map(x => '"'+String(x||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='veille-concurrents.csv'; a.click();
+}
 
 async function generateDevis(){const client=document.getElementById('devis-client').value.trim();const desc=document.getElementById('devis-desc').value.trim();if(!client||!desc){alert('renseignez le client et la prestation.');return;}if(!checkQuota('devis')) return;showSpinner('devis-spinner');document.getElementById('btn-devis').disabled=true;try{const d=await claudeAPI([{role:'user',content:'génère un devis professionnel en français pour :\nclient : '+client+'\nprestataire : '+document.getElementById('devis-activite').value+'\nprestation : '+desc+'\nbudget : '+(document.getElementById('devis-budget').value||'à définir')+'€\ndélai : '+(document.getElementById('devis-delai').value||'à définir')+'\n\nformat : devis structuré, texte brut, pas de markdown.'}],800);incrementUsage('devis');document.getElementById('devis-text').textContent=d.content[0].text;show('devis-result');}catch(e){alert('erreur : '+e.message);}hideSpinner('devis-spinner');document.getElementById('btn-devis').disabled=false;}
 
