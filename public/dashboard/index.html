@@ -1714,7 +1714,12 @@ function updateQuotaUI(){
 
 // ═══ CLAUDE API PROXY ═══
 async function claudeAPI(messages, max_tokens=800, quota_type=null) {
-  const { data: { session } } = await _sb.auth.getSession();
+  let { data: { session } } = await _sb.auth.getSession();
+  if (!session) {
+    // Tentative de refresh
+    const { data: refreshed } = await _sb.auth.refreshSession();
+    session = refreshed.session;
+  }
   if (!session) throw new Error('non authentifié');
 
   const res = await fetch(
@@ -2362,7 +2367,7 @@ async function searchInsee(){
   showSpinner('insee-spinner');
   try {
     // API officielle gouvernement — gratuite, sans token
-    let url='https://recherche-entreprises.api.gouv.fr/search?per_page=25&minimal=false&etat_administratif=A';
+    let url='https://recherche-entreprises.api.gouv.fr/search?per_page=25&etat_administratif=A';
     if(naf) url+='&activite_principale='+encodeURIComponent(naf);
     if(dept) url+='&departement='+encodeURIComponent(dept);
     if(effectif) url+='&tranche_effectif_salarie='+effectif;
@@ -2886,6 +2891,51 @@ function exportVeilleCSV() {
   const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='veille-huntly.csv'; a.click();
 }
 
+
+
+async function generateDevis() {
+  const client = document.getElementById('devis-client')?.value.trim();
+  const activite = document.getElementById('devis-activite')?.value.trim();
+  const desc = document.getElementById('devis-desc')?.value.trim();
+  const budget = document.getElementById('devis-budget')?.value.trim();
+  const delai = document.getElementById('devis-delai')?.value.trim();
+
+  if (!client || !desc) return alert('renseignez au moins le nom du client et la prestation.');
+  if (!checkQuota('devis')) return;
+
+  const btn = document.getElementById('btn-devis');
+  showSpinner('devis-spinner');
+  if (btn) btn.disabled = true;
+
+  const profile = getProfile();
+  const prompt = `tu es un expert en rédaction commerciale. génère un devis professionnel complet.
+
+CLIENT : ${client}
+PRESTATAIRE : ${profile.societe || 'mon entreprise'} — ${profile.prenom || ''} ${profile.nom || ''}
+ACTIVITÉ : ${profile.activite || activite || 'prestataire'}
+PRESTATION : ${desc}
+BUDGET : ${budget ? budget + ' €' : 'à définir'}
+DÉLAI : ${delai || 'à définir'}
+
+CONSIGNES :
+- format devis professionnel complet
+- inclure : référence devis, date, coordonnées, détail des prestations, conditions de paiement
+- ton professionnel
+- texte brut uniquement, pas de markdown`;
+
+  try {
+    const d = await claudeAPI([{role:'user', content: prompt}], 700, 'devis');
+    incrementUsage('devis');
+    document.getElementById('devis-text').textContent = d.content[0].text;
+    document.getElementById('devis-result').style.display = '';
+    addActivity('devis généré · ' + client, 'description', 'primary');
+  } catch(e) {
+    if (e.message !== 'quota_exceeded') alert('erreur génération devis : ' + e.message);
+  }
+
+  hideSpinner('devis-spinner');
+  if (btn) btn.disabled = false;
+}
 
 // ═══ SÉQUENCES ═══
 function saveSequence(){alert('séquence enregistrée !');}
