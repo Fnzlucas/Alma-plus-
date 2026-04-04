@@ -1714,11 +1714,12 @@ function updateQuotaUI(){
 
 // ═══ CLAUDE API PROXY ═══
 async function claudeAPI(messages, max_tokens=800, quota_type=null) {
-  let { data: { session } } = await _sb.auth.getSession();
+  // Utiliser la session globale stockée au login
+  let session = _session;
   if (!session) {
-    // Tentative de refresh
-    const { data: refreshed } = await _sb.auth.refreshSession();
-    session = refreshed.session;
+    const { data } = await _sb.auth.getSession();
+    session = data.session;
+    if (session) _session = session;
   }
   if (!session) throw new Error('non authentifié');
 
@@ -1762,6 +1763,7 @@ const SUPABASE_PROXY = 'https://tzrtptpzbrszibuifzns.supabase.co/functions/v1/pr
 
 // ═══ CLIENT SUPABASE GLOBAL ═══
 const _sb = supabase.createClient(ALMA_CONFIG.supaUrl, ALMA_CONFIG.supaAnon);
+let _session = null; // Session globale mise à jour au login
 
 
 // ═══ STATE ═══
@@ -3290,6 +3292,13 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
   // 1. Vérifier session
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = '/login'; return; }
+  _session = session; // Stocker globalement
+  
+  // Refresh auto toutes les 30 min
+  setInterval(async () => {
+    const { data } = await _sb.auth.refreshSession();
+    if (data.session) _session = data.session;
+  }, 1800000);
 
   // 2. Mettre à jour nom sidebar
   const meta = session.user.user_metadata || {};
