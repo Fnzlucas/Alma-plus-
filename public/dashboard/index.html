@@ -2399,38 +2399,25 @@ async function searchInsee(){
   if(!naf&&!dept){alert('renseignez au moins un code NAF ou un département.');return;}
   showSpinner('insee-spinner');
   try {
-    // API entreprise.data.gouv.fr — plus stable
-    let url='https://api.recherche-entreprises.gouv.fr/api/v1/search?per_page=25&status=A';
-    if(naf) url+='&naf='+encodeURIComponent(naf);
-    if(dept) url+='&departement='+encodeURIComponent(dept);
-    if(effectif) url+='&tranche_effectif='+effectif;
+    // Passer par l'Edge Function pour éviter les problèmes CORS
+    const { data: { session } } = await _sb.auth.getSession();
+    const res = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/insee-proxy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + (session?.access_token || HUNTLIST_CONFIG.supaAnon),
+        'apikey': HUNTLIST_CONFIG.supaAnon,
+      },
+      body: JSON.stringify({ naf, dept, effectif })
+    });
 
-    let res = await fetch(url);
-    
-    // Fallback vers l'API SIRENE directe si la première échoue
     if(!res.ok) {
-      url = 'https://api.insee.fr/entreprises/sirene/V3.11/siret?q=';
-      let q = [];
-      if(naf) q.push('activitePrincipaleEtablissement:'+naf);
-      if(dept) q.push('codePostalEtablissement:'+dept+'*');
-      q.push('etatAdministratifEtablissement:A');
-      url += encodeURIComponent(q.join(' AND ')) + '&nombre=25';
-      res = await fetch(url, {headers:{'Accept':'application/json'}});
+      const err = await res.json();
+      throw new Error(err.error || 'API non disponible (' + res.status + ')');
     }
 
-    // Fallback final : API recherche-entreprises avec paramètres minimaux
-    if(!res.ok) {
-      let fallbackUrl = 'https://recherche-entreprises.api.gouv.fr/search?q=';
-      if(naf) fallbackUrl += encodeURIComponent(naf);
-      if(dept) fallbackUrl += '&departement='+encodeURIComponent(dept);
-      fallbackUrl += '&per_page=25&is_siege=true';
-      res = await fetch(fallbackUrl);
-    }
-
-    if(!res.ok) throw new Error('API non disponible ('+res.status+')');
-    
     const data = await res.json();
-    const results = data.results || data.etablissements || data.items || [];
+    const results = data.results || data.etablissements || [];
 
     if(!results.length){
       document.getElementById('insee-results').style.display='none';
@@ -2440,14 +2427,14 @@ async function searchInsee(){
     }
 
     document.getElementById('insee-results-title').textContent=results.length+' entreprises actives';
-    document.getElementById('insee-results-sub').textContent='base sirene · source officielle';
+    document.getElementById('insee-results-sub').textContent='base sirene · source officielle insee';
 
     document.getElementById('insee-table').innerHTML=results.map(r=>{
       const nom=r.nom_complet||r.nom_raison_sociale||r.denomination||'—';
       const siret=r.siege?.siret||r.siret||r.siren||'—';
-      const nafCode=r.activite_principale||r.activitePrincipale||'—';
-      const ville=r.siege?.commune||r.siege?.libelle_commune||r.libelle_commune_etablissement||'—';
-      const cp=r.siege?.code_postal||r.code_postal_etablissement||'';
+      const nafCode=r.activite_principale||'—';
+      const ville=r.siege?.commune||r.siege?.libelle_commune||'—';
+      const cp=r.siege?.code_postal||'';
       const creation=r.date_creation||'—';
       const score=Math.min(99,55+Math.floor(Math.random()*30));
       const mapsLink='https://www.google.com/maps/search/'+encodeURIComponent(nom+' '+ville);
