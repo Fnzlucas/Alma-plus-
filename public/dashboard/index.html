@@ -4137,6 +4137,124 @@ function loadLinkedinLeads() { checkLiApiKey(); }
 
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCounter();});
+
+
+// ═══ ONBOARDING ═══
+const OB_KEY = 'huntlist_onboarding_done';
+let _obStep = 1;
+const _obTotalSteps = 6;
+
+function obCheckAndShow(){
+  const done = localStorage.getItem(OB_KEY);
+  if(!done){
+    document.getElementById('onboarding-overlay').style.display = 'flex';
+    obUpdateProgress();
+  }
+}
+
+function obUpdateProgress(){
+  const pct = ((_obStep - 1) / (_obTotalSteps - 1)) * 100;
+  document.getElementById('ob-progress').style.width = pct + '%';
+  document.getElementById('ob-step-count').textContent = 'étape ' + _obStep + ' / ' + _obTotalSteps;
+}
+
+function obNext(){
+  document.getElementById('ob-step-' + _obStep).style.display = 'none';
+  _obStep++;
+  if(_obStep > _obTotalSteps){ obFinish(); return; }
+  document.getElementById('ob-step-' + _obStep).style.display = 'block';
+  obUpdateProgress();
+  
+  // Actions spéciales par step
+  if(_obStep === 4) obGenerateEmailPreview();
+}
+
+function obSaveProfile(){
+  const prenom = document.getElementById('ob-prenom').value.trim();
+  const nom = document.getElementById('ob-nom').value.trim();
+  const societe = document.getElementById('ob-societe').value.trim();
+  const secteur = document.getElementById('ob-secteur').value;
+  const valeur = document.getElementById('ob-valeur').value.trim();
+  
+  if(!prenom || !nom || !societe || !secteur){
+    alert('renseignez tous les champs obligatoires (*)');
+    return;
+  }
+  
+  // Préremplir le profil dans les paramètres
+  const prefill = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+  prefill('prof-prenom', prenom);
+  prefill('prof-nom', nom);
+  prefill('prof-societe', societe);
+  prefill('prof-secteur', secteur);
+  prefill('prof-valeur', valeur);
+  
+  // Sauvegarder
+  const p = { prenom, nom, societe, activite: secteur, valeur, ton: 'professionnel' };
+  localStorage.setItem('huntlist_profile', JSON.stringify(p));
+  
+  // Mettre à jour le sidebar
+  const nameEl = document.getElementById('sidebar-user-name');
+  if(nameEl) nameEl.textContent = (prenom + ' ' + nom).toLowerCase();
+  
+  obNext();
+}
+
+async function obLaunchSearch(){
+  const type = document.getElementById('ob-search-type').value.trim();
+  const city = document.getElementById('ob-search-city').value.trim();
+  if(!type || !city){ alert('renseignez un type de business et une ville.'); return; }
+  
+  // Préremplir la vraie recherche
+  const typeEl = document.getElementById('search-type');
+  const cityEl = document.getElementById('search-city');
+  if(typeEl) typeEl.value = type;
+  if(cityEl) cityEl.value = city;
+  
+  obNext();
+  
+  // Fermer l'onboarding et lancer la recherche
+  setTimeout(() => {
+    obFinish();
+    goPage('prospection', document.querySelector('[onclick*="prospection"]'));
+    setTimeout(() => searchProspects(), 500);
+  }, 800);
+}
+
+async function obGenerateEmailPreview(){
+  const profile = getProfile();
+  const preview = document.getElementById('ob-email-preview');
+  if(!preview) return;
+  
+  const secteur = profile.activite || profile.secteur || 'votre secteur';
+  const prenom = profile.prenom || 'prénom';
+  const societe = profile.societe || 'votre société';
+  
+  preview.innerHTML = `<em style="color:rgba(255,255,255,0.4)">génération d'un exemple...</em>`;
+  
+  try {
+    const prompt = `génère un court email de prospection B2B (100 mots max) pour un ${secteur} nommé ${prenom} de ${societe}. 
+Prospect fictif : une PME locale avec quelques avis Google. Objet + corps. Texte brut.`;
+    const d = await claudeAPI([{role:'user', content: prompt}], 200, null);
+    preview.style.fontSize = '12px';
+    preview.style.lineHeight = '1.7';
+    preview.innerHTML = d.content[0].text.replace(/\n/g, '<br/>')
+  } catch(e) {
+    preview.innerHTML = `Objet : Proposition de service pour votre établissement<br/><br/>Bonjour,<br/>Je suis ${prenom} de ${societe}, spécialiste en ${secteur}. Je me permets de vous contacter car j'ai pu constater que votre établissement pourrait bénéficier de notre expertise.<br/><br/>Seriez-vous disponible pour un échange de 10 minutes cette semaine ?<br/><br/>Cordialement,<br/>${prenom}`;
+  }
+}
+
+function obFinish(){
+  localStorage.setItem(OB_KEY, 'true');
+  document.getElementById('onboarding-overlay').style.display = 'none';
+  addActivity('onboarding complété', 'check_circle', 'green');
+}
+
+// Lancer l'onboarding au chargement
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(obCheckAndShow, 1000);
+});
+
 </script>
 
 <!-- Fiche Pré-Appel Modal (standalone pour résultats) -->
@@ -4266,23 +4384,23 @@ document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCo
       <!-- STEP 1 : Bienvenue -->
       <div class="ob-step" id="ob-step-1">
         <div style="text-align:center;padding:20px 0">
-          <div style="font-size:52px;margin-bottom:16px">👋</div>
+          <span class="msym" style="font-size:52px;color:#0055D4;display:block;margin-bottom:16px">waving_hand</span>
           <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:8px">bienvenue sur Huntlist.</h2>
           <p style="font-size:14px;color:#6b7280;line-height:1.7;max-width:380px;margin:0 auto">votre outil de prospection IA automatisée. en 5 minutes, on configure tout et on vous montre comment trouver vos premiers clients.</p>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:24px 0">
           <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
-            <div style="font-size:24px;margin-bottom:6px">🎯</div>
+            <span class="msym" style="font-size:24px;color:#0055D4;display:block;margin-bottom:6px">radar</span>
             <div style="font-size:11px;font-weight:700;color:#0a0a1a">prospection</div>
             <div style="font-size:10px;color:#9ca3af">google maps, INSEE</div>
           </div>
           <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
-            <div style="font-size:24px;margin-bottom:6px">✉️</div>
+            <span class="msym" style="font-size:24px;color:#0055D4;display:block;margin-bottom:6px">mail</span>
             <div style="font-size:11px;font-weight:700;color:#0a0a1a">emails IA</div>
             <div style="font-size:10px;color:#9ca3af">personnalisés auto</div>
           </div>
           <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
-            <div style="font-size:24px;margin-bottom:6px">📊</div>
+            <span class="msym" style="font-size:24px;color:#0055D4;display:block;margin-bottom:6px">conversion_path</span>
             <div style="font-size:11px;font-weight:700;color:#0a0a1a">pipeline CRM</div>
             <div style="font-size:10px;color:#9ca3af">suivi des leads</div>
           </div>
@@ -4358,12 +4476,12 @@ document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCo
         <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Suivez chaque prospect de la découverte au closing. Le tracker d'appel génère un script personnalisé à votre secteur avant chaque appel.</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
           <div style="padding:16px;background:#f9f9fb;border-radius:12px;border:1px solid #e5e7eb">
-            <div style="font-size:20px;margin-bottom:8px">📋</div>
+            <div style="font-size:20px;margin-bottom:8px"></div>
             <div style="font-size:13px;font-weight:700;color:#0a0a1a;margin-bottom:4px">pipeline CRM</div>
             <div style="font-size:11px;color:#9ca3af;line-height:1.5">nouveau → contacté → répondu → converti</div>
           </div>
           <div style="padding:16px;background:#f9f9fb;border-radius:12px;border:1px solid #e5e7eb">
-            <div style="font-size:20px;margin-bottom:8px">📞</div>
+            <div style="font-size:20px;margin-bottom:8px"></div>
             <div style="font-size:13px;font-weight:700;color:#0a0a1a;margin-bottom:4px">tracker appel</div>
             <div style="font-size:11px;color:#9ca3af;line-height:1.5">script IA + objections + résumé post-appel</div>
           </div>
@@ -4379,7 +4497,7 @@ document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCo
         <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">veille concurrentielle & alertes</h2>
         <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Analysez vos concurrents locaux avec leurs forces et faiblesses. Les alertes du jour vous signalent les 20 opportunités les plus chaudes chaque matin.</p>
         <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:14px;padding:20px;margin-bottom:24px;text-align:center">
-          <div style="font-size:32px;margin-bottom:8px">🎉</div>
+          <span class="msym" style="font-size:36px;color:#059669;display:block;margin-bottom:8px">check_circle</span>
           <div style="font-size:16px;font-weight:800;color:#0a0a1a;margin-bottom:4px">vous êtes prêt !</div>
           <div style="font-size:13px;color:#6b7280;line-height:1.65">votre espace Huntlist. est configuré. lancez votre première recherche et trouvez vos premiers clients aujourd'hui.</div>
         </div>
@@ -4400,123 +4518,6 @@ document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCo
 .ob-next-btn:active{transform:none}
 </style>
 
-<script>
-// ═══ ONBOARDING ═══
-const OB_KEY = 'huntlist_onboarding_done';
-let _obStep = 1;
-const _obTotalSteps = 6;
 
-function obCheckAndShow(){
-  const done = localStorage.getItem(OB_KEY);
-  if(!done){
-    document.getElementById('onboarding-overlay').style.display = 'flex';
-    obUpdateProgress();
-  }
-}
-
-function obUpdateProgress(){
-  const pct = ((_obStep - 1) / (_obTotalSteps - 1)) * 100;
-  document.getElementById('ob-progress').style.width = pct + '%';
-  document.getElementById('ob-step-count').textContent = 'étape ' + _obStep + ' / ' + _obTotalSteps;
-}
-
-function obNext(){
-  document.getElementById('ob-step-' + _obStep).style.display = 'none';
-  _obStep++;
-  if(_obStep > _obTotalSteps){ obFinish(); return; }
-  document.getElementById('ob-step-' + _obStep).style.display = 'block';
-  obUpdateProgress();
-  
-  // Actions spéciales par step
-  if(_obStep === 4) obGenerateEmailPreview();
-}
-
-function obSaveProfile(){
-  const prenom = document.getElementById('ob-prenom').value.trim();
-  const nom = document.getElementById('ob-nom').value.trim();
-  const societe = document.getElementById('ob-societe').value.trim();
-  const secteur = document.getElementById('ob-secteur').value;
-  const valeur = document.getElementById('ob-valeur').value.trim();
-  
-  if(!prenom || !nom || !societe || !secteur){
-    alert('renseignez tous les champs obligatoires (*)');
-    return;
-  }
-  
-  // Préremplir le profil dans les paramètres
-  const prefill = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
-  prefill('prof-prenom', prenom);
-  prefill('prof-nom', nom);
-  prefill('prof-societe', societe);
-  prefill('prof-secteur', secteur);
-  prefill('prof-valeur', valeur);
-  
-  // Sauvegarder
-  const p = { prenom, nom, societe, activite: secteur, valeur, ton: 'professionnel' };
-  localStorage.setItem('huntlist_profile', JSON.stringify(p));
-  
-  // Mettre à jour le sidebar
-  const nameEl = document.getElementById('sidebar-user-name');
-  if(nameEl) nameEl.textContent = (prenom + ' ' + nom).toLowerCase();
-  
-  obNext();
-}
-
-async function obLaunchSearch(){
-  const type = document.getElementById('ob-search-type').value.trim();
-  const city = document.getElementById('ob-search-city').value.trim();
-  if(!type || !city){ alert('renseignez un type de business et une ville.'); return; }
-  
-  // Préremplir la vraie recherche
-  const typeEl = document.getElementById('search-type');
-  const cityEl = document.getElementById('search-city');
-  if(typeEl) typeEl.value = type;
-  if(cityEl) cityEl.value = city;
-  
-  obNext();
-  
-  // Fermer l'onboarding et lancer la recherche
-  setTimeout(() => {
-    obFinish();
-    goPage('prospection', document.querySelector('[onclick*="prospection"]'));
-    setTimeout(() => searchProspects(), 500);
-  }, 800);
-}
-
-async function obGenerateEmailPreview(){
-  const profile = getProfile();
-  const preview = document.getElementById('ob-email-preview');
-  if(!preview) return;
-  
-  const secteur = profile.activite || profile.secteur || 'votre secteur';
-  const prenom = profile.prenom || 'prénom';
-  const societe = profile.societe || 'votre société';
-  
-  preview.innerHTML = `<em style="color:rgba(255,255,255,0.4)">génération d'un exemple...</em>`;
-  
-  try {
-    const prompt = `génère un court email de prospection B2B (100 mots max) pour un ${secteur} nommé ${prenom} de ${societe}. 
-Prospect fictif : une PME locale avec quelques avis Google. Objet + corps. Texte brut.`;
-    const d = await claudeAPI([{role:'user', content: prompt}], 200, null);
-    preview.style.fontSize = '12px';
-    preview.style.lineHeight = '1.7';
-    preview.innerHTML = d.content[0].text.replace(/
-/g, '<br/>');
-  } catch(e) {
-    preview.innerHTML = `Objet : Proposition de service pour votre établissement<br/><br/>Bonjour,<br/>Je suis ${prenom} de ${societe}, spécialiste en ${secteur}. Je me permets de vous contacter car j'ai pu constater que votre établissement pourrait bénéficier de notre expertise.<br/><br/>Seriez-vous disponible pour un échange de 10 minutes cette semaine ?<br/><br/>Cordialement,<br/>${prenom}`;
-  }
-}
-
-function obFinish(){
-  localStorage.setItem(OB_KEY, 'true');
-  document.getElementById('onboarding-overlay').style.display = 'none';
-  addActivity('onboarding complété', 'check_circle', 'green');
-}
-
-// Lancer l'onboarding au chargement
-document.addEventListener('DOMContentLoaded', function(){
-  setTimeout(obCheckAndShow, 1000);
-});
-</script>
 </body>
 </html>
