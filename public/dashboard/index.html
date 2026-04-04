@@ -1723,7 +1723,7 @@ async function claudeAPI(messages, max_tokens=800, quota_type=null) {
   if (!session) throw new Error('non authentifié');
 
   const res = await fetch(
-    ALMA_CONFIG.supaUrl + '/functions/v1/claude-proxy',
+    HUNTLIST_CONFIG.supaUrl + '/functions/v1/claude-proxy',
     {
       method: 'POST',
       headers: {
@@ -1747,21 +1747,18 @@ async function claudeAPI(messages, max_tokens=800, quota_type=null) {
 }
 
 // ═══ CONFIG ═══
-const ALMA_CONFIG = {
-  gmaps: 'AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A',
-  brevo: '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',
+const HUNTLIST_CONFIG = {
+  gmaps: 'AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A', // clé Google Maps — restreindre dans Google Console
   emailFrom: 'noreply@huntlist.fr',
   emailName: 'Huntlist.',
   model: 'claude-sonnet-4-5',
   supaUrl: 'https://tzrtptpzbrszibuifzns.supabase.co',
   supaAnon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk',
-  resendKey: 're_XJ71yfZm_8NGwnEVT8nvRdedepPBhcg9Y',
-  resendFrom: 'onboarding@resend.dev',
 };
 const SUPABASE_PROXY = 'https://tzrtptpzbrszibuifzns.supabase.co/functions/v1/proxy';
 
 // ═══ CLIENT SUPABASE GLOBAL ═══
-const _sb = supabase.createClient(ALMA_CONFIG.supaUrl, ALMA_CONFIG.supaAnon);
+const _sb = supabase.createClient(HUNTLIST_CONFIG.supaUrl, HUNTLIST_CONFIG.supaAnon);
 
 
 // ═══ STATE ═══
@@ -1778,7 +1775,7 @@ function saveState() { try { localStorage.setItem('alma_state', JSON.stringify(s
 
 function getKeys() {
   const ce = localStorage.getItem('alma_client_email') ? JSON.parse(localStorage.getItem('alma_client_email')) : {};
-  return { ...ALMA_CONFIG, emailFrom: ce.from||ALMA_CONFIG.emailFrom, emailName: ce.name||ALMA_CONFIG.emailName };
+  return { ...HUNTLIST_CONFIG, emailFrom: ce.from||HUNTLIST_CONFIG.emailFrom, emailName: ce.name||HUNTLIST_CONFIG.emailName };
 }
 function getProfile() {
   return { prenom: v('prof-prenom')||'', nom: v('prof-nom')||'', societe: v('prof-societe')||'', activite: v('prof-activite')||'', valeur: v('prof-valeur')||'', ton: v('prof-ton')||'professionnel' };
@@ -2356,7 +2353,7 @@ function markAsSeen(pid){const seen=getSeenProspects();if(!seen.includes(pid)){s
 function resetSeenProspects(){if(!confirm('réinitialiser la mémoire ?')) return;localStorage.removeItem('alma_memorized_prospects');updateSeenCounter();}
 
 // ═══ B2B APIS ═══
-async function proxyFetch(url){const res=await fetch(SUPABASE_PROXY,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ALMA_CONFIG.supaAnon,'apikey':ALMA_CONFIG.supaAnon},body:JSON.stringify({url})});return res.json();}
+async function proxyFetch(url){const res=await fetch(SUPABASE_PROXY,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+HUNTLIST_CONFIG.supaAnon,'apikey':HUNTLIST_CONFIG.supaAnon},body:JSON.stringify({url})});return res.json();}
 function addToP(btn){const name=btn.getAttribute('data-name')||'prospect';const addr=btn.getAttribute('data-addr')||'';const score=parseInt(btn.getAttribute('data-score'))||70;addToPipeline({id:'ext-'+Date.now(),name,address:addr,rating:0,reviews:0,score,phone:null,website:null});}
 
 async function searchInsee(){
@@ -3014,14 +3011,14 @@ async function sendReply(){const textarea=document.getElementById('chat-reply');
 
 // ═══ ALERTES ═══
 let _alertesData=[],_alertesFilter='all';
-async function loadAlertes(){try{const today=new Date().toISOString().split('T')[0];const res=await fetch(ALMA_CONFIG.supaUrl+'/rest/v1/signals?order=created_at.desc&limit=100&created_at=gte.'+today+'T00:00:00Z',{headers:{'apikey':ALMA_CONFIG.supaAnon,'Authorization':'Bearer '+ALMA_CONFIG.supaAnon}});if(!res.ok) throw new Error('erreur');_alertesData=await res.json();renderAlertes();updateAlerteBadge();}catch(e){document.getElementById('alertes-list').innerHTML='<div class="glass card"><div class="card-body" style="text-align:center;padding:40px"><span class="msym" style="font-size:48px;display:block;margin-bottom:12px;opacity:.2;color:#0055D4">notifications_active</span><div style="font-size:14px;font-weight:700;color:#6b7280;margin-bottom:8px">scan de nuit pas encore effectué</div><div style="font-size:12px;color:#9ca3af;margin-bottom:20px">le pilote scanne automatiquement chaque matin à 6h.</div><button class="btn btn-primary" onclick="manualScan()"><span class="msym">play_arrow</span>lancer un scan maintenant</button></div></div>';['alertes-total','alertes-bodacc','alertes-dvf','alertes-dpe'].forEach(id=>{const el=document.getElementById(id);if(el) el.textContent='0';});}}
+async function loadAlertes(){try{const today=new Date().toISOString().split('T')[0];const res=await fetch(HUNTLIST_CONFIG.supaUrl+'/rest/v1/signals?order=created_at.desc&limit=100&created_at=gte.'+today+'T00:00:00Z',{headers:{'apikey':HUNTLIST_CONFIG.supaAnon,'Authorization':'Bearer '+HUNTLIST_CONFIG.supaAnon}});if(!res.ok) throw new Error('erreur');_alertesData=await res.json();renderAlertes();updateAlerteBadge();}catch(e){document.getElementById('alertes-list').innerHTML='<div class="glass card"><div class="card-body" style="text-align:center;padding:40px"><span class="msym" style="font-size:48px;display:block;margin-bottom:12px;opacity:.2;color:#0055D4">notifications_active</span><div style="font-size:14px;font-weight:700;color:#6b7280;margin-bottom:8px">scan de nuit pas encore effectué</div><div style="font-size:12px;color:#9ca3af;margin-bottom:20px">le pilote scanne automatiquement chaque matin à 6h.</div><button class="btn btn-primary" onclick="manualScan()"><span class="msym">play_arrow</span>lancer un scan maintenant</button></div></div>';['alertes-total','alertes-bodacc','alertes-dvf','alertes-dpe'].forEach(id=>{const el=document.getElementById(id);if(el) el.textContent='0';});}}
 function renderAlertes(){const filtered=_alertesFilter==='all'?_alertesData:_alertesFilter==='unseen'?_alertesData.filter(s=>!s.seen):_alertesFilter==='phone'?_alertesData.filter(s=>s.details?.phone):_alertesData.filter(s=>s.source===_alertesFilter);document.getElementById('alertes-total').textContent=_alertesData.length;document.getElementById('alertes-bodacc').textContent=_alertesData.filter(s=>s.source==='GMAPS').length;document.getElementById('alertes-dvf').textContent=_alertesData.filter(s=>s.details?.phone).length;const scores=_alertesData.map(s=>s.score||0).filter(Boolean);document.getElementById('alertes-dpe').textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):'—';if(!filtered.length){document.getElementById('alertes-list').innerHTML='<div style="text-align:center;padding:40px;color:#9ca3af">aucune alerte avec ce filtre.</div>';return;}const srcConfig={GMAPS:{icon:'map',color:'#0055D4',bg:'rgba(0,85,212,0.08)',label:'google maps'},BODACC:{icon:'gavel',color:'#dc2626',bg:'rgba(220,38,38,0.08)',label:'bodacc'},DVF:{icon:'real_estate_agent',color:'#7c3aed',bg:'rgba(124,58,237,0.08)',label:'dvf'},DPE:{icon:'eco',color:'#059669',bg:'rgba(5,150,105,0.08)',label:'dpe'}};document.getElementById('alertes-list').innerHTML=filtered.map(s=>{const cfg=srcConfig[s.source]||{icon:'circle',color:'#9ca3af',bg:'rgba(255,255,255,0.5)',label:s.source};const isNew=!s.seen;const timeStr=new Date(s.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});return`<div class="glass" style="border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;border-left:3px solid ${isNew?cfg.color:'rgba(255,255,255,0.3)'}"><div style="width:38px;height:38px;border-radius:10px;background:${cfg.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="msym" style="font-size:18px;color:${cfg.color}">${cfg.icon}</span></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="badge" style="background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.color}22">${s.source}</span>${isNew?'<span class="badge badge-red">nouveau</span>':''}<span style="font-size:10px;color:#9ca3af;margin-left:auto">${timeStr}</span></div><div style="font-size:13px;font-weight:800;color:#0a0a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.adresse||'—'}${s.commune?', '+s.commune:''}</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn btn-ghost btn-sm" onclick="addAlerteToPipeline('${s.id}')"><span class="msym">conversion_path</span>pipeline</button><button class="btn btn-ghost btn-sm" onclick="markAlerteRead('${s.id}')"><span class="msym">done</span></button></div></div>`;}).join('');}
 function filterAlertes(filter,btn){_alertesFilter=filter;document.querySelectorAll('#page-alertes .chip').forEach(b=>{b.style.background='';b.style.color='';b.style.borderColor='';b.style.fontWeight='';});if(btn){btn.style.background='rgba(0,85,212,0.08)';btn.style.color='#0055D4';btn.style.borderColor='rgba(0,85,212,0.2)';btn.style.fontWeight='800';}renderAlertes();}
-async function markAlerteRead(id){const s=_alertesData.find(x=>x.id===id);if(s) s.seen=true;renderAlertes();updateAlerteBadge();await fetch(ALMA_CONFIG.supaUrl+'/rest/v1/signals?id=eq.'+id,{method:'PATCH',headers:{'apikey':ALMA_CONFIG.supaAnon,'Authorization':'Bearer '+ALMA_CONFIG.supaAnon,'Content-Type':'application/json'},body:JSON.stringify({seen:true})});}
+async function markAlerteRead(id){const s=_alertesData.find(x=>x.id===id);if(s) s.seen=true;renderAlertes();updateAlerteBadge();await fetch(HUNTLIST_CONFIG.supaUrl+'/rest/v1/signals?id=eq.'+id,{method:'PATCH',headers:{'apikey':HUNTLIST_CONFIG.supaAnon,'Authorization':'Bearer '+HUNTLIST_CONFIG.supaAnon,'Content-Type':'application/json'},body:JSON.stringify({seen:true})});}
 async function markAllAlertesRead(){_alertesData.forEach(s=>s.seen=true);renderAlertes();updateAlerteBadge();}
 function updateAlerteBadge(){const unseen=_alertesData.filter(s=>!s.seen).length;const badge=document.getElementById('badge-alertes');if(badge){badge.textContent=unseen;badge.style.display=unseen>0?'inline':'none';}}
 function addAlerteToPipeline(id){const s=_alertesData.find(x=>x.id===id);if(!s) return;addToPipeline({id:'alert-'+s.id,name:s.nom||s.adresse,address:(s.adresse||'')+(s.commune?', '+s.commune:''),rating:0,reviews:0,score:(s.score||1)*25,phone:null,website:null});markAlerteRead(id);}
-async function manualScan(){try{const res=await fetch(ALMA_CONFIG.supaUrl+'/functions/v1/daily-scan',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ALMA_CONFIG.supaAnon,'apikey':ALMA_CONFIG.supaAnon},body:JSON.stringify({trigger:'manual'})});const data=await res.json();addActivity('scan manuel : '+(data.signals_inserted||0)+' nouveaux signaux','notifications_active','primary');setTimeout(()=>loadAlertes(),1000);}catch(e){alert('erreur scan : '+e.message);}}
+async function manualScan(){try{const res=await fetch(HUNTLIST_CONFIG.supaUrl+'/functions/v1/daily-scan',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+HUNTLIST_CONFIG.supaAnon,'apikey':HUNTLIST_CONFIG.supaAnon},body:JSON.stringify({trigger:'manual'})});const data=await res.json();addActivity('scan manuel : '+(data.signals_inserted||0)+' nouveaux signaux','notifications_active','primary');setTimeout(()=>loadAlertes(),1000);}catch(e){alert('erreur scan : '+e.message);}}
 
 // ═══ B2C CROSS SEARCH ═══
 async function searchCrossB2C(){const zone=document.getElementById('cross-zone').value.trim();if(!zone){alert('renseignez une zone.');return;}show('cross-spinner');show('cross-progress');hide('cross-results');const scoreMin=parseInt(document.getElementById('cross-score-min').value)||2;const max=parseInt(document.getElementById('cross-max').value)||20;const useDVF=document.getElementById('cross-dvf').checked,usePermis=document.getElementById('cross-permis').checked,useDPE=document.getElementById('cross-dpe').checked,useCopro=document.getElementById('cross-copro').checked,useBodacc=document.getElementById('cross-bodacc').checked;const sources=[];if(useDVF) sources.push({id:'dvf',label:'dvf',icon:'real_estate_agent'});if(usePermis) sources.push({id:'permis',label:'permis',icon:'construction'});if(useDPE) sources.push({id:'dpe',label:'dpe f/g',icon:'eco'});if(useCopro) sources.push({id:'copro',label:'copros',icon:'apartment'});if(useBodacc) sources.push({id:'bodacc',label:'bodacc',icon:'gavel'});document.getElementById('cross-sources-status').innerHTML=sources.map(s=>`<div style="display:flex;align-items:center;gap:10px;font-size:12px"><span class="msym" style="font-size:14px;color:#0055D4">${s.icon}</span><span style="flex:1;font-weight:600">${s.label}</span><span id="src-status-${s.id}" style="color:#9ca3af">⏳ chargement...</span></div>`).join('');document.getElementById('cross-progress-text').textContent='interrogation des '+sources.length+' sources...';
