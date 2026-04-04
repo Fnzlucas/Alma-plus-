@@ -1022,14 +1022,11 @@ tr:hover td { background: rgba(255,255,255,0.3); }
           </div>
         </div>
 
-        <!-- Bottom sheet fiche -->
-        <div id="radar-sheet" style="position:fixed;bottom:-100%;left:0;right:0;background:white;border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,0.15);z-index:500;transition:bottom .35s cubic-bezier(0.32,0.72,0,1);max-width:1280px;margin:0 auto;max-height:75vh;overflow-y:auto">
-          <div style="padding:0 0 20px 0">
-            <!-- Handle -->
-            <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:12px auto 0"></div>
-
+        <!-- Card flottante fiche -->
+        <div id="radar-sheet" style="position:absolute;top:16px;right:16px;width:340px;max-height:calc(100% - 32px);background:white;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18),0 2px 8px rgba(0,0,0,0.08);z-index:400;transition:opacity .25s ease,transform .25s ease;overflow-y:auto;opacity:0;transform:translateY(-8px) scale(0.97);pointer-events:none;display:block">
+          <div style="padding:0 0 16px 0">
             <!-- Map embed Google Maps style -->
-            <div id="sheet-map-embed" style="width:100%;height:180px;background:#e8f0fe;position:relative;overflow:hidden;margin-top:12px">
+            <div id="sheet-map-embed" style="width:100%;height:160px;background:#e8f0fe;position:relative;overflow:hidden;border-radius:20px 20px 0 0">
               <iframe id="sheet-map-iframe" src="" style="width:100%;height:100%;border:none;display:none" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
               <div id="sheet-map-placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8f0fe,#c5d5f8)">
                 <span class="msym" style="font-size:48px;color:#0055D4;opacity:.3">map</span>
@@ -3314,8 +3311,20 @@ réponds UNIQUEMENT en JSON sans markdown :
 les signaux doivent être précis et actionnables pour un ${secteur}.`;
 
     const d = await claudeAPI([{role:'user', content: prompt}], 1000, null);
-    const raw = d.content[0].text.replace(/\`\`\`json|\`\`\`/g,'').trim();
-    const data = JSON.parse(raw);
+    let raw = d.content[0].text.trim();
+    // Nettoyer tous les wrappers markdown possibles
+    raw = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    // Extraire uniquement le JSON valide (entre { et })
+    const jsonStart = raw.indexOf('{');
+    const jsonEnd = raw.lastIndexOf('}');
+    if (jsonStart >= 0 && jsonEnd > jsonStart) raw = raw.slice(jsonStart, jsonEnd + 1);
+    let data;
+    try { data = JSON.parse(raw); }
+    catch(parseErr) {
+      // Tentative de réparation : retirer les caractères problématiques
+      const cleaned = raw.replace(/[\x00-\x1F\x7F]/g, ' ').replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+      data = JSON.parse(cleaned);
+    }
     const opportunites = data.opportunites || [];
 
     _alertesData = opportunites.map((o, i) => ({
@@ -4615,11 +4624,17 @@ function openRadarSheet(place, secteur) {
     _radarMap.setZoom(16);
   }
 
-  document.getElementById('radar-sheet').style.bottom = '0';
+  const sheet = document.getElementById('radar-sheet');
+  sheet.style.opacity = '1';
+  sheet.style.transform = 'translateY(0) scale(1)';
+  sheet.style.pointerEvents = 'auto';
 }
 
 function closeRadarSheet() {
-  document.getElementById('radar-sheet').style.bottom = '-100%';
+  const sheet = document.getElementById('radar-sheet');
+  sheet.style.opacity = '0';
+  sheet.style.transform = 'translateY(-8px) scale(0.97)';
+  sheet.style.pointerEvents = 'none';
   _radarCurrentPlace = null;
 }
 
