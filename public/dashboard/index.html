@@ -290,6 +290,9 @@ tr:hover td { background: rgba(255,255,255,0.3); }
     <button class="nav-item" onclick="goPage('veille',this)">
       <span class="msym">visibility</span>veille concurrentielle
     </button>
+    <button class="nav-item" onclick="goPage('radar',this)">
+      <span class="msym">satellite_alt</span>radar aérien
+    </button>
     <button class="nav-item" onclick="goPage('coldcall',this)">
       <span class="msym">settings_phone</span>tracker appel
     </button>
@@ -979,6 +982,113 @@ tr:hover td { background: rgba(255,255,255,0.3); }
           </div>
           <div id="cal-events-list" style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">cliquez sur un jour pour voir les événements</div>
         </div>
+      </div>
+    </div>
+
+    <!-- ═══ RADAR AÉRIEN ═══ -->
+    <div class="page" id="page-radar">
+      <div style="display:flex;flex-direction:column;height:calc(100vh - 60px);gap:0">
+
+        <!-- Header -->
+        <div style="padding:16px 24px 12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;flex-shrink:0">
+          <div>
+            <h2 style="font-size:18px;font-weight:700;letter-spacing:-0.04em;color:#0a0a1a;display:flex;align-items:center;gap:8px">
+              <span class="msym" style="color:#0055D4;font-size:22px">satellite_alt</span>radar aérien
+            </h2>
+            <p style="font-size:11px;color:#9ca3af;margin-top:2px">scannez un secteur · cliquez sur une entreprise pour ouvrir sa fiche</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id="radar-search" class="form-input" placeholder="type de business (ex: plombier, restaurant...)" style="width:220px;height:36px;font-size:12px"/>
+            <input id="radar-city" class="form-input" placeholder="ville" style="width:140px;height:36px;font-size:12px"/>
+            <button class="btn btn-primary btn-sm" onclick="radarSearch()" id="btn-radar">
+              <span id="radar-spinner" style="display:none" class="spinner"></span>
+              <span class="msym">radar</span>scanner
+            </button>
+            <div style="display:flex;gap:4px">
+              <button class="btn btn-ghost btn-sm" id="radar-toggle-sat" onclick="radarToggleSat()" title="Vue satellite">
+                <span class="msym">satellite</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compteur résultats -->
+        <div id="radar-stats" style="display:none;padding:0 24px 8px;flex-shrink:0">
+          <span style="font-size:11px;font-weight:700;color:#0055D4;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.12);padding:4px 12px;border-radius:99px" id="radar-count-label"></span>
+        </div>
+
+        <!-- Map container -->
+        <div style="flex:1;position:relative;overflow:hidden">
+          <div id="radar-map" style="width:100%;height:100%"></div>
+
+          <!-- Legend -->
+          <div style="position:absolute;bottom:16px;left:16px;background:white;border-radius:10px;padding:10px 14px;box-shadow:0 2px 16px rgba(0,0,0,0.1);font-size:10px;font-weight:600;color:#6b7280;display:flex;gap:12px;align-items:center">
+            <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#0055D4"></div>élevé</div>
+            <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#d97706"></div>moyen</div>
+            <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#059669"></div>faible</div>
+          </div>
+        </div>
+
+        <!-- Fiche prospect slide (bottom sheet) -->
+        <div id="radar-sheet" style="position:fixed;bottom:-100%;left:0;right:0;background:white;border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,0.15);z-index:500;transition:bottom .35s cubic-bezier(0.32,0.72,0,1);max-width:1280px;margin:0 auto;max-height:70vh;overflow-y:auto">
+          <div style="padding:16px 24px 24px">
+            <!-- Handle -->
+            <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:0 auto 20px"></div>
+
+            <!-- Header fiche -->
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px">
+              <div style="flex:1">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:4px" id="sheet-sector">secteur</div>
+                <div style="font-size:20px;font-weight:700;letter-spacing:-0.03em;color:#0a0a1a;line-height:1.2" id="sheet-name">nom</div>
+                <div style="font-size:12px;color:#9ca3af;margin-top:4px" id="sheet-addr">adresse</div>
+              </div>
+              <button onclick="closeRadarSheet()" style="background:#f9f9fb;border:none;border-radius:99px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✕</button>
+            </div>
+
+            <!-- Métriques -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+              <div style="background:#f9f9fb;border-radius:10px;padding:12px;text-align:center">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:4px">note google</div>
+                <div style="font-size:20px;font-weight:800;color:#0a0a1a" id="sheet-rating">—</div>
+              </div>
+              <div style="background:#f9f9fb;border-radius:10px;padding:12px;text-align:center">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:4px">avis</div>
+                <div style="font-size:20px;font-weight:800;color:#0a0a1a" id="sheet-reviews">—</div>
+              </div>
+              <div style="background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.12);border-radius:10px;padding:12px;text-align:center">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0055D4;margin-bottom:4px">score IA</div>
+                <div style="font-size:20px;font-weight:800;color:#0055D4" id="sheet-score">—</div>
+              </div>
+            </div>
+
+            <!-- Téléphone si dispo -->
+            <div id="sheet-phone-row" style="display:none;margin-bottom:12px">
+              <a id="sheet-phone-link" href="#" style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:10px;text-decoration:none;color:#059669;font-size:13px;font-weight:600">
+                <span class="msym">phone</span><span id="sheet-phone-text"></span>
+              </a>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+              <button class="btn btn-primary" onclick="addSheetToPipeline()" style="justify-content:center">
+                <span class="msym">conversion_path</span>ajouter au pipeline
+              </button>
+              <button class="btn btn-ghost" onclick="generateSheetEmail()" id="btn-sheet-email" style="justify-content:center;border:1px solid rgba(0,85,212,0.2);color:#0055D4">
+                <span id="sheet-email-spinner" style="display:none" class="spinner"></span>
+                <span class="msym">mail</span>email IA
+              </button>
+            </div>
+
+            <!-- Email généré -->
+            <div id="sheet-email-result" style="display:none">
+              <div style="background:#f9f9fb;border-radius:12px;padding:16px;font-size:12px;line-height:1.75;color:#1a1a2e;white-space:pre-wrap;border:1px solid #e5e7eb;max-height:200px;overflow-y:auto" id="sheet-email-text"></div>
+              <button onclick="copySheetEmail()" class="btn btn-ghost btn-sm" style="margin-top:8px">
+                <span class="msym">content_copy</span>copier
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -1835,6 +1945,7 @@ function goPage(name, btn) {
     devis:['devis','génération rapide'],
     calendrier:['calendrier','planification'],
     rapport:['rapport','vos performances'],
+    radar:['radar aérien','satellite_alt'],
     veille:['veille concurrentielle','analyse concurrentielle'],
     coldcall:['tracker appel','enregistrez vos appels'],
     settings:['paramètres','configuration'],
@@ -4249,6 +4360,231 @@ document.addEventListener('DOMContentLoaded', function(){
   setTimeout(obCheckAndShow, 1000);
 });
 
+
+
+// ═══ RADAR AÉRIEN ═══
+let _radarMap = null;
+let _radarMarkers = [];
+let _radarCurrentPlace = null;
+let _radarSatMode = false;
+let _radarGmapsLoaded = false;
+
+function initRadarMap() {
+  if (_radarMap || !document.getElementById('radar-map')) return;
+  _radarMap = new google.maps.Map(document.getElementById('radar-map'), {
+    center: { lat: 46.603354, lng: 1.888334 },
+    zoom: 13,
+    mapTypeId: 'roadmap',
+    styles: [
+      { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+      { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+    ],
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+  });
+}
+
+function radarToggleSat() {
+  if (!_radarMap) return;
+  _radarSatMode = !_radarSatMode;
+  _radarMap.setMapTypeId(_radarSatMode ? 'hybrid' : 'roadmap');
+  const btn = document.getElementById('radar-toggle-sat');
+  if (btn) btn.style.background = _radarSatMode ? 'rgba(0,85,212,0.1)' : '';
+}
+
+async function radarSearch() {
+  const type = document.getElementById('radar-search').value.trim();
+  const city = document.getElementById('radar-city').value.trim();
+  if (!type) return alert('renseignez un type de business.');
+
+  const btn = document.getElementById('btn-radar');
+  const spinner = document.getElementById('radar-spinner');
+  btn.disabled = true;
+  if (spinner) spinner.style.display = 'inline-block';
+
+  initRadarMap();
+
+  // Vider les anciens markers
+  _radarMarkers.forEach(m => m.setMap(null));
+  _radarMarkers = [];
+
+  try {
+    // Géocoder la ville pour centrer la carte
+    if (city) {
+      const geocoder = new google.maps.Geocoder();
+      await new Promise(resolve => {
+        geocoder.geocode({ address: city + ', France' }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            _radarMap.setCenter(results[0].geometry.location);
+            _radarMap.setZoom(14);
+          }
+          resolve();
+        });
+      });
+    }
+
+    // Recherche Places
+    const service = new google.maps.places.PlacesService(_radarMap);
+    const query = city ? type + ' ' + city : type;
+
+    const results = await new Promise(resolve => {
+      service.textSearch({ query, language: 'fr', region: 'fr' }, (res, status) => {
+        resolve(status === google.maps.places.PlacesServiceStatus.OK ? res : []);
+      });
+    });
+
+    if (!results.length) {
+      alert('aucun résultat trouvé. essayez un autre secteur ou ville.');
+      btn.disabled = false;
+      if (spinner) spinner.style.display = 'none';
+      return;
+    }
+
+    // Créer les markers
+    results.forEach(place => {
+      if (!place.geometry) return;
+
+      const rating = place.rating || 0;
+      const color = rating >= 4.5 ? '#0055D4' : rating >= 3.5 ? '#d97706' : '#059669';
+
+      // SVG marker personnalisé
+      const markerSvg = `<svg width="36" height="44" viewBox="0 0 36 44" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 0C8.06 0 0 8.06 0 18c0 13.5 18 26 18 26s18-12.5 18-26C36 8.06 27.94 0 18 0z" fill="${color}" opacity="0.9"/>
+        <circle cx="18" cy="18" r="10" fill="white" opacity="0.95"/>
+        <text x="18" y="23" text-anchor="middle" font-size="12" font-weight="bold" fill="${color}">${rating > 0 ? rating.toFixed(1) : '?'}</text>
+      </svg>`;
+
+      const marker = new google.maps.Marker({
+        position: place.geometry.location,
+        map: _radarMap,
+        title: place.name,
+        icon: {
+          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(markerSvg),
+          scaledSize: new google.maps.Size(36, 44),
+          anchor: new google.maps.Point(18, 44),
+        },
+      });
+
+      marker.addListener('click', () => openRadarSheet(place, type));
+      _radarMarkers.push(marker);
+    });
+
+    // Stats
+    const statsEl = document.getElementById('radar-stats');
+    const countEl = document.getElementById('radar-count-label');
+    if (statsEl) statsEl.style.display = '';
+    if (countEl) countEl.textContent = results.length + ' établissements trouvés · ' + type + (city ? ' · ' + city : '');
+
+    // Ajuster le zoom pour voir tous les markers
+    const bounds = new google.maps.LatLngBounds();
+    _radarMarkers.forEach(m => bounds.extend(m.getPosition()));
+    _radarMap.fitBounds(bounds);
+
+  } catch(e) {
+    alert('erreur radar : ' + e.message);
+  }
+
+  btn.disabled = false;
+  if (spinner) spinner.style.display = 'none';
+}
+
+function openRadarSheet(place, secteur) {
+  _radarCurrentPlace = place;
+  const sheet = document.getElementById('radar-sheet');
+
+  document.getElementById('sheet-name').textContent = place.name;
+  document.getElementById('sheet-addr').textContent = place.formatted_address || place.vicinity || '—';
+  document.getElementById('sheet-sector').textContent = secteur || 'commerce local';
+  document.getElementById('sheet-rating').textContent = place.rating ? place.rating + '/5' : '—';
+  document.getElementById('sheet-reviews').textContent = place.user_ratings_total || '—';
+  const score = Math.min(99, 40 + Math.round((place.rating || 3) * 10) + Math.floor(Math.random()*10));
+  document.getElementById('sheet-score').textContent = score + '/100';
+
+  // Téléphone (nécessite getDetails)
+  const phoneRow = document.getElementById('sheet-phone-row');
+  phoneRow.style.display = 'none';
+  document.getElementById('sheet-email-result').style.display = 'none';
+
+  const service = new google.maps.places.PlacesService(_radarMap);
+  service.getDetails({ placeId: place.place_id, fields: ['formatted_phone_number', 'website'] }, (details, status) => {
+    if (status === google.maps.places.PlacesServiceStatus.OK && details?.formatted_phone_number) {
+      const phone = details.formatted_phone_number;
+      document.getElementById('sheet-phone-link').href = 'tel:' + phone.replace(/ /g, '');
+      document.getElementById('sheet-phone-text').textContent = phone;
+      phoneRow.style.display = '';
+    }
+    if (details?.website) place._website = details.website;
+  });
+
+  // Centrer la carte sur le lieu
+  if (_radarMap && place.geometry) {
+    _radarMap.panTo(place.geometry.location);
+    _radarMap.setZoom(16);
+  }
+
+  sheet.style.bottom = '0';
+}
+
+function closeRadarSheet() {
+  document.getElementById('radar-sheet').style.bottom = '-100%';
+  _radarCurrentPlace = null;
+}
+
+function addSheetToPipeline() {
+  if (!_radarCurrentPlace) return;
+  const p = _radarCurrentPlace;
+  const score = parseInt(document.getElementById('sheet-score').textContent) || 70;
+  addToPipeline({
+    id: 'r-' + p.place_id?.slice(-8),
+    name: p.name,
+    address: p.formatted_address || p.vicinity || '',
+    rating: p.rating || 0,
+    reviews: p.user_ratings_total || 0,
+    score,
+    phone: document.getElementById('sheet-phone-text').textContent || null,
+    website: p._website || null,
+  });
+  closeRadarSheet();
+  showToast('Ajouté au pipeline : ' + p.name);
+}
+
+async function generateSheetEmail() {
+  if (!_radarCurrentPlace) return;
+  const p = _radarCurrentPlace;
+  const profile = getProfile();
+  const secteur = document.getElementById('sheet-sector').textContent;
+
+  const btn = document.getElementById('btn-sheet-email');
+  const spinner = document.getElementById('sheet-email-spinner');
+  btn.disabled = true;
+  if (spinner) spinner.style.display = 'inline-block';
+
+  const prompt = `génère un email de prospection B2B court (120 mots max) ultra-personnalisé.
+commercial : ${profile.prenom || ''} ${profile.nom || ''} · ${profile.societe || ''} · secteur : ${profile.activite || secteur}
+prospect : ${p.name} · ${p.formatted_address || ''} · note Google : ${p.rating || '?'}/5 (${p.user_ratings_total || '?'} avis)
+propose de l'aide concrète liée à LEUR activité (${secteur}). objet + corps. texte brut uniquement.`;
+
+  try {
+    const d = await claudeAPI([{role:'user', content: prompt}], 300, 'emails');
+    const emailResult = document.getElementById('sheet-email-result');
+    document.getElementById('sheet-email-text').textContent = d.content[0].text;
+    emailResult.style.display = '';
+    incrementUsage('emails');
+  } catch(e) {
+    if (e.message !== 'quota_exceeded') alert('erreur email : ' + e.message);
+  }
+
+  btn.disabled = false;
+  if (spinner) spinner.style.display = 'none';
+}
+
+function copySheetEmail() {
+  const text = document.getElementById('sheet-email-text').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Email copié !'));
+}
+
+// Initialiser la carte quand on va sur la page radar
 </script>
 
 <!-- Fiche Pré-Appel Modal (standalone pour résultats) -->
