@@ -989,7 +989,6 @@ tr:hover td { background: rgba(255,255,255,0.3); }
     <div class="page" id="page-radar">
       <div style="display:flex;flex-direction:column;height:calc(100vh - 60px);gap:0">
 
-        <!-- Header -->
         <div style="padding:16px 24px 12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;flex-shrink:0">
           <div>
             <h2 style="font-size:18px;font-weight:700;letter-spacing:-0.04em;color:#0a0a1a;display:flex;align-items:center;gap:8px">
@@ -1004,24 +1003,18 @@ tr:hover td { background: rgba(255,255,255,0.3); }
               <span id="radar-spinner" style="display:none" class="spinner"></span>
               <span class="msym">radar</span>scanner
             </button>
-            <div style="display:flex;gap:4px">
-              <button class="btn btn-ghost btn-sm" id="radar-toggle-sat" onclick="radarToggleSat()" title="Vue satellite">
-                <span class="msym">satellite</span>
-              </button>
-            </div>
+            <button class="btn btn-ghost btn-sm" id="radar-toggle-sat" onclick="radarToggleSat()" title="Vue satellite">
+              <span class="msym">satellite</span>
+            </button>
           </div>
         </div>
 
-        <!-- Compteur résultats -->
         <div id="radar-stats" style="display:none;padding:0 24px 8px;flex-shrink:0">
           <span style="font-size:11px;font-weight:700;color:#0055D4;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.12);padding:4px 12px;border-radius:99px" id="radar-count-label"></span>
         </div>
 
-        <!-- Map container -->
         <div style="flex:1;position:relative;overflow:hidden">
           <div id="radar-map" style="width:100%;height:100%"></div>
-
-          <!-- Legend -->
           <div style="position:absolute;bottom:16px;left:16px;background:white;border-radius:10px;padding:10px 14px;box-shadow:0 2px 16px rgba(0,0,0,0.1);font-size:10px;font-weight:600;color:#6b7280;display:flex;gap:12px;align-items:center">
             <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#0055D4"></div>élevé</div>
             <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#d97706"></div>moyen</div>
@@ -1029,13 +1022,14 @@ tr:hover td { background: rgba(255,255,255,0.3); }
           </div>
         </div>
 
-        <!-- Fiche prospect slide (bottom sheet) -->
-        <div id="radar-sheet" style="position:fixed;bottom:-100%;left:0;right:0;background:white;border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,0.15);z-index:500;transition:bottom .35s cubic-bezier(0.32,0.72,0,1);max-width:1280px;margin:0 auto;max-height:70vh;overflow-y:auto">
-          <div style="padding:16px 24px 24px">
-            <!-- Handle -->
-            <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:0 auto 20px"></div>
+        <!-- Bottom sheet fiche -->
+        <div id="radar-sheet" style="position:fixed;bottom:-100%;left:0;right:0;background:white;border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,0.15);z-index:500;transition:bottom .35s cubic-bezier(0.32,0.72,0,1);max-width:1280px;margin:0 auto;max-height:75vh;overflow-y:auto">
+          <div style="padding:16px 24px 28px">
+            <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:0 auto 16px"></div>
 
-            <!-- Header fiche -->
+            <!-- Photo Google Maps -->
+            <img id="sheet-photo" src="" alt="" style="display:none;width:100%;height:160px;object-fit:cover;border-radius:12px;margin-bottom:16px"/>
+
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px">
               <div style="flex:1">
                 <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:4px" id="sheet-sector">secteur</div>
@@ -1045,7 +1039,6 @@ tr:hover td { background: rgba(255,255,255,0.3); }
               <button onclick="closeRadarSheet()" style="background:#f9f9fb;border:none;border-radius:99px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✕</button>
             </div>
 
-            <!-- Métriques -->
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
               <div style="background:#f9f9fb;border-radius:10px;padding:12px;text-align:center">
                 <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:4px">note google</div>
@@ -1061,17 +1054,15 @@ tr:hover td { background: rgba(255,255,255,0.3); }
               </div>
             </div>
 
-            <!-- Téléphone si dispo -->
             <div id="sheet-phone-row" style="display:none;margin-bottom:12px">
               <a id="sheet-phone-link" href="#" style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:10px;text-decoration:none;color:#059669;font-size:13px;font-weight:600">
                 <span class="msym">phone</span><span id="sheet-phone-text"></span>
               </a>
             </div>
 
-            <!-- Actions -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
               <button class="btn btn-primary" onclick="addSheetToPipeline()" style="justify-content:center">
-                <span class="msym">conversion_path</span>ajouter au pipeline
+                <span class="msym">conversion_path</span>pipeline
               </button>
               <button class="btn btn-ghost" onclick="generateSheetEmail()" id="btn-sheet-email" style="justify-content:center;border:1px solid rgba(0,85,212,0.2);color:#0055D4">
                 <span id="sheet-email-spinner" style="display:none" class="spinner"></span>
@@ -1079,16 +1070,12 @@ tr:hover td { background: rgba(255,255,255,0.3); }
               </button>
             </div>
 
-            <!-- Email généré -->
             <div id="sheet-email-result" style="display:none">
               <div style="background:#f9f9fb;border-radius:12px;padding:16px;font-size:12px;line-height:1.75;color:#1a1a2e;white-space:pre-wrap;border:1px solid #e5e7eb;max-height:200px;overflow-y:auto" id="sheet-email-text"></div>
-              <button onclick="copySheetEmail()" class="btn btn-ghost btn-sm" style="margin-top:8px">
-                <span class="msym">content_copy</span>copier
-              </button>
+              <button onclick="copySheetEmail()" class="btn btn-ghost btn-sm" style="margin-top:8px"><span class="msym">content_copy</span>copier</button>
             </div>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -1891,14 +1878,11 @@ async function claudeAPI(messages, max_tokens=800, quota_type=null) {
 // ═══ CONFIG ═══
 const HUNTLIST_CONFIG = {
   gmaps: 'AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A',
-  brevo: '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',
   emailFrom: 'noreply@huntlist.fr',
   emailName: 'Huntlist.',
   model: 'claude-sonnet-4-5',
   supaUrl: 'https://tzrtptpzbrszibuifzns.supabase.co',
   supaAnon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk',
-  resendKey: 're_XJ71yfZm_8NGwnEVT8nvRdedepPBhcg9Y',
-  resendFrom: 'onboarding@resend.dev',
 };
 const SUPABASE_PROXY = 'https://tzrtptpzbrszibuifzns.supabase.co/functions/v1/proxy';
 
@@ -1945,13 +1929,14 @@ function goPage(name, btn) {
     devis:['devis','génération rapide'],
     calendrier:['calendrier','planification'],
     rapport:['rapport','vos performances'],
-    radar:['radar aérien','satellite_alt'],
     veille:['veille concurrentielle','analyse concurrentielle'],
+    radar:['radar aérien','satellite · détection en temps réel'],
     coldcall:['tracker appel','enregistrez vos appels'],
     settings:['paramètres','configuration'],
   };
   if(titles[name]) { document.getElementById('page-title').textContent=titles[name][0]; document.getElementById('page-sub').textContent=' · '+titles[name][1]; }
   if(name==='rapport') refreshRapport();
+  if(name==='radar') setTimeout(initRadarMap, 100);
   if(name==='calendrier') renderCal();
   if(name==='pipeline') refreshPipeline();
   if(name==='messagerie') initMessagerie();
@@ -4367,7 +4352,6 @@ let _radarMap = null;
 let _radarMarkers = [];
 let _radarCurrentPlace = null;
 let _radarSatMode = false;
-let _radarGmapsLoaded = false;
 
 function initRadarMap() {
   if (_radarMap || !document.getElementById('radar-map')) return;
@@ -4404,13 +4388,10 @@ async function radarSearch() {
   if (spinner) spinner.style.display = 'inline-block';
 
   initRadarMap();
-
-  // Vider les anciens markers
   _radarMarkers.forEach(m => m.setMap(null));
   _radarMarkers = [];
 
   try {
-    // Géocoder la ville pour centrer la carte
     if (city) {
       const geocoder = new google.maps.Geocoder();
       await new Promise(resolve => {
@@ -4424,39 +4405,87 @@ async function radarSearch() {
       });
     }
 
-    // Recherche Places
     const service = new google.maps.places.PlacesService(_radarMap);
     const query = city ? type + ' ' + city : type;
 
-    const results = await new Promise(resolve => {
-      service.textSearch({ query, language: 'fr', region: 'fr' }, (res, status) => {
-        resolve(status === google.maps.places.PlacesServiceStatus.OK ? res : []);
-      });
+    // Récupérer jusqu'à 60 résultats via pagination
+    let allResults = [];
+    await new Promise(resolve => {
+      function doSearch(pageToken) {
+        const req = pageToken
+          ? { query, language: 'fr', region: 'fr', pageToken }
+          : { query, language: 'fr', region: 'fr' };
+        service.textSearch(req, (res, status, pagination) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && res) {
+            allResults = allResults.concat(res);
+            if (allResults.length < 60 && pagination && pagination.hasNextPage) {
+              setTimeout(() => pagination.nextPage(), 300);
+            } else {
+              resolve();
+            }
+          } else {
+            resolve();
+          }
+        });
+      }
+      doSearch(null);
     });
 
-    if (!results.length) {
-      alert('aucun résultat trouvé. essayez un autre secteur ou ville.');
+    // Enrichir avec OSM Overpass pour les résultats supplémentaires
+    if (city) {
+      try {
+        const geoRes = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(city + ', France') + '&format=json&limit=1');
+        const geoData = await geoRes.json();
+        if (geoData.length) {
+          const lat = parseFloat(geoData[0].lat);
+          const lon = parseFloat(geoData[0].lon);
+          const delta = 0.05;
+          const osmQuery = `[out:json][timeout:10];node["name"~"${type}",i](${lat-delta},${lon-delta},${lat+delta},${lon+delta});out 80;`;
+          const osmRes = await fetch('https://overpass-api.de/api/interpreter', {
+            method: 'POST',
+            body: osmQuery
+          });
+          const osmData = await osmRes.json();
+          const osmElements = osmData.elements || [];
+          const existingNames = new Set(allResults.map(r => r.name.toLowerCase()));
+
+          osmElements.forEach(el => {
+            if (!el.tags?.name || existingNames.has(el.tags.name.toLowerCase())) return;
+            allResults.push({
+              name: el.tags.name,
+              geometry: { location: { lat: () => el.lat, lng: () => el.lon } },
+              formatted_address: el.tags['addr:housenumber'] ? el.tags['addr:housenumber'] + ' ' + (el.tags['addr:street'] || '') + ', ' + city : city,
+              rating: 0,
+              user_ratings_total: 0,
+              place_id: 'osm-' + el.id,
+              photos: null,
+              _osm: true
+            });
+          });
+        }
+      } catch(e) { console.warn('OSM fallback failed:', e); }
+    }
+
+    if (!allResults.length) {
+      alert('aucun résultat trouvé.');
       btn.disabled = false;
       if (spinner) spinner.style.display = 'none';
       return;
     }
 
-    // Créer les markers
-    results.forEach(place => {
+    allResults.forEach(place => {
       if (!place.geometry) return;
-
       const rating = place.rating || 0;
       const color = rating >= 4.5 ? '#0055D4' : rating >= 3.5 ? '#d97706' : '#059669';
-
-      // SVG marker personnalisé
       const markerSvg = `<svg width="36" height="44" viewBox="0 0 36 44" xmlns="http://www.w3.org/2000/svg">
         <path d="M18 0C8.06 0 0 8.06 0 18c0 13.5 18 26 18 26s18-12.5 18-26C36 8.06 27.94 0 18 0z" fill="${color}" opacity="0.9"/>
         <circle cx="18" cy="18" r="10" fill="white" opacity="0.95"/>
         <text x="18" y="23" text-anchor="middle" font-size="12" font-weight="bold" fill="${color}">${rating > 0 ? rating.toFixed(1) : '?'}</text>
       </svg>`;
-
+      const lat = typeof place.geometry.location.lat === 'function' ? place.geometry.location.lat() : place.geometry.location.lat;
+      const lng = typeof place.geometry.location.lng === 'function' ? place.geometry.location.lng() : place.geometry.location.lng;
       const marker = new google.maps.Marker({
-        position: place.geometry.location,
+        position: { lat, lng },
         map: _radarMap,
         title: place.name,
         icon: {
@@ -4465,18 +4494,15 @@ async function radarSearch() {
           anchor: new google.maps.Point(18, 44),
         },
       });
-
       marker.addListener('click', () => openRadarSheet(place, type));
       _radarMarkers.push(marker);
     });
 
-    // Stats
     const statsEl = document.getElementById('radar-stats');
     const countEl = document.getElementById('radar-count-label');
     if (statsEl) statsEl.style.display = '';
-    if (countEl) countEl.textContent = results.length + ' établissements trouvés · ' + type + (city ? ' · ' + city : '');
+    if (countEl) countEl.textContent = allResults.length + ' établissements trouvés · ' + type + (city ? ' · ' + city : '');
 
-    // Ajuster le zoom pour voir tous les markers
     const bounds = new google.maps.LatLngBounds();
     _radarMarkers.forEach(m => bounds.extend(m.getPosition()));
     _radarMap.fitBounds(bounds);
@@ -4491,7 +4517,6 @@ async function radarSearch() {
 
 function openRadarSheet(place, secteur) {
   _radarCurrentPlace = place;
-  const sheet = document.getElementById('radar-sheet');
 
   document.getElementById('sheet-name').textContent = place.name;
   document.getElementById('sheet-addr').textContent = place.formatted_address || place.vicinity || '—';
@@ -4501,29 +4526,49 @@ function openRadarSheet(place, secteur) {
   const score = Math.min(99, 40 + Math.round((place.rating || 3) * 10) + Math.floor(Math.random()*10));
   document.getElementById('sheet-score').textContent = score + '/100';
 
-  // Téléphone (nécessite getDetails)
+  // Photo immédiate si disponible
+  const photoEl = document.getElementById('sheet-photo');
+  if (photoEl) {
+    if (place.photos && place.photos.length > 0) {
+      photoEl.src = place.photos[0].getUrl({ maxWidth: 600, maxHeight: 200 });
+      photoEl.style.display = 'block';
+    } else {
+      photoEl.style.display = 'none';
+    }
+  }
+
   const phoneRow = document.getElementById('sheet-phone-row');
   phoneRow.style.display = 'none';
   document.getElementById('sheet-email-result').style.display = 'none';
 
-  const service = new google.maps.places.PlacesService(_radarMap);
-  service.getDetails({ placeId: place.place_id, fields: ['formatted_phone_number', 'website'] }, (details, status) => {
-    if (status === google.maps.places.PlacesServiceStatus.OK && details?.formatted_phone_number) {
-      const phone = details.formatted_phone_number;
-      document.getElementById('sheet-phone-link').href = 'tel:' + phone.replace(/ /g, '');
-      document.getElementById('sheet-phone-text').textContent = phone;
-      phoneRow.style.display = '';
-    }
-    if (details?.website) place._website = details.website;
-  });
+  // Si c'est un résultat OSM, pas de getDetails
+  if (!place._osm && _radarMap) {
+    const service = new google.maps.places.PlacesService(_radarMap);
+    service.getDetails({ placeId: place.place_id, fields: ['formatted_phone_number', 'website', 'photos'] }, (details, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        if (details?.formatted_phone_number) {
+          const phone = details.formatted_phone_number;
+          document.getElementById('sheet-phone-link').href = 'tel:' + phone.replace(/ /g, '');
+          document.getElementById('sheet-phone-text').textContent = phone;
+          phoneRow.style.display = '';
+        }
+        if (details?.website) place._website = details.website;
+        if (details?.photos && details.photos.length > 0 && photoEl) {
+          photoEl.src = details.photos[0].getUrl({ maxWidth: 600, maxHeight: 200 });
+          photoEl.style.display = 'block';
+        }
+      }
+    });
+  }
 
-  // Centrer la carte sur le lieu
   if (_radarMap && place.geometry) {
-    _radarMap.panTo(place.geometry.location);
+    const lat = typeof place.geometry.location.lat === 'function' ? place.geometry.location.lat() : place.geometry.location.lat;
+    const lng = typeof place.geometry.location.lng === 'function' ? place.geometry.location.lng() : place.geometry.location.lng;
+    _radarMap.panTo({ lat, lng });
     _radarMap.setZoom(16);
   }
 
-  sheet.style.bottom = '0';
+  document.getElementById('radar-sheet').style.bottom = '0';
 }
 
 function closeRadarSheet() {
@@ -4536,7 +4581,7 @@ function addSheetToPipeline() {
   const p = _radarCurrentPlace;
   const score = parseInt(document.getElementById('sheet-score').textContent) || 70;
   addToPipeline({
-    id: 'r-' + p.place_id?.slice(-8),
+    id: 'r-' + (p.place_id || Date.now()).toString().slice(-8),
     name: p.name,
     address: p.formatted_address || p.vicinity || '',
     rating: p.rating || 0,
@@ -4546,7 +4591,6 @@ function addSheetToPipeline() {
     website: p._website || null,
   });
   closeRadarSheet();
-  showToast('Ajouté au pipeline : ' + p.name);
 }
 
 async function generateSheetEmail() {
@@ -4554,37 +4598,42 @@ async function generateSheetEmail() {
   const p = _radarCurrentPlace;
   const profile = getProfile();
   const secteur = document.getElementById('sheet-sector').textContent;
-
   const btn = document.getElementById('btn-sheet-email');
   const spinner = document.getElementById('sheet-email-spinner');
   btn.disabled = true;
   if (spinner) spinner.style.display = 'inline-block';
-
   const prompt = `génère un email de prospection B2B court (120 mots max) ultra-personnalisé.
 commercial : ${profile.prenom || ''} ${profile.nom || ''} · ${profile.societe || ''} · secteur : ${profile.activite || secteur}
 prospect : ${p.name} · ${p.formatted_address || ''} · note Google : ${p.rating || '?'}/5 (${p.user_ratings_total || '?'} avis)
 propose de l'aide concrète liée à LEUR activité (${secteur}). objet + corps. texte brut uniquement.`;
-
   try {
     const d = await claudeAPI([{role:'user', content: prompt}], 300, 'emails');
-    const emailResult = document.getElementById('sheet-email-result');
     document.getElementById('sheet-email-text').textContent = d.content[0].text;
-    emailResult.style.display = '';
+    document.getElementById('sheet-email-result').style.display = '';
     incrementUsage('emails');
   } catch(e) {
     if (e.message !== 'quota_exceeded') alert('erreur email : ' + e.message);
   }
-
   btn.disabled = false;
   if (spinner) spinner.style.display = 'none';
 }
 
 function copySheetEmail() {
   const text = document.getElementById('sheet-email-text').textContent;
-  navigator.clipboard.writeText(text).then(() => showToast('Email copié !'));
+  navigator.clipboard.writeText(text);
 }
 
-// Initialiser la carte quand on va sur la page radar
+function showToast(msg) {
+  const existing = document.getElementById('_toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.id = '_toast';
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0a0a1a;color:white;padding:10px 20px;border-radius:12px;font-size:12px;font-weight:600;z-index:9999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.3)';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
 </script>
 
 <!-- Fiche Pré-Appel Modal (standalone pour résultats) -->
