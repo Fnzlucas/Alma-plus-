@@ -942,7 +942,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
     </div>
 
     <!-- ═══ CALENDRIER ═══ -->
-  class="page" id="page-calendrier">
+  <div class="page" id="page-calendrier">
       <div style="max-width:900px">
         <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
@@ -960,7 +960,13 @@ tr:hover td { background: rgba(255,255,255,0.3); }
         <!-- Jours de la semaine -->
         <div class="glass card" style="overflow:hidden">
           <div style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid rgba(255,255,255,0.3)">
-            ${['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(j=>`<div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">${j}</div>`).join('')}
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Lun</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Mar</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Mer</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Jeu</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Ven</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Sam</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Dim</div>
           </div>
           <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr)"></div>
         </div>
