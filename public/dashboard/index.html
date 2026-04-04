@@ -4205,20 +4205,14 @@ async function obLaunchSearch(){
   const city = document.getElementById('ob-search-city').value.trim();
   if(!type || !city){ alert('renseignez un type de business et une ville.'); return; }
   
-  // Préremplir la vraie recherche
+  // Préremplir la vraie recherche pour plus tard
   const typeEl = document.getElementById('search-type');
   const cityEl = document.getElementById('search-city');
   if(typeEl) typeEl.value = type;
   if(cityEl) cityEl.value = city;
   
+  // Juste passer à l'étape suivante — ne pas fermer l'onboarding
   obNext();
-  
-  // Fermer l'onboarding et lancer la recherche
-  setTimeout(() => {
-    obFinish();
-    goPage('prospection', document.querySelector('[onclick*="prospection"]'));
-    setTimeout(() => searchProspects(), 500);
-  }, 800);
 }
 
 async function obGenerateEmailPreview(){
