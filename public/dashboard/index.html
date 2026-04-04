@@ -1028,7 +1028,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
             <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:0 auto 16px"></div>
 
             <!-- Photo Google Maps -->
-            <img id="sheet-photo" src="" alt="" style="display:none;width:100%;height:160px;object-fit:cover;border-radius:12px;margin-bottom:16px"/>
+            <img id="sheet-photo" src="" alt="" style="display:none;width:100%;height:140px;object-fit:cover;object-position:center;border-radius:12px;margin-bottom:16px;background:#f0f0f0"/>
 
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px">
               <div style="flex:1">
@@ -4530,7 +4530,7 @@ function openRadarSheet(place, secteur) {
   const photoEl = document.getElementById('sheet-photo');
   if (photoEl) {
     if (place.photos && place.photos.length > 0) {
-      photoEl.src = place.photos[0].getUrl({ maxWidth: 600, maxHeight: 200 });
+      photoEl.src = place.photos[0].getUrl({ maxWidth: 400, maxHeight: 140 });
       photoEl.style.display = 'block';
     } else {
       photoEl.style.display = 'none';
@@ -4554,7 +4554,7 @@ function openRadarSheet(place, secteur) {
         }
         if (details?.website) place._website = details.website;
         if (details?.photos && details.photos.length > 0 && photoEl) {
-          photoEl.src = details.photos[0].getUrl({ maxWidth: 600, maxHeight: 200 });
+          photoEl.src = details.photos[0].getUrl({ maxWidth: 400, maxHeight: 140 });
           photoEl.style.display = 'block';
         }
       }
