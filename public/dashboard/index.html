@@ -1024,55 +1024,80 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 
         <!-- Bottom sheet fiche -->
         <div id="radar-sheet" style="position:fixed;bottom:-100%;left:0;right:0;background:white;border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,0.15);z-index:500;transition:bottom .35s cubic-bezier(0.32,0.72,0,1);max-width:1280px;margin:0 auto;max-height:75vh;overflow-y:auto">
-          <div style="padding:16px 24px 28px">
-            <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:0 auto 16px"></div>
+          <div style="padding:0 0 20px 0">
+            <!-- Handle -->
+            <div style="width:36px;height:4px;background:#e5e7eb;border-radius:99px;margin:12px auto 0"></div>
 
-            <!-- Photo Google Maps -->
-            <img id="sheet-photo" src="" alt="" style="display:none;width:100%;height:140px;object-fit:cover;object-position:center;border-radius:12px;margin-bottom:16px;background:#f0f0f0"/>
-
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px">
-              <div style="flex:1">
-                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:4px" id="sheet-sector">secteur</div>
-                <div style="font-size:20px;font-weight:700;letter-spacing:-0.03em;color:#0a0a1a;line-height:1.2" id="sheet-name">nom</div>
-                <div style="font-size:12px;color:#9ca3af;margin-top:4px" id="sheet-addr">adresse</div>
-              </div>
-              <button onclick="closeRadarSheet()" style="background:#f9f9fb;border:none;border-radius:99px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✕</button>
-            </div>
-
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-              <div style="background:#f9f9fb;border-radius:10px;padding:12px;text-align:center">
-                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:4px">note google</div>
-                <div style="font-size:20px;font-weight:800;color:#0a0a1a" id="sheet-rating">—</div>
-              </div>
-              <div style="background:#f9f9fb;border-radius:10px;padding:12px;text-align:center">
-                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:4px">avis</div>
-                <div style="font-size:20px;font-weight:800;color:#0a0a1a" id="sheet-reviews">—</div>
-              </div>
-              <div style="background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.12);border-radius:10px;padding:12px;text-align:center">
-                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0055D4;margin-bottom:4px">score IA</div>
-                <div style="font-size:20px;font-weight:800;color:#0055D4" id="sheet-score">—</div>
+            <!-- Map embed Google Maps style -->
+            <div id="sheet-map-embed" style="width:100%;height:180px;background:#e8f0fe;position:relative;overflow:hidden;margin-top:12px">
+              <iframe id="sheet-map-iframe" src="" style="width:100%;height:100%;border:none;display:none" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              <div id="sheet-map-placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8f0fe,#c5d5f8)">
+                <span class="msym" style="font-size:48px;color:#0055D4;opacity:.3">map</span>
               </div>
             </div>
 
-            <div id="sheet-phone-row" style="display:none;margin-bottom:12px">
-              <a id="sheet-phone-link" href="#" style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:10px;text-decoration:none;color:#059669;font-size:13px;font-weight:600">
-                <span class="msym">phone</span><span id="sheet-phone-text"></span>
-              </a>
-            </div>
+            <div style="padding:16px 20px 0">
+              <!-- Header -->
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
+                <div style="flex:1">
+                  <div style="font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:2px" id="sheet-sector">secteur</div>
+                  <div style="font-size:18px;font-weight:800;letter-spacing:-0.03em;color:#0a0a1a;line-height:1.2" id="sheet-name">nom</div>
+                  <div style="font-size:12px;color:#6b7280;margin-top:3px;display:flex;align-items:center;gap:4px">
+                    <span class="msym" style="font-size:14px;color:#9ca3af">location_on</span>
+                    <span id="sheet-addr">adresse</span>
+                  </div>
+                </div>
+                <button onclick="closeRadarSheet()" style="background:#f3f4f6;border:none;border-radius:99px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:18px;flex-shrink:0">✕</button>
+              </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-              <button class="btn btn-primary" onclick="addSheetToPipeline()" style="justify-content:center">
-                <span class="msym">conversion_path</span>pipeline
-              </button>
-              <button class="btn btn-ghost" onclick="generateSheetEmail()" id="btn-sheet-email" style="justify-content:center;border:1px solid rgba(0,85,212,0.2);color:#0055D4">
-                <span id="sheet-email-spinner" style="display:none" class="spinner"></span>
-                <span class="msym">mail</span>email IA
-              </button>
-            </div>
+              <!-- Note + avis + score -->
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+                <div id="sheet-stars" style="font-size:13px;color:#f59e0b"></div>
+                <span style="font-size:14px;font-weight:800;color:#0a0a1a" id="sheet-rating-val">—</span>
+                <span style="font-size:12px;color:#9ca3af" id="sheet-reviews-val"></span>
+                <div style="margin-left:auto;background:rgba(0,85,212,0.08);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:3px 10px;font-size:10px;font-weight:800;color:#0055D4" id="sheet-score">—</div>
+              </div>
 
-            <div id="sheet-email-result" style="display:none">
-              <div style="background:#f9f9fb;border-radius:12px;padding:16px;font-size:12px;line-height:1.75;color:#1a1a2e;white-space:pre-wrap;border:1px solid #e5e7eb;max-height:200px;overflow-y:auto" id="sheet-email-text"></div>
-              <button onclick="copySheetEmail()" class="btn btn-ghost btn-sm" style="margin-top:8px"><span class="msym">content_copy</span>copier</button>
+              <!-- Numéro de téléphone style Google Maps -->
+              <div id="sheet-phone-row" style="display:none;margin-bottom:12px">
+                <a id="sheet-phone-link" href="#" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:#f8faff;border:1px solid #e0e8ff;border-radius:12px;text-decoration:none;color:#0055D4;font-size:14px;font-weight:700">
+                  <div style="width:32px;height:32px;border-radius:99px;background:#0055D4;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span class="msym" style="font-size:16px;color:white">phone</span>
+                  </div>
+                  <span id="sheet-phone-text"></span>
+                  <span class="msym" style="margin-left:auto;color:#9ca3af;font-size:16px">chevron_right</span>
+                </a>
+              </div>
+
+              <!-- Lien Maps externe -->
+              <div id="sheet-maps-link-row" style="display:none;margin-bottom:14px">
+                <a id="sheet-maps-link" href="#" target="_blank" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:#f8faff;border:1px solid #e0e8ff;border-radius:12px;text-decoration:none;color:#0055D4;font-size:13px;font-weight:600">
+                  <div style="width:32px;height:32px;border-radius:99px;background:#34a853;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span class="msym" style="font-size:16px;color:white">open_in_new</span>
+                  </div>
+                  Voir sur Google Maps
+                  <span class="msym" style="margin-left:auto;color:#9ca3af;font-size:16px">chevron_right</span>
+                </a>
+              </div>
+
+              <!-- Actions CTA -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+                <button class="btn btn-primary" onclick="addSheetToPipeline()" style="justify-content:center;border-radius:12px;padding:12px">
+                  <span class="msym">conversion_path</span>Pipeline
+                </button>
+                <button class="btn btn-ghost" onclick="generateSheetEmail()" id="btn-sheet-email" style="justify-content:center;border-radius:12px;padding:12px;border:1.5px solid #0055D4;color:#0055D4;background:rgba(0,85,212,0.04)">
+                  <span id="sheet-email-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">mail</span>Email IA
+                </button>
+              </div>
+
+              <!-- Email généré -->
+              <div id="sheet-email-result" style="display:none">
+                <div style="background:#f9f9fb;border-radius:12px;padding:14px;font-size:12px;line-height:1.75;color:#1a1a2e;white-space:pre-wrap;border:1px solid #e5e7eb;max-height:180px;overflow-y:auto" id="sheet-email-text"></div>
+                <button onclick="copySheetEmail()" class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;justify-content:center">
+                  <span class="msym">content_copy</span>copier l'email
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -4518,33 +4543,60 @@ async function radarSearch() {
 function openRadarSheet(place, secteur) {
   _radarCurrentPlace = place;
 
+  // Infos de base
   document.getElementById('sheet-name').textContent = place.name;
   document.getElementById('sheet-addr').textContent = place.formatted_address || place.vicinity || '—';
   document.getElementById('sheet-sector').textContent = secteur || 'commerce local';
-  document.getElementById('sheet-rating').textContent = place.rating ? place.rating + '/5' : '—';
-  document.getElementById('sheet-reviews').textContent = place.user_ratings_total || '—';
-  const score = Math.min(99, 40 + Math.round((place.rating || 3) * 10) + Math.floor(Math.random()*10));
-  document.getElementById('sheet-score').textContent = score + '/100';
-
-  // Photo immédiate si disponible
-  const photoEl = document.getElementById('sheet-photo');
-  if (photoEl) {
-    if (place.photos && place.photos.length > 0) {
-      photoEl.src = place.photos[0].getUrl({ maxWidth: 400, maxHeight: 140 });
-      photoEl.style.display = 'block';
-    } else {
-      photoEl.style.display = 'none';
-    }
-  }
-
-  const phoneRow = document.getElementById('sheet-phone-row');
-  phoneRow.style.display = 'none';
   document.getElementById('sheet-email-result').style.display = 'none';
 
-  // Si c'est un résultat OSM, pas de getDetails
-  if (!place._osm && _radarMap) {
+  // Note + étoiles
+  const rating = place.rating || 0;
+  const reviews = place.user_ratings_total || 0;
+  const ratingEl = document.getElementById('sheet-rating-val');
+  const reviewsEl = document.getElementById('sheet-reviews-val');
+  const starsEl = document.getElementById('sheet-stars');
+  if (ratingEl) ratingEl.textContent = rating ? rating.toFixed(1) : '—';
+  if (reviewsEl) reviewsEl.textContent = reviews ? '(' + reviews + ' avis)' : '';
+  if (starsEl) {
+    const full = Math.round(rating);
+    starsEl.innerHTML = Array.from({length:5}, (_,i) =>
+      `<span style="color:${i < full ? '#f59e0b' : '#e5e7eb'}">★</span>`
+    ).join('');
+  }
+
+  // Score IA
+  const score = Math.min(99, 40 + Math.round((rating || 3) * 10) + Math.floor(Math.random()*10));
+  document.getElementById('sheet-score').textContent = 'Score ' + score;
+
+  // Iframe Google Maps embed
+  const lat = typeof place.geometry?.location?.lat === 'function' ? place.geometry.location.lat() : place.geometry?.location?.lat;
+  const lng = typeof place.geometry?.location?.lng === 'function' ? place.geometry.location.lng() : place.geometry?.location?.lng;
+  const iframe = document.getElementById('sheet-map-iframe');
+  const placeholder = document.getElementById('sheet-map-placeholder');
+  if (iframe && lat && lng) {
+    const encodedName = encodeURIComponent(place.name);
+    iframe.src = `https://www.google.com/maps/embed/v1/place?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&q=${encodedName}&center=${lat},${lng}&zoom=16&maptype=roadmap`;
+    iframe.style.display = 'block';
+    if (placeholder) placeholder.style.display = 'none';
+  }
+
+  // Lien Google Maps externe
+  const mapsLinkRow = document.getElementById('sheet-maps-link-row');
+  const mapsLink = document.getElementById('sheet-maps-link');
+  if (lat && lng) {
+    const query = encodeURIComponent(place.name + ' ' + (place.formatted_address || ''));
+    mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${query}&query_place_id=${place.place_id || ''}`;
+    mapsLinkRow.style.display = '';
+  }
+
+  // Reset téléphone
+  const phoneRow = document.getElementById('sheet-phone-row');
+  phoneRow.style.display = 'none';
+
+  // Détails (téléphone, website)
+  if (!place._osm && _radarMap && place.place_id) {
     const service = new google.maps.places.PlacesService(_radarMap);
-    service.getDetails({ placeId: place.place_id, fields: ['formatted_phone_number', 'website', 'photos'] }, (details, status) => {
+    service.getDetails({ placeId: place.place_id, fields: ['formatted_phone_number', 'website'] }, (details, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
         if (details?.formatted_phone_number) {
           const phone = details.formatted_phone_number;
@@ -4553,17 +4605,12 @@ function openRadarSheet(place, secteur) {
           phoneRow.style.display = '';
         }
         if (details?.website) place._website = details.website;
-        if (details?.photos && details.photos.length > 0 && photoEl) {
-          photoEl.src = details.photos[0].getUrl({ maxWidth: 400, maxHeight: 140 });
-          photoEl.style.display = 'block';
-        }
       }
     });
   }
 
-  if (_radarMap && place.geometry) {
-    const lat = typeof place.geometry.location.lat === 'function' ? place.geometry.location.lat() : place.geometry.location.lat;
-    const lng = typeof place.geometry.location.lng === 'function' ? place.geometry.location.lng() : place.geometry.location.lng;
+  // Centrer la carte principale
+  if (_radarMap && lat && lng) {
     _radarMap.panTo({ lat, lng });
     _radarMap.setZoom(16);
   }
@@ -4579,7 +4626,7 @@ function closeRadarSheet() {
 function addSheetToPipeline() {
   if (!_radarCurrentPlace) return;
   const p = _radarCurrentPlace;
-  const score = parseInt(document.getElementById('sheet-score').textContent) || 70;
+  const scoreText = document.getElementById('sheet-score').textContent.replace('Score ',''); const score = parseInt(scoreText) || 70;
   addToPipeline({
     id: 'r-' + (p.place_id || Date.now()).toString().slice(-8),
     name: p.name,
