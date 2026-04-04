@@ -4241,5 +4241,282 @@ document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCo
   </div>
 </div>
 
+
+<!-- ═══ ONBOARDING ═══ -->
+<div id="onboarding-overlay" style="position:fixed;inset:0;background:rgba(10,10,26,0.85);backdrop-filter:blur(12px);z-index:1000;display:none;align-items:center;justify-content:center;padding:24px">
+  <div style="background:white;border-radius:24px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,85,212,0.2)">
+
+    <!-- Progress bar -->
+    <div style="height:3px;background:#f0f0f0;border-radius:3px 3px 0 0;overflow:hidden">
+      <div id="ob-progress" style="height:100%;background:#0055D4;border-radius:3px;transition:width .4s ease;width:0%"></div>
+    </div>
+
+    <!-- Header -->
+    <div style="padding:28px 32px 0;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <svg viewBox="0 0 66 66" fill="none" style="width:28px;height:28px"><rect width="66" height="66" rx="14" fill="#0055D4"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg>
+        <span style="font-size:1.1rem;font-weight:700;letter-spacing:-0.03em;color:#0a0a1a">Huntlist.</span>
+      </div>
+      <div style="font-size:11px;color:#9ca3af;font-weight:600" id="ob-step-count">étape 1 / 6</div>
+    </div>
+
+    <!-- Steps -->
+    <div id="ob-steps" style="padding:24px 32px 32px">
+
+      <!-- STEP 1 : Bienvenue -->
+      <div class="ob-step" id="ob-step-1">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:52px;margin-bottom:16px">👋</div>
+          <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:8px">bienvenue sur Huntlist.</h2>
+          <p style="font-size:14px;color:#6b7280;line-height:1.7;max-width:380px;margin:0 auto">votre outil de prospection IA automatisée. en 5 minutes, on configure tout et on vous montre comment trouver vos premiers clients.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:24px 0">
+          <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
+            <div style="font-size:24px;margin-bottom:6px">🎯</div>
+            <div style="font-size:11px;font-weight:700;color:#0a0a1a">prospection</div>
+            <div style="font-size:10px;color:#9ca3af">google maps, INSEE</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
+            <div style="font-size:24px;margin-bottom:6px">✉️</div>
+            <div style="font-size:11px;font-weight:700;color:#0a0a1a">emails IA</div>
+            <div style="font-size:10px;color:#9ca3af">personnalisés auto</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
+            <div style="font-size:24px;margin-bottom:6px">📊</div>
+            <div style="font-size:11px;font-weight:700;color:#0a0a1a">pipeline CRM</div>
+            <div style="font-size:10px;color:#9ca3af">suivi des leads</div>
+          </div>
+        </div>
+        <button class="ob-next-btn" onclick="obNext()">commencer la configuration <span style="margin-left:4px">→</span></button>
+      </div>
+
+      <!-- STEP 2 : Profil -->
+      <div class="ob-step" id="ob-step-2" style="display:none">
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">votre profil commercial</h2>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:24px">ces infos personnalisent tous vos emails IA et scripts d'appel.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">prénom *</label><input id="ob-prenom" class="form-input" placeholder="jean"/></div>
+          <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">nom *</label><input id="ob-nom" class="form-input" placeholder="dupont"/></div>
+        </div>
+        <div style="margin-bottom:12px"><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">nom de l'entreprise *</label><input id="ob-societe" class="form-input" placeholder="plomberie dupont"/></div>
+        <div style="margin-bottom:12px"><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">secteur d'activité *</label>
+          <select id="ob-secteur" class="form-input">
+            <option value="">choisir...</option>
+            <option>maçonnerie / gros œuvre</option>
+            <option>plomberie / chauffage</option>
+            <option>électricité</option>
+            <option>isolation / rénovation énergétique</option>
+            <option>menuiserie / fenêtres</option>
+            <option>peinture / revêtements</option>
+            <option>consultant / freelance</option>
+            <option>agence / growth</option>
+            <option>autre</option>
+          </select>
+        </div>
+        <div style="margin-bottom:20px"><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">votre proposition de valeur</label><input id="ob-valeur" class="form-input" placeholder="intervention en 48h, devis gratuit, 10 ans d'expérience..."/></div>
+        <button class="ob-next-btn" onclick="obSaveProfile()">enregistrer et continuer →</button>
+      </div>
+
+      <!-- STEP 3 : Prospection -->
+      <div class="ob-step" id="ob-step-3" style="display:none">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
+          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 1/4</span>
+        </div>
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">la prospection IA</h2>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Huntlist. scanne Google Maps et trouve les entreprises qui ont besoin de vos services. Testez maintenant en cherchant vos premiers prospects.</p>
+        <div style="background:#f9f9fb;border-radius:14px;padding:20px;margin-bottom:20px;border:1px solid #e5e7eb">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:12px">essayez maintenant</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div><label style="font-size:10px;font-weight:600;color:#6b7280;display:block;margin-bottom:4px">type de business</label><input id="ob-search-type" class="form-input" placeholder="plombier, restaurant..."/></div>
+            <div><label style="font-size:10px;font-weight:600;color:#6b7280;display:block;margin-bottom:4px">ville</label><input id="ob-search-city" class="form-input" placeholder="lyon, paris..."/></div>
+          </div>
+          <button class="ob-next-btn" style="margin:0" onclick="obLaunchSearch()"><span id="ob-search-spinner" style="display:none" class="spinner"></span>lancer ma première recherche →</button>
+        </div>
+        <button onclick="obNext()" style="background:none;border:none;color:#9ca3af;font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">passer cette étape</button>
+      </div>
+
+      <!-- STEP 4 : Email IA -->
+      <div class="ob-step" id="ob-step-4" style="display:none">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
+          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 2/4</span>
+        </div>
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">l'email IA personnalisé</h2>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Pour chaque prospect trouvé, Huntlist. génère un email de prospection unique en quelques secondes, adapté à leur activité et à votre profil.</p>
+        <div style="background:linear-gradient(135deg,#0a0a1a,#1a1a3e);border-radius:14px;padding:20px;margin-bottom:20px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.4);margin-bottom:12px">exemple d'email généré</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.75" id="ob-email-preview">Objet : Intervention rapide pour votre établissement<br/><br/>Bonjour,<br/>Je suis [votre prénom] de [votre société]. En passant devant votre établissement, j'ai remarqué que vos installations dataient de quelques années...<br/><br/><em style="color:rgba(255,255,255,0.4)">génération en cours...</em></div>
+        </div>
+        <button class="ob-next-btn" onclick="obNext()">j'ai compris, continuer →</button>
+      </div>
+
+      <!-- STEP 5 : Pipeline + Tracker -->
+      <div class="ob-step" id="ob-step-5" style="display:none">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
+          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 3/4</span>
+        </div>
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">le pipeline CRM & tracker appel</h2>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Suivez chaque prospect de la découverte au closing. Le tracker d'appel génère un script personnalisé à votre secteur avant chaque appel.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+          <div style="padding:16px;background:#f9f9fb;border-radius:12px;border:1px solid #e5e7eb">
+            <div style="font-size:20px;margin-bottom:8px">📋</div>
+            <div style="font-size:13px;font-weight:700;color:#0a0a1a;margin-bottom:4px">pipeline CRM</div>
+            <div style="font-size:11px;color:#9ca3af;line-height:1.5">nouveau → contacté → répondu → converti</div>
+          </div>
+          <div style="padding:16px;background:#f9f9fb;border-radius:12px;border:1px solid #e5e7eb">
+            <div style="font-size:20px;margin-bottom:8px">📞</div>
+            <div style="font-size:13px;font-weight:700;color:#0a0a1a;margin-bottom:4px">tracker appel</div>
+            <div style="font-size:11px;color:#9ca3af;line-height:1.5">script IA + objections + résumé post-appel</div>
+          </div>
+        </div>
+        <button class="ob-next-btn" onclick="obNext()">continuer →</button>
+      </div>
+
+      <!-- STEP 6 : Veille + Fin -->
+      <div class="ob-step" id="ob-step-6" style="display:none">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
+          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 4/4</span>
+        </div>
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">veille concurrentielle & alertes</h2>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Analysez vos concurrents locaux avec leurs forces et faiblesses. Les alertes du jour vous signalent les 20 opportunités les plus chaudes chaque matin.</p>
+        <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:14px;padding:20px;margin-bottom:24px;text-align:center">
+          <div style="font-size:32px;margin-bottom:8px">🎉</div>
+          <div style="font-size:16px;font-weight:800;color:#0a0a1a;margin-bottom:4px">vous êtes prêt !</div>
+          <div style="font-size:13px;color:#6b7280;line-height:1.65">votre espace Huntlist. est configuré. lancez votre première recherche et trouvez vos premiers clients aujourd'hui.</div>
+        </div>
+        <button class="ob-next-btn" onclick="obFinish()">accéder à mon tableau de bord →</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+.ob-next-btn{
+  width:100%;background:#0055D4;color:white;border:none;border-radius:12px;
+  padding:14px 20px;font-family:inherit;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.ob-next-btn:hover{background:#0047B8;transform:translateY(-1px)}
+.ob-next-btn:active{transform:none}
+</style>
+
+<script>
+// ═══ ONBOARDING ═══
+const OB_KEY = 'huntlist_onboarding_done';
+let _obStep = 1;
+const _obTotalSteps = 6;
+
+function obCheckAndShow(){
+  const done = localStorage.getItem(OB_KEY);
+  if(!done){
+    document.getElementById('onboarding-overlay').style.display = 'flex';
+    obUpdateProgress();
+  }
+}
+
+function obUpdateProgress(){
+  const pct = ((_obStep - 1) / (_obTotalSteps - 1)) * 100;
+  document.getElementById('ob-progress').style.width = pct + '%';
+  document.getElementById('ob-step-count').textContent = 'étape ' + _obStep + ' / ' + _obTotalSteps;
+}
+
+function obNext(){
+  document.getElementById('ob-step-' + _obStep).style.display = 'none';
+  _obStep++;
+  if(_obStep > _obTotalSteps){ obFinish(); return; }
+  document.getElementById('ob-step-' + _obStep).style.display = 'block';
+  obUpdateProgress();
+  
+  // Actions spéciales par step
+  if(_obStep === 4) obGenerateEmailPreview();
+}
+
+function obSaveProfile(){
+  const prenom = document.getElementById('ob-prenom').value.trim();
+  const nom = document.getElementById('ob-nom').value.trim();
+  const societe = document.getElementById('ob-societe').value.trim();
+  const secteur = document.getElementById('ob-secteur').value;
+  const valeur = document.getElementById('ob-valeur').value.trim();
+  
+  if(!prenom || !nom || !societe || !secteur){
+    alert('renseignez tous les champs obligatoires (*)');
+    return;
+  }
+  
+  // Préremplir le profil dans les paramètres
+  const prefill = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+  prefill('prof-prenom', prenom);
+  prefill('prof-nom', nom);
+  prefill('prof-societe', societe);
+  prefill('prof-secteur', secteur);
+  prefill('prof-valeur', valeur);
+  
+  // Sauvegarder
+  const p = { prenom, nom, societe, activite: secteur, valeur, ton: 'professionnel' };
+  localStorage.setItem('huntlist_profile', JSON.stringify(p));
+  
+  // Mettre à jour le sidebar
+  const nameEl = document.getElementById('sidebar-user-name');
+  if(nameEl) nameEl.textContent = (prenom + ' ' + nom).toLowerCase();
+  
+  obNext();
+}
+
+async function obLaunchSearch(){
+  const type = document.getElementById('ob-search-type').value.trim();
+  const city = document.getElementById('ob-search-city').value.trim();
+  if(!type || !city){ alert('renseignez un type de business et une ville.'); return; }
+  
+  // Préremplir la vraie recherche
+  const typeEl = document.getElementById('search-type');
+  const cityEl = document.getElementById('search-city');
+  if(typeEl) typeEl.value = type;
+  if(cityEl) cityEl.value = city;
+  
+  obNext();
+  
+  // Fermer l'onboarding et lancer la recherche
+  setTimeout(() => {
+    obFinish();
+    goPage('prospection', document.querySelector('[onclick*="prospection"]'));
+    setTimeout(() => searchProspects(), 500);
+  }, 800);
+}
+
+async function obGenerateEmailPreview(){
+  const profile = getProfile();
+  const preview = document.getElementById('ob-email-preview');
+  if(!preview) return;
+  
+  const secteur = profile.activite || profile.secteur || 'votre secteur';
+  const prenom = profile.prenom || 'prénom';
+  const societe = profile.societe || 'votre société';
+  
+  preview.innerHTML = `<em style="color:rgba(255,255,255,0.4)">génération d'un exemple...</em>`;
+  
+  try {
+    const prompt = `génère un court email de prospection B2B (100 mots max) pour un ${secteur} nommé ${prenom} de ${societe}. 
+Prospect fictif : une PME locale avec quelques avis Google. Objet + corps. Texte brut.`;
+    const d = await claudeAPI([{role:'user', content: prompt}], 200, null);
+    preview.style.fontSize = '12px';
+    preview.style.lineHeight = '1.7';
+    preview.innerHTML = d.content[0].text.replace(/
+/g, '<br/>');
+  } catch(e) {
+    preview.innerHTML = `Objet : Proposition de service pour votre établissement<br/><br/>Bonjour,<br/>Je suis ${prenom} de ${societe}, spécialiste en ${secteur}. Je me permets de vous contacter car j'ai pu constater que votre établissement pourrait bénéficier de notre expertise.<br/><br/>Seriez-vous disponible pour un échange de 10 minutes cette semaine ?<br/><br/>Cordialement,<br/>${prenom}`;
+  }
+}
+
+function obFinish(){
+  localStorage.setItem(OB_KEY, 'true');
+  document.getElementById('onboarding-overlay').style.display = 'none';
+  addActivity('onboarding complété', 'check_circle', 'green');
+}
+
+// Lancer l'onboarding au chargement
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(obCheckAndShow, 1000);
+});
+</script>
 </body>
 </html>
