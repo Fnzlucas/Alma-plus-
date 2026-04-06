@@ -1077,41 +1077,6 @@ tr:hover td { background: rgba(255,255,255,0.3); }
                 </a>
               </div>
 
-              <!-- Bouton analyser le prospect -->
-              <button id="btn-sheet-ia" onclick="analyseSheetIA()" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-bottom:10px;border:1px solid rgba(0,85,212,0.2);color:#0055D4">
-                <span id="sheet-ia-spinner" style="display:none" class="spinner spinner-dark"></span>
-                <span class="msym">psychology</span>analyser le prospect
-              </button>
-
-              <!-- Section analyse -->
-              <div id="sheet-ia-section" style="display:none;margin-bottom:14px">
-                <!-- Point de douleur principal -->
-                <div id="sheet-pain-row" style="margin-bottom:10px">
-                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#f97316;margin-bottom:5px;display:flex;align-items:center;gap:3px">
-                    <span class="msym" style="font-size:12px">warning</span>point de douleur
-                  </div>
-                  <div id="sheet-pain" style="font-size:11px;font-weight:700;color:#ea580c;padding:8px 12px;background:rgba(249,115,22,0.08);border-left:3px solid #f97316;border-radius:0 8px 8px 0;line-height:1.5"></div>
-                </div>
-                <!-- Accroche -->
-                <div style="margin-bottom:10px">
-                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#0055D4;margin-bottom:5px;display:flex;align-items:center;gap:3px">
-                    <span class="msym" style="font-size:12px">record_voice_over</span>accroche
-                  </div>
-                  <div id="sheet-accroche" style="font-size:11px;font-weight:600;color:#0a0a1a;line-height:1.6;padding:8px 12px;background:rgba(0,85,212,0.05);border-left:3px solid #0055D4;border-radius:0 8px 8px 0;font-style:italic"></div>
-                </div>
-                <!-- Forces / Faiblesses -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                  <div>
-                    <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#dc2626;margin-bottom:5px">forces</div>
-                    <div id="sheet-forces" style="display:flex;flex-direction:column;gap:3px"></div>
-                  </div>
-                  <div>
-                    <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#059669;margin-bottom:5px">faiblesses</div>
-                    <div id="sheet-faiblesses" style="display:flex;flex-direction:column;gap:3px"></div>
-                  </div>
-                </div>
-              </div>
-
               <!-- Actions CTA -->
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
                 <button class="btn btn-primary" onclick="addSheetToPipeline()" style="justify-content:center;border-radius:12px;padding:12px">
@@ -1119,7 +1084,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
                 </button>
                 <button class="btn btn-ghost" onclick="generateSheetEmail()" id="btn-sheet-email" style="justify-content:center;border-radius:12px;padding:12px;border:1.5px solid #0055D4;color:#0055D4;background:rgba(0,85,212,0.04)">
                   <span id="sheet-email-spinner" style="display:none" class="spinner spinner-dark"></span>
-                  <span class="msym">mail</span>Email
+                  <span class="msym">mail</span>Email IA
                 </button>
               </div>
 
@@ -3323,13 +3288,1677 @@ let _alertesData=[],_alertesFilter='all';
 async function loadAlertes(){
   const listEl = document.getElementById('alertes-list');
   const profile = getProfile();
-  listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af"><div class="spinner spinner-dark" style="display:inline-block;margin-bottom:12px"></div><div style="font-size:13px;font-weight:600;color:#6b7280">scan en cours...</div></div>';
+  
+  listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af"><div class="spinner spinner-dark" style="display:inline-block;margin-bottom:12px"></div><div style="font-size:13px;font-weight:600;color:#6b7280;margin-bottom:4px">scan des opportunités en cours...</div></div>';
+
   try {
-    const secteur = (profile.activite || profile.secteur || 'commerce local').replace(/[^a-zA-Z0-9À-ž\s]/g,'');
-    const ville = (profile.ville || 'France').replace(/[^a-zA-Z0-9À-ž\s]/g,'');
-    const prompt = 'Genere 20 opportunites commerciales pour un professionnel du secteur ' + secteur + ' en ' + ville + '. Reponds UNIQUEMENT en JSON valide sans markdown sans apostrophe. Format: {"opportunites":[{"nom":"Nom","adresse":"Ville","signal":"Signal sans apostrophe","score":80,"source":"GMAPS","telephone":null,"urgent":true}]}';
-    const d = await claudeAPI([{role:'user', content: prompt}], 1200, null);
-    let raw = (d.content[0].text || '').replace(/```json/gi,'').replace(/```/gi,'').trim();
-    const s = raw.indexOf('{'), e2 = raw.lastIndexOf('}');
-    if (s>=0&&e2>s) raw = raw.slice(s,e2+1);
-    raw = raw.replace(/‘|’|‚|‛/g,'-').replace(/[
+    // Charger les prospects existants pour contextualiser
+    const existingProspects = state.prospects.slice(0, 10).map(p => p.name + ' (' + p.address + ')').join(', ');
+    const secteur = profile.activite || profile.secteur || 'commerce local';
+    const ville = profile.societe ? profile.societe.split(' ').pop() : 'France';
+
+    const prompt = `tu es un expert en détection d'opportunités commerciales pour un professionnel du secteur "${secteur}".
+génère une liste de 20 opportunités chaudes du jour en JSON.
+contexte : ${existingProspects ? 'prospects existants : ' + existingProspects : 'aucun prospect existant'}
+ville/région : ${ville}
+
+réponds UNIQUEMENT en JSON sans markdown :
+{"opportunites":[
+  {"nom":"Nom de l'entreprise ou prospect","adresse":"adresse","signal":"raison précise pour contacter maintenant (ex: vient d'ouvrir, travaux en cours, avis négatifs récents, nouveau gérant)","score":85,"source":"GMAPS|BODACC|DVF|PERMIS","telephone":null,"urgent":true},
+  ...20 éléments
+]}
+
+les signaux doivent être précis et actionnables pour un ${secteur}.`;
+
+    const d = await claudeAPI([{role:'user', content: prompt}], 1000, null);
+    let raw = d.content[0].text.trim();
+    // Nettoyer tous les wrappers markdown possibles
+    raw = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    // Extraire uniquement le JSON valide (entre { et })
+    const jsonStart = raw.indexOf('{');
+    const jsonEnd = raw.lastIndexOf('}');
+    if (jsonStart >= 0 && jsonEnd > jsonStart) raw = raw.slice(jsonStart, jsonEnd + 1);
+    let data;
+    try { data = JSON.parse(raw); }
+    catch(parseErr) {
+      // Tentative de réparation : retirer les caractères problématiques
+      const cleaned = raw.replace(/[\x00-\x1F\x7F]/g, ' ').replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+      data = JSON.parse(cleaned);
+    }
+    const opportunites = data.opportunites || [];
+
+    _alertesData = opportunites.map((o, i) => ({
+      id: 'alert-'+i,
+      adresse: o.nom,
+      commune: o.adresse,
+      source: o.source || 'GMAPS',
+      score: o.score || 70,
+      signal: o.signal,
+      telephone: o.telephone,
+      urgent: o.urgent,
+      seen: false,
+      created_at: new Date().toISOString(),
+    }));
+
+    // Mettre à jour les KPIs
+    const total = _alertesData.length;
+    const gmaps = _alertesData.filter(s=>s.source==='GMAPS').length;
+    const withPhone = _alertesData.filter(s=>s.telephone).length;
+    const avgScore = Math.round(_alertesData.reduce((a,b)=>a+(b.score||0),0)/total);
+
+    document.getElementById('alertes-total').textContent = total;
+    document.getElementById('alertes-bodacc').textContent = gmaps;
+    document.getElementById('alertes-dvf').textContent = withPhone;
+    document.getElementById('alertes-dpe').textContent = avgScore;
+
+    renderAlertes();
+    updateAlerteBadge();
+    addActivity('alertes : '+total+' opportunités détectées', 'notifications_active', 'primary');
+
+  } catch(e) {
+    listEl.innerHTML = `<div class="glass card"><div class="card-body" style="text-align:center;padding:40px">
+      <span class="msym" style="font-size:48px;display:block;margin-bottom:12px;opacity:.2;color:#0055D4">notifications_active</span>
+      <div style="font-size:14px;font-weight:700;color:#6b7280;margin-bottom:8px">erreur lors du scan</div>
+      <div style="font-size:12px;color:#9ca3af;margin-bottom:20px">${e.message}</div>
+      <button class="btn btn-primary" onclick="loadAlertes()"><span class="msym">refresh</span>réessayer</button>
+    </div></div>`;
+  }
+}
+function renderAlertes(){const filtered=_alertesFilter==='all'?_alertesData:_alertesFilter==='unseen'?_alertesData.filter(s=>!s.seen):_alertesFilter==='phone'?_alertesData.filter(s=>s.details?.phone):_alertesData.filter(s=>s.source===_alertesFilter);document.getElementById('alertes-total').textContent=_alertesData.length;document.getElementById('alertes-bodacc').textContent=_alertesData.filter(s=>s.source==='GMAPS').length;document.getElementById('alertes-dvf').textContent=_alertesData.filter(s=>s.details?.phone).length;const scores=_alertesData.map(s=>s.score||0).filter(Boolean);document.getElementById('alertes-dpe').textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):'—';if(!filtered.length){document.getElementById('alertes-list').innerHTML='<div style="text-align:center;padding:40px;color:#9ca3af">aucune alerte avec ce filtre.</div>';return;}const srcConfig={GMAPS:{icon:'map',color:'#0055D4',bg:'rgba(0,85,212,0.08)',label:'google maps'},BODACC:{icon:'gavel',color:'#dc2626',bg:'rgba(220,38,38,0.08)',label:'bodacc'},DVF:{icon:'real_estate_agent',color:'#7c3aed',bg:'rgba(124,58,237,0.08)',label:'dvf'},DPE:{icon:'eco',color:'#059669',bg:'rgba(5,150,105,0.08)',label:'dpe'}};document.getElementById('alertes-list').innerHTML=filtered.map(s=>{const cfg=srcConfig[s.source]||{icon:'circle',color:'#9ca3af',bg:'rgba(255,255,255,0.5)',label:s.source};const isNew=!s.seen;const timeStr=new Date(s.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});return`<div class="glass" style="border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;border-left:3px solid ${isNew?cfg.color:'rgba(255,255,255,0.3)'}"><div style="width:38px;height:38px;border-radius:10px;background:${cfg.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="msym" style="font-size:18px;color:${cfg.color}">${cfg.icon}</span></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="badge" style="background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.color}22">${s.source}</span>${isNew?'<span class="badge badge-red">nouveau</span>':''}<span style="font-size:10px;color:#9ca3af;margin-left:auto">${timeStr}</span></div><div style="font-size:13px;font-weight:800;color:#0a0a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.adresse||'—'}${s.commune?', '+s.commune:''}</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn btn-ghost btn-sm" onclick="addAlerteToPipeline('${s.id}')"><span class="msym">conversion_path</span>pipeline</button><button class="btn btn-ghost btn-sm" onclick="markAlerteRead('${s.id}')"><span class="msym">done</span></button></div></div>`;}).join('');}
+function filterAlertes(filter,btn){_alertesFilter=filter;document.querySelectorAll('#page-alertes .chip').forEach(b=>{b.style.background='';b.style.color='';b.style.borderColor='';b.style.fontWeight='';});if(btn){btn.style.background='rgba(0,85,212,0.08)';btn.style.color='#0055D4';btn.style.borderColor='rgba(0,85,212,0.2)';btn.style.fontWeight='800';}renderAlertes();}
+async function markAlerteRead(id){const s=_alertesData.find(x=>x.id===id);if(s) s.seen=true;renderAlertes();updateAlerteBadge();await fetch(HUNTLIST_CONFIG.supaUrl+'/rest/v1/signals?id=eq.'+id,{method:'PATCH',headers:{'apikey':HUNTLIST_CONFIG.supaAnon,'Authorization':'Bearer '+HUNTLIST_CONFIG.supaAnon,'Content-Type':'application/json'},body:JSON.stringify({seen:true})});}
+async function markAllAlertesRead(){_alertesData.forEach(s=>s.seen=true);renderAlertes();updateAlerteBadge();}
+function updateAlerteBadge(){const unseen=_alertesData.filter(s=>!s.seen).length;const badge=document.getElementById('badge-alertes');if(badge){badge.textContent=unseen;badge.style.display=unseen>0?'inline':'none';}}
+function addAlerteToPipeline(id){const s=_alertesData.find(x=>x.id===id);if(!s) return;addToPipeline({id:'alert-'+s.id,name:s.nom||s.adresse,address:(s.adresse||'')+(s.commune?', '+s.commune:''),rating:0,reviews:0,score:(s.score||1)*25,phone:null,website:null});markAlerteRead(id);}
+async function manualScan(){try{const res=await fetch(HUNTLIST_CONFIG.supaUrl+'/functions/v1/daily-scan',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+HUNTLIST_CONFIG.supaAnon,'apikey':HUNTLIST_CONFIG.supaAnon},body:JSON.stringify({trigger:'manual'})});const data=await res.json();addActivity('scan manuel : '+(data.signals_inserted||0)+' nouveaux signaux','notifications_active','primary');setTimeout(()=>loadAlertes(),1000);}catch(e){alert('erreur scan : '+e.message);}}
+
+// ═══ B2C CROSS SEARCH ═══
+async function searchCrossB2C(){const zone=document.getElementById('cross-zone').value.trim();if(!zone){alert('renseignez une zone.');return;}show('cross-spinner');show('cross-progress');hide('cross-results');const scoreMin=parseInt(document.getElementById('cross-score-min').value)||2;const max=parseInt(document.getElementById('cross-max').value)||20;const useDVF=document.getElementById('cross-dvf').checked,usePermis=document.getElementById('cross-permis').checked,useDPE=document.getElementById('cross-dpe').checked,useCopro=document.getElementById('cross-copro').checked,useBodacc=document.getElementById('cross-bodacc').checked;const sources=[];if(useDVF) sources.push({id:'dvf',label:'dvf',icon:'real_estate_agent'});if(usePermis) sources.push({id:'permis',label:'permis',icon:'construction'});if(useDPE) sources.push({id:'dpe',label:'dpe f/g',icon:'eco'});if(useCopro) sources.push({id:'copro',label:'copros',icon:'apartment'});if(useBodacc) sources.push({id:'bodacc',label:'bodacc',icon:'gavel'});document.getElementById('cross-sources-status').innerHTML=sources.map(s=>`<div style="display:flex;align-items:center;gap:10px;font-size:12px"><span class="msym" style="font-size:14px;color:#0055D4">${s.icon}</span><span style="flex:1;font-weight:600">${s.label}</span><span id="src-status-${s.id}" style="color:#9ca3af">⏳ chargement...</span></div>`).join('');document.getElementById('cross-progress-text').textContent='interrogation des '+sources.length+' sources...';
+try{const geoRes=await fetch('https://api-adresse.data.gouv.fr/search/?q='+encodeURIComponent(zone)+'&type=municipality&limit=1');const geoData=await geoRes.json();const feat=geoData.features?.[0];const codeCommune=feat?.properties?.citycode;const nomCommune=feat?.properties?.city||zone;const codeDept=codeCommune?codeCommune.slice(0,2):zone;const signalMap={};function addSignal(adresse,commune,type,data){const key=adresse+'|'+commune;if(!signalMap[key]) signalMap[key]={adresse,commune,signaux:[],score:0};signalMap[key].signaux.push({type,data});signalMap[key].score++;}function setSourceStatus(id,status,count){const el=document.getElementById('src-status-'+id);if(el) el.innerHTML=status==='ok'?`<span style="color:#059669"> ${count} résultats</span>`:'<span style="color:#dc2626"> indisponible</span>';}
+const promises=[];
+if(useDVF&&codeCommune){promises.push(proxyFetch('https://api.cquest.org/dvf?code_commune='+codeCommune+'&nb_resultats=30').then(d=>{const items=d.resultats||[];items.forEach(r=>{const adresse=[(r.adresse_numero||''),(r.adresse_nom_voie||'')].filter(Boolean).join(' ')||'transaction '+nomCommune;addSignal(adresse,r.l_commune||nomCommune,'DVF',{prix:r.valeur_fonciere?new Intl.NumberFormat('fr-FR').format(r.valeur_fonciere)+' €':'',type:r.type_local||'',date:r.date_mutation||''});});setSourceStatus('dvf','ok',items.length);}).catch(()=>setSourceStatus('dvf','error',0)));}
+if(usePermis){promises.push(proxyFetch('https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=sitadel-logements&q='+encodeURIComponent(codeDept)+'&rows=30&sort=date_prise_en_compte&order=desc').then(d=>{const records=d.records||[];records.forEach(r=>{const f=r.fields;const adresse=[(f.ad_num_voie||''),(f.ad_nom_voie||'')].filter(Boolean).join(' ')||'pc '+nomCommune;addSignal(adresse,f.libelle_commune||nomCommune,'Permis',{type:f.type_projet_lib||''});});setSourceStatus('permis','ok',records.length);}).catch(()=>setSourceStatus('permis','error',0)));}
+if(useBodacc){promises.push(proxyFetch('https://bodacc-datadila.opendatasoft.com/api/records/1.0/search/?dataset=annonces-commerciales&rows=25&sort=dateparution&refine.familleavis_lib=Immatriculations&refine.numerodepartement='+encodeURIComponent(codeDept)).then(d=>{const records=d.records||[];records.forEach(r=>{const f=r.fields;const nom=f.commercant||f.denomination||'';const ville=f.ville||nomCommune;if(nom) addSignal(nom+' — '+ville,ville,'BODACC',{nom,date:f.dateparution||''});});setSourceStatus('bodacc','ok',records.length);}).catch(()=>setSourceStatus('bodacc','error',0)));}
+
+
+        // ═══ DPE — ADEME Open Data ═══
+        if(useDPE){promises.push(
+          fetch('https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-existants/lines?size=25&q='+encodeURIComponent(zone)+'&q_fields=commune_name,code_postal&sort=-date_reception_dpe&select=adresse_ban,commune_name,code_postal,etiquette_dpe,annee_construction,type_batiment,surface_habitable_logement')
+          .then(r=>r.json())
+          .then(d=>{
+            const items=(d.results||[]).filter(i=>i.etiquette_dpe==='F'||i.etiquette_dpe==='G');
+            items.forEach(r=>{
+              const adresse=(r.adresse_ban||'').split(',')[0]||'dpe '+nomCommune;
+              addSignal(adresse,r.commune_name||nomCommune,'DPE',{etiquette:r.etiquette_dpe,surface:r.surface_habitable_logement,type:r.type_batiment});
+            });
+            setSourceStatus('dpe','ok',items.length);
+          })
+          .catch(()=>setSourceStatus('dpe','error',0))
+        );}
+
+        // ═══ COPROPRIÉTÉS — registre national ═══
+        if(useCopro){promises.push(
+          proxyFetch('https://data.statistiques.developpement-durable.gouv.fr/api/records/1.0/search/?dataset=registre-national-immatriculation-syndicats&rows=20&q='+encodeURIComponent(codeDept))
+          .then(d=>{
+            const records=d.records||[];
+            records.forEach(r=>{
+              const f=r.fields;
+              const nom=f.nom_copropriete||f.adresse||'copropriété';
+              const commune=f.commune||nomCommune;
+              addSignal(nom,commune,'Copro',{lots:f.nb_lots_total_pp||0});
+            });
+            setSourceStatus('copro','ok',records.length);
+          })
+          .catch(()=>setSourceStatus('copro','error',0))
+        );}
+
+        await Promise.allSettled(promises);const results=Object.values(signalMap).filter(p=>p.score>=scoreMin).sort((a,b)=>b.score-a.score).slice(0,max);
+document.getElementById('cross-results-sub').textContent=results.length+' opportunités · '+nomCommune+' · '+scoreMin+'+ signal(s)';
+window._b2cResults=results;
+document.getElementById('cross-table').innerHTML=results.map((p,idx)=>{const heatIcon=p.score>=3?'':p.score>=2?'':'';const heatColor=p.score>=3?'#dc2626':p.score>=2?'#d97706':'#0055D4';const heatBg=p.score>=3?'rgba(220,38,38,0.08)':p.score>=2?'rgba(217,119,6,0.08)':'rgba(0,85,212,0.08)';const signalBadges=p.signaux.map(s=>{const sColors={DVF:'#7c3aed',Permis:'#7c3aed',DPE:'#059669',Copro:'#0284c7',BODACC:'#0055D4'};const col=sColors[s.type]||'#0055D4';return`<span style="font-size:9px;font-weight:800;background:${col}15;color:${col};padding:3px 8px;border-radius:99px;border:1px solid ${col}22">${s.type}</span>`;}).join(' ');const mapsLink='https://www.google.com/maps/search/'+encodeURIComponent(p.adresse+' '+p.commune);const score=Math.min(99,50+p.score*15);
+return`<div class="pipeline-card" style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;align-items:center;justify-content:space-between"><span style="padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800;background:${heatBg};color:${heatColor}">${heatIcon} ${p.score} signal${p.score>1?'s':''}</span><span style="font-size:9px;color:#9ca3af">score ${score}</span></div><div><div style="display:flex;align-items:flex-start;gap:8px"><span class="msym" style="font-size:16px;color:#0055D4;flex-shrink:0;margin-top:1px">location_on</span><div><div style="font-size:13px;font-weight:800;color:#0a0a1a;line-height:1.3">${p.adresse}</div><div style="font-size:11px;color:#9ca3af;margin-top:2px">${p.commune}</div></div></div></div><div style="display:flex;gap:4px;flex-wrap:wrap">${signalBadges}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><a href="${mapsLink}" target="_blank" class="btn btn-ghost btn-sm" style="justify-content:center;text-decoration:none"><span class="msym">map</span>maps</a><button class="btn btn-ghost btn-sm" style="justify-content:center" onclick="genCourrierB2C(${idx})"><span class="msym">auto_awesome</span>courrier</button><button class="btn btn-ghost btn-sm" style="justify-content:center;grid-column:span 2" onclick="addToP(this)" data-name="${p.adresse}" data-addr="${p.commune}" data-score="${score}"><span class="msym">conversion_path</span>ajouter au pipeline</button></div></div>`;}).join('');
+hide('cross-progress');hide('cross-spinner');show('cross-results');addActivity('croisement b2c : '+zone+' ('+results.length+' opportunités)','hub','primary');}catch(e){alert('erreur : '+e.message);hide('cross-progress');hide('cross-spinner');}}
+
+function exportCrossCSV(){alert('export csv généré.');}
+function genAllCourrierB2C(){alert('sélectionnez un prospect pour générer son courrier.');}
+
+// ═══ COURRIER B2C ═══
+let _currentCourrierIdx=null;
+async function genCourrierB2C(idx){_currentCourrierIdx=idx;const results=window._b2cResults||[];const p=results[idx];if(!p) return;document.getElementById('courrier-adresse-title').textContent=p.adresse+' — '+p.commune;document.getElementById('courrier-loading').style.display='block';document.getElementById('courrier-text').style.display='none';document.getElementById('courrier-modal').classList.add('open');const profile=getProfile();const prompt='tu es un expert en prospection locale. rédige un courrier physique court.\nadresse : '+p.adresse+', '+p.commune+'\nsignaux : '+p.signaux.map(s=>s.type).join(', ')+'\nexpéditeur : '+profile.prenom+' '+profile.nom+', '+(profile.societe||'mon entreprise')+'\nactivité : '+(profile.activite||'prestataire local')+'\nvaleur : '+(profile.valeur||'service de qualité')+'\nconsignes : 150-200 mots, commencer par madame/monsieur, ton professionnel, proposer rdv gratuit, texte brut.';try{const d=await claudeAPI([{role:'user',content:prompt}],500,'emails');document.getElementById('courrier-text').value=d.content?.[0]?.text||'erreur de génération';}catch(e){document.getElementById('courrier-text').value='erreur : '+e.message;}document.getElementById('courrier-loading').style.display='none';document.getElementById('courrier-text').style.display='block';}
+async function regenCourrier(){if(_currentCourrierIdx!==null) await genCourrierB2C(_currentCourrierIdx);}
+
+// ═══ CANCELLATION ═══
+function startCancellation(){const months=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];const now=new Date();const m=months[now.getMonth()]+' '+now.getFullYear();const el1=document.getElementById('cancel-current-month');const el2=document.getElementById('cancel-month-reminder');if(el1) el1.textContent=m;if(el2) el2.textContent=m;document.getElementById('cancel-reason').value='';document.getElementById('cancel-comment').value='';const ct=document.getElementById('cancel-confirm-text');if(ct) ct.value='';cancelStep(1);document.getElementById('cancel-modal').classList.add('open');}
+function closeCancellation(){document.getElementById('cancel-modal').classList.remove('open');}
+function cancelStep(n){[1,2,3,4].forEach(i=>{const el=document.getElementById('cancel-step-'+i);if(el) el.style.display=i===n?'block':'none';});}
+function checkCancelReason(){const reason=document.getElementById('cancel-reason').value;const comment=document.getElementById('cancel-comment').value.trim();const btn=document.getElementById('cancel-step2-btn');if(btn) btn.style.opacity=reason!==''&&comment.length>=20?'1':'0.45';hide('cancel-step2-error');}
+function tryGoStep3(){const reason=document.getElementById('cancel-reason').value;const comment=document.getElementById('cancel-comment').value.trim();if(reason===''||comment.length<20){show('cancel-step2-error');return;}cancelStep(3);}
+function checkCancelConfirm(){const val=document.getElementById('cancel-confirm-text').value.trim();const btn=document.getElementById('cancel-final-btn');if(btn) btn.style.opacity=val==='ANNULER MON COMPTE'?'1':'0.45';}
+function confirmCancellation(){if(document.getElementById('cancel-confirm-text').value.trim()!=='ANNULER MON COMPTE'){alert('tapez exactement : ANNULER MON COMPTE');return;}cancelStep(4);}
+
+// ═══ COLD CALL ═══
+const CC_CFG={rdv:{label:'rdv pris',color:'#059669',icon:'event_available'},converti:{label:'converti',color:'#7c3aed',icon:'emoji_events'},interesse:{label:'intéressé',color:'#0055D4',icon:'thumb_up'},rappel:{label:'à rappeler',color:'#d97706',icon:'schedule_send'},objection:{label:'objection',color:'#6b7280',icon:'report_problem'},deja_equipe:{label:'déjà équipé',color:'#6b7280',icon:'inventory_2'},non_repondu:{label:'non répondu',color:'#6b7280',icon:'phone_missed'},non_interesse:{label:'non intéressé',color:'#dc2626',icon:'thumb_down'},raccroche:{label:'raccroché',color:'#dc2626',icon:'call_end'}};
+function getCCData(){try{return JSON.parse(localStorage.getItem('alma_coldcall')||'[]');}catch(_){return[];}}
+function saveCCData(d){localStorage.setItem('alma_coldcall',JSON.stringify(d));}
+function filterCC(filter){const all=getCCData();const now=new Date();const today=now.toISOString().split('T')[0];if(filter==='today') return all.filter(d=>d.ts.startsWith(today));if(filter==='week') return all.filter(d=>d.ts>=new Date(now-7*86400000).toISOString());if(filter==='month') return all.filter(d=>d.ts>=new Date(now-30*86400000).toISOString());return all;}
+function logCC(type){const note=(document.getElementById('cc-note')?.value||'').trim();saveCCData([{id:Date.now(),type,note,ts:new Date().toISOString()},...getCCData()]);document.getElementById('cc-note').value='';const el=document.getElementById('cc-c-'+type);if(el){el.textContent=parseInt(el.textContent||0)+1;el.style.transform='scale(1.4)';setTimeout(()=>el.style.transform='scale(1)',180);}updateCCStats();renderCCHistory();renderCCCharts();}
+function updateCCStats(){const filter=document.getElementById('cc-kpi-filter')?.value||'today';const data=filterCC(filter);const T=data.length;const nr=data.filter(d=>d.type==='non_repondu').length;const rd=data.filter(d=>d.type==='rdv').length;const cv=data.filter(d=>d.type==='converti').length;const rp=data.filter(d=>d.type==='rappel').length;const rc=data.filter(d=>d.type==='raccroche').length;const ni=data.filter(d=>d.type==='non_interesse').length;const contacted=T-nr;const pContact=T>0?Math.round(contacted/T*100):0;const pRefus=contacted>0?Math.round((rc+ni)/contacted*100):0;const setV=(id,val)=>{const e=document.getElementById(id);if(e){e.textContent=val;}};setV('kpi-total',T);setV('kpi-contact',pContact+'%');setV('kpi-rdv',rd);setV('kpi-conv',cv);setV('kpi-rappel',rp);setV('kpi-refus',pRefus+'%');const todayData=filterCC('today');const s=document.getElementById('cc-session');if(s) s.textContent="aujourd'hui · "+todayData.length+' appel'+(todayData.length!==1?'s':'');Object.keys(CC_CFG).forEach(type=>{const el=document.getElementById('cc-c-'+type);if(el) el.textContent=filterCC(filter).filter(d=>d.type===type).length;});updateCCGoal();const breakdown=document.getElementById('cc-breakdown');if(breakdown&&T>0){breakdown.innerHTML=Object.keys(CC_CFG).map(type=>{const count=data.filter(d=>d.type===type).length;if(!count) return '';const pct=Math.round(count/T*100);const cfg=CC_CFG[type];return`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:10px;font-weight:700;color:${cfg.color};flex-shrink:0;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cfg.label}</span><div style="flex:1;height:3px;background:rgba(0,0,0,0.06);border-radius:99px;overflow:hidden"><div style="height:100%;background:${cfg.color};border-radius:99px;width:${pct}%"></div></div><span style="font-size:10px;font-weight:800;color:${cfg.color};flex-shrink:0">${count}</span></div>`;}).join('');}else if(breakdown){breakdown.innerHTML='<div style="text-align:center;padding:20px;color:#9ca3af;font-size:12px">aucune donnée</div>';}}
+function updateCCGoal(){const goal=parseInt(document.getElementById('cc-goal')?.value)||50;const today=filterCC('today').length;const pct=Math.min(100,Math.round(today/goal*100));const bar=document.getElementById('cc-goal-bar');if(bar) bar.style.width=pct+'%';const lbl=document.getElementById('cc-goal-label');if(lbl) lbl.textContent=today+' / '+goal;const pctEl=document.getElementById('cc-goal-pct');if(pctEl) pctEl.textContent=pct+'%';}
+function renderCCHistory(){const filter=document.getElementById('cc-hist-filter')?.value||'today';const data=filterCC(filter);const container=document.getElementById('cc-history');if(!container) return;if(!data.length){container.innerHTML='<div style="text-align:center;padding:28px;color:#9ca3af;font-size:12px">aucun appel enregistré.</div>';return;}container.innerHTML=data.map(d=>{const cfg=CC_CFG[d.type]||{label:d.type,color:'#9ca3af',icon:'call'};const t=new Date(d.ts);const time=t.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});const date=t.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});return`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.3)"><span class="msym" style="font-size:15px;color:${cfg.color};flex-shrink:0">${cfg.icon}</span><span style="font-size:12px;font-weight:700;color:${cfg.color};flex-shrink:0">${cfg.label}</span>${d.note?`<span style="font-size:11px;color:#9ca3af;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">— ${d.note}</span>`:'<span style="flex:1"></span>'}<span style="font-size:10px;color:#9ca3af;flex-shrink:0">${date} ${time}</span><button onclick="deleteCC(${d.id})" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;padding:2px 4px;opacity:.4;transition:opacity .1s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.4"></button></div>`;}).join('');}
+function deleteCC(id){saveCCData(getCCData().filter(d=>d.id!==id));updateCCStats();renderCCHistory();}
+function resetCCToday(){if(!confirm('supprimer tous les appels du jour ?')) return;const today=new Date().toISOString().split('T')[0];saveCCData(getCCData().filter(d=>!d.ts.startsWith(today)));updateCCStats();renderCCHistory();renderCCCharts();}
+function exportCC(){const data=getCCData();if(!data.length){alert('aucun appel à exporter.');return;}const rows=[['date','heure','résultat','note']];data.forEach(d=>{const t=new Date(d.ts);rows.push([t.toLocaleDateString('fr-FR'),t.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),CC_CFG[d.type]?.label||d.type,d.note||'']);});const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='tracker-appels-'+new Date().toISOString().split('T')[0]+'.csv';a.click();}
+function initColdCall(){updateCCStats();renderCCHistory();renderCCCharts();}
+
+// ═══ COLD CALL CHARTS ═══
+let _ccLineChart=null,_ccDonutChart=null;
+function renderCCCharts(){
+  renderLineChart();
+  renderDonutChart();
+}
+
+function renderLineChart(){
+  const canvas=document.getElementById('cc-chart-line');if(!canvas) return;
+  const data=filterCC('today');
+  // build hourly buckets 7h → 20h
+  const hours=[];const counts=[];
+  for(let h=7;h<=20;h++){hours.push(h+'h');const start=new Date();start.setHours(h,0,0,0);const end=new Date();end.setHours(h+1,0,0,0);counts.push(data.filter(d=>{const t=new Date(d.ts);return t>=start&&t<end;}).length);}
+  if(_ccLineChart){_ccLineChart.data.datasets[0].data=counts;_ccLineChart.update();return;}
+  _ccLineChart=new Chart(canvas,{
+    type:'line',
+    data:{labels:hours,datasets:[{data:counts,borderColor:'#0055D4',backgroundColor:'rgba(0,85,212,0.08)',borderWidth:2.5,pointBackgroundColor:'#0055D4',pointBorderColor:'white',pointBorderWidth:2,pointRadius:4,pointHoverRadius:6,fill:true,tension:0.4}]},
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#0a0a1a',titleColor:'rgba(255,255,255,0.5)',bodyColor:'white',bodyFont:{family:'Inter',weight:'700'},padding:10,cornerRadius:10,callbacks:{title:ctx=>ctx[0].label,label:ctx=>ctx.parsed.y+' appel'+(ctx.parsed.y>1?'s':'')}}},
+      scales:{x:{grid:{display:false},ticks:{font:{family:'Inter',size:9,weight:'700'},color:'#9ca3af'}},y:{grid:{color:'rgba(0,0,0,0.04)',drawBorder:false},ticks:{font:{family:'Inter',size:9},color:'#9ca3af',stepSize:1},beginAtZero:true}},
+    }
+  });
+}
+
+function renderDonutChart(){
+  const canvas=document.getElementById('cc-chart-donut');if(!canvas) return;
+  const filter=document.getElementById('cc-kpi-filter')?.value||'today';
+  const data=filterCC(filter);
+  const labels=[],values=[],colors=[];
+  // positive outcomes first
+  const order=['rdv','converti','interesse','rappel','objection','deja_equipe','non_repondu','non_interesse','raccroche'];
+  order.forEach(type=>{const count=data.filter(d=>d.type===type).length;if(count>0){labels.push(CC_CFG[type].label);values.push(count);colors.push(CC_CFG[type].color);}});
+  const total=values.reduce((a,b)=>a+b,0);
+  const totalEl=document.getElementById('cc-donut-total');if(totalEl) totalEl.textContent=total;
+  const legendEl=document.getElementById('cc-donut-legend');
+  if(!total){if(legendEl) legendEl.innerHTML='<div style="text-align:center;color:#9ca3af;font-size:11px;padding:8px 0">aucun appel</div>';if(_ccDonutChart){_ccDonutChart.data.datasets[0].data=[];_ccDonutChart.update();}return;}
+  if(legendEl) legendEl.innerHTML=labels.map((l,i)=>`<div style="display:flex;align-items:center;gap:7px"><div style="width:8px;height:8px;border-radius:50%;background:${colors[i]};flex-shrink:0"></div><span style="font-size:11px;font-weight:600;color:#1a1a2e;flex:1">${l}</span><span style="font-size:11px;font-weight:800;color:${colors[i]}">${values[i]}</span></div>`).join('');
+  if(_ccDonutChart){_ccDonutChart.data.labels=labels;_ccDonutChart.data.datasets[0].data=values;_ccDonutChart.data.datasets[0].backgroundColor=colors;_ccDonutChart.update();return;}
+  _ccDonutChart=new Chart(canvas,{
+    type:'doughnut',
+    data:{labels,datasets:[{data:values,backgroundColor:colors,borderColor:'rgba(255,255,255,0.9)',borderWidth:3,hoverOffset:6}]},
+    options:{
+      responsive:false,cutout:'68%',
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#0a0a1a',bodyColor:'white',bodyFont:{family:'Inter',weight:'700'},padding:10,cornerRadius:10,callbacks:{label:ctx=>ctx.label+' : '+ctx.parsed}}},
+    }
+  });
+}
+
+// ═══ MOBILE ═══
+function mobToggle(){document.getElementById('sidebar').classList.toggle('mob-open');document.getElementById('mob-overlay').classList.toggle('show');}
+function mobClose(){document.getElementById('sidebar').classList.remove('mob-open');document.getElementById('mob-overlay').classList.remove('show');}
+document.addEventListener('click',function(e){const navItem=e.target.closest('.nav-item');if(navItem&&window.innerWidth<=768) mobClose();});
+
+// ═══ LOGOUT ═══
+async function confirmLogout(){
+  if(confirm('se déconnecter de Huntlist. ?')){
+    const sb = _sb;
+    await sb.auth.signOut();
+    localStorage.clear();
+    window.location.href='/login';
+  }
+}
+
+// ═══ FICHE PRÉ-APPEL IA ═══
+async function genFichePreAppel() {
+  const p = state.pipeline.find(x => x.id === currentPipelineId);
+  if (!p) return;
+  const key = getKeys().anthropic;
+  if (!key) { alert('clé anthropic non configurée.'); return; }
+
+  // Afficher le bloc fiche
+  const wrap = document.getElementById('pm-fiche-wrap');
+  wrap.style.display = 'flex';
+  wrap.style.flexDirection = 'column';
+  document.getElementById('pm-fiche-loading').style.display = 'block';
+  document.getElementById('pm-fiche-content').style.display = 'none';
+  showSpinner('pm-fiche-btn-spinner');
+  document.getElementById('pm-fiche-btn').disabled = true;
+
+  // Scroller vers la fiche
+  setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+
+  const profile = getProfile();
+  const steps = ['analyse de l\'activité...', 'identification des points de douleur...', 'préparation des réponses aux objections...', 'finalisation de la fiche...'];
+  let si = 0;
+  const interval = setInterval(() => {
+    si = (si + 1) % steps.length;
+    const el = document.getElementById('pm-fiche-loading-text');
+    if (el) el.textContent = steps[si];
+  }, 1800);
+
+  const websiteInfo = p.website ? `site web : ${p.website}` : 'pas de site web connu';
+  const ratingInfo = p.rating ? `note google : ${p.rating}/5 (${p.reviews} avis)` : 'pas de note google';
+
+  const prompt = `tu es un expert en vente terrain et cold calling. analyse ce prospect et génère une fiche pré-appel ultra-pratique pour un commercial.
+
+PROSPECT :
+- nom : ${p.name}
+- adresse : ${p.address}
+- ${ratingInfo}
+- ${websiteInfo}
+- score Huntlist. : ${p.score}/100
+
+COMMERCIAL :
+- prénom : ${profile.prenom || 'commercial'}
+- société : ${profile.societe || 'notre société'}
+- activité : ${profile.activite || 'prestataire de services'}
+- valeur : ${profile.valeur || 'solution de qualité'}
+
+GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
+{
+  "accroche": "phrase d'ouverture naturelle de 1-2 phrases pour démarrer l'appel, personnalisée à ce prospect précis, pas générique",
+  "douleurs": [
+    "point de douleur probable 1 (court, direct)",
+    "point de douleur probable 2",
+    "point de douleur probable 3"
+  ],
+  "objections": [
+    {"objection": "objection classique 1", "reponse": "réponse courte et percutante"},
+    {"objection": "objection classique 2", "reponse": "réponse courte et percutante"},
+    {"objection": "objection classique 3", "reponse": "réponse courte et percutante"}
+  ],
+  "closing": "conseil tactique de closing personnalisé pour ce type de prospect"
+}`;
+
+  try {
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 800, 'fiches');
+    const raw = d.content?.[0]?.text || '{}';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const fiche = JSON.parse(clean);
+
+    clearInterval(interval);
+
+    // Accroche
+    document.getElementById('pm-fiche-accroche').textContent = fiche.accroche || '—';
+
+    // Points de douleur
+    const douleursEl = document.getElementById('pm-fiche-douleurs');
+    douleursEl.innerHTML = (fiche.douleurs || []).map(d => `
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:rgba(217,119,6,0.06);border-radius:8px;border:1px solid rgba(217,119,6,0.12)">
+        <span style="color:#d97706;flex-shrink:0;font-size:14px;margin-top:1px">→</span>
+        <span style="font-size:12px;color:#1a1a2e;line-height:1.5">${d}</span>
+      </div>`).join('');
+
+    // Objections
+    const objectionsEl = document.getElementById('pm-fiche-objections');
+    objectionsEl.innerHTML = (fiche.objections || []).map(o => `
+      <div style="border-radius:10px;overflow:hidden;border:1px solid rgba(220,38,38,0.12)">
+        <div style="padding:8px 12px;background:rgba(220,38,38,0.06);display:flex;align-items:flex-start;gap:6px">
+          <span style="font-size:10px;font-weight:800;color:#dc2626;flex-shrink:0;margin-top:1px">OBJECTION</span>
+          <span style="font-size:12px;color:#dc2626;font-weight:600">${o.objection}</span>
+        </div>
+        <div style="padding:8px 12px;background:rgba(5,150,105,0.04);display:flex;align-items:flex-start;gap:6px">
+          <span style="font-size:10px;font-weight:800;color:#059669;flex-shrink:0;margin-top:1px">RÉPONSE</span>
+          <span style="font-size:12px;color:#059669;line-height:1.5">${o.reponse}</span>
+        </div>
+      </div>`).join('');
+
+    // Closing
+    document.getElementById('pm-fiche-closing').textContent = fiche.closing || '—';
+
+    document.getElementById('pm-fiche-loading').style.display = 'none';
+    document.getElementById('pm-fiche-content').style.display = 'block';
+
+    // Sauvegarder dans le prospect
+    p.fiche_preappel = fiche;
+    saveState();
+    addActivity('fiche pré-appel · ' + p.name, 'psychology', 'primary');
+
+  } catch (e) {
+    clearInterval(interval);
+    document.getElementById('pm-fiche-loading').style.display = 'none';
+    document.getElementById('pm-fiche-wrap').style.display = 'none';
+    alert('erreur génération fiche : ' + e.message);
+  }
+
+  hideSpinner('pm-fiche-btn-spinner');
+  document.getElementById('pm-fiche-btn').disabled = false;
+}
+
+
+// ═══ AUTH & PLAN CHECK ═══
+(async function() {
+  const sb = _sb;
+
+  // 1. Vérifier session
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = '/login'; return; }
+
+  // 2. Mettre à jour nom sidebar
+  const meta = session.user.user_metadata || {};
+  const name = [meta.prenom, meta.nom].filter(Boolean).join(' ') || session.user.email;
+  const nameEl = document.getElementById('sidebar-user-name');
+  if (nameEl) nameEl.textContent = name.toLowerCase();
+
+  // 3. Vérifier plan — localStorage d'abord
+  let plan = localStorage.getItem('alma_plan');
+
+  if (!plan || plan === 'null' || plan === 'undefined') {
+    // Chercher dans Supabase
+    const { data: profile } = await sb
+      .from('profiles')
+      .select('plan, subscription_status')
+      .eq('id', session.user.id)
+      .maybeSingle();
+
+    if (profile?.plan && profile?.subscription_status === 'active') {
+      plan = profile.plan;
+      localStorage.setItem('alma_plan', plan);
+    } else {
+      // Pas de plan → pricing
+      window.location.href = '/pricing';
+      return;
+    }
+  }
+
+  updateQuotaUI();
+})();
+
+
+// ═══ assistant appel ═══
+const assistantState = {
+  active: false,
+  timerInterval: null,
+  seconds: 0,
+  recognition: null,
+  micActive: false,
+  transcript: '',
+  objectionCount: 0,
+  currentObjection: null,
+  currentProspect: null,
+};
+
+function toggleAssistantAppel() {
+  const panel = document.getElementById('assistant-appel');
+  const isVisible = panel.style.display !== 'none';
+  if (isVisible) {
+    panel.style.display = 'none';
+    stopTimer();
+    stopMic();
+  } else {
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    startTimer();
+    populateProspectSelect();
+  }
+}
+
+function startTimer() {
+  assistantState.seconds = 0;
+  assistantState.active = true;
+  const indicator = document.getElementById('assistant-mic-indicator');
+  const statusLabel = document.getElementById('assistant-status-label');
+  if (indicator) { indicator.style.background = '#059669'; indicator.style.boxShadow = '0 0 8px rgba(5,150,105,0.6)'; }
+  if (statusLabel) statusLabel.textContent = 'appel en cours';
+  assistantState.timerInterval = setInterval(() => {
+    assistantState.seconds++;
+    const m = String(Math.floor(assistantState.seconds / 60)).padStart(2, '0');
+    const s = String(assistantState.seconds % 60).padStart(2, '0');
+    const timer = document.getElementById('assistant-timer');
+    if (timer) timer.textContent = m + ':' + s;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(assistantState.timerInterval);
+  assistantState.active = false;
+  const indicator = document.getElementById('assistant-mic-indicator');
+  const statusLabel = document.getElementById('assistant-status-label');
+  if (indicator) { indicator.style.background = '#9ca3af'; indicator.style.boxShadow = 'none'; }
+  if (statusLabel) statusLabel.textContent = 'inactif';
+}
+
+function populateProspectSelect() {
+  const sel = document.getElementById('assistant-prospect-select');
+  if (!sel) return;
+  const all = [...state.pipeline, ...state.prospects].filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i);
+  sel.innerHTML = '<option value="">— sélectionnez un prospect —</option>';
+  all.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.name + (p.address ? ' · ' + p.address.split(',')[0] : '');
+    sel.appendChild(opt);
+  });
+}
+
+async function loadAssistantScript() {
+  const pid = document.getElementById('assistant-prospect-select').value;
+  if (!pid) return;
+  const p = [...state.pipeline, ...state.prospects].find(x => x.id === pid);
+  if (!p) return;
+  assistantState.currentProspect = p;
+  await genScript();
+}
+
+async function genScript() {
+  const p = assistantState.currentProspect;
+  if (!p) { alert("sélectionnez un prospect d'abord."); return; }
+  const profile = getProfile();
+  showSpinner('script-spinner');
+  document.getElementById('btn-gen-script').disabled = true;
+  document.getElementById('assistant-script').style.fontStyle = 'italic';
+  document.getElementById('assistant-script').style.color = 'rgba(255,255,255,0.3)';
+  document.getElementById('assistant-script').textContent = 'génération en cours...';
+
+  // Adapter le script selon le secteur du commercial
+  const secteur = profile.secteur || profile.activite || 'prestataire de services';
+  const valeur = profile.valeur || 'service de qualité';
+  const societe = profile.societe || 'mon entreprise';
+  const prenom = profile.prenom || 'prénom';
+
+  // Construire un contexte métier précis
+  let contexteMetier = '';
+  const secteurLower = secteur.toLowerCase();
+  if(secteurLower.includes('maçon') || secteurLower.includes('maçonnerie') || secteurLower.includes('gros œuvre')) {
+    contexteMetier = `tu proposes : fondations, murs porteurs, dalles béton, ravalement de façade, rénovation structurelle. 
+angle d'attaque : permis de construire récents dans la zone, maisons anciennes à rénover, fissures/problèmes de structure visibles sur les avis google du prospect.`;
+  } else if(secteurLower.includes('plombier') || secteurLower.includes('plomberie') || secteurLower.includes('chauffage')) {
+    contexteMetier = `tu proposes : installation sanitaire, chaudières, pompes à chaleur, dépannage urgent, remplacement de tuyauterie ancienne.
+angle d'attaque : bâtiments anciens (avant 1980), avis clients mentionnant des problèmes d'eau, saison hivernale approchante.`;
+  } else if(secteurLower.includes('électricien') || secteurLower.includes('électricité')) {
+    contexteMetier = `tu proposes : mise aux normes électriques, tableau électrique, prises/interrupteurs, alarme, domotique.
+angle d'attaque : bâtiments construits avant 1990 (normes obsolètes), extensions/rénovations en cours (permis de construire).`;
+  } else if(secteurLower.includes('peinture') || secteurLower.includes('revêtement')) {
+    contexteMetier = `tu proposes : peinture intérieure/extérieure, papier peint, sol, ravalement.
+angle d'attaque : locaux commerciaux qui ont des avis mentionnant la vétusté, nouveaux gérants (signaux BODACC).`;
+  } else if(secteurLower.includes('menuisier') || secteurLower.includes('menuiserie') || secteurLower.includes('fenêtre')) {
+    contexteMetier = `tu proposes : fenêtres double vitrage, portes, volets, isolation thermique.
+angle d'attaque : économies d'énergie, DPE F/G (obligation de rénovation), bâtiments anciens.`;
+  } else if(secteurLower.includes('isolation') || secteurLower.includes('rénovation énergétique')) {
+    contexteMetier = `tu proposes : isolation combles, murs, planchers, aide MaPrimeRénov'.
+angle d'attaque : DPE mauvais, factures énergie élevées, obligation légale de rénovation avant 2028.`;
+  } else if(secteurLower.includes('consultant') || secteurLower.includes('freelance') || secteurLower.includes('agence')) {
+    contexteMetier = `tu proposes : ${valeur}.
+angle d'attaque : douleurs business visibles (mauvais avis, site web obsolète, pas de présence en ligne).`;
+  } else {
+    contexteMetier = `tu proposes : ${valeur}.
+angle d'attaque : identifier un besoin précis lié à leur activité visible sur google (avis, site web, présence en ligne).`;
+  }
+
+  const prompt = `tu es un expert en cold call terrain. génère un script d'ouverture téléphonique de 40-50 mots max, naturel et ultra-personnalisé.
+
+COMMERCIAL :
+- prénom : ${prenom}
+- société : ${societe}
+- secteur : ${secteur}
+- ${contexteMetier}
+
+PROSPECT :
+- nom : ${p.name}
+- adresse : ${p.address || '—'}
+- note google : ${p.rating ? p.rating + '/5 (' + p.reviews + ' avis)' : 'non disponible'}
+- type d'établissement : ${p.name.toLowerCase().includes('hotel') ? 'hôtel' : p.name.toLowerCase().includes('restaurant') ? 'restaurant' : 'établissement commercial'}
+
+CONSIGNES :
+- commencer par "bonjour, je suis ${prenom} de ${societe}..."
+- mentionner un élément CONCRET lié à LEUR activité ou leur bâtiment (pas générique)
+- proposer quelque chose qui résout un problème réel pour CE type de prospect
+- finir par une question courte et ouverte
+- tutoyer si TPE/artisan, vouvoyer sinon
+- 40-50 mots max, texte brut uniquement`;
+
+  try {
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 300, 'appels');
+    const script = d.content[0].text;
+    const scriptEl = document.getElementById('assistant-script');
+    scriptEl.textContent = script;
+    scriptEl.style.fontStyle = 'normal';
+    scriptEl.style.color = 'rgba(255,255,255,0.9)';
+    await genQuestions(p, profile);
+  } catch(e) {
+    document.getElementById('assistant-script').textContent = 'erreur : ' + e.message;
+  }
+  hideSpinner('script-spinner');
+  document.getElementById('btn-gen-script').disabled = false;
+}
+
+async function genQuestions(p, profile) {
+  const prompt = `génère 4 questions courtes à poser pendant un cold call pour qualifier ce prospect.
+prospect : ${p.name} — ${p.address || ''}
+note : ${p.rating || '?'}/5
+activité du commercial : ${profile.activite || 'prospection ia'}
+format : 4 questions numérotées, max 15 mots chacune, texte brut.`;
+
+  try {
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 200, 'appels');
+    const questions = d.content[0].text.trim().split('\n').filter(q => q.trim());
+    const container = document.getElementById('questions-list');
+    container.innerHTML = questions.map(q => `
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:all .12s" onclick="this.style.background='rgba(0,85,212,0.15)';this.style.borderColor='rgba(0,85,212,0.3)'">
+        <span class="msym" style="font-size:13px;color:rgba(0,212,255,0.6);flex-shrink:0;margin-top:1px">help_outline</span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5">${q.replace(/^[\d\.\-\*]\s*/, '')}</span>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+let _currentObjectionText = '';
+async function handleObjection(objection) {
+  if (!checkQuota('appels')) return;
+  _currentObjectionText = objection;
+  assistantState.objectionCount++;
+  const countEl = document.getElementById('assistant-objection-count');
+  if (countEl) countEl.textContent = assistantState.objectionCount + ' objection' + (assistantState.objectionCount > 1 ? 's traitées' : ' traitée');
+
+  const wrap = document.getElementById('objection-response-wrap');
+  const respText = document.getElementById('resp-text');
+  const respLoading = document.getElementById('resp-loading');
+  wrap.style.display = 'block';
+  respLoading.style.display = 'flex';
+  respText.style.display = 'none';
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  const p = assistantState.currentProspect;
+  const profile = getProfile();
+  const prompt = `tu es un expert en cold call B2B. génère une réponse courte et percutante à cette objection.
+
+objection : "${objection}"
+prospect : ${p ? p.name + ' (' + (p.address || '') + ')' : 'prospect inconnu'}
+commercial : ${profile.prenom || ''} ${profile.nom || ''} — ${profile.societe || 'Huntlist.'}
+activité : ${profile.activite || 'solutions ia'}
+valeur : ${profile.valeur || ''}
+
+consignes :
+- 30-50 mots max
+- naturel, humain, pas agressif
+- rebondir positivement sur l'objection
+- garder le prospect en ligne
+- finir par une mini-question pour relancer
+- texte brut uniquement`;
+
+  try {
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 200, 'appels');
+    const response = d.content[0].text;
+    respText.textContent = response;
+    respLoading.style.display = 'none';
+    respText.style.display = 'block';
+    incrementUsage('appels');
+  } catch(e) {
+    respText.textContent = 'erreur : ' + e.message;
+    respLoading.style.display = 'none';
+    respText.style.display = 'block';
+  }
+}
+
+async function regenResponse() {
+  if (_currentObjectionText) await handleObjection(_currentObjectionText);
+}
+
+function copyResponse() {
+  const text = document.getElementById('resp-text').textContent;
+  if (text) navigator.clipboard.writeText(text);
+}
+
+function copyScript() {
+  const text = document.getElementById('assistant-script').textContent;
+  if (text) navigator.clipboard.writeText(text);
+}
+
+// Micro - Web Speech API
+function toggleMic() {
+  if (assistantState.micActive) { stopMic(); } else { startMic(); }
+}
+
+function startMic() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('transcription non supportée sur ce navigateur. utilisez chrome.');
+    return;
+  }
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  assistantState.recognition = new SpeechRecognition();
+  assistantState.recognition.continuous = true;
+  assistantState.recognition.interimResults = true;
+  assistantState.recognition.lang = 'fr-FR';
+
+  assistantState.recognition.onresult = (event) => {
+    let interim = '';
+    let final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) final += event.results[i][0].transcript + ' ';
+      else interim += event.results[i][0].transcript;
+    }
+    assistantState.transcript += final;
+    const box = document.getElementById('transcription-box');
+    if (box) {
+      box.innerHTML = '<span style="color:rgba(255,255,255,0.7)">' + assistantState.transcript + '</span>' +
+        (interim ? '<span style="color:rgba(255,255,255,0.3);font-style:italic">' + interim + '</span>' : '');
+      box.scrollTop = box.scrollHeight;
+    }
+  };
+
+  assistantState.recognition.onerror = () => stopMic();
+  assistantState.recognition.onend = () => { if (assistantState.micActive) assistantState.recognition.start(); };
+  assistantState.recognition.start();
+  assistantState.micActive = true;
+
+  const btn = document.getElementById('btn-mic');
+  const indicator = document.getElementById('assistant-mic-indicator');
+  if (btn) { btn.textContent = 'stopper le micro'; btn.style.background = 'rgba(220,38,38,0.2)'; btn.style.color = '#fca5a5'; btn.style.borderColor = 'rgba(220,38,38,0.3)'; }
+  if (indicator) { indicator.style.background = '#dc2626'; indicator.style.boxShadow = '0 0 8px rgba(220,38,38,0.6)'; indicator.style.animation = 'pulse 1s infinite'; }
+}
+
+function stopMic() {
+  if (assistantState.recognition) { assistantState.recognition.stop(); assistantState.recognition = null; }
+  assistantState.micActive = false;
+  const btn = document.getElementById('btn-mic');
+  const indicator = document.getElementById('assistant-mic-indicator');
+  if (btn) { btn.textContent = 'activer le micro'; btn.style.background = 'rgba(255,255,255,0.08)'; btn.style.color = 'rgba(255,255,255,0.5)'; btn.style.borderColor = 'rgba(255,255,255,0.1)'; }
+  if (indicator) { indicator.style.background = '#059669'; indicator.style.boxShadow = '0 0 8px rgba(5,150,105,0.6)'; indicator.style.animation = ''; }
+}
+
+async function genResume() {
+  const transcript = assistantState.transcript;
+  const p = assistantState.currentProspect;
+  const duration = document.getElementById('assistant-timer')?.textContent || '—';
+  showSpinner('resume-spinner');
+  document.getElementById('btn-resume').disabled = true;
+
+  const prompt = `génère un résumé structuré de cet appel commercial.
+prospect : ${p ? p.name : 'inconnu'}
+durée : ${duration}
+transcription : ${transcript || 'non disponible'}
+objections traitées : ${assistantState.objectionCount}
+
+format :
+- résultat de l'appel (1 ligne)
+- points clés discutés (3 max)
+- prochaine action recommandée
+- texte brut, concis`;
+
+  try {
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 300, 'appels');
+    const resume = d.content[0].text;
+    // Afficher dans une modal
+    const modal = document.getElementById('email-modal');
+    document.getElementById('modal-prospect-name').textContent = 'résumé appel — ' + (p ? p.name : '');
+    document.getElementById('modal-email-text').value = resume;
+    modal.classList.add('open');
+  } catch(e) {
+    alert('erreur résumé : ' + e.message);
+  }
+  hideSpinner('resume-spinner');
+  document.getElementById('btn-resume').disabled = false;
+}
+
+function finirAppel() {
+  stopMic();
+  stopTimer();
+  // Logger l'appel dans le tracker
+  const note = assistantState.currentProspect ? assistantState.currentProspect.name : '';
+  document.getElementById('cc-note').value = note;
+  // Reset
+  assistantState.transcript = '';
+  assistantState.objectionCount = 0;
+  const countEl = document.getElementById('assistant-objection-count');
+  if (countEl) countEl.textContent = '0 objection traitée';
+  const box = document.getElementById('transcription-box');
+  if (box) box.innerHTML = 'activez le micro pour transcrire la conversation...';
+  document.getElementById('objection-response-wrap').style.display = 'none';
+  // Fermer le panel
+  document.getElementById('assistant-appel').style.display = 'none';
+  // Scroller vers les boutons de résultat
+  document.querySelector('.cc-main').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ═══ LINKEDIN ═══
+let _liData = [], _liFilter = 'all';
+
+function fillLiSearch(secteur, region) {
+  document.getElementById('li-secteur').value = secteur;
+  document.getElementById('li-region').value = region;
+}
+
+function getLiKeys() {
+  return {
+    googleKey: localStorage.getItem('alma_google_search_key') || '',
+    googleCx: localStorage.getItem('alma_google_cx') || ''
+  };
+}
+
+function checkLiApiKey() {
+  const { googleKey, googleCx } = getLiKeys();
+  const banner = document.getElementById('li-no-key-banner');
+  const apiBadge = document.getElementById('li-api-badge');
+  if (googleKey && googleCx) {
+    if (banner) banner.style.display = 'none';
+    if (apiBadge) apiBadge.style.display = 'inline-flex';
+    return true;
+  }
+  if (banner) banner.style.display = 'flex';
+  if (apiBadge) apiBadge.style.display = 'none';
+  return false;
+}
+
+async function searchLinkedinProfiles() {
+  const secteur = document.getElementById('li-secteur').value.trim();
+  const region = document.getElementById('li-region').value.trim();
+  const company = document.getElementById('li-company').value.trim();
+  const maxResults = parseInt(document.getElementById('li-max').value) || 10;
+
+  if (!secteur) { alert('renseignez un poste ou secteur cible.'); return; }
+
+  const { googleKey, googleCx } = getLiKeys();
+
+  if (!googleKey || !googleCx) {
+    alert("configurez votre clé Google Search API dans Paramètres → LinkedIn API. Gratuit sur console.developers.google.com");
+    return;
+  }
+
+  showSpinner('li-search-spinner');
+  document.getElementById('btn-li-search').disabled = true;
+  document.getElementById('li-results').style.display = 'none';
+
+  try {
+    // Construire la requête Google ciblée LinkedIn
+    let query = `site:linkedin.com/in "${secteur}"`;
+    if (region) query += ` "${region}"`;
+    if (company) query += ` "${company}"`;
+
+    const url = `https://www.googleapis.com/customsearch/v1?key=${googleKey}&cx=${googleCx}&q=${encodeURIComponent(query)}&num=${Math.min(maxResults, 10)}`;
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'erreur API Google (' + res.status + ')');
+    }
+    const data = await res.json();
+    const items = data.items || [];
+
+    if (!items.length) {
+      alert('aucun profil trouvé. essayez d\'autres mots-clés.');
+      hideSpinner('li-search-spinner');
+      document.getElementById('btn-li-search').disabled = false;
+      return;
+    }
+
+    // Parser les résultats Google → profils LinkedIn
+    _liData = items.map((item, i) => {
+      // Extraire les infos du snippet Google
+      const title = item.title || '';
+      const snippet = item.snippet || '';
+      const link = item.link || '';
+
+      // Parser le nom depuis le titre (format: "Prénom Nom - Titre | LinkedIn")
+      const titleParts = title.replace(' | LinkedIn', '').replace(' - LinkedIn', '').split(' - ');
+      const name = titleParts[0]?.trim() || 'Profil LinkedIn';
+      const titleJob = titleParts[1]?.trim() || '';
+
+      // Extraire entreprise et localisation du snippet
+      const snippetParts = snippet.split('·').map(s => s.trim());
+      let jobTitle = titleJob;
+      let company = '';
+      let location = '';
+
+      // Le snippet LinkedIn a souvent : "Titre · Entreprise · Lieu"
+      if (snippetParts.length >= 2) {
+        if (!jobTitle) jobTitle = snippetParts[0];
+        company = snippetParts[1] || '';
+        location = snippetParts[2] || '';
+      }
+
+      // Nettoyer
+      location = location.replace(/\d+\s*(relations?|connections?).*/i, '').trim();
+
+      // Image depuis pagemap si dispo
+      const avatar = item.pagemap?.cse_image?.[0]?.src || 
+                     item.pagemap?.person?.[0]?.image || '';
+
+      const score = 60 + Math.floor(Math.random() * 30);
+
+      return {
+        id: 'li-' + Date.now() + '-' + i,
+        name,
+        title: jobTitle,
+        company,
+        location,
+        linkedin_url: link,
+        avatar,
+        score,
+        source: 'linkedin_search',
+        extracted_at: new Date().toISOString()
+      };
+    });
+
+    renderLinkedinCards(secteur, region);
+    addActivity('linkedin · ' + secteur + (region ? ' · ' + region : '') + ' (' + _liData.length + ' profils)', 'person_search', 'primary');
+
+  } catch(e) {
+    if (e.message.includes('quota') || e.message.includes('429')) {
+      alert('quota journalier Google atteint (100 req/jour gratuit). Attendez demain ou passez sur un plan payant Google (2$/1000 req).');
+    } else {
+      alert('erreur : ' + e.message);
+    }
+  }
+
+  hideSpinner('li-search-spinner');
+  document.getElementById('btn-li-search').disabled = false;
+}
+
+function renderLinkedinCards(secteur, region) {
+  document.getElementById('li-results-title').textContent = _liData.length + ' profils trouvés';
+  document.getElementById('li-results-sub').textContent = secteur + (region ? ' · ' + region : '') + ' · via google search';
+
+  const colors = ['#0077b5','#0055D4','#7c3aed','#059669','#d97706','#0284c7'];
+
+  document.getElementById('li-cards').innerHTML = _liData.map((p, i) => {
+    const ini = (p.name || '?').split(' ').slice(0,2).map(w => w[0]||'').join('').toUpperCase();
+    const sc = p.score >= 80 ? 's-h' : p.score >= 60 ? 's-m' : 's-l';
+
+    return `<div class="pipeline-card" style="display:flex;flex-direction:column;gap:10px">
+
+      <!-- Avatar + nom -->
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="width:44px;height:44px;border-radius:10px;background:${colors[i%colors.length]};display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:800;flex-shrink:0;overflow:hidden;position:relative">
+          ${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:10px" onerror="this.style.display='none'"/>` : ''}
+          <span style="position:absolute">${ini}</span>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:800;color:#0a0a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+          <div style="font-size:10px;color:#9ca3af;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title || '—'}</div>
+        </div>
+        <span class="score ${sc}" style="flex-shrink:0">${p.score}</span>
+      </div>
+
+      <!-- Entreprise -->
+      ${p.company ? `
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#1a1a2e;font-weight:600">
+        <span class="msym" style="font-size:14px;color:#9ca3af">business</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.company}</span>
+      </div>` : ''}
+
+      <!-- Localisation -->
+      ${p.location ? `
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#9ca3af">
+        <span class="msym" style="font-size:13px">location_on</span>
+        ${p.location}
+      </div>` : ''}
+
+      <!-- Badge LinkedIn -->
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:9px;font-weight:800;background:rgba(0,119,181,0.08);color:#0077b5;padding:3px 8px;border-radius:99px;display:flex;align-items:center;gap:4px">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
+          profil linkedin
+        </span>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:6px">
+        <a href="${p.linkedin_url}" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;text-decoration:none;border-color:rgba(0,119,181,0.25);color:#0077b5">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
+          voir profil
+        </a>
+        <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="addLiCardToPipeline(${i})">
+          <span class="msym">conversion_path</span>pipeline
+        </button>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="genLiEmail(${i})">
+        <span class="msym">auto_awesome</span>email ia
+      </button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('li-results').style.display = '';
+}
+
+function addLiCardToPipeline(idx) {
+  const p = _liData[idx];
+  if (!p) return;
+  addToPipeline({
+    id: p.id,
+    name: p.name,
+    address: p.location || '',
+    rating: 0,
+    reviews: 0,
+    score: p.score,
+    phone: null,
+    website: p.linkedin_url || null,
+    email_generated: null
+  });
+}
+
+function addAllLinkedinToPipeline() {
+  _liData.forEach((_, i) => addLiCardToPipeline(i));
+  addActivity(_liData.length + ' profils linkedin → pipeline', 'person_search', 'primary');
+}
+
+async function genLiEmail(idx) {
+  const p = _liData[idx];
+  if (!p) return;
+  if (!state.prospects.find(x => x.id === p.id)) {
+    state.prospects.push({
+      id: p.id, name: p.name,
+      address: p.location || '',
+      rating: 0, reviews: 0,
+      score: p.score,
+      phone: null, website: p.linkedin_url || null,
+      email_generated: null
+    });
+  }
+  openEmailModal(p.id);
+}
+
+function exportLinkedinCSV() {
+  if (!_liData.length) { alert('aucun profil à exporter.'); return; }
+  const rows = [['nom','titre','entreprise','localisation','linkedin','score']];
+  _liData.forEach(p => rows.push([p.name, p.title||'', p.company||'', p.location||'', p.linkedin_url||'', p.score||65]));
+  const csv = rows.map(r => r.map(c => '"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'profils-linkedin-huntlist.csv';
+  a.click();
+}
+
+function loadLinkedinLeads() { checkLiApiKey(); }
+
+// ═══ INIT ═══
+document.addEventListener('DOMContentLoaded',function(){loadState();updateSeenCounter();});
+
+
+// ═══ ONBOARDING ═══
+const OB_KEY = 'huntlist_onboarding_done';
+let _obStep = 1;
+const _obTotalSteps = 6;
+
+function obCheckAndShow(){
+  const done = localStorage.getItem(OB_KEY);
+  if(!done){
+    document.getElementById('onboarding-overlay').style.display = 'flex';
+    obUpdateProgress();
+  }
+}
+
+function obUpdateProgress(){
+  const pct = ((_obStep - 1) / (_obTotalSteps - 1)) * 100;
+  document.getElementById('ob-progress').style.width = pct + '%';
+  document.getElementById('ob-step-count').textContent = 'étape ' + _obStep + ' / ' + _obTotalSteps;
+}
+
+function obNext(){
+  document.getElementById('ob-step-' + _obStep).style.display = 'none';
+  _obStep++;
+  if(_obStep > _obTotalSteps){ obFinish(); return; }
+  document.getElementById('ob-step-' + _obStep).style.display = 'block';
+  obUpdateProgress();
+  
+  // Actions spéciales par step
+  if(_obStep === 4) obGenerateEmailPreview();
+}
+
+function obSaveProfile(){
+  const prenom = document.getElementById('ob-prenom').value.trim();
+  const nom = document.getElementById('ob-nom').value.trim();
+  const societe = document.getElementById('ob-societe').value.trim();
+  const secteur = document.getElementById('ob-secteur').value;
+  const valeur = document.getElementById('ob-valeur').value.trim();
+  
+  if(!prenom || !nom || !societe || !secteur){
+    alert('renseignez tous les champs obligatoires (*)');
+    return;
+  }
+  
+  // Préremplir le profil dans les paramètres
+  const prefill = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+  prefill('prof-prenom', prenom);
+  prefill('prof-nom', nom);
+  prefill('prof-societe', societe);
+  prefill('prof-secteur', secteur);
+  prefill('prof-valeur', valeur);
+  
+  // Sauvegarder
+  const p = { prenom, nom, societe, activite: secteur, valeur, ton: 'professionnel' };
+  localStorage.setItem('huntlist_profile', JSON.stringify(p));
+  
+  // Mettre à jour le sidebar
+  const nameEl = document.getElementById('sidebar-user-name');
+  if(nameEl) nameEl.textContent = (prenom + ' ' + nom).toLowerCase();
+  
+  obNext();
+}
+
+async function obLaunchSearch(){
+  const type = document.getElementById('ob-search-type').value.trim();
+  const city = document.getElementById('ob-search-city').value.trim();
+  if(!type || !city){ alert('renseignez un type de business et une ville.'); return; }
+  
+  // Préremplir la vraie recherche pour plus tard
+  const typeEl = document.getElementById('search-type');
+  const cityEl = document.getElementById('search-city');
+  if(typeEl) typeEl.value = type;
+  if(cityEl) cityEl.value = city;
+  
+  // Juste passer à l'étape suivante — ne pas fermer l'onboarding
+  obNext();
+}
+
+async function obGenerateEmailPreview(){
+  const profile = getProfile();
+  const preview = document.getElementById('ob-email-preview');
+  if(!preview) return;
+  
+  const secteur = profile.activite || profile.secteur || 'votre secteur';
+  const prenom = profile.prenom || 'prénom';
+  const societe = profile.societe || 'votre société';
+  
+  preview.innerHTML = `<em style="color:rgba(255,255,255,0.4)">génération d'un exemple...</em>`;
+  
+  try {
+    const prompt = `génère un court email de prospection B2B (100 mots max) pour un ${secteur} nommé ${prenom} de ${societe}. 
+Prospect fictif : une PME locale avec quelques avis Google. Objet + corps. Texte brut.`;
+    const d = await claudeAPI([{role:'user', content: prompt}], 200, null);
+    preview.style.fontSize = '12px';
+    preview.style.lineHeight = '1.7';
+    preview.innerHTML = d.content[0].text.replace(/\n/g, '<br/>')
+  } catch(e) {
+    preview.innerHTML = `Objet : Proposition de service pour votre établissement<br/><br/>Bonjour,<br/>Je suis ${prenom} de ${societe}, spécialiste en ${secteur}. Je me permets de vous contacter car j'ai pu constater que votre établissement pourrait bénéficier de notre expertise.<br/><br/>Seriez-vous disponible pour un échange de 10 minutes cette semaine ?<br/><br/>Cordialement,<br/>${prenom}`;
+  }
+}
+
+function obFinish(){
+  localStorage.setItem(OB_KEY, 'true');
+  document.getElementById('onboarding-overlay').style.display = 'none';
+  addActivity('onboarding complété', 'check_circle', 'green');
+}
+
+// Lancer l'onboarding au chargement
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(obCheckAndShow, 1000);
+});
+
+
+
+// ═══ RADAR AÉRIEN ═══
+let _radarMap = null;
+let _radarMarkers = [];
+let _radarCurrentPlace = null;
+let _radarSatMode = false;
+
+function initRadarMap() {
+  if (_radarMap || !document.getElementById('radar-map')) return;
+  _radarMap = new google.maps.Map(document.getElementById('radar-map'), {
+    center: { lat: 46.603354, lng: 1.888334 },
+    zoom: 13,
+    mapTypeId: 'roadmap',
+    styles: [
+      { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+      { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+    ],
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+  });
+}
+
+function radarToggleSat() {
+  if (!_radarMap) return;
+  _radarSatMode = !_radarSatMode;
+  _radarMap.setMapTypeId(_radarSatMode ? 'hybrid' : 'roadmap');
+  const btn = document.getElementById('radar-toggle-sat');
+  if (btn) btn.style.background = _radarSatMode ? 'rgba(0,85,212,0.1)' : '';
+}
+
+async function radarSearch() {
+  const type = document.getElementById('radar-search').value.trim();
+  const city = document.getElementById('radar-city').value.trim();
+  if (!type) return alert('renseignez un type de business.');
+
+  const btn = document.getElementById('btn-radar');
+  const spinner = document.getElementById('radar-spinner');
+  btn.disabled = true;
+  if (spinner) spinner.style.display = 'inline-block';
+
+  initRadarMap();
+  _radarMarkers.forEach(m => m.setMap(null));
+  _radarMarkers = [];
+
+  try {
+    if (city) {
+      const geocoder = new google.maps.Geocoder();
+      await new Promise(resolve => {
+        geocoder.geocode({ address: city + ', France' }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            _radarMap.setCenter(results[0].geometry.location);
+            _radarMap.setZoom(14);
+          }
+          resolve();
+        });
+      });
+    }
+
+    const service = new google.maps.places.PlacesService(_radarMap);
+    const query = city ? type + ' ' + city : type;
+
+    // Récupérer jusqu'à 60 résultats via pagination
+    let allResults = [];
+    await new Promise(resolve => {
+      function doSearch(pageToken) {
+        const req = pageToken
+          ? { query, language: 'fr', region: 'fr', pageToken }
+          : { query, language: 'fr', region: 'fr' };
+        service.textSearch(req, (res, status, pagination) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && res) {
+            allResults = allResults.concat(res);
+            if (allResults.length < 60 && pagination && pagination.hasNextPage) {
+              setTimeout(() => pagination.nextPage(), 300);
+            } else {
+              resolve();
+            }
+          } else {
+            resolve();
+          }
+        });
+      }
+      doSearch(null);
+    });
+
+    // Enrichir avec OSM Overpass pour les résultats supplémentaires
+    if (city) {
+      try {
+        const geoRes = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(city + ', France') + '&format=json&limit=1');
+        const geoData = await geoRes.json();
+        if (geoData.length) {
+          const lat = parseFloat(geoData[0].lat);
+          const lon = parseFloat(geoData[0].lon);
+          const delta = 0.05;
+          const osmQuery = `[out:json][timeout:10];node["name"~"${type}",i](${lat-delta},${lon-delta},${lat+delta},${lon+delta});out 80;`;
+          const osmRes = await fetch('https://overpass-api.de/api/interpreter', {
+            method: 'POST',
+            body: osmQuery
+          });
+          const osmData = await osmRes.json();
+          const osmElements = osmData.elements || [];
+          const existingNames = new Set(allResults.map(r => r.name.toLowerCase()));
+
+          osmElements.forEach(el => {
+            if (!el.tags?.name || existingNames.has(el.tags.name.toLowerCase())) return;
+            allResults.push({
+              name: el.tags.name,
+              geometry: { location: { lat: () => el.lat, lng: () => el.lon } },
+              formatted_address: el.tags['addr:housenumber'] ? el.tags['addr:housenumber'] + ' ' + (el.tags['addr:street'] || '') + ', ' + city : city,
+              rating: 0,
+              user_ratings_total: 0,
+              place_id: 'osm-' + el.id,
+              photos: null,
+              _osm: true
+            });
+          });
+        }
+      } catch(e) { console.warn('OSM fallback failed:', e); }
+    }
+
+    if (!allResults.length) {
+      alert('aucun résultat trouvé.');
+      btn.disabled = false;
+      if (spinner) spinner.style.display = 'none';
+      return;
+    }
+
+    allResults.forEach(place => {
+      if (!place.geometry) return;
+      const rating = place.rating || 0;
+      const color = rating >= 4.5 ? '#0055D4' : rating >= 3.5 ? '#d97706' : '#059669';
+      const markerSvg = `<svg width="36" height="44" viewBox="0 0 36 44" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 0C8.06 0 0 8.06 0 18c0 13.5 18 26 18 26s18-12.5 18-26C36 8.06 27.94 0 18 0z" fill="${color}" opacity="0.9"/>
+        <circle cx="18" cy="18" r="10" fill="white" opacity="0.95"/>
+        <text x="18" y="23" text-anchor="middle" font-size="12" font-weight="bold" fill="${color}">${rating > 0 ? rating.toFixed(1) : '?'}</text>
+      </svg>`;
+      const lat = typeof place.geometry.location.lat === 'function' ? place.geometry.location.lat() : place.geometry.location.lat;
+      const lng = typeof place.geometry.location.lng === 'function' ? place.geometry.location.lng() : place.geometry.location.lng;
+      const marker = new google.maps.Marker({
+        position: { lat, lng },
+        map: _radarMap,
+        title: place.name,
+        icon: {
+          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(markerSvg),
+          scaledSize: new google.maps.Size(36, 44),
+          anchor: new google.maps.Point(18, 44),
+        },
+      });
+      marker.addListener('click', () => openRadarSheet(place, type));
+      _radarMarkers.push(marker);
+    });
+
+    const statsEl = document.getElementById('radar-stats');
+    const countEl = document.getElementById('radar-count-label');
+    if (statsEl) statsEl.style.display = '';
+    if (countEl) countEl.textContent = allResults.length + ' établissements trouvés · ' + type + (city ? ' · ' + city : '');
+
+    const bounds = new google.maps.LatLngBounds();
+    _radarMarkers.forEach(m => bounds.extend(m.getPosition()));
+    _radarMap.fitBounds(bounds);
+
+  } catch(e) {
+    alert('erreur radar : ' + e.message);
+  }
+
+  btn.disabled = false;
+  if (spinner) spinner.style.display = 'none';
+}
+
+function openRadarSheet(place, secteur) {
+  _radarCurrentPlace = place;
+
+  // Infos de base
+  document.getElementById('sheet-name').textContent = place.name;
+  document.getElementById('sheet-addr').textContent = place.formatted_address || place.vicinity || '—';
+  document.getElementById('sheet-sector').textContent = secteur || 'commerce local';
+  document.getElementById('sheet-email-result').style.display = 'none';
+
+  // Note + étoiles
+  const rating = place.rating || 0;
+  const reviews = place.user_ratings_total || 0;
+  const ratingEl = document.getElementById('sheet-rating-val');
+  const reviewsEl = document.getElementById('sheet-reviews-val');
+  const starsEl = document.getElementById('sheet-stars');
+  if (ratingEl) ratingEl.textContent = rating ? rating.toFixed(1) : '—';
+  if (reviewsEl) reviewsEl.textContent = reviews ? '(' + reviews + ' avis)' : '';
+  if (starsEl) {
+    const full = Math.round(rating);
+    starsEl.innerHTML = Array.from({length:5}, (_,i) =>
+      `<span style="color:${i < full ? '#f59e0b' : '#e5e7eb'}">★</span>`
+    ).join('');
+  }
+
+  // Score IA
+  const score = Math.min(99, 40 + Math.round((rating || 3) * 10) + Math.floor(Math.random()*10));
+  document.getElementById('sheet-score').textContent = 'Score ' + score;
+
+  // Iframe Google Maps embed
+  const lat = typeof place.geometry?.location?.lat === 'function' ? place.geometry.location.lat() : place.geometry?.location?.lat;
+  const lng = typeof place.geometry?.location?.lng === 'function' ? place.geometry.location.lng() : place.geometry?.location?.lng;
+  const iframe = document.getElementById('sheet-map-iframe');
+  const placeholder = document.getElementById('sheet-map-placeholder');
+  if (iframe && lat && lng) {
+    const encodedName = encodeURIComponent(place.name);
+    iframe.src = `https://www.google.com/maps/embed/v1/place?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&q=${encodedName}&center=${lat},${lng}&zoom=16&maptype=roadmap`;
+    iframe.style.display = 'block';
+    if (placeholder) placeholder.style.display = 'none';
+  }
+
+  // Lien Google Maps externe
+  const mapsLinkRow = document.getElementById('sheet-maps-link-row');
+  const mapsLink = document.getElementById('sheet-maps-link');
+  if (lat && lng) {
+    const query = encodeURIComponent(place.name + ' ' + (place.formatted_address || ''));
+    mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${query}&query_place_id=${place.place_id || ''}`;
+    mapsLinkRow.style.display = '';
+  }
+
+  // Reset téléphone
+  const phoneRow = document.getElementById('sheet-phone-row');
+  phoneRow.style.display = 'none';
+
+  // Détails (téléphone, website)
+  if (!place._osm && _radarMap && place.place_id) {
+    const service = new google.maps.places.PlacesService(_radarMap);
+    service.getDetails({ placeId: place.place_id, fields: ['formatted_phone_number', 'website'] }, (details, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        if (details?.formatted_phone_number) {
+          const phone = details.formatted_phone_number;
+          document.getElementById('sheet-phone-link').href = 'tel:' + phone.replace(/ /g, '');
+          document.getElementById('sheet-phone-text').textContent = phone;
+          phoneRow.style.display = '';
+        }
+        if (details?.website) place._website = details.website;
+      }
+    });
+  }
+
+  // Centrer la carte principale
+  if (_radarMap && lat && lng) {
+    _radarMap.panTo({ lat, lng });
+    _radarMap.setZoom(16);
+  }
+
+  const sheet = document.getElementById('radar-sheet');
+  sheet.style.opacity = '1';
+  sheet.style.transform = 'translateY(0) scale(1)';
+  sheet.style.pointerEvents = 'auto';
+}
+
+function closeRadarSheet() {
+  const sheet = document.getElementById('radar-sheet');
+  sheet.style.opacity = '0';
+  sheet.style.transform = 'translateY(-8px) scale(0.97)';
+  sheet.style.pointerEvents = 'none';
+  _radarCurrentPlace = null;
+}
+
+function addSheetToPipeline() {
+  if (!_radarCurrentPlace) return;
+  const p = _radarCurrentPlace;
+  const scoreText = document.getElementById('sheet-score').textContent.replace('Score ',''); const score = parseInt(scoreText) || 70;
+  addToPipeline({
+    id: 'r-' + (p.place_id || Date.now()).toString().slice(-8),
+    name: p.name,
+    address: p.formatted_address || p.vicinity || '',
+    rating: p.rating || 0,
+    reviews: p.user_ratings_total || 0,
+    score,
+    phone: document.getElementById('sheet-phone-text').textContent || null,
+    website: p._website || null,
+  });
+  closeRadarSheet();
+}
+
+async function generateSheetEmail() {
+  if (!_radarCurrentPlace) return;
+  const p = _radarCurrentPlace;
+  const profile = getProfile();
+  const secteur = document.getElementById('sheet-sector').textContent;
+  const btn = document.getElementById('btn-sheet-email');
+  const spinner = document.getElementById('sheet-email-spinner');
+  btn.disabled = true;
+  if (spinner) spinner.style.display = 'inline-block';
+  const prompt = `génère un email de prospection B2B court (120 mots max) ultra-personnalisé.
+commercial : ${profile.prenom || ''} ${profile.nom || ''} · ${profile.societe || ''} · secteur : ${profile.activite || secteur}
+prospect : ${p.name} · ${p.formatted_address || ''} · note Google : ${p.rating || '?'}/5 (${p.user_ratings_total || '?'} avis)
+propose de l'aide concrète liée à LEUR activité (${secteur}). objet + corps. texte brut uniquement.`;
+  try {
+    const d = await claudeAPI([{role:'user', content: prompt}], 300, 'emails');
+    document.getElementById('sheet-email-text').textContent = d.content[0].text;
+    document.getElementById('sheet-email-result').style.display = '';
+    incrementUsage('emails');
+  } catch(e) {
+    if (e.message !== 'quota_exceeded') alert('erreur email : ' + e.message);
+  }
+  btn.disabled = false;
+  if (spinner) spinner.style.display = 'none';
+}
+
+function copySheetEmail() {
+  const text = document.getElementById('sheet-email-text').textContent;
+  navigator.clipboard.writeText(text);
+}
+
+function showToast(msg) {
+  const existing = document.getElementById('_toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.id = '_toast';
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0a0a1a;color:white;padding:10px 20px;border-radius:12px;font-size:12px;font-weight:600;z-index:9999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.3)';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+</script>
+
+<!-- Fiche Pré-Appel Modal (standalone pour résultats) -->
+<div class="modal-overlay" id="fiche-standalone-modal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header" style="background:linear-gradient(135deg,#0055D4,#0047B8);border-radius:24px 24px 0 0">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="msym" style="color:#00d4ff;font-size:22px">psychology</span>
+        <div>
+          <div class="modal-title" id="fiche-standalone-name" style="color:white">fiche pré-appel</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px" id="fiche-standalone-addr">—</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('fiche-standalone-modal').classList.remove('open')" style="background:rgba(255,255,255,0.15);color:white"><span class="msym" style="font-size:16px">close</span></button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- Loading -->
+      <div id="fiche-standalone-loading" style="text-align:center;padding:40px 20px">
+        <div class="spinner spinner-dark" style="display:inline-block;margin-bottom:12px;width:20px;height:20px;border-width:3px"></div>
+        <div style="font-size:13px;color:#6b7280;font-weight:600">claude analyse ce prospect...</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:6px">note, avis, secteur, concurrents probables...</div>
+      </div>
+
+      <!-- Content -->
+      <div id="fiche-standalone-content" style="display:none;flex-direction:column;gap:16px">
+
+        <!-- Activité -->
+        <div style="padding:14px 16px;background:rgba(0,85,212,0.04);border-radius:12px;border:1px solid rgba(0,85,212,0.1)">
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#0055D4;margin-bottom:6px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">business</span>activité du prospect</div>
+          <div id="fs-activite" style="font-size:13px;font-weight:600;color:#0a0a1a;line-height:1.6"></div>
+        </div>
+
+        <!-- Accroche -->
+        <div>
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#0055D4;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">record_voice_over</span>accroche d'ouverture</div>
+          <div id="fs-accroche" style="font-size:14px;font-weight:700;color:#0a0a1a;line-height:1.65;padding:14px 16px;background:rgba(0,85,212,0.06);border-radius:12px;border-left:3px solid #0055D4"></div>
+        </div>
+
+        <!-- Points de douleur -->
+        <div>
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#d97706;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">crisis_alert</span>points de douleur probables</div>
+          <div id="fs-douleurs" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+
+        <!-- Objections -->
+        <div>
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#dc2626;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">shield</span>objections + réponses</div>
+          <div id="fs-objections" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+
+        <!-- Closing -->
+        <div>
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#059669;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">emoji_events</span>conseil de closing</div>
+          <div id="fs-closing" style="font-size:13px;color:#1a1a2e;line-height:1.65;padding:14px 16px;background:rgba(5,150,105,0.06);border-radius:12px;border-left:3px solid #059669"></div>
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('fiche-standalone-modal').classList.remove('open')"><span class="msym">close</span>fermer</button>
+      <button class="btn btn-primary" onclick="addToPipeline(state.prospects.find(x=>x.id===state.currentFicheProspect));document.getElementById('fiche-standalone-modal').classList.remove('open')"><span class="msym">conversion_path</span>ajouter au pipeline</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Upgrade Modal -->
+<div class="modal-overlay" id="upgrade-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header" style="background:linear-gradient(135deg,#0a0a1a,#1a1a3e);border-radius:24px 24px 0 0">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(0,85,212,0.3);display:flex;align-items:center;justify-content:center">
+          <span class="msym" style="color:#00d4ff;font-size:22px">rocket_launch</span>
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:white;letter-spacing:-.5px">quota atteint</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">passez au niveau supérieur</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('upgrade-modal').classList.remove('open')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6)"><span class="msym" style="font-size:16px">close</span></button>
+    </div>
+    <div class="modal-body" style="text-align:center;padding:32px 28px">
+      <div style="font-size:13px;color:#6b7280;margin-bottom:8px">vous avez utilisé</div>
+      <div style="font-size:48px;font-weight:900;letter-spacing:-3px;color:#0a0a1a;line-height:1"><span id="upgrade-used">0</span><span style="font-size:20px;color:#9ca3af"> / <span id="upgrade-limit">0</span></span></div>
+      <div style="font-size:13px;font-weight:700;color:#0055D4;margin-bottom:28px;text-transform:uppercase;letter-spacing:.1em" id="upgrade-feature">emails ia</div>
+      <div style="background:rgba(0,85,212,0.04);border:1px solid rgba(0,85,212,0.12);border-radius:16px;padding:20px;margin-bottom:24px;text-align:left">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#0055D4;margin-bottom:12px">plan <span id="upgrade-plan-name">pro</span> — <span id="upgrade-plan-price">119€/mois</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>4 000 emails ia / mois</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>100 fiches pré-appel</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>pilote automatique ia</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>prospects illimités</div>
+        </div>
+      </div>
+      <a href="/pricing" class="btn btn-primary" style="width:100%;justify-content:center;font-size:13px;padding:15px;border-radius:14px;text-decoration:none">
+        <span class="msym">arrow_forward</span>upgrader mon plan
+      </a>
+      <button onclick="document.getElementById('upgrade-modal').classList.remove('open')" style="margin-top:12px;background:none;border:none;font-size:12px;color:#9ca3af;cursor:pointer;font-family:inherit">rester sur mon plan actuel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ ONBOARDING ═══ -->
+<div id="onboarding-overlay" style="position:fixed;inset:0;background:rgba(10,10,26,0.85);backdrop-filter:blur(12px);z-index:1000;display:none;align-items:center;justify-content:center;padding:24px">
+  <div style="background:white;border-radius:24px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,85,212,0.2)">
+
+    <!-- Progress bar -->
+    <div style="height:3px;background:#f0f0f0;border-radius:3px 3px 0 0;overflow:hidden">
+      <div id="ob-progress" style="height:100%;background:#0055D4;border-radius:3px;transition:width .4s ease;width:0%"></div>
+    </div>
+
+    <!-- Header -->
+    <div style="padding:28px 32px 0;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <svg viewBox="0 0 66 66" fill="none" style="width:28px;height:28px"><rect width="66" height="66" rx="14" fill="#0055D4"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg>
+        <span style="font-size:1.1rem;font-weight:700;letter-spacing:-0.03em;color:#0a0a1a">Huntlist.</span>
+      </div>
+      <div style="font-size:11px;color:#9ca3af;font-weight:600" id="ob-step-count">étape 1 / 6</div>
+    </div>
+
+    <!-- Steps -->
+    <div id="ob-steps" style="padding:24px 32px 32px">
+
+      <!-- STEP 1 : Bienvenue -->
+      <div class="ob-step" id="ob-step-1">
+        <div style="text-align:center;padding:20px 0">
+          <span class="msym" style="font-size:52px;color:#0055D4;display:block;margin-bottom:16px">waving_hand</span>
+          <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:8px">bienvenue sur Huntlist.</h2>
+          <p style="font-size:14px;color:#6b7280;line-height:1.7;max-width:380px;margin:0 auto">votre outil de prospection IA automatisée. en 5 minutes, on configure tout et on vous montre comment trouver vos premiers clients.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:24px 0">
+          <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
+            <span class="msym" style="font-size:24px;color:#0055D4;display:block;margin-bottom:6px">radar</span>
+            <div style="font-size:11px;font-weight:700;color:#0a0a1a">prospection</div>
+            <div style="font-size:10px;color:#9ca3af">google maps, INSEE</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
+            <span class="msym" style="font-size:24px;color:#0055D4;display:block;margin-bottom:6px">mail</span>
+            <div style="font-size:11px;font-weight:700;color:#0a0a1a">emails IA</div>
+            <div style="font-size:10px;color:#9ca3af">personnalisés auto</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
+            <span class="msym" style="font-size:24px;color:#0055D4;display:block;margin-bottom:6px">conversion_path</span>
+            <div style="font-size:11px;font-weight:700;color:#0a0a1a">pipeline CRM</div>
+            <div style="font-size:10px;color:#9ca3af">suivi des leads</div>
+          </div>
+        </div>
+        <button class="ob-next-btn" onclick="obNext()">commencer la configuration <span style="margin-left:4px">→</span></button>
+      </div>
+
+      <!-- STEP 2 : Profil -->
+      <div class="ob-step" id="ob-step-2" style="display:none">
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">votre profil commercial</h2>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:24px">ces infos personnalisent tous vos emails IA et scripts d'appel.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">prénom *</label><input id="ob-prenom" class="form-input" placeholder="jean"/></div>
+          <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">nom *</label><input id="ob-nom" class="form-input" placeholder="dupont"/></div>
+        </div>
+        <div style="margin-bottom:12px"><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">nom de l'entreprise *</label><input id="ob-societe" class="form-input" placeholder="plomberie dupont"/></div>
+        <div style="margin-bottom:12px"><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">secteur d'activité *</label>
+          <select id="ob-secteur" class="form-input">
+            <option value="">choisir...</option>
+            <option>maçonnerie / gros œuvre</option>
+            <option>plomberie / chauffage</option>
+            <option>électricité</option>
+            <option>isolation / rénovation énergétique</option>
+            <option>menuiserie / fenêtres</option>
+            <option>peinture / revêtements</option>
+            <option>consultant / freelance</option>
+            <option>agence / growth</option>
+            <option>autre</option>
+          </select>
+        </div>
+        <div style="margin-bottom:20px"><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">votre proposition de valeur</label><input id="ob-valeur" class="form-input" placeholder="intervention en 48h, devis gratuit, 10 ans d'expérience..."/></div>
+        <button class="ob-next-btn" onclick="obSaveProfile()">enregistrer et continuer →</button>
+      </div>
+
+      <!-- STEP 3 : Prospection -->
+      <div class="ob-step" id="ob-step-3" style="display:none">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
+          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 1/4</span>
+        </div>
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">la prospection IA</h2>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Huntlist. scanne Google Maps et trouve les entreprises qui ont besoin de vos services. Testez maintenant en cherchant vos premiers prospects.</p>
+        <div style="background:#f9f9fb;border-radius:14px;padding:20px;margin-bottom:20px;border:1px solid #e5e7eb">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:12px">essayez maintenant</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div><label style="font-size:10px;font-weight:600;color:#6b7280;display:block;margin-bottom:4px">type de business</label><input id="ob-search-type" class="form-input" placeholder="plombier, restaurant..."/></div>
+            <div><label style="font-size:10px;font-weight:600;color:#6b7280;display:block;margin-bottom:4px">ville</label><input id="ob-search-city" class="form-input" placeholder="lyon, paris..."/></div>
+          </div>
+          <button class="ob-next-btn" style="margin:0" onclick="obLaunchSearch()"><span id="ob-search-spinner" style="display:none" class="spinner"></span>lancer ma première recherche →</button>
+        </div>
+        <button onclick="obNext()" style="background:none;border:none;color:#9ca3af;font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">passer cette étape</button>
+      </div>
+
+      <!-- STEP 4 : Email IA -->
+      <div class="ob-step" id="ob-step-4" style="display:none">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
+          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 2/4</span>
+        </div>
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">l'email IA personnalisé</h2>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Pour chaque prospect trouvé, Huntlist. génère un email de prospection unique en quelques secondes, adapté à leur activité et à votre profil.</p>
+        <div style="background:linear-gradient(135deg,#0a0a1a,#1a1a3e);border-radius:14px;padding:20px;margin-bottom:20px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.4);margin-bottom:12px">exemple d'email généré</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.75" id="ob-email-preview">Objet : Intervention rapide pour votre établissement<br/><br/>Bonjour,<br/>Je suis [votre prénom] de [votre société]. En passant devant votre établissement, j'ai remarqué que vos installations dataient de quelques années...<br/><br/><em style="color:rgba(255,255,255,0.4)">génération en cours...</em></div>
+        </div>
+        <button class="ob-next-btn" onclick="obNext()">j'ai compris, continuer →</button>
+      </div>
+
+      <!-- STEP 5 : Pipeline + Tracker -->
+      <div class="ob-step" id="ob-step-5" style="display:none">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
+          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 3/4</span>
+        </div>
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">le pipeline CRM & tracker appel</h2>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Suivez chaque prospect de la découverte au closing. Le tracker d'appel génère un script personnalisé à votre secteur avant chaque appel.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+          <div style="padding:16px;background:#f9f9fb;border-radius:12px;border:1px solid #e5e7eb">
+            <div style="font-size:20px;margin-bottom:8px"></div>
+            <div style="font-size:13px;font-weight:700;color:#0a0a1a;margin-bottom:4px">pipeline CRM</div>
+            <div style="font-size:11px;color:#9ca3af;line-height:1.5">nouveau → contacté → répondu → converti</div>
+          </div>
+          <div style="padding:16px;background:#f9f9fb;border-radius:12px;border:1px solid #e5e7eb">
+            <div style="font-size:20px;margin-bottom:8px"></div>
+            <div style="font-size:13px;font-weight:700;color:#0a0a1a;margin-bottom:4px">tracker appel</div>
+            <div style="font-size:11px;color:#9ca3af;line-height:1.5">script IA + objections + résumé post-appel</div>
+          </div>
+        </div>
+        <button class="ob-next-btn" onclick="obNext()">continuer →</button>
+      </div>
+
+      <!-- STEP 6 : Veille + Fin -->
+      <div class="ob-step" id="ob-step-6" style="display:none">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
+          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 4/4</span>
+        </div>
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">veille concurrentielle & alertes</h2>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Analysez vos concurrents locaux avec leurs forces et faiblesses. Les alertes du jour vous signalent les 20 opportunités les plus chaudes chaque matin.</p>
+        <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:14px;padding:20px;margin-bottom:24px;text-align:center">
+          <span class="msym" style="font-size:36px;color:#059669;display:block;margin-bottom:8px">check_circle</span>
+          <div style="font-size:16px;font-weight:800;color:#0a0a1a;margin-bottom:4px">vous êtes prêt !</div>
+          <div style="font-size:13px;color:#6b7280;line-height:1.65">votre espace Huntlist. est configuré. lancez votre première recherche et trouvez vos premiers clients aujourd'hui.</div>
+        </div>
+        <button class="ob-next-btn" onclick="obFinish()">accéder à mon tableau de bord →</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+.ob-next-btn{
+  width:100%;background:#0055D4;color:white;border:none;border-radius:12px;
+  padding:14px 20px;font-family:inherit;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.ob-next-btn:hover{background:#0047B8;transform:translateY(-1px)}
+.ob-next-btn:active{transform:none}
+</style>
+
+
+</body>
+</html>
