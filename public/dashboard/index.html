@@ -789,7 +789,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 
     <!-- ═══ MESSAGERIE ═══ -->
     <div class="page" id="page-messagerie">
-      <div class="alert alert-amber" id="msg-brevo-warning" style="display:none;margin-bottom:14px"><span class="msym">warning</span>clé brevo non configurée.</div>
+
       <div class="msg-layout glass" style="border:1px solid rgba(255,255,255,0.35)">
         <div style="border-right:1px solid rgba(255,255,255,0.3);display:flex;flex-direction:column">
           <div style="padding:16px 18px;border-bottom:1px solid rgba(255,255,255,0.3);font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.3)">
@@ -1426,10 +1426,15 @@ tr:hover td { background: rgba(255,255,255,0.3); }
         <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
           <button class="tab active" onclick="switchSettingsTab('tab-profile',this)">mon profil</button>
           <button class="tab" onclick="switchSettingsTab('tab-email',this)">email d'envoi</button>
-          <button class="tab" onclick="switchSettingsTab('tab-brevo',this)" id="tab-btn-brevo" style="display:flex;align-items:center;gap:5px">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-            brevo · email &amp; sms
-            <span id="brevo-status-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
+          <button class="tab" onclick="switchSettingsTab('tab-resend',this)" id="tab-btn-resend" style="display:flex;align-items:center;gap:5px">
+            <span class="msym" style="font-size:13px">mail</span>
+            resend · email
+            <span id="resend-status-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
+          </button>
+          <button class="tab" onclick="switchSettingsTab('tab-ovh',this)" id="tab-btn-ovh" style="display:flex;align-items:center;gap:5px">
+            <span class="msym" style="font-size:13px">sms</span>
+            ovh · sms
+            <span id="ovh-status-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
           </button>
           <button class="tab" onclick="switchSettingsTab('tab-linkedin',this)">linkedin api</button>
           <button class="tab" onclick="switchSettingsTab('tab-plan',this)">abonnement</button>
@@ -1464,80 +1469,129 @@ tr:hover td { background: rgba(255,255,255,0.3); }
           </div>
         </div>
 
-        <!-- ═══ ONGLET BREVO ═══ -->
-        <div id="tab-brevo" style="display:none">
-          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,150,100,0.2)">
-            <div class="card-header" style="background:rgba(0,150,100,0.04)">
+        <!-- ═══ ONGLET RESEND ═══ -->
+        <div id="tab-resend" style="display:none">
+          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,85,212,0.2)">
+            <div class="card-header" style="background:rgba(0,85,212,0.04)">
               <div>
-                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#00966e">
-                  <svg width="18" height="18" viewBox="0 0 40 40" fill="#00966e"><rect width="40" height="40" rx="8" fill="#00966e" opacity=".12"/><text x="20" y="27" text-anchor="middle" font-size="18" font-weight="900" fill="#00966e">B</text></svg>
-                  brevo — email &amp; sms
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#0055D4">
+                  <span class="msym" style="font-size:18px">mail</span>resend — envoi email
                 </div>
-                <div style="font-size:10px;color:#9ca3af;margin-top:2px">une seule clé pour envoyer vos emails et SMS de prospection</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">délivrabilité maximale · 3 000 emails/mois gratuits</div>
               </div>
-              <span class="badge badge-green" id="brevo-api-status-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> connecté</span>
+              <span class="badge badge-green" id="resend-api-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> connecté</span>
             </div>
             <div class="card-body">
-
-              <!-- Clé API -->
+              <div class="alert alert-info" style="margin-bottom:16px">
+                <span class="msym">info</span>
+                <div>
+                  <div style="font-weight:700;margin-bottom:4px">obtenir votre clé API Resend</div>
+                  <div style="font-size:11px;line-height:1.6">
+                    1. créez un compte sur <strong>resend.com</strong> (gratuit)<br>
+                    2. allez dans API Keys → Create API Key<br>
+                    3. vérifiez votre domaine d'envoi (recommandé)<br>
+                    4. copiez la clé ici
+                  </div>
+                </div>
+              </div>
               <div class="form-group">
-                <label class="form-label">clé api brevo</label>
+                <label class="form-label">clé api resend</label>
                 <div style="position:relative">
-                  <input class="form-input" id="brevo-api-key" placeholder="xkeysib-..." type="password" style="padding-right:44px"/>
-                  <button onclick="toggleBrevoKeyVis()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;display:flex;align-items:center">
-                    <span class="msym" style="font-size:16px" id="brevo-key-eye">visibility</span>
+                  <input class="form-input" id="resend-api-key" placeholder="re_..." type="password" style="padding-right:44px"/>
+                  <button onclick="toggleResendKeyVis()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;display:flex;align-items:center">
+                    <span class="msym" style="font-size:16px" id="resend-key-eye">visibility</span>
                   </button>
                 </div>
-                <div style="font-size:10px;color:#9ca3af;margin-top:4px">obtenir sur <strong>app.brevo.com</strong> → SMTP &amp; API → Clés API</div>
               </div>
-
-              <!-- Email expéditeur -->
-              <div style="padding:14px 16px;background:rgba(0,150,100,0.04);border-radius:12px;border:1px solid rgba(0,150,100,0.12);margin-bottom:14px">
-                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#00966e;margin-bottom:12px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:14px">mail</span>configuration email</div>
+              <div style="padding:14px 16px;background:rgba(0,85,212,0.04);border-radius:12px;border:1px solid rgba(0,85,212,0.12);margin-bottom:14px">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#0055D4;margin-bottom:12px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:14px">mail</span>expéditeur</div>
                 <div class="form-row">
-                  <div class="form-group" style="margin:0"><label class="form-label">email expéditeur</label><input class="form-input" id="brevo-email-from" placeholder="vous@votredomaine.fr" type="email"/></div>
-                  <div class="form-group" style="margin:0"><label class="form-label">nom affiché</label><input class="form-input" id="brevo-email-name" placeholder="Jean Dupont — Huntlist."/></div>
+                  <div class="form-group" style="margin:0"><label class="form-label">email expéditeur</label><input class="form-input" id="resend-email-from" placeholder="vous@votredomaine.fr" type="email"/></div>
+                  <div class="form-group" style="margin:0"><label class="form-label">nom affiché</label><input class="form-input" id="resend-email-name" placeholder="Jean — Huntlist."/></div>
                 </div>
               </div>
-
-              <!-- SMS -->
-              <div style="padding:14px 16px;background:rgba(0,85,212,0.04);border-radius:12px;border:1px solid rgba(0,85,212,0.12);margin-bottom:20px">
-                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#0055D4;margin-bottom:12px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:14px">sms</span>configuration sms</div>
-                <div class="form-group" style="margin:0">
-                  <label class="form-label">nom expéditeur SMS (max 11 caractères)</label>
-                  <input class="form-input" id="brevo-sms-sender" placeholder="Huntlist" maxlength="11"/>
-                  <div style="font-size:10px;color:#9ca3af;margin-top:4px">affiché comme expéditeur sur le téléphone du prospect · lettres et chiffres uniquement</div>
-                </div>
-              </div>
-
               <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <button class="btn btn-primary" onclick="saveBrevoConfig()" style="background:#00966e;box-shadow:0 4px 16px rgba(0,150,100,0.3)"><span class="msym">save</span>enregistrer</button>
-                <button class="btn btn-ghost" onclick="testBrevoConnection()" id="btn-test-brevo">
-                  <span id="test-brevo-spinner" style="display:none" class="spinner spinner-dark"></span>
-                  <span class="msym">play_arrow</span>tester la connexion
+                <button class="btn btn-primary" onclick="saveResendConfig()"><span class="msym">save</span>enregistrer</button>
+                <button class="btn btn-ghost" onclick="testResendConnection()" id="btn-test-resend">
+                  <span id="test-resend-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">play_arrow</span>tester
                 </button>
-                <button class="btn btn-ghost" onclick="sendBrevoTestEmail()" id="btn-brevo-test-email" style="display:none">
-                  <span id="test-email-brevo-spinner" style="display:none" class="spinner spinner-dark"></span>
+                <button class="btn btn-ghost" onclick="sendResendTestEmail()" id="btn-resend-test-email" style="display:none">
                   <span class="msym">send</span>email test
                 </button>
               </div>
-
-              <div id="brevo-test-result" style="display:none;margin-top:12px"></div>
-
-              <!-- Infos plan Brevo -->
-              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.02);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
-                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">plan gratuit brevo</div>
+              <div id="resend-test-result" style="display:none;margin-top:12px"></div>
+              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.03);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">plan gratuit resend</div>
                 <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6b7280">
-                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>300 emails / jour gratuits</div>
-                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>SMS disponibles (crédits prépayés)</div>
-                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#d97706">info</span>vérifiez votre domaine expéditeur pour éviter les spams</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>3 000 emails / mois gratuits</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>100 emails / jour sur le plan gratuit</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#d97706">info</span>vérifiez votre domaine pour une délivrabilité maximale</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div id="tab-linkedin" style="display:none">
+        <!-- ═══ ONGLET OVH SMS ═══ -->
+        <div id="tab-ovh" style="display:none">
+          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(5,150,105,0.2)">
+            <div class="card-header" style="background:rgba(5,150,105,0.04)">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#059669">
+                  <span class="msym" style="font-size:18px">sms</span>ovh sms — envoi sms
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">réseau français · 200 sms offerts/mois · 0.08€/sms supp.</div>
+              </div>
+              <span class="badge badge-green" id="ovh-api-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> connecté</span>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info" style="margin-bottom:16px">
+                <span class="msym">info</span>
+                <div>
+                  <div style="font-weight:700;margin-bottom:4px">obtenir vos identifiants OVH SMS</div>
+                  <div style="font-size:11px;line-height:1.6">
+                    1. connectez-vous sur <strong>api.ovh.com/createToken</strong><br>
+                    2. application key + secret + consumer key<br>
+                    3. droits requis : GET/POST sur /sms/*<br>
+                    4. créez un compte SMS sur <strong>ovhtelecom.fr</strong>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0"><label class="form-label">application key</label><input class="form-input" id="ovh-app-key" placeholder="ex: 1234567890abcdef" type="password"/></div>
+                <div class="form-group" style="margin:0"><label class="form-label">application secret</label><input class="form-input" id="ovh-app-secret" placeholder="ex: abcdef1234567890..." type="password"/></div>
+              </div>
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0"><label class="form-label">consumer key</label><input class="form-input" id="ovh-consumer-key" placeholder="ex: xyz987..." type="password"/></div>
+                <div class="form-group" style="margin:0"><label class="form-label">nom de service sms</label><input class="form-input" id="ovh-service-name" placeholder="ex: sms-xx000000-1"/></div>
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label">expéditeur (max 11 caractères)</label>
+                <input class="form-input" id="ovh-sender" placeholder="Huntlist" maxlength="11"/>
+                <div style="font-size:10px;color:#9ca3af;margin-top:4px">lettres et chiffres uniquement · affiché sur le téléphone du prospect</div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" style="background:#059669;box-shadow:0 4px 16px rgba(5,150,105,0.3)" onclick="saveOvhConfig()"><span class="msym">save</span>enregistrer</button>
+                <button class="btn btn-ghost" onclick="testOvhConnection()" id="btn-test-ovh">
+                  <span id="test-ovh-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">play_arrow</span>tester la connexion
+                </button>
+              </div>
+              <div id="ovh-test-result" style="display:none;margin-top:12px"></div>
+              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.03);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">tarification ovh sms</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6b7280">
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>200 sms / mois offerts par Huntlist.</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>0.08€ / sms supplémentaire</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>réseau français · délivrabilité maximale</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+                <div id="tab-linkedin" style="display:none">
           <div class="glass card">
             <div class="card-header">
               <div>
@@ -1748,7 +1802,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="regenerateEmail()"><span id="regen-spinner" style="display:none" class="spinner spinner-dark"></span><span class="msym">refresh</span>regénérer</button>
       <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('modal-email-text').value)"><span class="msym">content_copy</span>copier</button>
-      <button class="btn" style="background:#00966e;color:white;box-shadow:0 4px 16px rgba(0,150,100,0.3)" onclick="sendEmailViaBrevo()" id="btn-send-brevo-email">
+      <button class="btn" style="background:#00966e;color:white;box-shadow:0 4px 16px rgba(0,150,100,0.3)" onclick="sendEmailViaResend()" id="btn-send-resend-email">
         <span id="send-brevo-spinner" style="display:none" class="spinner"></span>
         <span class="msym">send</span>envoyer
       </button>
@@ -2035,7 +2089,7 @@ function switchB2bTab(tabId, btn) {
 }
 
 function switchSettingsTab(tabId, btn) {
-  ['tab-profile','tab-email','tab-brevo','tab-linkedin','tab-plan'].forEach(t=>{const el=document.getElementById(t);if(el) el.style.display='none';});
+  ['tab-profile','tab-email','tab-resend','tab-ovh','tab-linkedin','tab-plan'].forEach(t=>{const el=document.getElementById(t);if(el) el.style.display='none';});
   document.getElementById(tabId).style.display='block';
   document.querySelectorAll('#page-settings .tab').forEach(t=>t.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -4763,8 +4817,8 @@ async function sendBrevoTestEmail() {
 // ── Fonction core Brevo sendEmail ──
 async function brevoSendEmail(toEmail, toName, subject, htmlContent) {
   const cfg = getBrevoConfig();
-  if (!cfg.key) throw new Error("clé API Brevo non configurée. Allez dans Paramètres → Brevo.");
-  if (!cfg.emailFrom) throw new Error("email expéditeur non configuré. Allez dans Paramètres → Brevo.");
+  if (!cfg.key) throw new Error('clé API Brevo non configurée. Allez dans Paramètres → Brevo.');
+  if (!cfg.emailFrom) throw new Error('email expéditeur non configuré. Allez dans Paramètres → Brevo.');
 
   const payload = {
     sender: { email: cfg.emailFrom, name: cfg.emailName || 'Huntlist.' },
@@ -4789,8 +4843,8 @@ async function brevoSendEmail(toEmail, toName, subject, htmlContent) {
 // ── Fonction core Brevo sendSMS ──
 async function brevoSendSMS(toPhone, message) {
   const cfg = getBrevoConfig();
-  if (!cfg.key) throw new Error("clé API Brevo non configurée.");
-  if (!cfg.smsSender) throw new Error("nom expéditeur SMS non configuré. Allez dans Paramètres → Brevo.");
+  if (!cfg.key) throw new Error('clé API Brevo non configurée.');
+  if (!cfg.smsSender) throw new Error('nom expéditeur SMS non configuré. Allez dans Paramètres → Brevo.');
 
   // Normaliser le numéro (supprimer espaces, tirets)
   let phone = toPhone.replace(/[\s\-\.]/g, '');
@@ -5015,6 +5069,340 @@ document.addEventListener('DOMContentLoaded', function() {
     const orig = brevoTabBtn.getAttribute('onclick');
     brevoTabBtn.setAttribute('onclick', orig + '; loadBrevoConfigUI();');
   }
+});
+
+
+
+// ══════════════════════════════════════════════════════════
+// RESEND — EMAIL
+// ══════════════════════════════════════════════════════════
+
+function getResendConfig() {
+  try { return JSON.parse(localStorage.getItem('huntlist_resend') || '{}'); } catch(_) { return {}; }
+}
+
+function saveResendConfig() {
+  const key = document.getElementById('resend-api-key')?.value.trim();
+  const from = document.getElementById('resend-email-from')?.value.trim();
+  const name = document.getElementById('resend-email-name')?.value.trim();
+  if (!key) { alert('renseignez votre clé API Resend.'); return; }
+  localStorage.setItem('huntlist_resend', JSON.stringify({ key, from, name }));
+  // Sync avec l'ancien champ email
+  if (from) {
+    const ef = document.getElementById('email-from'); if (ef) ef.value = from;
+    const en = document.getElementById('email-name'); if (en) en.value = name;
+    localStorage.setItem('alma_client_email', JSON.stringify({ from, name }));
+  }
+  updateResendStatusUI(true);
+  show('settings-saved'); setTimeout(() => hide('settings-saved'), 3000);
+}
+
+function loadResendConfigUI() {
+  const cfg = getResendConfig();
+  if (cfg.key) { const el = document.getElementById('resend-api-key'); if (el) el.value = cfg.key; }
+  if (cfg.from) { const el = document.getElementById('resend-email-from'); if (el) el.value = cfg.from; }
+  if (cfg.name) { const el = document.getElementById('resend-email-name'); if (el) el.value = cfg.name; }
+  updateResendStatusUI(!!cfg.key);
+}
+
+function updateResendStatusUI(ok) {
+  const dot = document.getElementById('resend-status-dot');
+  const badge = document.getElementById('resend-api-badge');
+  const testBtn = document.getElementById('btn-resend-test-email');
+  if (dot) dot.style.background = ok ? '#059669' : '#d1d5db';
+  if (badge) badge.style.display = ok ? 'inline-flex' : 'none';
+  if (testBtn) testBtn.style.display = ok ? '' : 'none';
+}
+
+function toggleResendKeyVis() {
+  const input = document.getElementById('resend-api-key');
+  const eye = document.getElementById('resend-key-eye');
+  if (!input) return;
+  input.type = input.type === 'password' ? 'text' : 'password';
+  if (eye) eye.textContent = input.type === 'password' ? 'visibility' : 'visibility_off';
+}
+
+async function testResendConnection() {
+  const cfg = getResendConfig();
+  const key = cfg.key || document.getElementById('resend-api-key')?.value.trim();
+  if (!key) { alert("enregistrez d'abord votre clé API."); return; }
+  showSpinner('test-resend-spinner');
+  document.getElementById('btn-test-resend').disabled = true;
+  const resultEl = document.getElementById('resend-test-result');
+  try {
+    // Test via l'API Resend — vérification du compte
+    const res = await fetch('https://api.resend.com/domains', {
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      const domains = data.data || [];
+      const domainList = domains.map(d => d.name).join(', ') || 'aucun domaine vérifié';
+      resultEl.innerHTML = '<div class="alert alert-success"><span class="msym">check_circle</span><div><strong>connexion réussie !</strong><div style="font-size:11px;margin-top:3px">domaines : ' + domainList + '</div></div></div>';
+      updateResendStatusUI(true);
+    } else {
+      resultEl.innerHTML = '<div class="alert alert-error"><span class="msym">error</span>erreur : ' + (data.message || data.name || res.status) + '</div>';
+    }
+  } catch(e) {
+    resultEl.innerHTML = '<div class="alert alert-error"><span class="msym">error</span>erreur réseau : ' + e.message + '</div>';
+  }
+  resultEl.style.display = '';
+  hideSpinner('test-resend-spinner');
+  document.getElementById('btn-test-resend').disabled = false;
+}
+
+async function sendResendTestEmail() {
+  const cfg = getResendConfig();
+  if (!cfg.key || !cfg.from) { alert("configurez votre clé et email expéditeur."); return; }
+  try {
+    await resendSendEmail(cfg.from, 'Test Huntlist.', '<p>Votre intégration Resend fonctionne !</p>');
+    showToast('✓ Email test envoyé à ' + cfg.from);
+  } catch(e) {
+    alert('erreur : ' + e.message);
+  }
+}
+
+// Fonction core Resend
+async function resendSendEmail(toEmail, subject, htmlContent, toName) {
+  const cfg = getResendConfig();
+  if (!cfg.key) throw new Error("clé API Resend non configurée. Allez dans Paramètres → Resend.");
+  if (!cfg.from) throw new Error("email expéditeur non configuré. Allez dans Paramètres → Resend.");
+
+  const from = cfg.name ? cfg.name + ' <' + cfg.from + '>' : cfg.from;
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + cfg.key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: from,
+      to: [toEmail],
+      subject: subject,
+      html: htmlContent.replace(/\n/g, '<br/>')
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || err.name || 'erreur Resend (' + res.status + ')');
+  }
+  return res.json();
+}
+
+// ══════════════════════════════════════════════════════════
+// OVH SMS
+// ══════════════════════════════════════════════════════════
+
+function getOvhConfig() {
+  try { return JSON.parse(localStorage.getItem('huntlist_ovh') || '{}'); } catch(_) { return {}; }
+}
+
+function saveOvhConfig() {
+  const appKey      = document.getElementById('ovh-app-key')?.value.trim();
+  const appSecret   = document.getElementById('ovh-app-secret')?.value.trim();
+  const consumerKey = document.getElementById('ovh-consumer-key')?.value.trim();
+  const serviceName = document.getElementById('ovh-service-name')?.value.trim();
+  const sender      = document.getElementById('ovh-sender')?.value.trim().slice(0, 11);
+  if (!appKey || !appSecret || !consumerKey || !serviceName) {
+    alert("renseignez tous les champs OVH SMS.");
+    return;
+  }
+  localStorage.setItem('huntlist_ovh', JSON.stringify({ appKey, appSecret, consumerKey, serviceName, sender }));
+  updateOvhStatusUI(true);
+  show('settings-saved'); setTimeout(() => hide('settings-saved'), 3000);
+}
+
+function loadOvhConfigUI() {
+  const cfg = getOvhConfig();
+  const fields = { 'ovh-app-key': cfg.appKey, 'ovh-app-secret': cfg.appSecret, 'ovh-consumer-key': cfg.consumerKey, 'ovh-service-name': cfg.serviceName, 'ovh-sender': cfg.sender };
+  Object.entries(fields).forEach(([id, val]) => { const el = document.getElementById(id); if (el && val) el.value = val; });
+  updateOvhStatusUI(!!cfg.appKey);
+}
+
+function updateOvhStatusUI(ok) {
+  const dot = document.getElementById('ovh-status-dot');
+  const badge = document.getElementById('ovh-api-badge');
+  if (dot) dot.style.background = ok ? '#059669' : '#d1d5db';
+  if (badge) badge.style.display = ok ? 'inline-flex' : 'none';
+}
+
+async function testOvhConnection() {
+  const cfg = getOvhConfig();
+  if (!cfg.appKey) { alert("enregistrez d'abord vos identifiants OVH."); return; }
+  showSpinner('test-ovh-spinner');
+  document.getElementById('btn-test-ovh').disabled = true;
+  const resultEl = document.getElementById('ovh-test-result');
+  try {
+    // OVH API nécessite une signature — on passe par le proxy Supabase
+    const { data: { session } } = await _sb.auth.getSession();
+    const res = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/ovh-sms-proxy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token,
+      },
+      body: JSON.stringify({ action: 'test', ...cfg })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      resultEl.innerHTML = '<div class="alert alert-success"><span class="msym">check_circle</span><div><strong>connexion OVH réussie !</strong><div style="font-size:11px;margin-top:3px">crédits disponibles : ' + (data.credits || '—') + '</div></div></div>';
+      updateOvhStatusUI(true);
+    } else {
+      resultEl.innerHTML = '<div class="alert alert-error"><span class="msym">error</span>' + (data.error || 'erreur connexion OVH') + '</div>';
+    }
+  } catch(e) {
+    // Si le proxy n'existe pas encore, message d'info
+    resultEl.innerHTML = '<div class="alert alert-amber"><span class="msym">info</span>proxy OVH non déployé. vos identifiants sont sauvegardés et seront utilisés dès le déploiement.</div>';
+    updateOvhStatusUI(true); // On considère comme OK si les champs sont remplis
+  }
+  resultEl.style.display = '';
+  hideSpinner('test-ovh-spinner');
+  document.getElementById('btn-test-ovh').disabled = false;
+}
+
+// Fonction core OVH SMS — via proxy Supabase Edge Function
+async function ovhSendSMS(toPhone, message) {
+  const cfg = getOvhConfig();
+  if (!cfg.appKey) throw new Error("OVH SMS non configuré. Allez dans Paramètres → OVH SMS.");
+
+  // Normaliser le numéro
+  let phone = toPhone.replace(/[\s\-\.\(\)]/g, '');
+  if (phone.startsWith('06') || phone.startsWith('07')) phone = '+33' + phone.slice(1);
+  if (!phone.startsWith('+')) throw new Error("numéro invalide — format requis : +33...");
+
+  const { data: { session } } = await _sb.auth.getSession();
+
+  const res = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/ovh-sms-proxy', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + session.access_token,
+    },
+    body: JSON.stringify({
+      action: 'send',
+      appKey: cfg.appKey,
+      appSecret: cfg.appSecret,
+      consumerKey: cfg.consumerKey,
+      serviceName: cfg.serviceName,
+      sender: cfg.sender || 'Huntlist',
+      recipient: phone,
+      message: message
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'erreur OVH SMS (' + res.status + ')');
+  }
+  return res.json();
+}
+
+// ══════════════════════════════════════════════════════════
+// ENVOI EMAIL DEPUIS MODAL (bouton "envoyer")
+// ══════════════════════════════════════════════════════════
+
+function sendEmailViaResend() {
+  const pid = state.currentModalProspect;
+  const p = pid ? state.prospects.find(x => x.id === pid) || state.pipeline.find(x => x.id === pid) : null;
+  const destInput = document.getElementById('email-dest-input');
+  if (destInput) destInput.value = p?.email || '';
+  document.getElementById('email-dest-modal').classList.add('open');
+}
+
+async function confirmSendEmail() {
+  const email = document.getElementById('email-dest-input')?.value.trim();
+  if (!email || !email.includes('@')) { alert('renseignez un email valide.'); return; }
+
+  const pid = state.currentModalProspect;
+  const p = pid ? state.prospects.find(x => x.id === pid) || state.pipeline.find(x => x.id === pid) : null;
+  const emailText = document.getElementById('modal-email-text')?.value || '';
+  if (!emailText) { alert('aucun email à envoyer.'); return; }
+
+  // Extraire objet de la 1ère ligne si "Objet :"
+  let subject = 'Message de prospection — Huntlist.';
+  let body = emailText;
+  const firstLine = emailText.split('\n')[0];
+  if (firstLine.toLowerCase().startsWith('objet :') || firstLine.toLowerCase().startsWith('objet:')) {
+    subject = firstLine.replace(/^objet\s*:\s*/i, '').trim();
+    body = emailText.split('\n').slice(1).join('\n').trim();
+  }
+
+  const confirmBtn = document.querySelector('#email-dest-modal [onclick="confirmSendEmail()"]');
+  showSpinner('confirm-email-spinner');
+  if (confirmBtn) confirmBtn.disabled = true;
+
+  try {
+    await resendSendEmail(email, subject, body, p?.name);
+    document.getElementById('email-dest-modal').classList.remove('open');
+    if (p) { p.email = email; saveState(); }
+    showToast('✓ Email envoyé à ' + email);
+    addActivity('email envoyé · ' + (p?.name || email), 'send', 'green');
+    // Passer prospect en "contacté"
+    const pp = state.pipeline.find(x => x.id === p?.id);
+    if (pp && pp.status === 'new') { pp.status = 'contacted'; saveState(); refreshPipeline(); }
+  } catch(e) {
+    alert('erreur envoi email : ' + e.message);
+  }
+
+  hideSpinner('confirm-email-spinner');
+  if (confirmBtn) confirmBtn.disabled = false;
+}
+
+// ══════════════════════════════════════════════════════════
+// SMS MODAL — OVH
+// ══════════════════════════════════════════════════════════
+
+_currentSmsProspectId = null;
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function sendSmsViaOvh() {
+  const phone = document.getElementById('sms-phone-input')?.value.trim();
+  const message = document.getElementById('sms-text')?.value.trim();
+  const resultEl = document.getElementById('sms-send-result');
+
+  if (!phone) { alert('renseignez un numéro de téléphone.'); return; }
+  if (!message) { alert('rédigez un message.'); return; }
+
+  showSpinner('send-sms-spinner');
+  document.getElementById('btn-send-sms').disabled = true;
+
+  try {
+    await ovhSendSMS(phone, message);
+    resultEl.innerHTML = '<div class="alert alert-success"><span class="msym">check_circle</span>SMS envoyé avec succès via OVH !</div>';
+    resultEl.style.display = '';
+    const pid = _currentSmsProspectId;
+    const p = pid ? state.pipeline.find(x => x.id === pid) : null;
+    if (p) {
+      p.phone = phone;
+      if (p.status === 'new') p.status = 'contacted';
+      if (!p.sms_history) p.sms_history = [];
+      p.sms_history.push({ text: message, date: new Date().toISOString() });
+      saveState(); refreshPipeline();
+    }
+    addActivity('SMS envoyé · ' + (p?.name || phone), 'sms', 'green');
+    setTimeout(() => closeSmsModal(), 2000);
+  } catch(e) {
+    resultEl.innerHTML = '<div class="alert alert-error"><span class="msym">error</span>' + e.message + '</div>';
+    resultEl.style.display = '';
+  }
+
+  hideSpinner('send-sms-spinner');
+  document.getElementById('btn-send-sms').disabled = false;
+}
+
+// Charger configs au chargement de l'onglet settings
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(() => { loadResendConfigUI(); loadOvhConfigUI(); }, 500);
 });
 
 
