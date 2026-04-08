@@ -1426,6 +1426,11 @@ tr:hover td { background: rgba(255,255,255,0.3); }
         <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
           <button class="tab active" onclick="switchSettingsTab('tab-profile',this)">mon profil</button>
           <button class="tab" onclick="switchSettingsTab('tab-email',this)">email d'envoi</button>
+          <button class="tab" onclick="switchSettingsTab('tab-brevo',this)" id="tab-btn-brevo" style="display:flex;align-items:center;gap:5px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+            brevo · email &amp; sms
+            <span id="brevo-status-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
+          </button>
           <button class="tab" onclick="switchSettingsTab('tab-linkedin',this)">linkedin api</button>
           <button class="tab" onclick="switchSettingsTab('tab-plan',this)">abonnement</button>
         </div>
@@ -1454,6 +1459,79 @@ tr:hover td { background: rgba(255,255,255,0.3); }
               <div style="display:flex;gap:10px">
                 <button class="btn btn-primary" onclick="saveEmail()"><span class="msym">save</span>enregistrer</button>
                 <button class="btn btn-ghost" onclick="sendTestEmail()"><span class="msym">send</span>email test</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ ONGLET BREVO ═══ -->
+        <div id="tab-brevo" style="display:none">
+          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,150,100,0.2)">
+            <div class="card-header" style="background:rgba(0,150,100,0.04)">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#00966e">
+                  <svg width="18" height="18" viewBox="0 0 40 40" fill="#00966e"><rect width="40" height="40" rx="8" fill="#00966e" opacity=".12"/><text x="20" y="27" text-anchor="middle" font-size="18" font-weight="900" fill="#00966e">B</text></svg>
+                  brevo — email &amp; sms
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">une seule clé pour envoyer vos emails et SMS de prospection</div>
+              </div>
+              <span class="badge badge-green" id="brevo-api-status-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> connecté</span>
+            </div>
+            <div class="card-body">
+
+              <!-- Clé API -->
+              <div class="form-group">
+                <label class="form-label">clé api brevo</label>
+                <div style="position:relative">
+                  <input class="form-input" id="brevo-api-key" placeholder="xkeysib-..." type="password" style="padding-right:44px"/>
+                  <button onclick="toggleBrevoKeyVis()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;display:flex;align-items:center">
+                    <span class="msym" style="font-size:16px" id="brevo-key-eye">visibility</span>
+                  </button>
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:4px">obtenir sur <strong>app.brevo.com</strong> → SMTP &amp; API → Clés API</div>
+              </div>
+
+              <!-- Email expéditeur -->
+              <div style="padding:14px 16px;background:rgba(0,150,100,0.04);border-radius:12px;border:1px solid rgba(0,150,100,0.12);margin-bottom:14px">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#00966e;margin-bottom:12px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:14px">mail</span>configuration email</div>
+                <div class="form-row">
+                  <div class="form-group" style="margin:0"><label class="form-label">email expéditeur</label><input class="form-input" id="brevo-email-from" placeholder="vous@votredomaine.fr" type="email"/></div>
+                  <div class="form-group" style="margin:0"><label class="form-label">nom affiché</label><input class="form-input" id="brevo-email-name" placeholder="Jean Dupont — Huntlist."/></div>
+                </div>
+              </div>
+
+              <!-- SMS -->
+              <div style="padding:14px 16px;background:rgba(0,85,212,0.04);border-radius:12px;border:1px solid rgba(0,85,212,0.12);margin-bottom:20px">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#0055D4;margin-bottom:12px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:14px">sms</span>configuration sms</div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">nom expéditeur SMS (max 11 caractères)</label>
+                  <input class="form-input" id="brevo-sms-sender" placeholder="Huntlist" maxlength="11"/>
+                  <div style="font-size:10px;color:#9ca3af;margin-top:4px">affiché comme expéditeur sur le téléphone du prospect · lettres et chiffres uniquement</div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="saveBrevoConfig()" style="background:#00966e;box-shadow:0 4px 16px rgba(0,150,100,0.3)"><span class="msym">save</span>enregistrer</button>
+                <button class="btn btn-ghost" onclick="testBrevoConnection()" id="btn-test-brevo">
+                  <span id="test-brevo-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">play_arrow</span>tester la connexion
+                </button>
+                <button class="btn btn-ghost" onclick="sendBrevoTestEmail()" id="btn-brevo-test-email" style="display:none">
+                  <span id="test-email-brevo-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">send</span>email test
+                </button>
+              </div>
+
+              <div id="brevo-test-result" style="display:none;margin-top:12px"></div>
+
+              <!-- Infos plan Brevo -->
+              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.02);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">plan gratuit brevo</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6b7280">
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>300 emails / jour gratuits</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>SMS disponibles (crédits prépayés)</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#d97706">info</span>vérifiez votre domaine expéditeur pour éviter les spams</div>
+                </div>
               </div>
             </div>
           </div>
@@ -1647,9 +1725,12 @@ tr:hover td { background: rgba(255,255,255,0.3); }
         </div>
       </div>
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer" style="flex-wrap:wrap;gap:8px">
       <button class="btn" style="background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.15)" onclick="removePipelineProspect()"><span class="msym">delete</span>retirer</button>
       <button class="btn btn-ghost" id="pm-email-btn" onclick="openEmailFromModal()"><span class="msym">auto_awesome</span>email ia</button>
+      <button class="btn" style="background:#0055D4;color:white" onclick="openSmsModal(currentPipelineId)" id="pm-sms-btn">
+        <span class="msym">sms</span>SMS
+      </button>
       <button class="btn" style="background:linear-gradient(135deg,#0055D4,#0047B8);color:white;box-shadow:0 4px 16px rgba(0,85,212,0.3)" id="pm-fiche-btn" onclick="genFichePreAppel()">
         <span id="pm-fiche-btn-spinner" style="display:none" class="spinner"></span>
         <span class="msym">psychology</span>fiche pré-appel
@@ -1667,6 +1748,10 @@ tr:hover td { background: rgba(255,255,255,0.3); }
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="regenerateEmail()"><span id="regen-spinner" style="display:none" class="spinner spinner-dark"></span><span class="msym">refresh</span>regénérer</button>
       <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('modal-email-text').value)"><span class="msym">content_copy</span>copier</button>
+      <button class="btn" style="background:#00966e;color:white;box-shadow:0 4px 16px rgba(0,150,100,0.3)" onclick="sendEmailViaBrevo()" id="btn-send-brevo-email">
+        <span id="send-brevo-spinner" style="display:none" class="spinner"></span>
+        <span class="msym">send</span>envoyer
+      </button>
       <button class="btn btn-primary" onclick="closeModal()"><span class="msym">check</span>enregistrer</button>
     </div>
   </div>
@@ -1950,7 +2035,7 @@ function switchB2bTab(tabId, btn) {
 }
 
 function switchSettingsTab(tabId, btn) {
-  ['tab-profile','tab-email','tab-linkedin','tab-plan'].forEach(t=>{const el=document.getElementById(t);if(el) el.style.display='none';});
+  ['tab-profile','tab-email','tab-brevo','tab-linkedin','tab-plan'].forEach(t=>{const el=document.getElementById(t);if(el) el.style.display='none';});
   document.getElementById(tabId).style.display='block';
   document.querySelectorAll('#page-settings .tab').forEach(t=>t.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -4572,269 +4657,365 @@ function showToast(msg) {
   setTimeout(() => t.remove(), 2500);
 }
 
-</script>
-
-<!-- Fiche Pré-Appel Modal (standalone pour résultats) -->
-<div class="modal-overlay" id="fiche-standalone-modal">
-  <div class="modal" style="max-width:520px">
-    <div class="modal-header" style="background:linear-gradient(135deg,#0055D4,#0047B8);border-radius:24px 24px 0 0">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="msym" style="color:#00d4ff;font-size:22px">psychology</span>
-        <div>
-          <div class="modal-title" id="fiche-standalone-name" style="color:white">fiche pré-appel</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px" id="fiche-standalone-addr">—</div>
-        </div>
-      </div>
-      <button class="modal-close" onclick="document.getElementById('fiche-standalone-modal').classList.remove('open')" style="background:rgba(255,255,255,0.15);color:white"><span class="msym" style="font-size:16px">close</span></button>
-    </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
-
-      <!-- Loading -->
-      <div id="fiche-standalone-loading" style="text-align:center;padding:40px 20px">
-        <div class="spinner spinner-dark" style="display:inline-block;margin-bottom:12px;width:20px;height:20px;border-width:3px"></div>
-        <div style="font-size:13px;color:#6b7280;font-weight:600">claude analyse ce prospect...</div>
-        <div style="font-size:11px;color:#9ca3af;margin-top:6px">note, avis, secteur, concurrents probables...</div>
-      </div>
-
-      <!-- Content -->
-      <div id="fiche-standalone-content" style="display:none;flex-direction:column;gap:16px">
-
-        <!-- Activité -->
-        <div style="padding:14px 16px;background:rgba(0,85,212,0.04);border-radius:12px;border:1px solid rgba(0,85,212,0.1)">
-          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#0055D4;margin-bottom:6px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">business</span>activité du prospect</div>
-          <div id="fs-activite" style="font-size:13px;font-weight:600;color:#0a0a1a;line-height:1.6"></div>
-        </div>
-
-        <!-- Accroche -->
-        <div>
-          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#0055D4;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">record_voice_over</span>accroche d'ouverture</div>
-          <div id="fs-accroche" style="font-size:14px;font-weight:700;color:#0a0a1a;line-height:1.65;padding:14px 16px;background:rgba(0,85,212,0.06);border-radius:12px;border-left:3px solid #0055D4"></div>
-        </div>
-
-        <!-- Points de douleur -->
-        <div>
-          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#d97706;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">crisis_alert</span>points de douleur probables</div>
-          <div id="fs-douleurs" style="display:flex;flex-direction:column;gap:6px"></div>
-        </div>
-
-        <!-- Objections -->
-        <div>
-          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#dc2626;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">shield</span>objections + réponses</div>
-          <div id="fs-objections" style="display:flex;flex-direction:column;gap:8px"></div>
-        </div>
-
-        <!-- Closing -->
-        <div>
-          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#059669;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">emoji_events</span>conseil de closing</div>
-          <div id="fs-closing" style="font-size:13px;color:#1a1a2e;line-height:1.65;padding:14px 16px;background:rgba(5,150,105,0.06);border-radius:12px;border-left:3px solid #059669"></div>
-        </div>
-
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="document.getElementById('fiche-standalone-modal').classList.remove('open')"><span class="msym">close</span>fermer</button>
-      <button class="btn btn-primary" onclick="addToPipeline(state.prospects.find(x=>x.id===state.currentFicheProspect));document.getElementById('fiche-standalone-modal').classList.remove('open')"><span class="msym">conversion_path</span>ajouter au pipeline</button>
-    </div>
-  </div>
-</div>
 
 
+// ═══════════════════════════════════════════════════
+// BREVO — EMAIL & SMS
+// ═══════════════════════════════════════════════════
 
-<!-- Upgrade Modal -->
-<div class="modal-overlay" id="upgrade-modal">
-  <div class="modal" style="max-width:440px">
-    <div class="modal-header" style="background:linear-gradient(135deg,#0a0a1a,#1a1a3e);border-radius:24px 24px 0 0">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="width:40px;height:40px;border-radius:12px;background:rgba(0,85,212,0.3);display:flex;align-items:center;justify-content:center">
-          <span class="msym" style="color:#00d4ff;font-size:22px">rocket_launch</span>
-        </div>
-        <div>
-          <div style="font-size:15px;font-weight:800;color:white;letter-spacing:-.5px">quota atteint</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">passez au niveau supérieur</div>
-        </div>
-      </div>
-      <button class="modal-close" onclick="document.getElementById('upgrade-modal').classList.remove('open')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6)"><span class="msym" style="font-size:16px">close</span></button>
-    </div>
-    <div class="modal-body" style="text-align:center;padding:32px 28px">
-      <div style="font-size:13px;color:#6b7280;margin-bottom:8px">vous avez utilisé</div>
-      <div style="font-size:48px;font-weight:900;letter-spacing:-3px;color:#0a0a1a;line-height:1"><span id="upgrade-used">0</span><span style="font-size:20px;color:#9ca3af"> / <span id="upgrade-limit">0</span></span></div>
-      <div style="font-size:13px;font-weight:700;color:#0055D4;margin-bottom:28px;text-transform:uppercase;letter-spacing:.1em" id="upgrade-feature">emails ia</div>
-      <div style="background:rgba(0,85,212,0.04);border:1px solid rgba(0,85,212,0.12);border-radius:16px;padding:20px;margin-bottom:24px;text-align:left">
-        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#0055D4;margin-bottom:12px">plan <span id="upgrade-plan-name">pro</span> — <span id="upgrade-plan-price">119€/mois</span></div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>4 000 emails ia / mois</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>100 fiches pré-appel</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>pilote automatique ia</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#1a1a2e"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>prospects illimités</div>
-        </div>
-      </div>
-      <a href="/pricing" class="btn btn-primary" style="width:100%;justify-content:center;font-size:13px;padding:15px;border-radius:14px;text-decoration:none">
-        <span class="msym">arrow_forward</span>upgrader mon plan
-      </a>
-      <button onclick="document.getElementById('upgrade-modal').classList.remove('open')" style="margin-top:12px;background:none;border:none;font-size:12px;color:#9ca3af;cursor:pointer;font-family:inherit">rester sur mon plan actuel</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- ═══ ONBOARDING ═══ -->
-<div id="onboarding-overlay" style="position:fixed;inset:0;background:rgba(10,10,26,0.85);backdrop-filter:blur(12px);z-index:1000;display:none;align-items:center;justify-content:center;padding:24px">
-  <div style="background:white;border-radius:24px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,85,212,0.2)">
-
-    <!-- Progress bar -->
-    <div style="height:3px;background:#f0f0f0;border-radius:3px 3px 0 0;overflow:hidden">
-      <div id="ob-progress" style="height:100%;background:#0055D4;border-radius:3px;transition:width .4s ease;width:0%"></div>
-    </div>
-
-    <!-- Header -->
-    <div style="padding:28px 32px 0;display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;align-items:center;gap:.5rem">
-        <svg viewBox="0 0 66 66" fill="none" style="width:28px;height:28px"><rect width="66" height="66" rx="14" fill="#0055D4"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg>
-        <span style="font-size:1.1rem;font-weight:700;letter-spacing:-0.03em;color:#0a0a1a">Huntlist.</span>
-      </div>
-      <div style="font-size:11px;color:#9ca3af;font-weight:600" id="ob-step-count">étape 1 / 6</div>
-    </div>
-
-    <!-- Steps -->
-    <div id="ob-steps" style="padding:24px 32px 32px">
-
-      <!-- STEP 1 : Bienvenue -->
-      <div class="ob-step" id="ob-step-1">
-        <div style="text-align:center;padding:20px 0">
-          <span class="msym" style="font-size:52px;color:#0055D4;display:block;margin-bottom:16px">waving_hand</span>
-          <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:8px">bienvenue sur Huntlist.</h2>
-          <p style="font-size:14px;color:#6b7280;line-height:1.7;max-width:380px;margin:0 auto">votre outil de prospection IA automatisée. en 5 minutes, on configure tout et on vous montre comment trouver vos premiers clients.</p>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:24px 0">
-          <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
-            <span class="msym" style="font-size:24px;color:#0055D4;display:block;margin-bottom:6px">radar</span>
-            <div style="font-size:11px;font-weight:700;color:#0a0a1a">prospection</div>
-            <div style="font-size:10px;color:#9ca3af">google maps, INSEE</div>
-          </div>
-          <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
-            <span class="msym" style="font-size:24px;color:#0055D4;display:block;margin-bottom:6px">mail</span>
-            <div style="font-size:11px;font-weight:700;color:#0a0a1a">emails IA</div>
-            <div style="font-size:10px;color:#9ca3af">personnalisés auto</div>
-          </div>
-          <div style="text-align:center;padding:16px;background:#f9f9fb;border-radius:12px">
-            <span class="msym" style="font-size:24px;color:#0055D4;display:block;margin-bottom:6px">conversion_path</span>
-            <div style="font-size:11px;font-weight:700;color:#0a0a1a">pipeline CRM</div>
-            <div style="font-size:10px;color:#9ca3af">suivi des leads</div>
-          </div>
-        </div>
-        <button class="ob-next-btn" onclick="obNext()">commencer la configuration <span style="margin-left:4px">→</span></button>
-      </div>
-
-      <!-- STEP 2 : Profil -->
-      <div class="ob-step" id="ob-step-2" style="display:none">
-        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">votre profil commercial</h2>
-        <p style="font-size:13px;color:#6b7280;margin-bottom:24px">ces infos personnalisent tous vos emails IA et scripts d'appel.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">prénom *</label><input id="ob-prenom" class="form-input" placeholder="jean"/></div>
-          <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">nom *</label><input id="ob-nom" class="form-input" placeholder="dupont"/></div>
-        </div>
-        <div style="margin-bottom:12px"><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">nom de l'entreprise *</label><input id="ob-societe" class="form-input" placeholder="plomberie dupont"/></div>
-        <div style="margin-bottom:12px"><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">secteur d'activité *</label>
-          <select id="ob-secteur" class="form-input">
-            <option value="">choisir...</option>
-            <option>maçonnerie / gros œuvre</option>
-            <option>plomberie / chauffage</option>
-            <option>électricité</option>
-            <option>isolation / rénovation énergétique</option>
-            <option>menuiserie / fenêtres</option>
-            <option>peinture / revêtements</option>
-            <option>consultant / freelance</option>
-            <option>agence / growth</option>
-            <option>autre</option>
-          </select>
-        </div>
-        <div style="margin-bottom:20px"><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:5px">votre proposition de valeur</label><input id="ob-valeur" class="form-input" placeholder="intervention en 48h, devis gratuit, 10 ans d'expérience..."/></div>
-        <button class="ob-next-btn" onclick="obSaveProfile()">enregistrer et continuer →</button>
-      </div>
-
-      <!-- STEP 3 : Prospection -->
-      <div class="ob-step" id="ob-step-3" style="display:none">
-        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
-          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 1/4</span>
-        </div>
-        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">la prospection IA</h2>
-        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Huntlist. scanne Google Maps et trouve les entreprises qui ont besoin de vos services. Testez maintenant en cherchant vos premiers prospects.</p>
-        <div style="background:#f9f9fb;border-radius:14px;padding:20px;margin-bottom:20px;border:1px solid #e5e7eb">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:12px">essayez maintenant</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-            <div><label style="font-size:10px;font-weight:600;color:#6b7280;display:block;margin-bottom:4px">type de business</label><input id="ob-search-type" class="form-input" placeholder="plombier, restaurant..."/></div>
-            <div><label style="font-size:10px;font-weight:600;color:#6b7280;display:block;margin-bottom:4px">ville</label><input id="ob-search-city" class="form-input" placeholder="lyon, paris..."/></div>
-          </div>
-          <button class="ob-next-btn" style="margin:0" onclick="obLaunchSearch()"><span id="ob-search-spinner" style="display:none" class="spinner"></span>lancer ma première recherche →</button>
-        </div>
-        <button onclick="obNext()" style="background:none;border:none;color:#9ca3af;font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">passer cette étape</button>
-      </div>
-
-      <!-- STEP 4 : Email IA -->
-      <div class="ob-step" id="ob-step-4" style="display:none">
-        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
-          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 2/4</span>
-        </div>
-        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">l'email IA personnalisé</h2>
-        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Pour chaque prospect trouvé, Huntlist. génère un email de prospection unique en quelques secondes, adapté à leur activité et à votre profil.</p>
-        <div style="background:linear-gradient(135deg,#0a0a1a,#1a1a3e);border-radius:14px;padding:20px;margin-bottom:20px">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.4);margin-bottom:12px">exemple d'email généré</div>
-          <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.75" id="ob-email-preview">Objet : Intervention rapide pour votre établissement<br/><br/>Bonjour,<br/>Je suis [votre prénom] de [votre société]. En passant devant votre établissement, j'ai remarqué que vos installations dataient de quelques années...<br/><br/><em style="color:rgba(255,255,255,0.4)">génération en cours...</em></div>
-        </div>
-        <button class="ob-next-btn" onclick="obNext()">j'ai compris, continuer →</button>
-      </div>
-
-      <!-- STEP 5 : Pipeline + Tracker -->
-      <div class="ob-step" id="ob-step-5" style="display:none">
-        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
-          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 3/4</span>
-        </div>
-        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">le pipeline CRM & tracker appel</h2>
-        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Suivez chaque prospect de la découverte au closing. Le tracker d'appel génère un script personnalisé à votre secteur avant chaque appel.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-          <div style="padding:16px;background:#f9f9fb;border-radius:12px;border:1px solid #e5e7eb">
-            <div style="font-size:20px;margin-bottom:8px"></div>
-            <div style="font-size:13px;font-weight:700;color:#0a0a1a;margin-bottom:4px">pipeline CRM</div>
-            <div style="font-size:11px;color:#9ca3af;line-height:1.5">nouveau → contacté → répondu → converti</div>
-          </div>
-          <div style="padding:16px;background:#f9f9fb;border-radius:12px;border:1px solid #e5e7eb">
-            <div style="font-size:20px;margin-bottom:8px"></div>
-            <div style="font-size:13px;font-weight:700;color:#0a0a1a;margin-bottom:4px">tracker appel</div>
-            <div style="font-size:11px;color:#9ca3af;line-height:1.5">script IA + objections + résumé post-appel</div>
-          </div>
-        </div>
-        <button class="ob-next-btn" onclick="obNext()">continuer →</button>
-      </div>
-
-      <!-- STEP 6 : Veille + Fin -->
-      <div class="ob-step" id="ob-step-6" style="display:none">
-        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:4px 12px;margin-bottom:16px">
-          <span style="font-size:11px;font-weight:700;color:#0055D4">fonctionnalité 4/4</span>
-        </div>
-        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#0a0a1a;margin-bottom:4px">veille concurrentielle & alertes</h2>
-        <p style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.65">Analysez vos concurrents locaux avec leurs forces et faiblesses. Les alertes du jour vous signalent les 20 opportunités les plus chaudes chaque matin.</p>
-        <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:14px;padding:20px;margin-bottom:24px;text-align:center">
-          <span class="msym" style="font-size:36px;color:#059669;display:block;margin-bottom:8px">check_circle</span>
-          <div style="font-size:16px;font-weight:800;color:#0a0a1a;margin-bottom:4px">vous êtes prêt !</div>
-          <div style="font-size:13px;color:#6b7280;line-height:1.65">votre espace Huntlist. est configuré. lancez votre première recherche et trouvez vos premiers clients aujourd'hui.</div>
-        </div>
-        <button class="ob-next-btn" onclick="obFinish()">accéder à mon tableau de bord →</button>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<style>
-.ob-next-btn{
-  width:100%;background:#0055D4;color:white;border:none;border-radius:12px;
-  padding:14px 20px;font-family:inherit;font-size:14px;font-weight:600;
-  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;
+// ── Config Brevo ──
+function getBrevoConfig() {
+  try { return JSON.parse(localStorage.getItem('huntlist_brevo') || '{}'); } catch(_) { return {}; }
 }
-.ob-next-btn:hover{background:#0047B8;transform:translateY(-1px)}
-.ob-next-btn:active{transform:none}
-</style>
+function saveBrevoConfig() {
+  const key = document.getElementById('brevo-api-key')?.value.trim();
+  const emailFrom = document.getElementById('brevo-email-from')?.value.trim();
+  const emailName = document.getElementById('brevo-email-name')?.value.trim();
+  const smsSender = document.getElementById('brevo-sms-sender')?.value.trim().slice(0, 11);
+  if (!key) { alert('renseignez votre clé API Brevo.'); return; }
+  localStorage.setItem('huntlist_brevo', JSON.stringify({ key, emailFrom, emailName, smsSender }));
+  // Sync avec l'ancien champ email
+  if (emailFrom) {
+    const ef = document.getElementById('email-from'); if (ef) ef.value = emailFrom;
+    const en = document.getElementById('email-name'); if (en) en.value = emailName;
+    localStorage.setItem('alma_client_email', JSON.stringify({ from: emailFrom, name: emailName }));
+  }
+  updateBrevoStatusUI(true);
+  show('settings-saved'); setTimeout(() => hide('settings-saved'), 3000);
+}
+
+function loadBrevoConfigUI() {
+  const cfg = getBrevoConfig();
+  const keyEl = document.getElementById('brevo-api-key');
+  const fromEl = document.getElementById('brevo-email-from');
+  const nameEl = document.getElementById('brevo-email-name');
+  const smsEl = document.getElementById('brevo-sms-sender');
+  if (keyEl && cfg.key) keyEl.value = cfg.key;
+  if (fromEl && cfg.emailFrom) fromEl.value = cfg.emailFrom;
+  if (nameEl && cfg.emailName) nameEl.value = cfg.emailName;
+  if (smsEl && cfg.smsSender) smsEl.value = cfg.smsSender;
+  updateBrevoStatusUI(!!cfg.key);
+}
+
+function updateBrevoStatusUI(connected) {
+  const dot = document.getElementById('brevo-status-dot');
+  const badge = document.getElementById('brevo-api-status-badge');
+  const testEmailBtn = document.getElementById('btn-brevo-test-email');
+  if (dot) dot.style.background = connected ? '#059669' : '#d1d5db';
+  if (badge) badge.style.display = connected ? 'inline-flex' : 'none';
+  if (testEmailBtn) testEmailBtn.style.display = connected ? '' : 'none';
+}
+
+function toggleBrevoKeyVis() {
+  const input = document.getElementById('brevo-api-key');
+  const eye = document.getElementById('brevo-key-eye');
+  if (!input) return;
+  input.type = input.type === 'password' ? 'text' : 'password';
+  if (eye) eye.textContent = input.type === 'password' ? 'visibility' : 'visibility_off';
+}
+
+// ── Test connexion Brevo ──
+async function testBrevoConnection() {
+  const cfg = getBrevoConfig();
+  const key = cfg.key || document.getElementById('brevo-api-key')?.value.trim();
+  if (!key) { alert('enregistrez d'abord votre clé API.'); return; }
+  showSpinner('test-brevo-spinner');
+  document.getElementById('btn-test-brevo').disabled = true;
+  const resultEl = document.getElementById('brevo-test-result');
+  try {
+    const res = await fetch('https://api.brevo.com/v3/account', {
+      headers: { 'api-key': key, 'Accept': 'application/json' }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      const plan = data.plan?.[0]?.type || 'free';
+      const credits = data.plan?.[0]?.credits ?? '—';
+      resultEl.innerHTML = `<div class="alert alert-success"><span class="msym">check_circle</span><div><strong>connexion réussie !</strong><div style="font-size:11px;margin-top:3px">compte : ${data.email} · plan : ${plan} · crédits SMS : ${credits}</div></div></div>`;
+      updateBrevoStatusUI(true);
+      document.getElementById('btn-brevo-test-email').style.display = '';
+    } else {
+      resultEl.innerHTML = `<div class="alert alert-error"><span class="msym">error</span>erreur : ${data.message || res.status}</div>`;
+    }
+  } catch(e) {
+    resultEl.innerHTML = `<div class="alert alert-error"><span class="msym">error</span>erreur réseau : ${e.message}</div>`;
+  }
+  resultEl.style.display = '';
+  hideSpinner('test-brevo-spinner');
+  document.getElementById('btn-test-brevo').disabled = false;
+}
+
+// ── Envoyer email test Brevo ──
+async function sendBrevoTestEmail() {
+  const cfg = getBrevoConfig();
+  if (!cfg.key || !cfg.emailFrom) { alert('configurez votre clé API et email expéditeur.'); return; }
+  showSpinner('test-email-brevo-spinner');
+  try {
+    await brevoSendEmail(cfg.emailFrom, cfg.emailName || 'Test', 'Test email Huntlist.', '<p>Votre intégration Brevo fonctionne parfaitement !</p>');
+    document.getElementById('brevo-test-result').innerHTML = `<div class="alert alert-success"><span class="msym">check_circle</span>email test envoyé à ${cfg.emailFrom}</div>`;
+    document.getElementById('brevo-test-result').style.display = '';
+  } catch(e) {
+    document.getElementById('brevo-test-result').innerHTML = `<div class="alert alert-error"><span class="msym">error</span>${e.message}</div>`;
+    document.getElementById('brevo-test-result').style.display = '';
+  }
+  hideSpinner('test-email-brevo-spinner');
+}
+
+// ── Fonction core Brevo sendEmail ──
+async function brevoSendEmail(toEmail, toName, subject, htmlContent) {
+  const cfg = getBrevoConfig();
+  if (!cfg.key) throw new Error('clé API Brevo non configurée. Allez dans Paramètres → Brevo.');
+  if (!cfg.emailFrom) throw new Error('email expéditeur non configuré. Allez dans Paramètres → Brevo.');
+
+  const payload = {
+    sender: { email: cfg.emailFrom, name: cfg.emailName || 'Huntlist.' },
+    to: [{ email: toEmail, name: toName || toEmail }],
+    subject: subject,
+    htmlContent: htmlContent.replace(/\n/g, '<br/>')
+  };
+
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'api-key': cfg.key, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || `erreur Brevo (${res.status})`);
+  }
+  return res.json();
+}
+
+// ── Fonction core Brevo sendSMS ──
+async function brevoSendSMS(toPhone, message) {
+  const cfg = getBrevoConfig();
+  if (!cfg.key) throw new Error('clé API Brevo non configurée.');
+  if (!cfg.smsSender) throw new Error('nom expéditeur SMS non configuré. Allez dans Paramètres → Brevo.');
+
+  // Normaliser le numéro (supprimer espaces, tirets)
+  let phone = toPhone.replace(/[\s\-\.]/g, '');
+  // Convertir 06/07 → +336/+337
+  if (phone.startsWith('06') || phone.startsWith('07')) phone = '+33' + phone.slice(1);
+  if (!phone.startsWith('+')) throw new Error('numéro invalide — utilisez le format +33...');
+
+  const payload = {
+    sender: cfg.smsSender,
+    recipient: phone,
+    content: message,
+    type: 'transactional'
+  };
+
+  const res = await fetch('https://api.brevo.com/v3/transactionalSMS/sms', {
+    method: 'POST',
+    headers: { 'api-key': cfg.key, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || `erreur SMS Brevo (${res.status})`);
+  }
+  return res.json();
+}
+
+// ── Envoi email depuis le modal email ──
+function sendEmailViaBrevo() {
+  // Ouvrir modal pour saisir l'email destinataire
+  const pid = state.currentModalProspect;
+  const p = pid ? state.prospects.find(x => x.id === pid) || state.pipeline.find(x => x.id === pid) : null;
+  const destInput = document.getElementById('email-dest-input');
+  if (destInput) destInput.value = '';
+  // Préremplir si on a un email en mémoire
+  if (p && p.email) { if (destInput) destInput.value = p.email; }
+  document.getElementById('email-dest-modal').classList.add('open');
+}
+
+async function confirmSendEmail() {
+  const email = document.getElementById('email-dest-input')?.value.trim();
+  if (!email || !email.includes('@')) { alert('renseignez un email valide.'); return; }
+  const pid = state.currentModalProspect;
+  const p = pid ? state.prospects.find(x => x.id === pid) || state.pipeline.find(x => x.id === pid) : null;
+  const emailText = document.getElementById('modal-email-text')?.value || '';
+  if (!emailText) { alert('aucun email à envoyer.'); return; }
+
+  // Extraire l'objet (première ligne si commence par "Objet :")
+  let subject = 'Message de prospection';
+  let body = emailText;
+  const firstLine = emailText.split('\n')[0];
+  if (firstLine.toLowerCase().startsWith('objet :') || firstLine.toLowerCase().startsWith('objet:')) {
+    subject = firstLine.replace(/^objet\s*:\s*/i, '').trim();
+    body = emailText.split('\n').slice(1).join('\n').trim();
+  }
+
+  showSpinner('confirm-email-spinner');
+  document.getElementById('email-dest-modal').querySelector('[onclick="confirmSendEmail()"]').disabled = true;
+
+  try {
+    await brevoSendEmail(email, p?.name || email, subject, body);
+    document.getElementById('email-dest-modal').classList.remove('open');
+    // Sauvegarder l'email du prospect
+    if (p) { p.email = email; saveState(); }
+    // Toast succès
+    showToast('✓ Email envoyé à ' + email);
+    addActivity('email envoyé · ' + (p?.name || email), 'send', 'green');
+    // Mettre à jour statut pipeline
+    if (p && state.pipeline.find(x => x.id === p.id)) {
+      const pp = state.pipeline.find(x => x.id === p.id);
+      if (pp.status === 'new') { pp.status = 'contacted'; saveState(); refreshPipeline(); }
+    }
+  } catch(e) {
+    alert('erreur envoi email : ' + e.message);
+  }
+
+  hideSpinner('confirm-email-spinner');
+  document.getElementById('email-dest-modal').querySelector('[onclick="confirmSendEmail()"]').disabled = false;
+}
+
+// ── SMS Modal ──
+let _currentSmsProspectId = null;
+
+function openSmsModal(pid) {
+  _currentSmsProspectId = pid;
+  const p = pid ? state.pipeline.find(x => x.id === pid) || state.prospects.find(x => x.id === pid) : null;
+  document.getElementById('sms-modal-name').textContent = 'SMS pour ' + (p?.name || '—');
+  document.getElementById('sms-modal-phone').textContent = p?.phone || 'numéro à renseigner';
+  const phoneInput = document.getElementById('sms-phone-input');
+  if (phoneInput) phoneInput.value = p?.phone || '';
+  document.getElementById('sms-text').value = '';
+  document.getElementById('sms-char-count').textContent = '0 / 160';
+  document.getElementById('sms-send-result').style.display = 'none';
+  document.getElementById('sms-modal').classList.add('open');
+}
+
+function closeSmsModal() {
+  document.getElementById('sms-modal').classList.remove('open');
+  _currentSmsProspectId = null;
+}
+
+function updateSmsCount() {
+  const text = document.getElementById('sms-text')?.value || '';
+  const count = text.length;
+  const el = document.getElementById('sms-char-count');
+  if (el) {
+    const msgs = Math.ceil(count / 160) || 1;
+    el.textContent = count + ' / 160' + (msgs > 1 ? ' (' + msgs + ' SMS)' : '');
+    el.style.color = count > 160 ? '#d97706' : '#9ca3af';
+  }
+}
+
+async function genSmsIA() {
+  const pid = _currentSmsProspectId;
+  const p = pid ? state.pipeline.find(x => x.id === pid) || state.prospects.find(x => x.id === pid) : null;
+  const profile = getProfile();
+  showSpinner('gen-sms-spinner');
+  document.getElementById('btn-gen-sms').disabled = true;
+  try {
+    const prompt = `rédige un SMS de prospection commerciale de 140 caractères MAX (important : jamais plus de 140 car).
+prospect : ${p ? p.name + ' — ' + (p.address || '') : 'prospect'}
+expéditeur : ${profile.prenom || ''} ${profile.nom || ''} de ${profile.societe || 'Huntlist.'}
+activité : ${profile.activite || 'services aux entreprises'}
+valeur : ${profile.valeur || ''}
+consignes : direct, personnalisé, avec un appel à l'action clair (rappeler, répondre), texte brut uniquement, PAS de signature longue`;
+    const d = await claudeAPI([{ role: 'user', content: prompt }], 150, null);
+    const sms = d.content[0].text.trim().slice(0, 160);
+    document.getElementById('sms-text').value = sms;
+    updateSmsCount();
+  } catch(e) {
+    alert('erreur génération SMS : ' + e.message);
+  }
+  hideSpinner('gen-sms-spinner');
+  document.getElementById('btn-gen-sms').disabled = false;
+}
+
+async function sendSmsViaBrevo() {
+  const phone = document.getElementById('sms-phone-input')?.value.trim();
+  const message = document.getElementById('sms-text')?.value.trim();
+  const resultEl = document.getElementById('sms-send-result');
+
+  if (!phone) { alert('renseignez un numéro de téléphone.'); return; }
+  if (!message) { alert('rédigez un message.'); return; }
+
+  showSpinner('send-sms-spinner');
+  document.getElementById('btn-send-sms').disabled = true;
+
+  try {
+    await brevoSendSMS(phone, message);
+    resultEl.innerHTML = '<div class="alert alert-success"><span class="msym">check_circle</span>SMS envoyé avec succès !</div>';
+    resultEl.style.display = '';
+    const pid = _currentSmsProspectId;
+    const p = pid ? state.pipeline.find(x => x.id === pid) : null;
+    if (p) {
+      p.phone = document.getElementById('sms-phone-input').value.trim();
+      if (p.status === 'new') p.status = 'contacted';
+      if (!p.sms_history) p.sms_history = [];
+      p.sms_history.push({ text: message, date: new Date().toISOString() });
+      saveState();
+      refreshPipeline();
+    }
+    addActivity('SMS envoyé · ' + (p?.name || phone), 'sms', 'green');
+    setTimeout(() => closeSmsModal(), 2000);
+  } catch(e) {
+    resultEl.innerHTML = '<div class="alert alert-error"><span class="msym">error</span>' + e.message + '</div>';
+    resultEl.style.display = '';
+  }
+
+  hideSpinner('send-sms-spinner');
+  document.getElementById('btn-send-sms').disabled = false;
+}
+
+// ── Charger config Brevo au démarrage settings ──
+const _origGoPage = goPage;
+// Patch goPage pour charger la config Brevo quand on va dans settings
+const _origGoPageFn = goPage;
+
+// ── Surcharge sendReply messagerie pour envoyer via Brevo ──
+const _origSendReply = sendReply;
+async function sendReply() {
+  const cfg = getBrevoConfig();
+  const conv = msgState.conversations.find(c => c.id === msgState.activeConvId);
+  
+  // Si Brevo configuré ET email prospect dispo → envoyer via Brevo
+  if (cfg.key && cfg.emailFrom && conv?.prospectEmail && conv.prospectEmail.includes('@')) {
+    const textarea = document.getElementById('chat-reply');
+    const text = textarea?.value.trim();
+    if (!text) return;
+    const btn = document.getElementById('chat-send-btn');
+    btn.disabled = true;
+    textarea.value = '';
+    // Afficher dans le chat
+    const msg = { id: 'msg-' + Date.now(), direction: 'sent', body: text, createdAt: new Date().toISOString() };
+    msgState.messages.push(msg);
+    renderMessages();
+    const el = document.getElementById('chat-messages-list');
+    if (el) el.scrollTop = el.scrollHeight;
+    localStorage.setItem('alma_messages_' + msgState.activeConvId, JSON.stringify(msgState.messages));
+    conv.lastPreview = text.slice(0, 60);
+    conv.lastAt = new Date().toISOString();
+    saveConversations();
+    renderConvList();
+    // Envoyer via Brevo
+    try {
+      await brevoSendEmail(conv.prospectEmail, conv.prospectName, conv.subject || 'Suite de notre échange', text);
+      showToast('✓ Email envoyé via Brevo');
+    } catch(e) {
+      showToast('⚠ Sauvegardé localement — ' + e.message.slice(0, 40));
+    }
+    btn.disabled = false;
+  } else {
+    // Pas de Brevo ou pas d'email → comportement original
+    await _origSendReply();
+  }
+}
+
+// ── Init Brevo au chargement settings ──
+document.addEventListener('DOMContentLoaded', function() {
+  // Charger config Brevo quand l'onglet est affiché
+  const brevoTabBtn = document.querySelector('[onclick*="tab-brevo"]');
+  if (brevoTabBtn) {
+    const orig = brevoTabBtn.getAttribute('onclick');
+    brevoTabBtn.setAttribute('onclick', orig + '; loadBrevoConfigUI();');
+  }
+});
 
 
-</body>
-</html>
+</script>
