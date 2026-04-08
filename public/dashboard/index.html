@@ -4718,7 +4718,7 @@ function toggleBrevoKeyVis() {
 async function testBrevoConnection() {
   const cfg = getBrevoConfig();
   const key = cfg.key || document.getElementById('brevo-api-key')?.value.trim();
-  if (!key) { alert('enregistrez d'abord votre clé API.'); return; }
+  if (!key) { alert("enregistrez d'abord votre clé API."); return; }
   showSpinner('test-brevo-spinner');
   document.getElementById('btn-test-brevo').disabled = true;
   const resultEl = document.getElementById('brevo-test-result');
@@ -4763,8 +4763,8 @@ async function sendBrevoTestEmail() {
 // ── Fonction core Brevo sendEmail ──
 async function brevoSendEmail(toEmail, toName, subject, htmlContent) {
   const cfg = getBrevoConfig();
-  if (!cfg.key) throw new Error('clé API Brevo non configurée. Allez dans Paramètres → Brevo.');
-  if (!cfg.emailFrom) throw new Error('email expéditeur non configuré. Allez dans Paramètres → Brevo.');
+  if (!cfg.key) throw new Error("clé API Brevo non configurée. Allez dans Paramètres → Brevo.");
+  if (!cfg.emailFrom) throw new Error("email expéditeur non configuré. Allez dans Paramètres → Brevo.");
 
   const payload = {
     sender: { email: cfg.emailFrom, name: cfg.emailName || 'Huntlist.' },
@@ -4789,8 +4789,8 @@ async function brevoSendEmail(toEmail, toName, subject, htmlContent) {
 // ── Fonction core Brevo sendSMS ──
 async function brevoSendSMS(toPhone, message) {
   const cfg = getBrevoConfig();
-  if (!cfg.key) throw new Error('clé API Brevo non configurée.');
-  if (!cfg.smsSender) throw new Error('nom expéditeur SMS non configuré. Allez dans Paramètres → Brevo.');
+  if (!cfg.key) throw new Error("clé API Brevo non configurée.");
+  if (!cfg.smsSender) throw new Error("nom expéditeur SMS non configuré. Allez dans Paramètres → Brevo.");
 
   // Normaliser le numéro (supprimer espaces, tirets)
   let phone = toPhone.replace(/[\s\-\.]/g, '');
