@@ -192,19 +192,92 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 /* Mobile */
 #mob-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 49; }
 #btn-mob { display: none; }
+
+/* CC Layout */
+.cc-main { display: grid; grid-template-columns: 1fr 320px; gap: 16px; }
+@media (max-width: 900px) { .cc-main { grid-template-columns: 1fr; } }
+
+/* =============================================
+   RESPONSIVE DASHBOARD — TABLET (≤900px)
+   ============================================= */
+@media (max-width: 900px) {
+  /* Topbar : masquer search + api pill */
+  .topbar > div[style*="rechercher"],
+  #api-pill { display: none !important; }
+
+  /* Messagerie layout → 1 col */
+  .msg-layout { grid-template-columns: 1fr !important; height: auto !important; }
+}
+
+/* =============================================
+   RESPONSIVE DASHBOARD — MOBILE (≤768px)
+   ============================================= */
 @media (max-width: 768px) {
+  /* Sidebar → slide-in depuis la gauche */
   .sidebar { left: -260px; transition: left .22s ease; }
   .sidebar.mob-open { left: 0 !important; box-shadow: 8px 0 40px rgba(0,85,212,0.15); }
   .main { margin-left: 0 !important; }
   #btn-mob { display: flex !important; }
   #mob-overlay.show { display: block; }
-  .kpi-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
-  .content { padding: 16px !important; }
-}
 
-/* CC Layout */
-.cc-main { display: grid; grid-template-columns: 1fr 320px; gap: 16px; }
-@media (max-width: 900px) { .cc-main { grid-template-columns: 1fr; } }
+  /* Topbar */
+  .topbar { padding: 0 14px !important; gap: 8px !important; }
+  .topbar > div[style*="rechercher"] { display: none !important; }
+  #api-pill { display: none !important; }
+  .topbar button:last-of-type { width: 34px !important; height: 34px !important; }
+
+  /* Content */
+  .content { padding: 12px !important; }
+
+  /* KPI grid → 2 col */
+  .kpi-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  .kpi-value { font-size: 28px !important; }
+  .kpi-card { padding: 16px !important; }
+
+  /* Dashboard main grid → 1 col */
+  .content > div[style*="grid-template-columns: 1fr 340px"],
+  .content > div[style*="grid-template-columns:1fr 340px"],
+  [style*="grid-template-columns: 1fr 340px"],
+  [style*="grid-template-columns: 2fr 1fr"],
+  [style*="grid-template-columns:2fr 1fr"] { grid-template-columns: 1fr !important; }
+
+  /* Pipeline board → 1 col */
+  #pipeline-board { grid-template-columns: 1fr !important; }
+
+  /* Tables : scroll horizontal */
+  .card-body { overflow-x: auto !important; padding: 12px !important; }
+  .card-header { padding: 14px 16px !important; flex-wrap: wrap; gap: 8px; }
+  table { min-width: 540px; }
+
+  /* Messagerie */
+  .msg-layout { grid-template-columns: 1fr !important; height: auto !important; }
+  .bubble { max-width: 90% !important; }
+
+  /* Modal → plein écran sur mobile */
+  .modal-overlay { padding: 0 !important; align-items: flex-end !important; }
+  .modal { max-width: 100% !important; border-radius: 24px 24px 0 0 !important; max-height: 92vh !important; }
+
+  /* Form rows → 1 col */
+  .form-row { grid-template-columns: 1fr !important; }
+
+  /* Cold call layout */
+  .cc-main { grid-template-columns: 1fr !important; }
+  .cc-btn { padding: 12px 8px !important; }
+
+  /* Tabs → scroll horizontal */
+  .tabs { overflow-x: auto; white-space: nowrap; flex-wrap: nowrap !important; }
+
+  /* Settings */
+  #page-settings.active { display: block !important; padding: 0 !important; }
+  #page-settings > div { max-width: 100% !important; }
+
+  /* Chips wrap */
+  .chip { font-size: 9px !important; padding: 5px 10px !important; }
+
+  /* Topbar title */
+  #page-title { font-size: 13px !important; }
+  #page-sub { display: none !important; }
+}
 
 /* Chips */
 .chip { font-size: 10px; font-weight: 700; padding: 6px 14px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.5); color: #6b7280; cursor: pointer; transition: all .12s; letter-spacing: .02em; }
