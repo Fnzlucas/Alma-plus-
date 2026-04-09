@@ -227,14 +227,25 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 #page-settings.active { display: flex; justify-content: center; }
 #page-settings > div { max-width: 680px; width: 100%; }
 
-/* Pulse dot */
-.dot-on { width: 7px; height: 7px; border-radius: 50%; background: #059669; animation: pulse 2s infinite; }
-.dot-off { width: 7px; height: 7px; border-radius: 50%; background: #d1d5db; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+/* Loading screen */
+#auth-loading {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #f9f9fb;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+}
+#auth-loading svg { animation: spin .8s linear infinite; }
+
 </style>
 </head>
 <body>
-<div class="app">
+<!-- Loading screen -->
+<div id="auth-loading">
+  <svg viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:40px;height:40px"><rect width="66" height="66" rx="14" fill="#0055D4"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg>
+  <div style="font-size:13px;font-weight:600;color:#9ca3af;letter-spacing:-0.01em">vérification...</div>
+</div>
+
+<div class="app" id="app-root" style="display:none">
 
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar glass-sidebar" id="sidebar">
@@ -1709,7 +1720,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 
   </div><!-- /content -->
 </div><!-- /main -->
-</div><!-- /app -->
+</div><!-- /app-root -->
 
 <!-- ═══ MODALS ═══ -->
 <!-- Prospect Modal -->
@@ -3657,9 +3668,7 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
   const paymentPlan = urlParams.get('plan');
   if (paymentStatus === 'success' && paymentPlan) {
     localStorage.setItem('alma_plan', paymentPlan);
-    // Nettoyer l'URL
     window.history.replaceState({}, '', '/dashboard');
-    showToast('✓ Abonnement ' + paymentPlan + ' activé — bienvenue !');
   }
 
   // 1. Vérifier session
@@ -3680,9 +3689,7 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
     .maybeSingle();
 
   const plan = profile?.plan;
-  const hasSub = profile?.mollie_subscription_id;
 
-  // Si pas de plan payant → rediriger vers pricing
   if (!plan || plan === 'free' || plan === 'null') {
     const localPlan = localStorage.getItem('alma_plan');
     if (!localPlan || localPlan === 'free' || localPlan === 'null' || localPlan === 'undefined') {
@@ -3691,6 +3698,14 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
     }
   } else {
     localStorage.setItem('alma_plan', plan);
+  }
+
+  // 4. Tout est OK → afficher le dashboard
+  document.getElementById('auth-loading').style.display = 'none';
+  document.getElementById('app-root').style.display = 'flex';
+
+  if (paymentStatus === 'success' && paymentPlan) {
+    setTimeout(() => showToast('✓ Abonnement ' + paymentPlan + ' activé — bienvenue !'), 300);
   }
 
   updateQuotaUI();
@@ -5418,3 +5433,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 </script>
+                
