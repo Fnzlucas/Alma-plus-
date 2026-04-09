@@ -251,6 +251,7 @@ nav{
   .plan-card.featured:hover{transform:translateY(-4px)}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -430,86 +431,108 @@ nav{
 <div class="error-toast" id="error-toast"></div>
 
 <script>
-// ── Plans Mollie (à remplacer par vos vrais IDs une fois créés dans Mollie) ──
-const PLANS = {
-  starter: { monthly: 'huntlist_starter_monthly', annual: 'huntlist_starter_annual' },
-  pro:     { monthly: 'huntlist_pro_monthly',     annual: 'huntlist_pro_annual'     },
-  ultra:   { monthly: 'huntlist_ultra_monthly',   annual: 'huntlist_ultra_annual'   },
-};
+// ── Supabase ──
+const SUPABASE_URL = 'https://tzrtptpzbrszibuifzns.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cnRwdHB6YnJzemlidWlmem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3ODQ0NzAsImV4cCI6MjA4OTM2MDQ3MH0.vnz7yDXA6ZdYx0YU1zZ8UjIng_4bob8t-gYlP9a0mgk'
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-const PRICES_MONTHLY = { starter: 79, pro: 149, ultra: 299 };
-const PRICES_ANNUAL  = { starter: 66, pro: 124, ultra: 249 }; // ÷ 12, arrondi
+// ── Toggle mensuel/annuel ──
+const PRICES_MONTHLY = { starter: 79,  pro: 149,  ultra: 299  }
+const PRICES_ANNUAL  = { starter: 66,  pro: 124,  ultra: 249  }
 
-let billing = 'monthly';
+let billing = 'monthly'
 
 function setBilling(mode) {
-  billing = mode;
-  document.getElementById('btn-monthly').classList.toggle('active', mode === 'monthly');
-  document.getElementById('btn-annual').classList.toggle('active', mode === 'annual');
-
-  if (mode === 'monthly') {
-    document.getElementById('price-starter').textContent = '79';
-    document.getElementById('price-pro').textContent = '149';
-    document.getElementById('price-ultra').textContent = '299';
-    document.getElementById('note-starter').innerHTML = '&nbsp;';
-    document.getElementById('note-pro').innerHTML = '&nbsp;';
-    document.getElementById('note-ultra').innerHTML = '&nbsp;';
+  billing = mode
+  document.getElementById('btn-monthly').classList.toggle('active', mode === 'monthly')
+  document.getElementById('btn-annual').classList.toggle('active', mode === 'annual')
+  const prices = mode === 'monthly' ? PRICES_MONTHLY : PRICES_ANNUAL
+  document.getElementById('price-starter').textContent = prices.starter
+  document.getElementById('price-pro').textContent     = prices.pro
+  document.getElementById('price-ultra').textContent   = prices.ultra
+  if (mode === 'annual') {
+    document.getElementById('note-starter').innerHTML = '<span class="save">790€ / an</span> — 2 mois offerts'
+    document.getElementById('note-pro').innerHTML     = '<span class="save">1 490€ / an</span> — 2 mois offerts'
+    document.getElementById('note-ultra').innerHTML   = '<span class="save">2 990€ / an</span> — 2 mois offerts'
   } else {
-    document.getElementById('price-starter').textContent = '66';
-    document.getElementById('price-pro').textContent = '124';
-    document.getElementById('price-ultra').textContent = '249';
-    document.getElementById('note-starter').innerHTML = '<span class="save">790€ / an</span> — 2 mois offerts';
-    document.getElementById('note-pro').innerHTML = '<span class="save">1 490€ / an</span> — 2 mois offerts';
-    document.getElementById('note-ultra').innerHTML = '<span class="save">2 990€ / an</span> — 2 mois offerts';
+    document.getElementById('note-starter').innerHTML = '&nbsp;'
+    document.getElementById('note-pro').innerHTML     = '&nbsp;'
+    document.getElementById('note-ultra').innerHTML   = '&nbsp;'
   }
 }
 
+// ── Checkout ──
 async function checkout(plan) {
-  const spinEl = document.getElementById('spin-' + plan);
-  const btnEl  = document.getElementById('cta-' + plan);
-  spinEl.style.display = 'inline-block';
-  btnEl.classList.add('cta-loading');
+  const spinEl = document.getElementById('spin-' + plan)
+  const btnEl  = document.getElementById('cta-' + plan)
+  spinEl.style.display = 'inline-block'
+  btnEl.classList.add('cta-loading')
 
   try {
-    const res = await fetch('/functions/v1/mollie-checkout', {
+    // Vérifier que l'user est connecté
+    const { data: { session } } = await sb.auth.getSession()
+    if (!session) {
+      // Pas connecté → rediriger vers login avec retour sur pricing
+      window.location.href = '/login?redirect=/pricing&plan=' + plan + '&billing=' + billing
+      return
+    }
+
+    // Appeler l'Edge Function avec le token
+    const res = await fetch(SUPABASE_URL + '/functions/v1/mollie-checkout', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token,
+      },
       body: JSON.stringify({ plan, billing }),
-    });
-    if (!res.ok) throw new Error((await res.json()).error || 'erreur serveur');
-    const { checkoutUrl } = await res.json();
-    window.location.href = checkoutUrl;
+    })
+
+    if (!res.ok) throw new Error((await res.json()).error || 'erreur serveur')
+    const { checkoutUrl } = await res.json()
+    window.location.href = checkoutUrl
+
   } catch(e) {
-    showError('erreur : ' + e.message);
-    spinEl.style.display = 'none';
-    btnEl.classList.remove('cta-loading');
+    showError('erreur : ' + e.message)
+    spinEl.style.display = 'none'
+    btnEl.classList.remove('cta-loading')
   }
 }
 
 function showError(msg) {
-  const el = document.getElementById('error-toast');
-  el.textContent = msg;
-  el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 4000);
+  const el = document.getElementById('error-toast')
+  el.textContent = msg
+  el.style.display = 'block'
+  setTimeout(() => el.style.display = 'none', 4000)
 }
 
 function toggleFaq(item) {
-  const a     = item.querySelector('.faq-a');
-  const arrow = item.querySelector('.faq-arrow');
-  a.classList.toggle('open');
-  arrow.classList.toggle('open');
+  const a     = item.querySelector('.faq-a')
+  const arrow = item.querySelector('.faq-arrow')
+  a.classList.toggle('open')
+  arrow.classList.toggle('open')
 }
 
-// Entrance animation
+// ── Entrance animation ──
 document.querySelectorAll('.plan-card').forEach((card, i) => {
-  card.style.opacity = '0';
-  card.style.transform = card.classList.contains('featured') ? 'scale(1.03) translateY(20px)' : 'translateY(20px)';
-  card.style.transition = 'opacity .4s ease, transform .4s ease';
+  card.style.opacity = '0'
+  card.style.transform = card.classList.contains('featured') ? 'scale(1.03) translateY(20px)' : 'translateY(20px)'
+  card.style.transition = 'opacity .4s ease, transform .4s ease'
   setTimeout(() => {
-    card.style.opacity = '1';
-    card.style.transform = card.classList.contains('featured') ? 'scale(1.03)' : 'translateY(0)';
-  }, 80 + i * 80);
-});
+    card.style.opacity = '1'
+    card.style.transform = card.classList.contains('featured') ? 'scale(1.03)' : 'translateY(0)'
+  }, 80 + i * 80)
+})
+
+// ── Si l'user revient du login avec ?plan=xxx → lancer checkout auto ──
+window.addEventListener('load', async () => {
+  const params = new URLSearchParams(window.location.search)
+  const planParam    = params.get('plan')
+  const billingParam = params.get('billing')
+  if (planParam && billingParam) {
+    setBilling(billingParam)
+    await checkout(planParam)
+  }
+})
 </script>
 </body>
 </html>
