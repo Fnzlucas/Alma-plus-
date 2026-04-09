@@ -192,128 +192,19 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 /* Mobile */
 #mob-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 49; }
 #btn-mob { display: none; }
-
-/* CC Layout */
-.cc-main { display: grid; grid-template-columns: 1fr 320px; gap: 16px; }
-
-/* =============================================
-   RESPONSIVE — ≤900px
-   ============================================= */
-@media (max-width: 900px) {
-  .cc-main { grid-template-columns: 1fr !important; }
-  .msg-layout { grid-template-columns: 1fr !important; height: auto !important; min-height: 400px; }
-  #api-pill { display: none !important; }
-}
-
-/* =============================================
-   RESPONSIVE — ≤768px  (mobile)
-   ============================================= */
 @media (max-width: 768px) {
-
-  /* ── Sidebar ── */
   .sidebar { left: -260px; transition: left .22s ease; }
   .sidebar.mob-open { left: 0 !important; box-shadow: 8px 0 40px rgba(0,85,212,0.15); }
   .main { margin-left: 0 !important; }
   #btn-mob { display: flex !important; }
   #mob-overlay.show { display: block; }
-
-  /* ── Topbar ── */
-  .topbar { padding: 0 12px !important; gap: 8px !important; height: 52px !important; }
-  #api-pill { display: none !important; }
-  #page-sub { display: none !important; }
-  #topbar-search { display: none !important; }
-  .topbar > div[style*="rechercher"],
-  .topbar > div[style*="search"] { display: none !important; }
-
-  /* ── Content ── */
-  .content { padding: 12px !important; overflow-x: hidden !important; }
-
-  /* ── Prevent ANY child from overflowing ── */
-  .content * { max-width: 100%; }
-
-  /* ── KPIs ── */
-  .kpi-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; margin-bottom: 16px !important; }
-  .kpi-value { font-size: 26px !important; letter-spacing: -1px !important; }
-  .kpi-card { padding: 14px 16px !important; }
-
-  /* ── Dashboard main grid (1fr 300px) → 1 col ── */
-  #page-dashboard > div[style*="grid-template-columns"] { display: flex !important; flex-direction: column !important; gap: 14px !important; }
-
-  /* ── ALL inline grids → 1 col via universal override ── */
-  [style*="grid-template-columns: 1fr 300px"],
-  [style*="grid-template-columns:1fr 300px"],
-  [style*="grid-template-columns: 1fr 320px"],
-  [style*="grid-template-columns:1fr 320px"],
-  [style*="grid-template-columns: 320px 1fr"],
-  [style*="grid-template-columns: 2fr 1fr"],
-  [style*="grid-template-columns:2fr 1fr"],
-  [style*="grid-template-columns: 1fr 1fr"],
-  [style*="grid-template-columns:1fr 1fr"],
-  [style*="grid-template-columns: 340px 1fr"],
-  [style*="grid-template-columns: 280px 1fr"],
-  [style*="grid-template-columns:280px 1fr"] { grid-template-columns: 1fr !important; }
-
-  /* ── Autopilot grid ── */
-  #page-autopilot [style*="grid-template-columns: 320px 1fr"],
-  #page-autopilot [style*="grid-template-columns:320px 1fr"] { grid-template-columns: 1fr !important; }
-  #page-autopilot [style*="grid-template-columns: repeat(3"] { grid-template-columns: 1fr 1fr 1fr !important; }
-
-  /* ── Pipeline board ── */
-  #pipeline-board, #pipeline-table { grid-template-columns: 1fr !important; }
-
-  /* ── Messagerie ── */
-  .msg-layout { grid-template-columns: 1fr !important; height: auto !important; }
-  .bubble { max-width: 88% !important; }
-
-  /* ── Cards ── */
-  .card-header { padding: 14px 16px !important; flex-wrap: wrap; gap: 8px; }
-  .card-body { padding: 14px 16px !important; }
-
-  /* ── Tables → scroll horizontal ── */
-  .card-body table, .card-body > div[style*="overflow"] { overflow-x: auto !important; }
-  table { min-width: 480px; display: block; overflow-x: auto; }
-
-  /* ── Form rows → 1 col ── */
-  .form-row { grid-template-columns: 1fr !important; gap: 10px !important; }
-
-  /* ── Modal → bottom sheet ── */
-  .modal-overlay { padding: 0 !important; align-items: flex-end !important; }
-  .modal { max-width: 100% !important; border-radius: 24px 24px 0 0 !important; max-height: 90vh !important; }
-
-  /* ── Radar page ── */
-  #page-radar > div { height: auto !important; }
-  #page-radar [style*="flex:1;position:relative"] { height: 55vw !important; min-height: 260px !important; }
-  #radar-sheet { position: fixed !important; top: auto !important; bottom: 0 !important; right: 0 !important; left: 0 !important; width: 100% !important; max-height: 60vh !important; border-radius: 20px 20px 0 0 !important; }
-  #page-radar [style*="align-items: center; flex-wrap: wrap"] { flex-direction: column !important; align-items: stretch !important; }
-  #radar-search { width: 100% !important; }
-  #radar-city { width: 100% !important; }
-
-  /* ── Radar/veille inputs ── */
-  .form-input[style*="width:220px"],
-  .form-input[style*="width: 220px"],
-  .form-input[style*="width:140px"],
-  .form-input[style*="width: 140px"],
-  input[style*="width:180px"] { width: 100% !important; }
-
-  /* ── Tabs → scroll ── */
-  .tabs { overflow-x: auto; white-space: nowrap; justify-content: flex-start !important; flex-wrap: nowrap !important; -webkit-overflow-scrolling: touch; }
-
-  /* ── Chips → wrap ── */
-  .chip { font-size: 9px !important; padding: 5px 10px !important; }
-
-  /* ── Settings ── */
-  #page-settings.active { display: block !important; padding: 0 !important; }
-  #page-settings > div { max-width: 100% !important; }
-
-  /* ── Calendrier ── */
-  #page-calendrier [style*="grid-template-columns: repeat(7"] { font-size: 9px !important; }
-  #page-calendrier [style*="max-width:900px"] { max-width: 100% !important; }
-
-  /* ── Buttons dans header ── */
-  .btn { font-size: 10px !important; padding: 7px 12px !important; }
-  .btn .msym { font-size: 13px !important; }
+  .kpi-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  .content { padding: 16px !important; }
 }
 
+/* CC Layout */
+.cc-main { display: grid; grid-template-columns: 1fr 320px; gap: 16px; }
+@media (max-width: 900px) { .cc-main { grid-template-columns: 1fr; } }
 
 /* Chips */
 .chip { font-size: 10px; font-weight: 700; padding: 6px 14px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.5); color: #6b7280; cursor: pointer; transition: all .12s; letter-spacing: .02em; }
@@ -441,7 +332,7 @@ tr:hover td { background: rgba(255,255,255,0.3); }
     <div style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(5,150,105,0.08);border:1px solid rgba(5,150,105,0.15);border-radius:99px;font-size:10px;font-weight:700;color:#059669" id="api-pill">
       <div class="dot-on"></div><span>toutes les apis actives</span>
     </div>
-    <div id="topbar-search" style="display:flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.5);border-radius:99px">
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.5);border-radius:99px">
       <span class="msym" style="font-size:18px;color:#9ca3af">search</span>
       <input placeholder="rechercher dans le noyau..." style="background:none;border:none;outline:none;font-size:11px;color:#1a1a2e;width:180px;font-family:inherit;letter-spacing:-.01em" type="text"/>
     </div>
@@ -3760,6 +3651,17 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
 (async function() {
   const sb = _sb;
 
+  // 0. Retour de paiement Mollie → sauvegarder le plan immédiatement
+  const urlParams = new URLSearchParams(window.location.search);
+  const paymentStatus = urlParams.get('payment');
+  const paymentPlan = urlParams.get('plan');
+  if (paymentStatus === 'success' && paymentPlan) {
+    localStorage.setItem('alma_plan', paymentPlan);
+    // Nettoyer l'URL
+    window.history.replaceState({}, '', '/dashboard');
+    showToast('✓ Abonnement ' + paymentPlan + ' activé — bienvenue !');
+  }
+
   // 1. Vérifier session
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = '/login'; return; }
@@ -3770,25 +3672,25 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
   const nameEl = document.getElementById('sidebar-user-name');
   if (nameEl) nameEl.textContent = name.toLowerCase();
 
-  // 3. Vérifier plan — localStorage d'abord
-  let plan = localStorage.getItem('alma_plan');
+  // 3. Vérifier plan dans Supabase (table users)
+  const { data: profile } = await sb
+    .from('users')
+    .select('plan, mollie_subscription_id, billing')
+    .eq('id', session.user.id)
+    .maybeSingle();
 
-  if (!plan || plan === 'null' || plan === 'undefined') {
-    // Chercher dans Supabase
-    const { data: profile } = await sb
-      .from('profiles')
-      .select('plan, subscription_status')
-      .eq('id', session.user.id)
-      .maybeSingle();
+  const plan = profile?.plan;
+  const hasSub = profile?.mollie_subscription_id;
 
-    if (profile?.plan && profile?.subscription_status === 'active') {
-      plan = profile.plan;
-      localStorage.setItem('alma_plan', plan);
-    } else {
-      // Pas de plan → pricing
+  // Si pas de plan payant → rediriger vers pricing
+  if (!plan || plan === 'free' || plan === 'null') {
+    const localPlan = localStorage.getItem('alma_plan');
+    if (!localPlan || localPlan === 'free' || localPlan === 'null' || localPlan === 'undefined') {
       window.location.href = '/pricing';
       return;
     }
+  } else {
+    localStorage.setItem('alma_plan', plan);
   }
 
   updateQuotaUI();
