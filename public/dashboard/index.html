@@ -3662,8 +3662,16 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
 (async function() {
   const sb = _sb;
 
-  // 0. Retour de paiement Mollie → sauvegarder le plan immédiatement
+  // DEV BYPASS — accès direct via ?dev=true
   const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('dev') === 'true') {
+    localStorage.setItem('alma_plan', 'pro');
+    document.getElementById('auth-loading').style.display = 'none';
+    document.getElementById('app-root').style.display = 'flex';
+    updateQuotaUI();
+    loadState();
+    return;
+  }
   const paymentStatus = urlParams.get('payment');
   const paymentPlan = urlParams.get('plan');
   if (paymentStatus === 'success' && paymentPlan) {
