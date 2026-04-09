@@ -543,55 +543,60 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
    ============================================= */
 @media(max-width:900px){
   /* Nav */
-  .nav-links,.nav-cta{display:none}
+  .nav-links,.nav-cta{display:none!important}
   #mob-btn{display:flex!important}
   .nav-inner{padding:0 1.2rem}
-  /* Masquer le lien "connexion" desktop aussi */
   .nav-inner > div:last-child > a:first-child{display:none}
 
   /* Hero */
   .hero{padding:90px 1.2rem 50px}
-  .hero-inner{grid-template-columns:1fr!important;gap:2.5rem}
+  .hero-inner{grid-template-columns:1fr!important;gap:2rem}
   .hero-title{font-size:2.2rem}
-  .hero-sub{max-width:100%;font-size:1.05rem}
-  .floating-notif{display:none!important}
-  /* Hero card KPIs 2x2 */
-  .hc-kpis{grid-template-columns:repeat(2,1fr)}
-  .hc-kpi:nth-child(2){border-right:none}
-  .hc-kpi:nth-child(3){border-top:1px solid rgba(0,0,0,0.05)}
-  .hc-kpi:nth-child(4){border-right:none;border-top:1px solid rgba(0,0,0,0.05)}
+  .hero-sub{max-width:100%}
+
+  /* Hero workflow → contenu simplifié visible */
+  .hero-inner > div:last-child{overflow:hidden}
 
   /* Stats bar */
-  .stats-inner{flex-wrap:wrap;padding:0 1.2rem}
-  .stat-item{border-right:none;border-bottom:1px solid rgba(0,0,0,0.06);width:50%;flex:unset}
-  .stat-item:last-child{border-bottom:none}
+  .stats-inner{flex-wrap:wrap!important;padding:0 1.2rem}
+  /* Masquer les dividers inline */
+  .stats-inner > div[style*="width:1px"]{display:none!important}
+  .stat-item{border-bottom:1px solid rgba(0,0,0,0.06);width:50%!important;flex:unset!important;padding:1.2rem 0!important}
 
   /* Sections */
   section{padding:4.5rem 1.2rem}
 
-  /* Grids → 1 col */
+  /* Grids via classe → 1 col */
   .split-grid,.feat-grid,.testim-grid,.price-grid,.steps-grid,.footer-grid{grid-template-columns:1fr!important}
+
+  /* Grids via style inline → 1 col */
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns:1fr 1fr"],
+  [style*="grid-template-columns: repeat(3"],
+  [style*="grid-template-columns:repeat(3"],
+  [style*="grid-template-columns: repeat(5"],
+  [style*="grid-template-columns:repeat(5"]{grid-template-columns:1fr!important}
 
   /* Sources */
   .sources-grid{grid-template-columns:repeat(2,1fr)!important}
   .sources-row{grid-template-columns:repeat(2,1fr)!important}
 
-  /* Pricing — annuler le scale */
-  .price-card-featured{transform:none}
-  .price-card-featured:hover{transform:translateY(-4px)}
+  /* Pricing */
+  .price-card-featured{transform:none!important}
+  .price-card-featured:hover{transform:translateY(-4px)!important}
 
   /* CTA */
   .cta-section{padding:3rem 1.2rem}
-  .cta-card{padding:3rem 1.5rem;border-radius:24px}
-  .cta-input-wrap{flex-direction:column}
+  .cta-card{padding:3rem 1.5rem!important;border-radius:24px!important}
+  .cta-input-wrap{flex-direction:column!important}
 
   /* Footer */
-  .footer-grid{gap:2rem}
+  .footer-grid{gap:2rem!important}
   footer{padding:3rem 1.2rem 2rem}
 
-  /* Pilote automatique */
+  /* Pilote */
   #puissance{padding:4.5rem 1.2rem}
-  .pilot-kpis{grid-template-columns:repeat(2,1fr)}
+  .pilot-kpis{grid-template-columns:repeat(2,1fr)!important}
   .pilot-kpi:nth-child(2){border-right:none}
   .pilot-kpi:nth-child(3){border-top:1px solid rgba(255,255,255,0.05)}
   .pilot-kpi:nth-child(4){border-right:none;border-top:1px solid rgba(255,255,255,0.05)}
@@ -605,47 +610,64 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
    RESPONSIVE — MOBILE (≤600px)
    ============================================= */
 @media(max-width:600px){
+  /* Prevent overflow global */
+  *{max-width:100%}
+
   /* Nav */
   .nav-inner{height:48px;padding:0 1rem}
 
   /* Hero */
-  .hero{padding:78px 1rem 40px}
-  .hero-title{font-size:1.9rem;line-height:1.1}
-  .hero-sub{font-size:.95rem}
-  .hero-btns{flex-direction:column;align-items:stretch}
-  .btn-primary,.btn-secondary{text-align:center;justify-content:center}
+  .hero{padding:74px 1rem 36px!important;min-height:auto!important}
+  .hero-title{font-size:1.85rem!important;line-height:1.08!important}
+  .hero-sub{font-size:.92rem}
+  .hero-btns{flex-direction:column!important;align-items:stretch!important}
+  .btn-primary,.btn-secondary{text-align:center!important;justify-content:center!important;width:100%!important}
   .hero-social-proof{flex-direction:column;align-items:flex-start;gap:.6rem}
-  /* Masquer la hero card sur très petit écran */
-  .hero-inner > div:last-child{display:none}
 
-  /* Stats */
-  .stats-inner{padding:0 1rem}
-  .stat-item{width:100%}
+  /* Masquer le bloc workflow hero sur mobile — trop dense */
+  .hero-inner > div:last-child{display:none!important}
+
+  /* Stats bar → 1 col */
+  .stat-item{width:100%!important;border-bottom:1px solid rgba(0,0,0,0.06)!important}
+  .stat-item:last-child{border-bottom:none!important}
+  .stats-inner > div[style*="width:1px"]{display:none!important}
 
   /* Sections */
-  section{padding:3rem 1rem}
+  section{padding:3rem 1rem!important}
 
-  /* Feature cards */
-  .feat-card{padding:1.6rem}
+  /* Toutes les grids inline → 1 col */
+  [style*="grid-template-columns"]{grid-template-columns:1fr!important}
+  /* Sauf les KPIs du pilote → garder 2 col */
+  .pilot-kpis{grid-template-columns:repeat(2,1fr)!important}
+  .pilot-stats{grid-template-columns:repeat(2,1fr)!important}
+  /* Et le calendrier */
+  [style*="grid-template-columns: repeat(7"]{grid-template-columns:repeat(7,1fr)!important}
 
-  /* Sources 1 col */
-  .sources-grid{grid-template-columns:1fr!important}
-  .sources-row{grid-template-columns:1fr!important}
+  /* Sources → 1 col */
+  .sources-grid,.sources-row{grid-template-columns:1fr!important}
 
-  /* Testimonials */
-  .testim-card{padding:1.6rem}
+  /* Features / steps / testi */
+  .feat-card,.step-card,.testim-card{padding:1.5rem!important}
+
+  /* Analytics split */
+  .analytics-kpis{grid-template-columns:repeat(3,1fr)!important}
 
   /* Pricing */
-  .price-card{padding:1.6rem}
+  .price-card{padding:1.5rem!important}
+  .price-card-featured{transform:none!important}
+
+  /* Floating stats dans le hero workflow → masquer */
+  [style*="position:absolute"][style*="animation:float"]{display:none!important}
 
   /* CTA */
-  .cta-section{padding:2rem 1rem}
-  .cta-card{padding:2.2rem 1rem;border-radius:18px}
-  .cta-input-wrap{flex-direction:column;gap:.5rem}
-  .cta-input,.cta-input-wrap .btn-primary{width:100%;text-align:center;justify-content:center}
+  .cta-section{padding:2rem 1rem!important}
+  .cta-card{padding:2rem 1rem!important;border-radius:18px!important}
+  .cta-input-wrap{flex-direction:column!important;gap:.5rem!important}
+  .cta-input{width:100%!important}
+  .cta-input-wrap .btn-primary{width:100%!important;text-align:center!important;justify-content:center!important}
 
   /* Footer */
-  .footer-grid{grid-template-columns:1fr!important;gap:1.8rem}
+  .footer-grid{grid-template-columns:1fr!important;gap:1.8rem!important}
   footer{padding:2.5rem 1rem 1.5rem}
 
   /* Logo cloud */
@@ -653,21 +675,22 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
   .logos{gap:1.5rem}
 
   /* Pilote */
-  #puissance{padding:3rem 1rem}
-  .pilot-kpis{grid-template-columns:repeat(2,1fr)}
-  .pilot-kpi{padding:12px}
-  .pilot-kpi-val{font-size:1.5rem}
+  #puissance{padding:3rem 1rem!important}
+  .pilot-kpi{padding:12px!important}
+  .pilot-kpi-val{font-size:1.5rem!important}
   .pilot-cards{grid-template-columns:1fr!important}
-  .pilot-stats{grid-template-columns:repeat(2,1fr)!important}
-  .pilot-sources{gap:.3rem}
+  .pilot-sources{gap:.3rem;flex-wrap:wrap}
   .src-pill{padding:5px 9px}
   .src-label{font-size:.62rem}
   .pilot-log{height:140px}
-  .pilot-topbar-title{display:none}
+  .pilot-topbar-title{display:none!important}
 
   /* FAQ */
   .faq-item{padding:1.1rem 1.2rem}
-  .faq-summary{font-size:.88rem}
+  .faq-summary{font-size:.86rem}
+
+  /* Supprimer les positions absolutes qui débordent */
+  [style*="position:absolute"][style*="left:-2"],[style*="position:absolute"][style*="right:-"]{display:none!important}
 }
 
 #mob-btn{display:none;background:none;border:none;cursor:pointer;padding:4px}
