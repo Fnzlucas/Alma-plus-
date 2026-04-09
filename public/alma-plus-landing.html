@@ -538,23 +538,59 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
 .pilot-stat-val{font-size:1.4rem;font-weight:700;letter-spacing:-0.05em;margin-bottom:.3rem;font-style:normal}
 .pilot-stat-label{font-size:.62rem;color:rgba(255,255,255,0.25);line-height:1.5}
 
-/* MOBILE */
+/* =============================================
+   RESPONSIVE — TABLET (≤900px)
+   ============================================= */
 @media(max-width:900px){
-  .hero-inner,.split-grid,.feat-grid,.testim-grid,.price-grid,.steps-grid,.footer-grid{grid-template-columns:1fr!important}
-  .sources-grid{grid-template-columns:repeat(2,1fr)!important}
-  .sources-row{grid-template-columns:1fr!important}
-  .stats-inner{flex-wrap:wrap}
-  .stat-item{border-right:none;border-bottom:1px solid rgba(0,0,0,0.06);min-width:45%}
-  .hero{padding:100px 1.5rem 60px}
-  .cta-card{padding:3rem 1.5rem}
-  .cta-input-wrap{flex-direction:column}
+  /* Nav */
   .nav-links,.nav-cta{display:none}
   #mob-btn{display:flex!important}
-  .hero-title{font-size:2.4rem}
-  section{padding:5rem 1.5rem}
+  .nav-inner{padding:0 1.2rem}
+  /* Masquer le lien "connexion" desktop aussi */
+  .nav-inner > div:last-child > a:first-child{display:none}
 
-  /* Pilote responsive */
-  #puissance{padding:5rem 1.2rem}
+  /* Hero */
+  .hero{padding:90px 1.2rem 50px}
+  .hero-inner{grid-template-columns:1fr!important;gap:2.5rem}
+  .hero-title{font-size:2.2rem}
+  .hero-sub{max-width:100%;font-size:1.05rem}
+  .floating-notif{display:none!important}
+  /* Hero card KPIs 2x2 */
+  .hc-kpis{grid-template-columns:repeat(2,1fr)}
+  .hc-kpi:nth-child(2){border-right:none}
+  .hc-kpi:nth-child(3){border-top:1px solid rgba(0,0,0,0.05)}
+  .hc-kpi:nth-child(4){border-right:none;border-top:1px solid rgba(0,0,0,0.05)}
+
+  /* Stats bar */
+  .stats-inner{flex-wrap:wrap;padding:0 1.2rem}
+  .stat-item{border-right:none;border-bottom:1px solid rgba(0,0,0,0.06);width:50%;flex:unset}
+  .stat-item:last-child{border-bottom:none}
+
+  /* Sections */
+  section{padding:4.5rem 1.2rem}
+
+  /* Grids → 1 col */
+  .split-grid,.feat-grid,.testim-grid,.price-grid,.steps-grid,.footer-grid{grid-template-columns:1fr!important}
+
+  /* Sources */
+  .sources-grid{grid-template-columns:repeat(2,1fr)!important}
+  .sources-row{grid-template-columns:repeat(2,1fr)!important}
+
+  /* Pricing — annuler le scale */
+  .price-card-featured{transform:none}
+  .price-card-featured:hover{transform:translateY(-4px)}
+
+  /* CTA */
+  .cta-section{padding:3rem 1.2rem}
+  .cta-card{padding:3rem 1.5rem;border-radius:24px}
+  .cta-input-wrap{flex-direction:column}
+
+  /* Footer */
+  .footer-grid{gap:2rem}
+  footer{padding:3rem 1.2rem 2rem}
+
+  /* Pilote automatique */
+  #puissance{padding:4.5rem 1.2rem}
   .pilot-kpis{grid-template-columns:repeat(2,1fr)}
   .pilot-kpi:nth-child(2){border-right:none}
   .pilot-kpi:nth-child(3){border-top:1px solid rgba(255,255,255,0.05)}
@@ -564,12 +600,74 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
   .pilot-stats .pilot-stat:last-child{grid-column:1/-1}
   .pilot-log{height:160px}
 }
+
+/* =============================================
+   RESPONSIVE — MOBILE (≤600px)
+   ============================================= */
 @media(max-width:600px){
+  /* Nav */
+  .nav-inner{height:48px;padding:0 1rem}
+
+  /* Hero */
+  .hero{padding:78px 1rem 40px}
+  .hero-title{font-size:1.9rem;line-height:1.1}
+  .hero-sub{font-size:.95rem}
+  .hero-btns{flex-direction:column;align-items:stretch}
+  .btn-primary,.btn-secondary{text-align:center;justify-content:center}
+  .hero-social-proof{flex-direction:column;align-items:flex-start;gap:.6rem}
+  /* Masquer la hero card sur très petit écran */
+  .hero-inner > div:last-child{display:none}
+
+  /* Stats */
+  .stats-inner{padding:0 1rem}
+  .stat-item{width:100%}
+
+  /* Sections */
+  section{padding:3rem 1rem}
+
+  /* Feature cards */
+  .feat-card{padding:1.6rem}
+
+  /* Sources 1 col */
+  .sources-grid{grid-template-columns:1fr!important}
+  .sources-row{grid-template-columns:1fr!important}
+
+  /* Testimonials */
+  .testim-card{padding:1.6rem}
+
+  /* Pricing */
+  .price-card{padding:1.6rem}
+
+  /* CTA */
+  .cta-section{padding:2rem 1rem}
+  .cta-card{padding:2.2rem 1rem;border-radius:18px}
+  .cta-input-wrap{flex-direction:column;gap:.5rem}
+  .cta-input,.cta-input-wrap .btn-primary{width:100%;text-align:center;justify-content:center}
+
+  /* Footer */
+  .footer-grid{grid-template-columns:1fr!important;gap:1.8rem}
+  footer{padding:2.5rem 1rem 1.5rem}
+
+  /* Logo cloud */
+  .logo-cloud{padding:1.5rem 1rem}
+  .logos{gap:1.5rem}
+
+  /* Pilote */
+  #puissance{padding:3rem 1rem}
   .pilot-kpis{grid-template-columns:repeat(2,1fr)}
-  .pilot-stats{grid-template-columns:repeat(2,1fr)}
-  .pilot-sources{gap:.35rem}
-  .src-pill{padding:5px 10px}
-  .src-label{font-size:.66rem}
+  .pilot-kpi{padding:12px}
+  .pilot-kpi-val{font-size:1.5rem}
+  .pilot-cards{grid-template-columns:1fr!important}
+  .pilot-stats{grid-template-columns:repeat(2,1fr)!important}
+  .pilot-sources{gap:.3rem}
+  .src-pill{padding:5px 9px}
+  .src-label{font-size:.62rem}
+  .pilot-log{height:140px}
+  .pilot-topbar-title{display:none}
+
+  /* FAQ */
+  .faq-item{padding:1.1rem 1.2rem}
+  .faq-summary{font-size:.88rem}
 }
 
 #mob-btn{display:none;background:none;border:none;cursor:pointer;padding:4px}
@@ -626,7 +724,7 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
           la prospection<br/><span class="accent">automatisée</span><br/>pour les entrepreneurs<br/><span class="muted">français.</span>
         </h1>
         <p class="hero-sub reveal on d2">
-          Huntlist. identifie vos prospects, rédige des emails personnalisés et les contacte automatiquement. vous intervenez uniquement quand ils répondent.
+          le ca d'un commercial à partir de 2,50€ par jour.
         </p>
         <div class="hero-btns reveal on d3">
           <a href="/login" class="btn-primary">démarrer maintenant <span class="msym" style="font-size:1rem">arrow_forward</span></a>
@@ -646,63 +744,136 @@ footer{background:#fff;border-top:1px solid rgba(0,0,0,0.06);padding:4rem 2rem 2
         </div>
       </div>
 
-      <!-- HERO CARD -->
-      <div style="position:relative" class="reveal on d2 float">
-        <div class="hero-card">
-          <div class="hc-bar">
-            <div class="hc-dots">
-              <div class="hc-dot" style="background:#ff5f57"></div>
-              <div class="hc-dot" style="background:#febc2e"></div>
-              <div class="hc-dot" style="background:#28c840"></div>
-            </div>
-            <div style="flex:1;display:flex;align-items:center;justify-content:center">
-              <div style="background:rgba(0,0,0,0.06);border-radius:6px;padding:3px 14px;font-size:10px;font-weight:500;color:rgba(0,0,0,0.35)">Huntlist. · tableau de bord</div>
-            </div>
-            <div style="font-size:8px;font-weight:700;color:#30d158;background:rgba(48,209,88,0.1);border:1px solid rgba(48,209,88,0.2);padding:3px 9px;border-radius:980px;display:flex;align-items:center;gap:4px">
-              <span style="width:5px;height:5px;border-radius:50%;background:#30d158"></span>pilote actif
-            </div>
+      <!-- WORKFLOW -->
+      <div style="position:relative;flex:1;min-width:0" class="reveal on d2">
+        <div style="background:#f4f6f9;border-radius:20px;border:1px solid #e2e6ed;padding:32px 28px 100px;position:relative;overflow:visible">
+
+          <!-- Dots pattern -->
+          <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.5;border-radius:20px;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+            <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#c8d0dc"/></pattern>
+            <rect width="100%" height="100%" fill="url(#dots)"/>
+          </svg>
+
+          <!-- Stat top right -->
+          <div style="position:absolute;top:16px;right:16px;background:white;border-radius:10px;padding:10px 14px;box-shadow:0 3px 12px rgba(0,0,0,0.09);border:1px solid #e2e6ed;z-index:2;animation:floatB 3.5s ease-in-out infinite">
+            <div style="font-size:8px;font-weight:700;color:#9ca3af;margin-bottom:2px;text-transform:uppercase;letter-spacing:.1em">prospects aujourd'hui</div>
+            <div style="font-size:22px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">+48</div>
+            <div style="font-size:9px;color:#059669;font-weight:700">↑ en temps réel</div>
           </div>
-          <div class="hc-kpis">
-            <div class="hc-kpi"><div class="hc-kpi-label">prospects</div><div class="hc-kpi-val">247</div><div class="hc-kpi-sub">↑ +48 auj.</div></div>
-            <div class="hc-kpi"><div class="hc-kpi-label">emails ia</div><div class="hc-kpi-val">124</div><div class="hc-kpi-sub">↑ 34% rép.</div></div>
-            <div class="hc-kpi"><div class="hc-kpi-label">pipeline</div><div class="hc-kpi-val">17</div><div class="hc-kpi-sub">↑ 3 nvx</div></div>
-            <div class="hc-kpi"><div class="hc-kpi-label">convertis</div><div class="hc-kpi-val" style="color:var(--blue)">4</div><div class="hc-kpi-sub">↑ ce mois</div></div>
-          </div>
-          <div class="hc-list">
-            <div style="font-size:7.5px;font-weight:700;color:rgba(0,0,0,0.3);text-transform:uppercase!important;letter-spacing:.1em;margin-bottom:3px">derniers prospects trouvés</div>
-            <div class="hc-row">
-              <div class="hc-av" style="background:#0055D4">pl</div>
-              <div style="flex:1"><div class="hc-name">plomberie leclerc</div><div class="hc-addr">lyon 3e · ★ 4.8 · tél. vérifié</div></div>
-              <span class="hc-score" style="background:rgba(239,68,68,0.1);color:#ef4444">96</span>
-              <button style="background:var(--blue);color:#fff;border:none;border-radius:7px;padding:3px 8px;font-size:8px;font-weight:700;cursor:pointer;font-family:var(--sf);font-style:italic">email ia</button>
+
+          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:0">
+
+            <!-- Prospect trouvé -->
+            <div style="background:white;border-radius:14px;border:1px solid #e2e6ed;padding:14px 18px;display:flex;align-items:center;gap:12px;width:100%;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+              <div style="width:38px;height:38px;border-radius:10px;background:#f0f4ff;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <span class="msym" style="color:#0055D4;font-size:20px">person_search</span>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:700;color:#0a0a1a">plomberie leclerc</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">lyon 3e · ★ 4.8 · tél. vérifié</div>
+              </div>
+              <span style="font-size:10px;font-weight:800;background:rgba(239,68,68,0.1);color:#ef4444;padding:3px 9px;border-radius:99px;white-space:nowrap">score 96</span>
+              <span style="font-size:10px;font-weight:700;color:#059669;background:rgba(5,150,105,0.1);padding:3px 9px;border-radius:99px;display:flex;align-items:center;gap:3px;white-space:nowrap"><span style="width:5px;height:5px;border-radius:50%;background:#059669;flex-shrink:0"></span>trouvé</span>
             </div>
-            <div class="hc-row">
-              <div class="hc-av" style="background:#7c3aed">sb</div>
-              <div style="flex:1"><div class="hc-name">sb plomberie pro</div><div class="hc-addr">lyon 6e · ★ 4.6 · email trouvé</div></div>
-              <span class="hc-score" style="background:rgba(239,68,68,0.1);color:#ef4444">91</span>
-              <button style="background:var(--blue);color:#fff;border:none;border-radius:7px;padding:3px 8px;font-size:8px;font-weight:700;cursor:pointer;font-family:var(--sf);font-style:italic">email ia</button>
+
+            <!-- Connecteur + condition -->
+            <div style="display:flex;flex-direction:column;align-items:center;margin:10px 0">
+              <div style="width:2px;height:18px;background:linear-gradient(to bottom,#e2e6ed,#0055D4)"></div>
+              <div style="background:white;border:2px solid #0055D4;border-radius:10px;padding:7px 18px;font-size:12px;font-weight:800;color:#0055D4;display:flex;align-items:center;gap:6px;box-shadow:0 2px 10px rgba(0,85,212,0.15)">
+                <span class="msym" style="font-size:15px">local_fire_department</span>score ≥ 80
+              </div>
+              <div style="display:flex;gap:80px;margin-top:0">
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div style="width:2px;height:12px;background:#059669"></div>
+                  <div style="font-size:9px;font-weight:700;color:#059669">oui</div>
+                  <div style="width:2px;height:12px;background:#059669"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div style="width:2px;height:12px;background:#dc2626"></div>
+                  <div style="font-size:9px;font-weight:700;color:#dc2626">non</div>
+                  <div style="width:2px;height:12px;background:#dc2626"></div>
+                </div>
+              </div>
             </div>
-            <div class="hc-row">
-              <div class="hc-av" style="background:#059669">bp</div>
-              <div style="flex:1"><div class="hc-name">bâti pro sarl</div><div class="hc-addr">bordeaux · ★ 4.3 · 5 ans</div></div>
-              <span class="hc-score" style="background:rgba(249,115,22,0.1);color:#f97316">78</span>
-              <button style="background:var(--blue);color:#fff;border:none;border-radius:7px;padding:3px 8px;font-size:8px;font-weight:700;cursor:pointer;font-family:var(--sf);font-style:italic">email ia</button>
+
+            <!-- Actions + mini cards -->
+            <div style="display:flex;gap:14px;width:100%;align-items:flex-start">
+
+              <!-- Colonne Appel -->
+              <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+                <div style="background:white;border-radius:12px;border:2px solid #059669;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(5,150,105,0.1)">
+                  <div style="width:32px;height:32px;border-radius:99px;background:rgba(5,150,105,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span class="msym" style="color:#059669;font-size:17px">phone_in_talk</span>
+                  </div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:#0a0a1a">appel</div>
+                    <div style="font-size:10px;color:#9ca3af">script généré</div>
+                  </div>
+                </div>
+                <!-- Tracker mini -->
+                <div style="background:#1a2035;border-radius:12px;padding:14px 16px">
+                  <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:6px;display:flex;justify-content:space-between">
+                    <span>tracker appel</span><span style="color:#059669">00:42</span>
+                  </div>
+                  <div style="font-size:12px;font-weight:700;color:white;margin-bottom:3px">plomberie leclerc</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:10px">script : "bonjour, je suis..."</div>
+                  <div style="display:flex;gap:6px">
+                    <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:7px;padding:5px;text-align:center;font-size:9px;font-weight:700;color:rgba(255,255,255,0.5)">rdv pris</div>
+                    <div style="flex:1;background:#ef4444;border-radius:7px;padding:5px;text-align:center;font-size:9px;font-weight:700;color:white">raccroché</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Colonne Email -->
+              <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+                <div style="background:white;border-radius:12px;border:2px solid #0055D4;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,85,212,0.1)">
+                  <div style="width:32px;height:32px;border-radius:99px;background:rgba(0,85,212,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span class="msym" style="color:#0055D4;font-size:17px">mail</span>
+                  </div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:#0a0a1a">email</div>
+                    <div style="font-size:10px;color:#9ca3af">personnalisé auto</div>
+                  </div>
+                </div>
+                <!-- Email preview mini -->
+                <div style="background:white;border-radius:12px;padding:14px 16px;border:1px solid #e2e6ed;box-shadow:0 2px 10px rgba(0,0,0,0.06)">
+                  <div style="font-size:9px;color:#9ca3af;margin-bottom:6px">objet : intervention rapide</div>
+                  <div style="font-size:11px;color:#0a0a1a;line-height:1.6">bonjour, j'ai vu que votre établissement est noté 4.8/5 sur google — en tant que spécialiste...</div>
+                  <div style="margin-top:10px">
+                    <div style="height:3px;background:#f0f0f0;border-radius:99px;overflow:hidden">
+                      <div style="width:72%;height:100%;background:#0055D4;border-radius:99px"></div>
+                    </div>
+                    <div style="font-size:9px;color:#9ca3af;margin-top:4px;text-align:center">délivrabilité 94%</div>
+                  </div>
+                </div>
+              </div>
+
             </div>
+
+            <!-- Connecteur bas -->
+            <div style="width:2px;height:18px;background:#e2e6ed;margin:10px 0"></div>
+
+            <!-- Résultat -->
+            <div style="background:linear-gradient(135deg,#0055D4,#0047B8);border-radius:14px;padding:14px 22px;display:flex;align-items:center;gap:12px;width:100%;box-shadow:0 8px 28px rgba(0,85,212,0.3)">
+              <div style="width:34px;height:34px;border-radius:99px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <span class="msym" style="color:white;font-size:20px">emoji_events</span>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:800;color:white">prospect converti</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:2px">rdv confirmé · +1 200€ potentiel</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.2);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:800;color:white">+1</div>
+            </div>
+
           </div>
-          <div class="hc-log">
-            <div style="font-size:7.5px;font-weight:700;color:rgba(255,255,255,0.25);text-transform:uppercase!important;letter-spacing:.12em;margin-bottom:7px">journal temps réel</div>
-            <div class="hc-log-row"><div class="hc-log-dot" style="background:#30d158"></div>email généré · chauffage martin · marseille<span style="margin-left:auto;font-size:7px;opacity:.4">09:47</span></div>
-            <div class="hc-log-row"><div class="hc-log-dot" style="background:var(--blue)"></div>ajouté pipeline · plomberie duval · montpellier<span style="margin-left:auto;font-size:7px;opacity:.4">09:46</span></div>
+
+          <!-- Stat bas gauche -->
+          <div style="position:absolute;bottom:16px;left:16px;background:white;border-radius:10px;padding:10px 14px;box-shadow:0 3px 12px rgba(0,0,0,0.09);border:1px solid #e2e6ed;z-index:2;animation:floatC 4s ease-in-out infinite 0.5s">
+            <div style="font-size:8px;font-weight:700;color:#9ca3af;margin-bottom:2px;text-transform:uppercase;letter-spacing:.1em">taux de réponse</div>
+            <div style="font-size:22px;font-weight:800;color:#0055D4;letter-spacing:-1px">34%</div>
+            <div style="font-size:9px;color:#9ca3af">vs 2% en cold call</div>
           </div>
-        </div>
-        <div class="floating-notif" style="background:#fff;border:1px solid rgba(0,0,0,0.07)">
-          <div style="width:32px;height:32px;border-radius:9px;background:rgba(48,209,88,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <span class="msym" style="font-size:16px;color:#30d158">notifications_active</span>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:700">nouveau prospect répond !</div>
-            <div style="font-size:9px;color:rgba(0,0,0,0.4);margin-top:1px">plomberie leclerc · rdv demain 10h</div>
-          </div>
+
         </div>
       </div>
     </div>
@@ -1412,7 +1583,7 @@ pstartPilot();
       <div class="price-card price-card-glass reveal">
         <div class="price-tier" style="color:rgba(0,0,0,0.3)">starter</div>
         <div style="display:flex;align-items:baseline;gap:.4rem;margin-bottom:.4rem">
-          <span class="price-amount">49€</span><span class="price-period">/mois</span>
+          <span class="price-amount">79€</span><span class="price-period">/mois</span>
         </div>
         <div class="price-list">
           <div class="price-item" style="color:rgba(0,0,0,0.6)"><span class="msym" style="color:var(--blue);font-size:1rem">check_circle</span>500 prospects / mois</div>
@@ -1428,7 +1599,7 @@ pstartPilot();
         <div style="position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:rgba(0,85,212,0.2);filter:blur(60px);border-radius:50%"></div>
         <div class="price-tier" style="color:rgba(255,255,255,0.3);position:relative">pro</div>
         <div style="display:flex;align-items:baseline;gap:.4rem;margin-bottom:.4rem;position:relative">
-          <span class="price-amount" style="color:#fff">129€</span><span class="price-period" style="color:rgba(255,255,255,0.3)">/mois</span>
+          <span class="price-amount" style="color:#fff">149€</span><span class="price-period" style="color:rgba(255,255,255,0.3)">/mois</span>
         </div>
         <div class="price-list" style="position:relative">
           <div class="price-item" style="color:rgba(255,255,255,0.75)"><span class="msym" style="color:var(--blue);font-size:1rem">check_circle</span>4 000 emails ia / mois</div>
@@ -1442,7 +1613,7 @@ pstartPilot();
       <div class="price-card price-card-glass reveal d2">
         <div class="price-tier" style="color:rgba(0,0,0,0.3)">ultra</div>
         <div style="display:flex;align-items:baseline;gap:.4rem;margin-bottom:.4rem">
-          <span class="price-amount">290€</span><span class="price-period">/mois</span>
+          <span class="price-amount">299€</span><span class="price-period">/mois</span>
         </div>
         <div class="price-list">
           <div class="price-item" style="color:rgba(0,0,0,0.6)"><span class="msym" style="color:var(--blue);font-size:1rem">check_circle</span>tout illimité</div>
