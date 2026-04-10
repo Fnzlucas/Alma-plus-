@@ -3753,9 +3753,9 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
   const nameEl = document.getElementById('sidebar-user-name');
   if (nameEl) nameEl.textContent = name.toLowerCase();
 
-  // 3. Vérifier plan dans Supabase (table users)
+  // 3. Vérifier plan dans Supabase (table profiles)
   const { data: profile } = await sb
-    .from('users')
+    .from('profiles')
     .select('plan, mollie_subscription_id, billing')
     .eq('id', session.user.id)
     .maybeSingle();
@@ -4389,8 +4389,9 @@ const _obTotalSteps = 6;
 
 function obCheckAndShow(){
   const done = localStorage.getItem(OB_KEY);
-  if(!done){
-    document.getElementById('onboarding-overlay').style.display = 'flex';
+  const overlay = document.getElementById('onboarding-overlay');
+  if(!done && overlay){
+    overlay.style.display = 'flex';
     obUpdateProgress();
   }
 }
@@ -4483,7 +4484,8 @@ Prospect fictif : une PME locale avec quelques avis Google. Objet + corps. Texte
 
 function obFinish(){
   localStorage.setItem(OB_KEY, 'true');
-  document.getElementById('onboarding-overlay').style.display = 'none';
+  const overlay = document.getElementById('onboarding-overlay');
+  if(overlay) overlay.style.display = 'none';
   addActivity('onboarding complété', 'check_circle', 'green');
 }
 
