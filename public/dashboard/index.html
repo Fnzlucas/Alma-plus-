@@ -260,7 +260,13 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
   /* Autopilot */
   #page-autopilot [style*="grid-template-columns: 320px"] { grid-template-columns: 1fr !important; }
+  #page-autopilot [style*="grid-template-columns:320px"] { grid-template-columns: 1fr !important; }
+  #autopilot-grid { grid-template-columns: 1fr !important; }
+  #page-autopilot > div { max-width: 100% !important; }
   #page-autopilot [style*="grid-template-columns: repeat(3"] { grid-template-columns: 1fr 1fr 1fr !important; }
+  #page-autopilot .card-header { flex-wrap: wrap !important; gap: 8px !important; }
+  #ap-log { height: 200px !important; }
+  #btn-autopilot, #btn-stop-autopilot { font-size: 13px !important; padding: 12px !important; }
 
   /* Pipeline */
   #pipeline-board, #pipeline-table { grid-template-columns: 1fr !important; }
@@ -947,7 +953,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start">
+        <div id="autopilot-grid" style="display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start">
           <div style="display:flex;flex-direction:column;gap:14px">
             <div class="glass card">
               <div class="card-header"><div class="card-title">configuration</div></div>
