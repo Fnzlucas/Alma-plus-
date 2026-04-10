@@ -1436,11 +1436,10 @@ tr:hover td { background: rgba(255,255,255,0.3); }
 
         <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
           <button class="tab active" onclick="switchSettingsTab('tab-profile',this)">mon profil</button>
-          <button class="tab" onclick="switchSettingsTab('tab-email',this)">email d'envoi</button>
-          <button class="tab" onclick="switchSettingsTab('tab-resend',this)" id="tab-btn-resend" style="display:flex;align-items:center;gap:5px">
-            <span class="msym" style="font-size:13px">mail</span>
-            resend · email
-            <span id="resend-status-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
+          <button class="tab" onclick="switchSettingsTab('tab-gmail',this)" id="tab-btn-gmail" style="display:flex;align-items:center;gap:5px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" fill="#EA4335"/></svg>
+            gmail
+            <span id="gmail-status-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
           </button>
           <button class="tab" onclick="switchSettingsTab('tab-ovh',this)" id="tab-btn-ovh" style="display:flex;align-items:center;gap:5px">
             <span class="msym" style="font-size:13px">sms</span>
@@ -1466,15 +1465,64 @@ tr:hover td { background: rgba(255,255,255,0.3); }
           </div>
         </div>
 
-        <div id="tab-email" style="display:none">
-          <div class="glass card">
-            <div class="card-header"><div><div class="card-title">email d'expédition</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">les prospects reçoivent vos emails depuis votre adresse</div></div></div>
+        <!-- ═══ ONGLET GMAIL ═══ -->
+        <div id="tab-gmail" style="display:none">
+          <div class="glass card" style="border:1px solid rgba(234,67,53,0.2)">
+            <div class="card-header" style="background:rgba(234,67,53,0.03)">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#EA4335">
+                  <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" fill="#EA4335"/></svg>
+                  connexion gmail
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">vos emails partent depuis votre vrai compte Gmail · délivrabilité maximale</div>
+              </div>
+              <span class="badge badge-green" id="gmail-connected-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> connecté</span>
+            </div>
             <div class="card-body">
-              <div class="form-group"><label class="form-label">adresse email d'envoi</label><input class="form-input" id="email-from" placeholder="jean@plomberie-dupont.fr" type="email"/></div>
-              <div class="form-group" style="margin-bottom:16px"><label class="form-label">nom affiché</label><input class="form-input" id="email-name" placeholder="jean dupont — plomberie dupont"/></div>
-              <div style="display:flex;gap:10px">
-                <button class="btn btn-primary" onclick="saveEmail()"><span class="msym">save</span>enregistrer</button>
-                <button class="btn btn-ghost" onclick="sendTestEmail()"><span class="msym">send</span>email test</button>
+
+              <!-- Compte connecté -->
+              <div id="gmail-connected-info" style="display:none;margin-bottom:20px">
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:12px">
+                  <div style="width:36px;height:36px;border-radius:50%;background:#EA4335;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" fill="white"/></svg>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-size:13px;font-weight:700;color:#0a0a1a" id="gmail-connected-email">—</div>
+                    <div style="font-size:11px;color:#059669;margin-top:2px">compte Gmail connecté · emails envoyés depuis cette adresse</div>
+                  </div>
+                  <button onclick="disconnectGmail()" class="btn btn-ghost btn-sm" style="color:#dc2626;border-color:rgba(220,38,38,0.2)">
+                    <span class="msym">link_off</span>déconnecter
+                  </button>
+                </div>
+              </div>
+
+              <!-- Pas encore connecté -->
+              <div id="gmail-not-connected-info">
+                <div class="alert alert-info" style="margin-bottom:20px">
+                  <span class="msym">info</span>
+                  <div>
+                    <div style="font-weight:700;margin-bottom:4px">pourquoi connecter Gmail ?</div>
+                    <div style="font-size:11px;line-height:1.65">
+                      vos emails partent depuis votre vraie adresse Gmail → arrivée en boîte principale (pas spam) · les réponses arrivent dans votre Gmail · zéro configuration technique
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bouton connexion -->
+              <button onclick="connectGmail()" id="btn-connect-gmail" class="btn" style="background:white;border:1px solid #dadce0;color:#3c4043;font-size:13px;padding:10px 20px;border-radius:4px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                se connecter avec Google
+              </button>
+
+              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.03);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">ce que Huntlist. peut faire avec votre Gmail</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6b7280">
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>envoyer des emails de prospection en votre nom</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#dc2626">cancel</span>lire vos emails</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#dc2626">cancel</span>supprimer vos emails</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#dc2626">cancel</span>accéder à vos contacts</div>
+                </div>
               </div>
             </div>
           </div>
@@ -2083,11 +2131,11 @@ function goPage(name, btn) {
     const pc=document.getElementById('plan-prospects-count');const pe=document.getElementById('plan-emails-count');
     if(pc) pc.textContent=state.stats.prospects||0;
     if(pe) pe.textContent=state.stats.emails||0;
-    // Charger les clés LinkedIn
     const gk=document.getElementById('google-search-key');
     const gcx=document.getElementById('google-cx');
     if(gk) gk.value=localStorage.getItem('alma_google_search_key')||'';
     if(gcx) gcx.value=localStorage.getItem('alma_google_cx')||'';
+    loadGmailStatus();
   }
 }
 
@@ -2100,7 +2148,7 @@ function switchB2bTab(tabId, btn) {
 }
 
 function switchSettingsTab(tabId, btn) {
-  ['tab-profile','tab-email','tab-resend','tab-ovh','tab-linkedin','tab-plan'].forEach(t=>{const el=document.getElementById(t);if(el) el.style.display='none';});
+  ['tab-profile','tab-gmail','tab-resend','tab-ovh','tab-linkedin','tab-plan'].forEach(t=>{const el=document.getElementById(t);if(el) el.style.display='none';});
   document.getElementById(tabId).style.display='block';
   document.querySelectorAll('#page-settings .tab').forEach(t=>t.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -3679,7 +3727,19 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
     window.history.replaceState({}, '', '/dashboard');
   }
 
-  // 1. Vérifier session
+  // 0b. Retour Gmail OAuth
+  const gmailStatus = urlParams.get('gmail');
+  const gmailEmail  = urlParams.get('email');
+  if (gmailStatus === 'success' && gmailEmail) {
+    window.history.replaceState({}, '', '/dashboard');
+    setTimeout(() => {
+      showToast('✓ Gmail connecté — ' + decodeURIComponent(gmailEmail));
+      updateGmailUI(decodeURIComponent(gmailEmail));
+    }, 500);
+  } else if (gmailStatus === 'error') {
+    window.history.replaceState({}, '', '/dashboard');
+    setTimeout(() => showToast('⚠ Erreur connexion Gmail'), 500);
+  }
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = '/login'; return; }
 
@@ -5108,8 +5168,100 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // ══════════════════════════════════════════════════════════
-// RESEND — EMAIL
+// GMAIL OAUTH
 // ══════════════════════════════════════════════════════════
+
+async function connectGmail() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { alert('connectez-vous d\'abord.'); return; }
+
+  const btn = document.getElementById('btn-connect-gmail');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner spinner-dark" style="display:inline-block"></span> connexion...'; }
+
+  try {
+    const res = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/gmail-oauth', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token,
+      },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'erreur');
+    // Rediriger vers Google
+    window.location.href = data.authUrl;
+  } catch(e) {
+    alert('erreur : ' + e.message);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>se connecter avec Google'; }
+  }
+}
+
+async function disconnectGmail() {
+  if (!confirm('déconnecter votre compte Gmail ?')) return;
+  const { data: { session } } = await _sb.auth.getSession();
+  await _sb.from('profiles').update({
+    gmail_access_token: null,
+    gmail_refresh_token: null,
+    gmail_email: null,
+    gmail_connected_at: null,
+  }).eq('id', session.user.id);
+  updateGmailUI(null);
+  showToast('Gmail déconnecté.');
+}
+
+function updateGmailUI(gmailEmail) {
+  const dot = document.getElementById('gmail-status-dot');
+  const badge = document.getElementById('gmail-connected-badge');
+  const connectedInfo = document.getElementById('gmail-connected-info');
+  const notConnectedInfo = document.getElementById('gmail-not-connected-info');
+  const connectedEmail = document.getElementById('gmail-connected-email');
+  const connectBtn = document.getElementById('btn-connect-gmail');
+
+  if (gmailEmail) {
+    if (dot) dot.style.background = '#059669';
+    if (badge) badge.style.display = 'inline-flex';
+    if (connectedInfo) connectedInfo.style.display = '';
+    if (notConnectedInfo) notConnectedInfo.style.display = 'none';
+    if (connectedEmail) connectedEmail.textContent = gmailEmail;
+    if (connectBtn) { connectBtn.textContent = 'reconnecter un autre compte'; connectBtn.style.marginTop = '12px'; }
+  } else {
+    if (dot) dot.style.background = '#d1d5db';
+    if (badge) badge.style.display = 'none';
+    if (connectedInfo) connectedInfo.style.display = 'none';
+    if (notConnectedInfo) notConnectedInfo.style.display = '';
+    if (connectBtn) connectBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>se connecter avec Google';
+  }
+}
+
+// Vérifier le statut Gmail au chargement des settings
+async function loadGmailStatus() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) return;
+  const { data: profile } = await _sb.from('profiles').select('gmail_email').eq('id', session.user.id).single();
+  updateGmailUI(profile?.gmail_email || null);
+}
+
+// Fonction d'envoi via Gmail Edge Function
+async function gmailSendEmail(toEmail, subject, body, fromName) {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) throw new Error('non authentifié');
+
+  const res = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/gmail-send', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + session.access_token,
+    },
+    body: JSON.stringify({ to: toEmail, subject, body, fromName }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    if (err.error === 'gmail_not_connected') throw new Error('gmail_not_connected');
+    throw new Error(err.error || 'erreur envoi Gmail');
+  }
+  return res.json();
+}
 
 function getResendConfig() {
   try { return JSON.parse(localStorage.getItem('huntlist_resend') || '{}'); } catch(_) { return {}; }
@@ -5365,16 +5517,22 @@ async function confirmSendEmail() {
   if (confirmBtn) confirmBtn.disabled = true;
 
   try {
-    await resendSendEmail(email, subject, body, p?.name);
+    await gmailSendEmail(email, subject, body, p?.name);
     document.getElementById('email-dest-modal').classList.remove('open');
     if (p) { p.email = email; saveState(); }
-    showToast('✓ Email envoyé à ' + email);
+    showToast('✓ Email envoyé via Gmail à ' + email);
     addActivity('email envoyé · ' + (p?.name || email), 'send', 'green');
-    // Passer prospect en "contacté"
     const pp = state.pipeline.find(x => x.id === p?.id);
     if (pp && pp.status === 'new') { pp.status = 'contacted'; saveState(); refreshPipeline(); }
   } catch(e) {
-    alert('erreur envoi email : ' + e.message);
+    if (e.message === 'gmail_not_connected') {
+      if (confirm('Gmail non connecté. Voulez-vous connecter votre compte Gmail maintenant ?')) {
+        goPage('settings', document.querySelector('[onclick*=settings]'));
+        setTimeout(() => switchSettingsTab('tab-gmail', null), 200);
+      }
+    } else {
+      alert('erreur envoi email : ' + e.message);
+    }
   }
 
   hideSpinner('confirm-email-spinner');
@@ -5440,4 +5598,98 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+</script><script>
+// ══════════════════════════════════════════════════════════
+// GMAIL OAuth
+// ══════════════════════════════════════════════════════════
+
+async function connectGmail() {
+  const btn = document.getElementById('btn-connect-gmail');
+  showSpinner('gmail-connect-spinner');
+  if (btn) btn.disabled = true;
+  try {
+    const { data: { session } } = await _sb.auth.getSession();
+    const res = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/gmail-oauth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'erreur');
+    window.location.href = data.authUrl;
+  } catch(e) {
+    alert('erreur connexion Gmail : ' + e.message);
+    hideSpinner('gmail-connect-spinner');
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function disconnectGmail() {
+  if (!confirm('déconnecter votre compte Gmail ?')) return;
+  const { data: { session } } = await _sb.auth.getSession();
+  await _sb.from('profiles').update({ gmail_access_token: null, gmail_refresh_token: null, gmail_email: null, gmail_connected_at: null }).eq('id', session.user.id);
+  updateGmailUI(null);
+  showToast('Gmail déconnecté.');
+}
+
+async function sendGmailTest() {
+  const { data: { session } } = await _sb.auth.getSession();
+  const { data: profile } = await _sb.from('profiles').select('gmail_email').eq('id', session.user.id).single();
+  const resultEl = document.getElementById('gmail-test-result');
+  try {
+    const res = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/gmail-send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ to: profile.gmail_email, subject: 'Test Huntlist. — Gmail connecté ✓', body: 'Votre compte Gmail est bien connecté à Huntlist.\n\nVos emails de prospection partiront depuis cette adresse.', fromName: 'Huntlist.' }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+    resultEl.innerHTML = '<div class="alert alert-success"><span class="msym">check_circle</span>email test envoyé à ' + profile.gmail_email + '</div>';
+    resultEl.style.display = '';
+  } catch(e) {
+    resultEl.innerHTML = '<div class="alert alert-error"><span class="msym">error</span>' + e.message + '</div>';
+    resultEl.style.display = '';
+  }
+}
+
+function updateGmailUI(email) {
+  const connected = !!email;
+  const dot = document.getElementById('gmail-status-dot');
+  const badge = document.getElementById('gmail-connected-badge');
+  const connectedInfo = document.getElementById('gmail-connected-info');
+  const notConnectedInfo = document.getElementById('gmail-not-connected-info');
+  const btnConnect = document.getElementById('btn-connect-gmail');
+  const emailEl = document.getElementById('gmail-connected-email');
+  if (dot) dot.style.background = connected ? '#059669' : '#d1d5db';
+  if (badge) badge.style.display = connected ? 'inline-flex' : 'none';
+  if (connectedInfo) connectedInfo.style.display = connected ? '' : 'none';
+  if (notConnectedInfo) notConnectedInfo.style.display = connected ? 'none' : '';
+  if (btnConnect) btnConnect.style.display = connected ? 'none' : '';
+  if (emailEl && email) emailEl.textContent = email;
+}
+
+async function loadGmailStatus() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) return;
+  const { data: profile } = await _sb.from('profiles').select('gmail_email').eq('id', session.user.id).maybeSingle();
+  updateGmailUI(profile?.gmail_email || null);
+}
+
+// Gérer le retour OAuth Gmail
+(async function checkGmailReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const gmailStatus = params.get('gmail');
+  const gmailEmail = params.get('email');
+  if (gmailStatus === 'success' && gmailEmail) {
+    window.history.replaceState({}, '', '/dashboard');
+    setTimeout(() => {
+      showToast('✓ Gmail connecté — ' + gmailEmail);
+      updateGmailUI(gmailEmail);
+    }, 500);
+  } else if (gmailStatus === 'error') {
+    window.history.replaceState({}, '', '/dashboard');
+    setTimeout(() => showToast('⚠ Erreur connexion Gmail'), 500);
+  }
+})();
+
+// Charger le statut Gmail au chargement
+document.addEventListener('DOMContentLoaded', () => setTimeout(loadGmailStatus, 600));
 </script>
