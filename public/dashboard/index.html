@@ -1622,66 +1622,56 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           </div>
         </div>
 
-        <!-- ═══ ONGLET RESEND ═══ -->
+        <!-- ═══ ONGLET EMAIL ═══ -->
         <div id="tab-resend" style="display:none">
-          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,85,212,0.2)">
+          <div class="glass card" style="border:1px solid rgba(0,85,212,0.2)">
             <div class="card-header" style="background:rgba(0,85,212,0.04)">
               <div>
                 <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#0055D4">
-                  <span class="msym" style="font-size:18px">mail</span>resend — envoi email
+                  <span class="msym" style="font-size:18px">mail</span>envoi d'emails
                 </div>
-                <div style="font-size:10px;color:#9ca3af;margin-top:2px">délivrabilité maximale · 3 000 emails/mois gratuits</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">vos emails partent depuis huntlist.fr · délivrabilité maximale</div>
               </div>
-              <span class="badge badge-green" id="resend-api-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> connecté</span>
+              <span class="badge badge-green"><span class="msym" style="font-size:11px">check_circle</span> actif</span>
             </div>
             <div class="card-body">
-              <div class="alert alert-info" style="margin-bottom:16px">
-                <span class="msym">info</span>
+
+              <!-- Info rassurante -->
+              <div class="alert alert-info" style="margin-bottom:20px">
+                <span class="msym">check_circle</span>
                 <div>
-                  <div style="font-weight:700;margin-bottom:4px">obtenir votre clé API Resend</div>
-                  <div style="font-size:11px;line-height:1.6">
-                    1. créez un compte sur <strong>resend.com</strong> (gratuit)<br>
-                    2. allez dans API Keys → Create API Key<br>
-                    3. vérifiez votre domaine d'envoi (recommandé)<br>
-                    4. copiez la clé ici
+                  <div style="font-weight:700;margin-bottom:3px">envoi d'emails inclus dans votre abonnement</div>
+                  <div style="font-size:11px;line-height:1.6;color:#6b7280">aucune configuration requise · choisissez simplement le nom qui apparaîtra sur vos emails</div>
+                </div>
+              </div>
+
+              <!-- Nom affiché -->
+              <div class="form-group" style="margin-bottom:20px">
+                <label class="form-label">nom affiché à vos prospects</label>
+                <input class="form-input" id="sender-display-name" placeholder="ex : Jean Dupont" style="font-size:14px;font-weight:600"/>
+                <div style="font-size:10px;color:#9ca3af;margin-top:5px">vos prospects verront ce nom dans leur boîte mail</div>
+              </div>
+
+              <!-- Aperçu -->
+              <div style="padding:14px 16px;background:rgba(0,85,212,0.04);border-radius:12px;border:1px solid rgba(0,85,212,0.12);margin-bottom:20px">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">aperçu dans la boîte mail du prospect</div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:36px;height:36px;border-radius:10px;background:#0055D4;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:800" id="sender-avatar-preview">J</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:#1a1a2e" id="sender-name-preview">Jean Dupont</div>
+                    <div style="font-size:11px;color:#9ca3af">contact@huntlist.fr</div>
                   </div>
                 </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">clé api resend</label>
-                <div style="position:relative">
-                  <input class="form-input" id="resend-api-key" placeholder="re_..." type="password" style="padding-right:44px"/>
-                  <button onclick="toggleResendKeyVis()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;display:flex;align-items:center">
-                    <span class="msym" style="font-size:16px" id="resend-key-eye">visibility</span>
-                  </button>
-                </div>
-              </div>
-              <div style="padding:14px 16px;background:rgba(0,85,212,0.04);border-radius:12px;border:1px solid rgba(0,85,212,0.12);margin-bottom:14px">
-                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#0055D4;margin-bottom:12px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:14px">mail</span>expéditeur</div>
-                <div class="form-row">
-                  <div class="form-group" style="margin:0"><label class="form-label">email expéditeur</label><input class="form-input" id="resend-email-from" placeholder="vous@votredomaine.fr" type="email"/></div>
-                  <div class="form-group" style="margin:0"><label class="form-label">nom affiché</label><input class="form-input" id="resend-email-name" placeholder="Jean — Huntlist."/></div>
-                </div>
-              </div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <button class="btn btn-primary" onclick="saveResendConfig()"><span class="msym">save</span>enregistrer</button>
-                <button class="btn btn-ghost" onclick="testResendConnection()" id="btn-test-resend">
-                  <span id="test-resend-spinner" style="display:none" class="spinner spinner-dark"></span>
-                  <span class="msym">play_arrow</span>tester
-                </button>
-                <button class="btn btn-ghost" onclick="sendResendTestEmail()" id="btn-resend-test-email" style="display:none">
-                  <span class="msym">send</span>email test
+
+              <div style="display:flex;gap:10px">
+                <button class="btn btn-primary" onclick="saveSenderName()"><span class="msym">save</span>enregistrer</button>
+                <button class="btn btn-ghost" onclick="sendSenderTestEmail()" id="btn-sender-test">
+                  <span id="sender-test-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">send</span>envoyer un email test
                 </button>
               </div>
-              <div id="resend-test-result" style="display:none;margin-top:12px"></div>
-              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.03);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
-                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">plan gratuit resend</div>
-                <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6b7280">
-                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>3 000 emails / mois gratuits</div>
-                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>100 emails / jour sur le plan gratuit</div>
-                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#d97706">info</span>vérifiez votre domaine pour une délivrabilité maximale</div>
-                </div>
-              </div>
+              <div id="sender-test-result" style="display:none;margin-top:12px"></div>
             </div>
           </div>
         </div>
@@ -5488,28 +5478,22 @@ async function sendResendTestEmail() {
   }
 }
 
-// Fonction core Resend
-async function resendSendEmail(toEmail, subject, htmlContent, toName) {
-  const cfg = getResendConfig();
-  if (!cfg.key) throw new Error("clé API Resend non configurée. Allez dans Paramètres → Resend.");
-  if (!cfg.from) throw new Error("email expéditeur non configuré. Allez dans Paramètres → Resend.");
-
-  const from = cfg.name ? cfg.name + ' <' + cfg.from + '>' : cfg.from;
-
-  const res = await fetch('https://api.resend.com/emails', {
+// Fonction core — passe par l'API proxy Vercel (clé Resend côté serveur)
+async function resendSendEmail(toEmail, subject, htmlContent) {
+  const senderName = getSenderName() || 'Huntlist.';
+  const res = await fetch('/api/send-email', {
     method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + cfg.key, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      from: from,
-      to: [toEmail],
+      fromName: senderName,
+      to: toEmail,
       subject: subject,
-      html: htmlContent.replace(/\n/g, '<br/>')
+      body: htmlContent.replace(/\n/g, '<br/>')
     })
   });
-
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.message || err.name || 'erreur Resend (' + res.status + ')');
+    throw new Error(err.error || 'erreur envoi (' + res.status + ')');
   }
   return res.json();
 }
@@ -5734,8 +5718,63 @@ async function sendSmsViaOvh() {
 
 // Charger configs au chargement de l'onglet settings
 document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(() => { loadResendConfigUI(); loadOvhConfigUI(); }, 500);
+  setTimeout(() => { loadOvhConfigUI(); loadSenderNameUI(); }, 500);
 });
+
+// ══════════════════════════════════════════════════════════
+// SENDER NAME — nom affiché dans les emails
+// ══════════════════════════════════════════════════════════
+
+function getSenderName() {
+  return localStorage.getItem('huntlist_sender_name') || '';
+}
+
+function loadSenderNameUI() {
+  const name = getSenderName();
+  const input = document.getElementById('sender-display-name');
+  if (input && name) {
+    input.value = name;
+    updateSenderPreview(name);
+  }
+  // Écouter les changements en live
+  if (input) input.addEventListener('input', () => updateSenderPreview(input.value));
+}
+
+function updateSenderPreview(name) {
+  const nameEl = document.getElementById('sender-name-preview');
+  const avatarEl = document.getElementById('sender-avatar-preview');
+  if (nameEl) nameEl.textContent = name || 'Votre Nom';
+  if (avatarEl) avatarEl.textContent = name ? name.charAt(0).toUpperCase() : 'H';
+}
+
+function saveSenderName() {
+  const name = document.getElementById('sender-display-name')?.value.trim();
+  if (!name) { alert('Renseignez votre nom.'); return; }
+  localStorage.setItem('huntlist_sender_name', name);
+  updateSenderPreview(name);
+  showToast('✓ Nom d\'expéditeur enregistré : ' + name);
+}
+
+async function sendSenderTestEmail() {
+  const name = getSenderName();
+  if (!name) { alert('Enregistrez d\'abord votre nom.'); return; }
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { alert('Connectez-vous d\'abord.'); return; }
+  const { data: profile } = await _sb.from('profiles').select('email').eq('id', session.user.id).single();
+  const resultEl = document.getElementById('sender-test-result');
+  showSpinner('sender-test-spinner');
+  document.getElementById('btn-sender-test').disabled = true;
+  try {
+    await resendSendEmail(profile?.email || session.user.email, 'Test Huntlist. — envoi OK ✓', '<p>Bonjour,</p><p>Votre configuration d\'envoi fonctionne parfaitement.</p><p>Vos emails de prospection partiront avec le nom : <strong>' + name + '</strong></p>');
+    resultEl.innerHTML = '<div class="alert alert-success"><span class="msym">check_circle</span>email test envoyé à ' + (profile?.email || session.user.email) + '</div>';
+    resultEl.style.display = '';
+  } catch(e) {
+    resultEl.innerHTML = '<div class="alert alert-error"><span class="msym">error</span>' + e.message + '</div>';
+    resultEl.style.display = '';
+  }
+  hideSpinner('sender-test-spinner');
+  document.getElementById('btn-sender-test').disabled = false;
+}
 
 
 </script>
