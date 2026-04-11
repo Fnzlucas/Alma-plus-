@@ -1526,10 +1526,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
         <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
           <button class="tab active" onclick="switchSettingsTab('tab-profile',this)">mon profil</button>
-          <button class="tab" onclick="switchSettingsTab('tab-gmail',this)" id="tab-btn-gmail" style="display:flex;align-items:center;gap:5px">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" fill="#EA4335"/></svg>
-            gmail
-            <span id="gmail-status-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
+          <button class="tab" onclick="switchSettingsTab('tab-resend',this)" id="tab-btn-email" style="display:flex;align-items:center;gap:5px">
+            <span class="msym" style="font-size:13px;color:#0055D4">mail</span>
+            email
+            <span id="resend-status-dot2" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
           </button>
           <button class="tab" onclick="switchSettingsTab('tab-ovh',this)" id="tab-btn-ovh" style="display:flex;align-items:center;gap:5px">
             <span class="msym" style="font-size:13px">sms</span>
@@ -2025,6 +2025,48 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   </div>
 </div>
 
+<!-- ═══ MODAL UPGRADE ═══ -->
+<div class="modal-overlay" id="upgrade-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center">
+          <span class="msym" style="color:#0055D4">rocket_launch</span>
+        </div>
+        <div class="modal-title">passez à l'offre supérieure</div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('upgrade-modal').classList.remove('open')">
+        <span class="msym" style="font-size:16px">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="background:rgba(0,85,212,0.04);border:1px solid rgba(0,85,212,0.12);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">fonctionnalité verrouillée</div>
+        <div style="font-size:16px;font-weight:800;color:#0055D4" id="upgrade-feature">—</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:6px">
+          utilisation : <strong id="upgrade-used">0</strong> / <strong id="upgrade-limit">0</strong>
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:10px">
+          inclus dans le plan <span id="upgrade-plan-name" style="color:#0055D4">pro</span>
+        </div>
+        <div id="upgrade-features-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(0,85,212,0.06),rgba(0,212,255,0.04));border:1px solid rgba(0,85,212,0.15);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:24px;font-weight:800;color:#0055D4" id="upgrade-plan-price">129€/mois</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:2px">sans engagement · résiliable à tout moment</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="document.getElementById('upgrade-modal').classList.remove('open')">plus tard</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="showPage('settings');switchSettingsTab('tab-plan',null);document.getElementById('upgrade-modal').classList.remove('open')">
+        <span class="msym">rocket_launch</span>upgrader maintenant
+      </button>
+    </div>
+  </div>
+</div>
+
 
 <script>
 
@@ -2243,6 +2285,8 @@ function switchB2bTab(tabId, btn) {
 
 function switchSettingsTab(tabId, btn) {
   ['tab-profile','tab-gmail','tab-resend','tab-ovh','tab-linkedin','tab-plan'].forEach(t=>{const el=document.getElementById(t);if(el) el.style.display='none';});
+  // Masquer tab-gmail définitivement
+  const gmailTab=document.getElementById('tab-gmail');if(gmailTab) gmailTab.style.display='none';
   document.getElementById(tabId).style.display='block';
   document.querySelectorAll('#page-settings .tab').forEach(t=>t.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -5624,7 +5668,7 @@ async function confirmSendEmail() {
     if (e.message === 'gmail_not_connected') {
       if (confirm('Gmail non connecté. Voulez-vous connecter votre compte Gmail maintenant ?')) {
         goPage('settings', document.querySelector('[onclick*=settings]'));
-        setTimeout(() => switchSettingsTab('tab-gmail', null), 200);
+        setTimeout(() => switchSettingsTab('tab-resend', null), 200);
       }
     } else {
       alert('erreur envoi email : ' + e.message);
@@ -5694,98 +5738,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-</script><script>
-// ══════════════════════════════════════════════════════════
-// GMAIL OAuth
-// ══════════════════════════════════════════════════════════
-
-async function connectGmail() {
-  const btn = document.getElementById('btn-connect-gmail');
-  showSpinner('gmail-connect-spinner');
-  if (btn) btn.disabled = true;
-  try {
-    const { data: { session } } = await _sb.auth.getSession();
-    const res = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/gmail-oauth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'erreur');
-    window.location.href = data.authUrl;
-  } catch(e) {
-    alert('erreur connexion Gmail : ' + e.message);
-    hideSpinner('gmail-connect-spinner');
-    if (btn) btn.disabled = false;
-  }
-}
-
-async function disconnectGmail() {
-  if (!confirm('déconnecter votre compte Gmail ?')) return;
-  const { data: { session } } = await _sb.auth.getSession();
-  await _sb.from('profiles').update({ gmail_access_token: null, gmail_refresh_token: null, gmail_email: null, gmail_connected_at: null }).eq('id', session.user.id);
-  updateGmailUI(null);
-  showToast('Gmail déconnecté.');
-}
-
-async function sendGmailTest() {
-  const { data: { session } } = await _sb.auth.getSession();
-  const { data: profile } = await _sb.from('profiles').select('gmail_email').eq('id', session.user.id).single();
-  const resultEl = document.getElementById('gmail-test-result');
-  try {
-    const res = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/gmail-send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
-      body: JSON.stringify({ to: profile.gmail_email, subject: 'Test Huntlist. — Gmail connecté ✓', body: 'Votre compte Gmail est bien connecté à Huntlist.\n\nVos emails de prospection partiront depuis cette adresse.', fromName: 'Huntlist.' }),
-    });
-    if (!res.ok) throw new Error((await res.json()).error);
-    resultEl.innerHTML = '<div class="alert alert-success"><span class="msym">check_circle</span>email test envoyé à ' + profile.gmail_email + '</div>';
-    resultEl.style.display = '';
-  } catch(e) {
-    resultEl.innerHTML = '<div class="alert alert-error"><span class="msym">error</span>' + e.message + '</div>';
-    resultEl.style.display = '';
-  }
-}
-
-function updateGmailUI(email) {
-  const connected = !!email;
-  const dot = document.getElementById('gmail-status-dot');
-  const badge = document.getElementById('gmail-connected-badge');
-  const connectedInfo = document.getElementById('gmail-connected-info');
-  const notConnectedInfo = document.getElementById('gmail-not-connected-info');
-  const btnConnect = document.getElementById('btn-connect-gmail');
-  const emailEl = document.getElementById('gmail-connected-email');
-  if (dot) dot.style.background = connected ? '#059669' : '#d1d5db';
-  if (badge) badge.style.display = connected ? 'inline-flex' : 'none';
-  if (connectedInfo) connectedInfo.style.display = connected ? '' : 'none';
-  if (notConnectedInfo) notConnectedInfo.style.display = connected ? 'none' : '';
-  if (btnConnect) btnConnect.style.display = connected ? 'none' : '';
-  if (emailEl && email) emailEl.textContent = email;
-}
-
-async function loadGmailStatus() {
-  const { data: { session } } = await _sb.auth.getSession();
-  if (!session) return;
-  const { data: profile } = await _sb.from('profiles').select('gmail_email').eq('id', session.user.id).maybeSingle();
-  updateGmailUI(profile?.gmail_email || null);
-}
-
-// Gérer le retour OAuth Gmail
-(async function checkGmailReturn() {
-  const params = new URLSearchParams(window.location.search);
-  const gmailStatus = params.get('gmail');
-  const gmailEmail = params.get('email');
-  if (gmailStatus === 'success' && gmailEmail) {
-    window.history.replaceState({}, '', '/dashboard');
-    setTimeout(() => {
-      showToast('✓ Gmail connecté — ' + gmailEmail);
-      updateGmailUI(gmailEmail);
-    }, 500);
-  } else if (gmailStatus === 'error') {
-    window.history.replaceState({}, '', '/dashboard');
-    setTimeout(() => showToast('⚠ Erreur connexion Gmail'), 500);
-  }
-})();
-
-// Charger le statut Gmail au chargement
-document.addEventListener('DOMContentLoaded', () => setTimeout(loadGmailStatus, 600));
 </script>
