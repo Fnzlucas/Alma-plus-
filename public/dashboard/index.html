@@ -1528,7 +1528,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           </button>
           <button class="tab" onclick="switchSettingsTab('tab-ovh',this)" id="tab-btn-ovh" style="display:flex;align-items:center;gap:5px">
             <span class="msym" style="font-size:13px">sms</span>
-            sms
+            ovh · sms
+            <span id="ovh-status-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
           </button>
           <button class="tab" onclick="switchSettingsTab('tab-linkedin',this)">linkedin api</button>
           <button class="tab" onclick="switchSettingsTab('tab-plan',this)">abonnement</button>
@@ -1653,7 +1654,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
                   <div style="width:36px;height:36px;border-radius:10px;background:#0055D4;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:800" id="sender-avatar-preview">J</div>
                   <div>
                     <div style="font-size:13px;font-weight:700;color:#1a1a2e" id="sender-name-preview">Jean Dupont</div>
-                    <div style="font-size:11px;color:#9ca3af"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="25464a4b51444651654d504b51494c56510b4357">[email&#160;protected]</a></div>
+                    <div style="font-size:11px;color:#9ca3af">contact@huntlist.fr</div>
                   </div>
                 </div>
               </div>
@@ -1670,40 +1671,58 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           </div>
         </div>
 
-        <!-- ═══ ONGLET SMS ═══ -->
+        <!-- ═══ ONGLET OVH SMS ═══ -->
         <div id="tab-ovh" style="display:none">
-          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,85,212,0.12)">
-            <div class="card-header" style="background:rgba(0,85,212,0.03)">
+          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(5,150,105,0.2)">
+            <div class="card-header" style="background:rgba(5,150,105,0.04)">
               <div>
-                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#0055D4">
-                  <span class="msym" style="font-size:18px">sms</span>envoi sms
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#059669">
+                  <span class="msym" style="font-size:18px">sms</span>ovh sms — envoi sms
                 </div>
-                <div style="font-size:10px;color:#9ca3af;margin-top:2px">fonctionnalité en cours de déploiement</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">réseau français · 200 sms offerts/mois · 0.08€/sms supp.</div>
               </div>
-              <span class="badge badge-amber">bientôt disponible</span>
+              <span class="badge badge-green" id="ovh-api-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> connecté</span>
             </div>
             <div class="card-body">
-              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:16px">
-                <div style="width:64px;height:64px;border-radius:20px;background:rgba(0,85,212,0.07);border:1px solid rgba(0,85,212,0.12);display:flex;align-items:center;justify-content:center">
-                  <span class="msym" style="font-size:32px;color:#0055D4">sms</span>
-                </div>
+              <div class="alert alert-info" style="margin-bottom:16px">
+                <span class="msym">info</span>
                 <div>
-                  <div style="font-size:16px;font-weight:800;color:#1a1a2e;letter-spacing:-0.03em;margin-bottom:6px">envoi sms bientôt disponible</div>
-                  <div style="font-size:12px;color:#9ca3af;line-height:1.7;max-width:340px">envoyez des sms à vos prospects directement depuis huntlist, avec votre nom d'expéditeur personnalisé.</div>
+                  <div style="font-weight:700;margin-bottom:4px">obtenir vos identifiants OVH SMS</div>
+                  <div style="font-size:11px;line-height:1.6">
+                    1. connectez-vous sur <strong>api.ovh.com/createToken</strong><br>
+                    2. application key + secret + consumer key<br>
+                    3. droits requis : GET/POST sur /sms/*<br>
+                    4. créez un compte SMS sur <strong>ovhtelecom.fr</strong>
+                  </div>
                 </div>
-                <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:300px;margin-top:8px">
-                  <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,85,212,0.04);border-radius:10px;border:1px solid rgba(0,85,212,0.08)">
-                    <span class="msym" style="font-size:15px;color:#0055D4">check_circle</span>
-                    <span style="font-size:11px;color:#6b7280">nom d'expéditeur personnalisé</span>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,85,212,0.04);border-radius:10px;border:1px solid rgba(0,85,212,0.08)">
-                    <span class="msym" style="font-size:15px;color:#0055D4">check_circle</span>
-                    <span style="font-size:11px;color:#6b7280">réseau français · haute délivrabilité</span>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,85,212,0.04);border-radius:10px;border:1px solid rgba(0,85,212,0.08)">
-                    <span class="msym" style="font-size:15px;color:#0055D4">check_circle</span>
-                    <span style="font-size:11px;color:#6b7280">crédits à la demande · sans abonnement</span>
-                  </div>
+              </div>
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0"><label class="form-label">application key</label><input class="form-input" id="ovh-app-key" placeholder="ex: 1234567890abcdef" type="password"/></div>
+                <div class="form-group" style="margin:0"><label class="form-label">application secret</label><input class="form-input" id="ovh-app-secret" placeholder="ex: abcdef1234567890..." type="password"/></div>
+              </div>
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0"><label class="form-label">consumer key</label><input class="form-input" id="ovh-consumer-key" placeholder="ex: xyz987..." type="password"/></div>
+                <div class="form-group" style="margin:0"><label class="form-label">nom de service sms</label><input class="form-input" id="ovh-service-name" placeholder="ex: sms-xx000000-1"/></div>
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label">expéditeur (max 11 caractères)</label>
+                <input class="form-input" id="ovh-sender" placeholder="Huntlist" maxlength="11"/>
+                <div style="font-size:10px;color:#9ca3af;margin-top:4px">lettres et chiffres uniquement · affiché sur le téléphone du prospect</div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" style="background:#059669;box-shadow:0 4px 16px rgba(5,150,105,0.3)" onclick="saveOvhConfig()"><span class="msym">save</span>enregistrer</button>
+                <button class="btn btn-ghost" onclick="testOvhConnection()" id="btn-test-ovh">
+                  <span id="test-ovh-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">play_arrow</span>tester la connexion
+                </button>
+              </div>
+              <div id="ovh-test-result" style="display:none;margin-top:12px"></div>
+              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.03);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">tarification ovh sms</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6b7280">
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>200 sms / mois offerts par Huntlist.</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>0.08€ / sms supplémentaire</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>réseau français · délivrabilité maximale</div>
                 </div>
               </div>
             </div>
@@ -2034,7 +2053,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 </div>
 
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 
 
 // ═══ QUOTAS & PLANS ═══
@@ -5745,4 +5764,12 @@ async function sendSenderTestEmail() {
     resultEl.innerHTML = '<div class="alert alert-success"><span class="msym">check_circle</span>email test envoyé à ' + (profile?.email || session.user.email) + '</div>';
     resultEl.style.display = '';
   } catch(e) {
-    resultEl.innerHTML = '<div class
+    resultEl.innerHTML = '<div class="alert alert-error"><span class="msym">error</span>' + e.message + '</div>';
+    resultEl.style.display = '';
+  }
+  hideSpinner('sender-test-spinner');
+  document.getElementById('btn-sender-test').disabled = false;
+}
+
+
+</script>
