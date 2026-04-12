@@ -28,8 +28,2032 @@ tailwind.config = {
     },
   },
 }
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.01em;
+  background-color: #f9f9fb;
+  background-image:
+    radial-gradient(circle at 15% 15%, rgba(0,85,212,0.06) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(0,212,255,0.05) 0%, transparent 45%);
+  -webkit-font-smoothing: antialiased;
+  color: #1a1a2e;
+}
+
+.glass { background: rgba(255,255,255,0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.35); }
+.glass-dark { background: rgba(255,255,255,0.35); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.2); }
+.glass-sidebar { background: rgba(255,255,255,0.65); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-right: 1px solid rgba(255,255,255,0.3); }
+
+.neon { box-shadow: 0 0 20px rgba(0,85,212,0.2), 0 4px 24px rgba(0,85,212,0.12); }
+.neon-sm { box-shadow: 0 0 12px rgba(0,85,212,0.18); }
+
+.scanline {
+  position: absolute; left: 0; width: 100%; height: 2px; pointer-events: none; z-index: 1;
+  background: linear-gradient(to right, transparent, rgba(0,212,255,0.15), transparent);
+  animation: scan 5s linear infinite;
+}
+@keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+.sidebar-scroll::-webkit-scrollbar { width: 2px; }
+.sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(0,85,212,0.15); border-radius: 10px; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,85,212,0.1); border-radius: 99px; }
+
+/* Layout */
+.app { display: flex; height: 100vh; overflow: hidden; }
+.sidebar { width: 240px; flex-shrink: 0; height: 100vh; display: flex; flex-direction: column; padding: 24px 20px; position: fixed; left: 0; top: 0; z-index: 50; }
+.main { margin-left: 240px; flex: 1; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
+.topbar { height: 60px; flex-shrink: 0; display: flex; align-items: center; padding: 0 32px; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.3); }
+.content { flex: 1; padding: 32px; overflow-x: hidden; }
+.page { display: none; animation: fadeUp .2s ease; }
+.page.active { display: block; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* Nav */
+.nav-section { font-size: 9px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #9ca3af; padding: 16px 12px 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 500; color: #6b7280; transition: all .15s; text-decoration: none; background: none; border: none; width: 100%; text-align: left; font-family: inherit; letter-spacing: -0.01em; position: relative; }
+.nav-item:hover { background: rgba(255,255,255,0.55); color: #1a1a2e; }
+.nav-item.active { background: rgba(0,85,212,0.07); color: #0055D4; font-weight: 700; border: 1px solid rgba(0,85,212,0.1); }
+.nav-item .msym { font-size: 17px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; font-size: 9px; font-weight: 800; background: #0055D4; color: white; padding: 2px 6px; border-radius: 99px; }
+.nav-badge-red { background: #dc2626; }
+
+/* KPI Cards */
+.kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+.kpi-card { border-radius: 16px; padding: 22px 24px; position: relative; overflow: hidden; }
+.kpi-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .15em; color: #9ca3af; display: block; margin-bottom: 8px; }
+.kpi-value { font-size: 36px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: #1a1a2e; }
+.kpi-delta { display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; margin-top: 10px; }
+
+/* Cards */
+.card { border-radius: 16px; overflow: hidden; }
+.card-header { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: space-between; }
+.card-title { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+.card-body { padding: 20px 24px; }
+
+/* Buttons */
+.btn { font-size: 11px; font-weight: 700; padding: 9px 18px; border-radius: 99px; cursor: pointer; border: none; transition: all .15s; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; letter-spacing: -0.01em; }
+.btn .msym { font-size: 14px; }
+.btn-primary { background: #0055D4; color: white; box-shadow: 0 4px 16px rgba(0,85,212,0.28); }
+.btn-primary:hover { background: #0047B8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,85,212,0.35); }
+.btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+.btn-ghost { background: rgba(255,255,255,0.6); color: #6b7280; border: 1px solid rgba(255,255,255,0.6); }
+.btn-ghost:hover { background: white; color: #0055D4; border-color: rgba(0,85,212,0.2); }
+.btn-sm { padding: 6px 14px; font-size: 10px; }
+
+/* Form inputs */
+.form-input { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.4); font-size: 12px; font-family: inherit; outline: none; background: rgba(255,255,255,0.6); color: #1a1a2e; transition: all .15s; letter-spacing: -0.01em; }
+.form-input:focus { border-color: rgba(0,85,212,0.28); background: white; box-shadow: 0 0 0 3px rgba(0,85,212,0.07); }
+.form-input::placeholder { color: #9ca3af; }
+.form-label { font-size: 10px; font-weight: 700; color: #6b7280; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .08em; }
+.form-group { margin-bottom: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+textarea.form-input { resize: vertical; min-height: 80px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 2px; padding: 4px; background: rgba(255,255,255,0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.4); }
+.tab { padding: 8px 18px; border-radius: 9px; font-size: 11px; font-weight: 600; cursor: pointer; color: #9ca3af; transition: all .15s; letter-spacing: -0.01em; background: none; border: none; font-family: inherit; }
+.tab.active { background: white; color: #0055D4; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-weight: 700; }
+
+/* Prospect / Pipeline cards */
+.prospect-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; cursor: pointer; transition: background .1s; border-bottom: 1px solid rgba(255,255,255,0.3); }
+.prospect-row:last-child { border-bottom: none; }
+.prospect-row:hover { background: rgba(255,255,255,0.4); }
+
+.avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+.score { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 99px; letter-spacing: .04em; }
+.s-h { background: #fee2e2; color: #dc2626; }
+.s-m { background: #fef3c7; color: #d97706; }
+.s-l { background: rgba(0,85,212,0.07); color: #0055D4; }
+
+/* Status badges */
+.badge { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 99px; letter-spacing: .04em; text-transform: uppercase; }
+.badge-green { background: rgba(5,150,105,0.08); color: #059669; border: 1px solid rgba(5,150,105,0.15); }
+.badge-amber { background: rgba(217,119,6,0.08); color: #d97706; border: 1px solid rgba(217,119,6,0.15); }
+.badge-blue { background: rgba(0,85,212,0.07); color: #0055D4; border: 1px solid rgba(0,85,212,0.15); }
+.badge-red { background: rgba(220,38,38,0.08); color: #dc2626; border: 1px solid rgba(220,38,38,0.15); }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(10,10,30,0.4); backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 24px; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: 24px; max-width: 560px; width: 100%; max-height: 88vh; overflow-y: auto; box-shadow: 0 32px 80px rgba(0,85,212,0.12); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 28px; border-bottom: 1px solid #f0f0f0; }
+.modal-title { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; }
+.modal-close { width: 30px; height: 30px; border-radius: 8px; border: none; background: #f5f5f5; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #9ca3af; transition: all .12s; }
+.modal-close:hover { background: #e5e5e5; color: #1a1a2e; }
+.modal-body { padding: 24px 28px; }
+.modal-footer { padding: 16px 28px; border-top: 1px solid #f0f0f0; display: flex; gap: 10px; justify-content: flex-end; }
+
+/* Alerts */
+.alert { padding: 12px 16px; border-radius: 12px; font-size: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.alert-info { background: rgba(0,85,212,0.05); border: 1px solid rgba(0,85,212,0.14); color: #0055D4; }
+.alert-success { background: rgba(5,150,105,0.06); border: 1px solid rgba(5,150,105,0.15); color: #059669; }
+.alert-error { background: rgba(220,38,38,0.06); border: 1px solid rgba(220,38,38,0.15); color: #dc2626; }
+.alert-amber { background: rgba(217,119,6,0.06); border: 1px solid rgba(217,119,6,0.15); color: #d97706; }
+.msym { font-family: 'Material Symbols Outlined'; font-weight: normal; font-size: 18px; line-height: 1; letter-spacing: normal; display: inline-block; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20; }
+
+/* Spinner */
+.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; }
+.spinner-dark { border-color: rgba(0,85,212,0.18); border-top-color: #0055D4; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Progress */
+.progress-bar { height: 3px; background: rgba(0,0,0,0.06); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; background: #0055D4; border-radius: 99px; transition: width .4s; }
+
+/* Pipeline board */
+#pipeline-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 14px; }
+
+/* Cold call buttons */
+.cc-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 14px 10px; border-radius: 12px; cursor: pointer; transition: all .15s; font-family: inherit; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.5); color: #6b7280; }
+.cc-btn:hover { transform: scale(1.02); background: white; }
+.cc-btn span { font-size: 18px; font-weight: 800; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+/* Messagerie */
+.msg-layout { display: grid; grid-template-columns: 280px 1fr; height: calc(100vh - 140px); border-radius: 16px; overflow: hidden; }
+.conv-item { padding: 14px 18px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.3); transition: background .1s; }
+.conv-item:hover { background: rgba(255,255,255,0.5); }
+.conv-item.active { background: rgba(0,85,212,0.06); }
+.bubble { max-width: 68%; padding: 12px 16px; border-radius: 14px; font-size: 13px; line-height: 1.55; }
+.bubble-sent { align-self: flex-end; background: #0055D4; color: white; border-bottom-right-radius: 4px; }
+.bubble-received { align-self: flex-start; background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.5); border-bottom-left-radius: 4px; }
+
+/* Bar chart */
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 180px; padding: 0 8px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0; }
+.bar { width: 100%; border-radius: 6px 6px 0 0; transition: all .2s; cursor: pointer; min-height: 4px; }
+
+/* Mobile overlay */
+#mob-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 49; }
+#btn-mob { display: none; }
+
+/* CC Layout */
+.cc-main { display: grid; grid-template-columns: 1fr 320px; gap: 16px; }
+
+/* Loading screen */
+#auth-loading {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #f9f9fb;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+}
+#auth-loading svg { animation: spin .8s linear infinite; }
+
+/* =============================================
+   RESPONSIVE ≤900px
+   ============================================= */
+@media (max-width: 900px) {
+  .cc-main { grid-template-columns: 1fr !important; }
+  .msg-layout { grid-template-columns: 1fr !important; height: auto !important; min-height: 400px; }
+  #api-pill { display: none !important; }
+}
+
+/* =============================================
+   RESPONSIVE ≤768px — MOBILE
+   ============================================= */
+@media (max-width: 768px) {
+
+  /* Sidebar slide-in */
+  .sidebar { left: -260px; transition: left .22s ease; z-index: 50; }
+  .sidebar.mob-open { left: 0 !important; box-shadow: 8px 0 40px rgba(0,85,212,0.15); }
+  .main { margin-left: 0 !important; }
+  #btn-mob { display: flex !important; }
+  #mob-overlay.show { display: block; }
+
+  /* Topbar */
+  .topbar { padding: 0 12px !important; gap: 8px !important; height: 52px !important; flex-wrap: nowrap !important; }
+  #api-pill { display: none !important; }
+  #page-sub { display: none !important; }
+  #topbar-search { display: none !important; }
+
+  /* Content */
+  .content { padding: 12px !important; overflow-x: hidden !important; }
+  .content * { max-width: 100%; box-sizing: border-box; }
+
+  /* KPIs */
+  .kpi-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; margin-bottom: 16px !important; }
+  .kpi-value { font-size: 24px !important; letter-spacing: -1px !important; }
+  .kpi-card { padding: 14px !important; }
+
+  /* Toutes les grids inline → 1 col */
+  [style*="grid-template-columns: 1fr 300px"],
+  [style*="grid-template-columns:1fr 300px"],
+  [style*="grid-template-columns: 1fr 320px"],
+  [style*="grid-template-columns:1fr 320px"],
+  [style*="grid-template-columns: 320px 1fr"],
+  [style*="grid-template-columns: 2fr 1fr"],
+  [style*="grid-template-columns:2fr 1fr"],
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns:1fr 1fr"],
+  [style*="grid-template-columns: 340px 1fr"],
+  [style*="grid-template-columns: 280px 1fr"],
+  [style*="grid-template-columns:280px 1fr"] { grid-template-columns: 1fr !important; }
+
+  /* Dashboard main grid */
+  #page-dashboard > div[style*="grid-template-columns"] { display: flex !important; flex-direction: column !important; gap: 14px !important; }
+
+  /* Autopilot */
+  #page-autopilot [style*="grid-template-columns: 320px"] { grid-template-columns: 1fr !important; }
+  #page-autopilot [style*="grid-template-columns:320px"] { grid-template-columns: 1fr !important; }
+  #autopilot-grid { grid-template-columns: 1fr !important; }
+  #page-autopilot > div { max-width: 100% !important; }
+  #page-autopilot [style*="grid-template-columns: repeat(3"] { grid-template-columns: 1fr 1fr 1fr !important; }
+  #page-autopilot .card-header { flex-wrap: wrap !important; gap: 8px !important; }
+  #ap-log { height: 200px !important; }
+  #btn-autopilot, #btn-stop-autopilot { font-size: 13px !important; padding: 12px !important; }
+
+  /* Pipeline */
+  #pipeline-board, #pipeline-table { grid-template-columns: 1fr !important; }
+
+  /* Messagerie */
+  .msg-layout { grid-template-columns: 1fr !important; height: auto !important; }
+  .bubble { max-width: 88% !important; }
+
+  /* Cards */
+  .card-header { padding: 12px 14px !important; flex-wrap: wrap !important; gap: 8px !important; }
+  .card-body { padding: 12px 14px !important; }
+
+  /* Tables scroll horizontal */
+  table { display: block !important; overflow-x: auto !important; min-width: 0 !important; white-space: nowrap; }
+  .card-body { overflow-x: auto !important; }
+
+  /* Form rows → 1 col */
+  .form-row { grid-template-columns: 1fr !important; gap: 10px !important; }
+
+  /* Modals → bottom sheet */
+  .modal-overlay { padding: 0 !important; align-items: flex-end !important; }
+  .modal { max-width: 100% !important; border-radius: 24px 24px 0 0 !important; max-height: 90vh !important; }
+
+  /* Radar */
+  #page-radar > div { height: auto !important; }
+  #page-radar [style*="flex:1;position:relative"] { height: 55vw !important; min-height: 240px !important; }
+  #radar-sheet { position: fixed !important; top: auto !important; bottom: 0 !important; right: 0 !important; left: 0 !important; width: 100% !important; max-height: 65vh !important; border-radius: 20px 20px 0 0 !important; }
+  #radar-search, #radar-city { width: 100% !important; }
+
+  /* Inputs larges → full width */
+  .form-input[style*="width:220px"], .form-input[style*="width:140px"],
+  input[style*="width:180px"], input[style*="width:220px"] { width: 100% !important; }
+
+  /* Tabs scroll */
+  .tabs { overflow-x: auto !important; white-space: nowrap !important; flex-wrap: nowrap !important; -webkit-overflow-scrolling: touch; justify-content: flex-start !important; }
+
+  /* Chips */
+  .chip { font-size: 9px !important; padding: 5px 10px !important; }
+
+  /* Settings */
+  #page-settings.active { display: block !important; }
+  #page-settings > div { max-width: 100% !important; }
+
+  /* CC layout */
+  .cc-main { grid-template-columns: 1fr !important; }
+
+  /* Assistant appel grids */
+  #assistant-appel [style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+
+  /* Cold call KPI strip */
+  .glass[style*="display:flex;border-radius:16px"] { flex-wrap: wrap !important; }
+
+  /* Buttons */
+  .btn { font-size: 10px !important; padding: 7px 12px !important; }
+
+  /* Topbar title */
+  #page-title { font-size: 13px !important; }
+}
+
+</style>
+</head>
+<body>
+<!-- Loading screen -->
+<div id="auth-loading">
+  <svg viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:40px;height:40px"><rect width="66" height="66" rx="14" fill="#0055D4"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg>
+  <div style="font-size:13px;font-weight:600;color:#9ca3af;letter-spacing:-0.01em">vérification...</div>
+</div>
+
+<div class="app" id="app-root" style="display:none">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar glass-sidebar" id="sidebar">
+  <div style="margin-bottom:24px;padding:0 4px;display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="display:flex;align-items:center;gap:.45rem;margin-bottom:3px"><svg viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:26px;height:26px;flex-shrink:0"><rect width="66" height="66" rx="14" fill="#0055D4"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg><span style="font-size:1.1rem;font-weight:700;letter-spacing:-0.03em;color:#0a0a1a">Huntlist.</span></div>
+      <p style="font-size:9px;color:#9ca3af;font-weight:600;letter-spacing:.18em;text-transform:uppercase;margin-top:3px">tableau de bord</p>
+    </div>
+    <div style="width:7px;height:7px;border-radius:50%;background:#00d4ff;animation:pulse 2s infinite"></div>
+  </div>
+
+  <nav style="flex:1;overflow-y:auto;padding-right:4px" class="sidebar-scroll">
+    <button class="nav-item active" onclick="goPage('dashboard',this)" id="nav-dashboard">
+      <span class="msym">space_dashboard</span>tableau de bord
+      <span class="nav-badge" id="badge-new" style="display:none">0</span>
+    </button>
+
+    <div class="nav-section">prospection</div>
+    <button class="nav-item" onclick="goPage('prospection',this)">
+      <span class="msym">hub</span>prospection
+    </button>
+
+    <button class="nav-item" onclick="goPage('pipeline',this)">
+      <span class="msym">conversion_path</span>pipeline crm
+    </button>
+
+    <div class="nav-section">opérations</div>
+    <button class="nav-item" onclick="goPage('messagerie',this)" id="nav-messagerie">
+      <span class="msym">alternate_email</span>messagerie
+      <span class="nav-badge" id="badge-msg" style="display:none">0</span>
+    </button>
+    <button class="nav-item" onclick="goPage('sequences',this)">
+      <span class="msym">reorder</span>séquences
+    </button>
+    <button class="nav-item" onclick="goPage('autopilot',this)">
+      <span class="msym">smart_toy</span>pilote auto
+      <span style="margin-left:auto;width:6px;height:6px;border-radius:50%;background:#00d4ff;flex-shrink:0"></span>
+    </button>
+    <button class="nav-item" onclick="goPage('devis',this)">
+      <span class="msym">description</span>devis
+    </button>
+    <button class="nav-item" onclick="goPage('calendrier',this)">
+      <span class="msym">calendar_month</span>calendrier
+    </button>
+
+    <div class="nav-section">analyse</div>
+    <button class="nav-item" onclick="goPage('rapport',this)">
+      <span class="msym">analytics</span>rapport
+    </button>
+    <button class="nav-item" onclick="goPage('veille',this)">
+      <span class="msym">visibility</span>veille concurrentielle
+    </button>
+    <button class="nav-item" onclick="goPage('radar',this)">
+      <span class="msym">satellite_alt</span>radar aérien
+    </button>
+    <button class="nav-item" onclick="goPage('coldcall',this)">
+      <span class="msym">settings_phone</span>tracker appel
+    </button>
+  </nav>
+
+  <div style="margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,0.3)">
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:12px;border-radius:12px" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'))">
+      <span class="msym">add_circle</span>nouveau lead
+    </button>
+    <button class="nav-item" onclick="goPage('settings',this)" style="margin-bottom:8px">
+      <span class="msym">settings</span>paramètres
+    </button>
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5)">
+      <div style="width:32px;height:32px;border-radius:9px;background:#0055D4;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;flex-shrink:0">U</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:700;color:#0a0a1a" id="sidebar-user-name">mon compte</div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase" id="sidebar-plan-badge" style="color:#9ca3af">starter</div>
+      </div>
+      <button onclick="confirmLogout()" style="background:none;border:none;cursor:pointer;color:#d1d5db;padding:4px;border-radius:6px;transition:color .12s;display:flex;align-items:center" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#d1d5db'">
+        <span class="msym" style="font-size:16px">logout</span>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <div id="mob-overlay" onclick="mobClose()"></div>
+
+  <!-- Topbar -->
+  <div class="topbar glass" style="position:sticky;top:0;z-index:40">
+    <button id="btn-mob" onclick="mobToggle()" style="background:none;border:none;cursor:pointer;padding:6px;color:#6b7280;display:none;align-items:center">
+      <span class="msym" style="font-size:22px">menu</span>
+    </button>
+    <div>
+      <span style="font-size:14px;font-weight:800;color:#0a0a1a;letter-spacing:-.5px" id="page-title">tableau de bord</span>
+      <span style="font-size:11px;color:#9ca3af" id="page-sub"> · flux de données synchronisé</span>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(5,150,105,0.08);border:1px solid rgba(5,150,105,0.15);border-radius:99px;font-size:10px;font-weight:700;color:#059669" id="api-pill">
+      <div class="dot-on"></div><span>toutes les apis actives</span>
+    </div>
+    <div id="topbar-search" style="display:flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.5);border-radius:99px">
+      <span class="msym" style="font-size:18px;color:#9ca3af">search</span>
+      <input placeholder="rechercher dans le noyau..." style="background:none;border:none;outline:none;font-size:11px;color:#1a1a2e;width:180px;font-family:inherit;letter-spacing:-.01em" type="text"/>
+    </div>
+    <button style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.5);cursor:pointer;position:relative" onclick="goPage('settings',document.querySelector('[onclick*=settings]'))">
+      <span class="msym" style="font-size:18px;color:#6b7280">settings</span>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="page active" id="page-dashboard">
+      <!-- KPI Grid -->
+      <div class="kpi-grid">
+        <div class="glass kpi-card" style="border-radius:16px">
+          <div class="scanline"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+            <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:rgba(0,85,212,0.06);border-radius:10px;border:1px solid rgba(0,85,212,0.1)">
+              <span class="msym" style="color:#0055D4">group</span>
+            </div>
+            <span class="badge badge-green" style="display:flex;align-items:center;gap:3px"><span class="msym" style="font-size:11px">trending_up</span> ce mois</span>
+          </div>
+          <span class="kpi-label">prospects trouvés</span>
+          <div class="kpi-value" id="stat-prospects">0</div>
+        </div>
+
+        <div class="glass kpi-card" style="border-radius:16px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+            <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.04);border-radius:10px;border:1px solid rgba(0,0,0,0.06)">
+              <span class="msym" style="color:#6b7280">mail</span>
+            </div>
+            <span style="font-size:9px;font-weight:700;color:#9ca3af;border:1px solid #e5e7eb;padding:3px 8px;border-radius:99px;letter-spacing:.04em">par l'ia</span>
+          </div>
+          <span class="kpi-label">emails générés</span>
+          <div class="kpi-value" id="stat-emails">0</div>
+        </div>
+
+        <div class="glass kpi-card" style="border-radius:16px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+            <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:rgba(2,132,199,0.06);border-radius:10px;border:1px solid rgba(2,132,199,0.1)">
+              <span class="msym" style="color:#0284c7">conversion_path</span>
+            </div>
+            <span style="font-size:9px;font-weight:700;color:#0284c7;background:rgba(2,132,199,0.06);border:1px solid rgba(2,132,199,0.15);padding:3px 8px;border-radius:99px">actifs</span>
+          </div>
+          <span class="kpi-label">en pipeline</span>
+          <div class="kpi-value" id="stat-pipeline">0</div>
+        </div>
+
+        <div style="background:#0a0a1a;border-radius:16px;padding:22px 24px;position:relative;overflow:hidden">
+          <div style="position:absolute;right:-20px;top:-20px;width:80px;height:80px;background:rgba(0,85,212,0.3);filter:blur(40px);border-radius:50%"></div>
+          <div style="position:absolute;bottom:-20px;left:-10px;width:60px;height:60px;background:rgba(0,212,255,0.2);filter:blur(30px);border-radius:50%"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;position:relative;z-index:1">
+            <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.1);border-radius:10px;border:1px solid rgba(255,255,255,0.1)">
+              <span class="msym" style="color:white">emoji_events</span>
+            </div>
+            <span style="font-size:9px;font-weight:700;color:#00d4ff;background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.3);padding:3px 8px;border-radius:99px">optimal</span>
+          </div>
+          <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.4);display:block;margin-bottom:8px;position:relative;z-index:1">convertis</span>
+          <div style="font-size:36px;font-weight:800;line-height:1;letter-spacing:-2px;color:white;position:relative;z-index:1" id="stat-converted">0</div>
+          <div style="position:absolute;bottom:0;left:0;width:100%;height:1px;background:linear-gradient(to right, transparent, rgba(0,85,212,0.5), transparent)"></div>
+        </div>
+      </div>
+
+      <!-- Main grid -->
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:20px">
+        <!-- Left -->
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <!-- Bar chart -->
+          <div class="glass card">
+            <div class="card-header">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px">
+                  performance des campagnes
+                  <span style="width:6px;height:6px;border-radius:50%;background:#00d4ff"></span>
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">métriques d'engagement hebdomadaires</div>
+              </div>
+              <div class="tabs" style="padding:3px">
+                <button class="tab active">semaine</button>
+                <button class="tab">mois</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="bar-chart">
+                <div class="bar-col"><div class="bar" style="height:40%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">lun</span></div>
+                <div class="bar-col"><div class="bar" style="height:65%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">mar</span></div>
+                <div class="bar-col" style="position:relative">
+                  <div class="bar neon-sm" style="height:85%;background:#0055D4;"></div>
+                  <div style="position:absolute;top:-32px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;background:#0a0a1a;color:white;padding:3px 8px;border-radius:6px;white-space:nowrap">82%</div>
+                  <span style="font-size:8px;font-weight:800;color:#0055D4;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">mer</span>
+                </div>
+                <div class="bar-col"><div class="bar" style="height:55%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">jeu</span></div>
+                <div class="bar-col"><div class="bar" style="height:72%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">ven</span></div>
+                <div class="bar-col"><div class="bar" style="height:38%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">sam</span></div>
+                <div class="bar-col"><div class="bar" style="height:25%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">dim</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent prospects -->
+          <div class="glass card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">leads récents</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px" id="dash-prospect-sub">aucune recherche effectuée</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'))">
+                <span class="msym">add</span>nouvelle recherche
+              </button>
+            </div>
+            <div id="dash-prospects-list" style="padding:40px 20px;text-align:center;color:#9ca3af">
+              <span class="msym" style="font-size:40px;display:block;margin-bottom:12px;opacity:.25">group_search</span>
+              <div style="font-size:13px;font-weight:600;color:#6b7280;margin-bottom:4px">aucun prospect pour l'instant</div>
+              <div style="font-size:11px">lancez votre première recherche pour commencer.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right widgets -->
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <!-- Insights -->
+          <div class="glass card">
+            <div class="card-header">
+              <div class="card-title" style="display:flex;align-items:center;gap:6px">
+                <span class="msym" style="color:#0055D4;font-size:16px">psychology</span>
+                insights prospects
+              </div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+              <div style="padding:16px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);border-radius:12px">
+                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#9ca3af;margin-bottom:8px">meilleur canal</div>
+                <div style="font-size:16px;font-weight:800;color:#0a0a1a;margin-bottom:8px">linkedin outbound</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:78%"></div></div>
+              </div>
+              <div style="padding:16px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);border-radius:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#9ca3af">temps de réponse</div>
+                  <span class="msym" style="color:#0055D4;font-size:16px">history</span>
+                </div>
+                <div style="font-size:16px;font-weight:800;color:#0a0a1a">12 minutes</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:4px">conversion ×4 dans les 15m</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Engine -->
+          <div style="background:#0a0a1a;border-radius:16px;padding:24px;position:relative;overflow:hidden" class="neon">
+            <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(0,85,212,0.25);filter:blur(50px);border-radius:50%"></div>
+            <div style="position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(0,212,255,0.2);filter:blur(40px);border-radius:50%"></div>
+            <div style="position:relative;z-index:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                <span class="msym" style="color:#00d4ff;animation:pulse 2s infinite">auto_awesome</span>
+                <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:white">moteur ia</span>
+              </div>
+              <p style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:20px;line-height:1.65">notre processeur traite 4 202 nouveaux points de données pour optimiser votre prospection.</p>
+              <button class="btn" style="width:100%;justify-content:center;background:white;color:#0055D4;font-size:10px;letter-spacing:.08em;text-transform:uppercase" onclick="launchAutopilot()">
+                activer le routage intelligent
+              </button>
+            </div>
+          </div>
+
+          <!-- Agents -->
+          <div class="glass card">
+            <div class="card-header"><div class="card-title">agents ia</div></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.06);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.1)">
+                  <span class="msym" style="color:#0055D4;font-size:16px">search</span>
+                </div>
+                <span style="font-size:12px;font-weight:600;flex:1;color:#0a0a1a">prospection</span>
+                <div id="ag1" class="dot-off"></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.06);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.1)">
+                  <span class="msym" style="color:#0055D4;font-size:16px">psychology</span>
+                </div>
+                <span style="font-size:12px;font-weight:600;flex:1;color:#0a0a1a">scoring ia</span>
+                <div id="ag2" class="dot-off"></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.06);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.1)">
+                  <span class="msym" style="color:#0055D4;font-size:16px">mail</span>
+                </div>
+                <span style="font-size:12px;font-weight:600;flex:1;color:#0a0a1a">email ia</span>
+                <div id="ag3" class="dot-off"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity -->
+          <div class="glass card">
+            <div class="card-header"><div class="card-title">activité récente</div></div>
+            <div style="padding:12px 20px" id="activity-log">
+              <div style="text-align:center;color:#9ca3af;font-size:11px;padding:12px 0">aucune activité</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ prospection ═══ -->
+    <div class="page" id="page-prospection">
+      <div style="max-width:860px">
+        <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap" id="b2b-tabs-wrap">
+          <button class="tab active" onclick="switchB2bTab('b2b-gmaps',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">map</span> google maps</button>
+          <button class="tab" onclick="switchB2bTab('b2b-insee',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">account_balance</span> insee</button>
+          <button class="tab" onclick="switchB2bTab('b2b-bodacc',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">gavel</span> bodacc</button>
+          <button class="tab" onclick="switchB2bTab('b2b-permis',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">construction</span> permis</button>
+          <button class="tab" onclick="switchB2bTab('b2b-ao',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">description</span> appels d'offres</button>
+          <button class="tab" onclick="switchB2bTab('b2b-linkedin',this)" style="background:rgba(0,119,181,0.08);color:#0077b5;border:1px solid rgba(0,119,181,0.2);font-weight:700"><span class="msym" style="font-size:13px;vertical-align:-3px">person_search</span> linkedin <span style="font-size:8px;background:#0077b5;color:white;padding:1px 6px;border-radius:99px;margin-left:2px;font-weight:800" id="li-badge">0</span></button>
+        </div>
+
+        <div id="b2b-gmaps">
+          <div class="glass card" style="margin-bottom:16px">
+            <div class="card-header">
+              <div>
+                <div class="card-title">google maps places</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">établissements professionnels · données temps réel</div>
+              </div>
+              <span class="badge badge-green"><span class="msym" style="font-size:11px">check_circle</span> actif</span>
+            </div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">type de business</label>
+                  <input class="form-input" id="search-type" placeholder="ex: plombier, restaurant..."/>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">ville / zone</label>
+                  <input class="form-input" id="search-city" placeholder="ex: lyon, paris 15e..."/>
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:16px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">nombre de résultats</label>
+                  <select class="form-input" id="search-max">
+                    <option value="10">10 prospects</option>
+                    <option value="20">20 prospects</option>
+                    <option value="40" selected>40 prospects</option>
+                    <option value="60">60 prospects</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">score minimum</label>
+                  <input class="form-input" id="search-minscore" type="number" min="0" max="100" value="40"/>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <button class="btn btn-primary" id="btn-search" onclick="searchProspects()">
+                  <span id="search-spinner" style="display:none" class="spinner"></span>
+                  <span class="msym">search</span>lancer la recherche
+                </button>
+                <div style="font-size:10px;color:#9ca3af;display:flex;align-items:center;gap:6px">
+                  <span class="msym" style="font-size:14px">visibility_off</span>
+                  <span id="seen-count">0</span> mémorisés
+                  <button onclick="resetSeenProspects()" style="font-size:10px;font-weight:700;background:none;border:1px solid rgba(255,255,255,0.4);border-radius:99px;padding:2px 8px;cursor:pointer;color:#9ca3af;transition:all .12s" onmouseover="this.style.color='#0055D4'" onmouseout="this.style.color='#9ca3af'">réinitialiser</button>
+                </div>
+              </div>
+              <div id="search-progress" style="display:none;margin-top:14px">
+                <div style="font-size:11px;color:#6b7280;margin-bottom:6px" id="search-progress-text">recherche en cours...</div>
+                <div class="progress-bar"><div class="progress-fill" id="search-progress-fill" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="search-results" style="display:none">
+            <div class="glass card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title" id="results-title">résultats</div>
+                  <div style="font-size:10px;color:#9ca3af;margin-top:2px" id="results-sub"></div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-ghost btn-sm" onclick="exportCSV()"><span class="msym">download</span>csv</button>
+                  <button class="btn btn-primary btn-sm" onclick="generateAllEmails()">
+                    <span id="all-email-spinner" style="display:none" class="spinner"></span>
+                    <span class="msym">auto_awesome</span>emails ia
+                  </button>
+                </div>
+              </div>
+              <div id="results-table" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;padding:16px"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="b2b-insee" style="display:none">
+          <div class="glass card" style="margin-bottom:16px">
+            <div class="card-header"><div><div class="card-title">insee — base sirene</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">18m d'établissements · données officielles</div></div></div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0"><label class="form-label">code naf</label><input class="form-input" id="insee-naf" placeholder="ex: 4321a..."/></div>
+                <div class="form-group" style="margin:0"><label class="form-label">département</label><input class="form-input" id="insee-dept" placeholder="ex: 75, 69..."/></div>
+              </div>
+              <div class="form-row" style="margin-bottom:16px">
+                <div class="form-group" style="margin:0"><label class="form-label">tranche effectif</label><select class="form-input" id="insee-effectif"><option value="">toutes</option><option value="01">1 salarié</option><option value="02">2 à 5</option><option value="11">10 à 19</option><option value="21">20 à 49</option></select></div>
+                <div class="form-group" style="margin:0"><label class="form-label">créées après</label><input class="form-input" type="date" id="insee-datemin"/></div>
+              </div>
+              <button class="btn btn-primary" onclick="searchInsee()"><span id="insee-spinner" style="display:none" class="spinner"></span><span class="msym">account_balance</span>rechercher sirene</button>
+            </div>
+          </div>
+          <div id="insee-results" style="display:none"><div class="glass card"><div class="card-header"><div><div class="card-title" id="insee-results-title">résultats sirene</div><div id="insee-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div></div></div><table><thead><tr><th>raison sociale</th><th>siret</th><th>naf</th><th>département</th><th>création</th><th>actions</th></tr></thead><tbody id="insee-table"></tbody></table></div></div>
+        </div>
+
+        <div id="b2b-bodacc" style="display:none">
+          <div class="glass card" style="margin-bottom:16px">
+            <div class="card-header"><div><div class="card-title">bodacc — annonces légales</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">créations, cessions, procédures · data.gouv.fr</div></div></div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0"><label class="form-label">type d'annonce</label><select class="form-input" id="bodacc-type"><option value="creation">créations</option><option value="cession">cessions</option><option value="procedure">procédures</option><option value="radiation">radiations</option></select></div>
+                <div class="form-group" style="margin:0"><label class="form-label">département</label><input class="form-input" id="bodacc-dept" placeholder="ex: 75, 69..."/></div>
+              </div>
+              <button class="btn btn-primary" onclick="searchBodacc()"><span id="bodacc-spinner" style="display:none" class="spinner"></span><span class="msym">gavel</span>rechercher bodacc</button>
+            </div>
+          </div>
+          <div id="bodacc-results" style="display:none"><div class="glass card"><div class="card-header"><div><div class="card-title">annonces bodacc</div><div id="bodacc-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div></div></div><table><thead><tr><th>entreprise</th><th>type</th><th>ville</th><th>date</th><th>activité</th><th>actions</th></tr></thead><tbody id="bodacc-table"></tbody></table></div></div>
+        </div>
+
+        <div id="b2b-permis" style="display:none">
+          <div class="glass card" style="margin-bottom:16px">
+            <div class="card-header"><div><div class="card-title">permis de construire — sit@del2</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">chantiers autorisés · ministère écologie</div></div></div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0"><label class="form-label">commune / département</label><input class="form-input" id="permis-commune" placeholder="ex: lyon, 69..."/></div>
+                <div class="form-group" style="margin:0"><label class="form-label">type de projet</label><select class="form-input" id="permis-type"><option value="tous" selected>tous</option><option value="maison">logement individuel</option><option value="collectif">logement collectif</option></select></div>
+              </div>
+              <button class="btn btn-primary" onclick="searchPermis()"><span id="permis-spinner" style="display:none" class="spinner"></span><span class="msym">construction</span>rechercher les permis</button>
+            </div>
+          </div>
+          <div id="permis-results" style="display:none"><div class="glass card"><div class="card-header"><div><div class="card-title">permis de construire</div><div id="permis-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div></div></div><table><thead><tr><th>référence</th><th>adresse</th><th>type</th><th>surface</th><th>date</th><th>actions</th></tr></thead><tbody id="permis-table"></tbody></table></div></div>
+        </div>
+
+        <!-- ═══ ONGLET LINKEDIN ═══ -->
+        <div id="b2b-linkedin" style="display:none">
+
+          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,119,181,0.2)">
+            <div class="card-header" style="background:rgba(0,119,181,0.04)">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#0077b5">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
+                  prospection linkedin
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">recherchez des profils linkedin directement depuis Huntlist.</div>
+              </div>
+              <span class="badge badge-green" id="li-api-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> api active</span>
+            </div>
+            <div class="card-body">
+
+              <!-- Alerte clé manquante -->
+              <div id="li-no-key-banner" class="alert alert-amber" style="margin-bottom:16px">
+                <span class="msym">key</span>
+                <div style="flex:1">
+                  <strong>clé google search api requise</strong>
+                  <div style="font-size:11px;margin-top:2px">gratuite · 100 recherches/jour · configurez-la dans paramètres → linkedin api</div>
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="goPage('settings',document.querySelector('[onclick*=settings]'));setTimeout(()=>switchSettingsTab('tab-linkedin',null),200)">configurer →</button>
+              </div>
+
+              <!-- Formulaire -->
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">poste / secteur cible *</label>
+                  <input class="form-input" id="li-secteur" placeholder="ex: directeur commercial, plombier, drh..."/>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">ville / région</label>
+                  <input class="form-input" id="li-region" placeholder="ex: lyon, paris, bordeaux..."/>
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:16px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">entreprise (optionnel)</label>
+                  <input class="form-input" id="li-company" placeholder="ex: bouygues, renault..."/>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">nombre de résultats</label>
+                  <select class="form-input" id="li-max">
+                    <option value="5">5 profils</option>
+                    <option value="10" selected>10 profils</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Chips rapides -->
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+                <span style="font-size:10px;font-weight:700;color:#9ca3af;padding-top:6px">raccourcis :</span>
+                <button class="chip" onclick="fillLiSearch('directeur commercial','paris')">dir. commercial paris</button>
+                <button class="chip" onclick="fillLiSearch('gérant','lyon')">gérant lyon</button>
+                <button class="chip" onclick="fillLiSearch('responsable achats','france')">achats france</button>
+                <button class="chip" onclick="fillLiSearch('drh','bordeaux')">drh bordeaux</button>
+                <button class="chip" onclick="fillLiSearch('ceo','marseille')">ceo marseille</button>
+              </div>
+
+              <button class="btn btn-primary" onclick="searchLinkedinProfiles()" id="btn-li-search" style="background:#0077b5;box-shadow:0 4px 16px rgba(0,119,181,0.3)">
+                <span id="li-search-spinner" style="display:none" class="spinner"></span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="white"/></svg>
+                rechercher des profils linkedin
+              </button>
+            </div>
+          </div>
+
+          <!-- Résultats -->
+          <div id="li-results" style="display:none">
+            <div class="glass card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title" id="li-results-title">profils trouvés</div>
+                  <div style="font-size:10px;color:#9ca3af;margin-top:2px" id="li-results-sub"></div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-ghost btn-sm" onclick="exportLinkedinCSV()"><span class="msym">download</span>csv</button>
+                  <button class="btn btn-primary btn-sm" onclick="addAllLinkedinToPipeline()"><span class="msym">conversion_path</span>tout en pipeline</button>
+                </div>
+              </div>
+              <div id="li-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;padding:16px"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="b2b-ao" style="display:none">
+          <div class="glass card" style="margin-bottom:16px">
+            <div class="card-header"><div><div class="card-title">appels d'offres — boamp</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">marchés publics · data.gouv.fr</div></div></div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0"><label class="form-label">mots-clés</label><input class="form-input" id="ao-keywords" placeholder="ex: informatique, travaux..."/></div>
+                <div class="form-group" style="margin:0"><label class="form-label">région</label><input class="form-input" id="ao-region" placeholder="ex: île-de-france, 69..."/></div>
+              </div>
+              <button class="btn btn-primary" onclick="searchAO()"><span id="ao-spinner" style="display:none" class="spinner"></span><span class="msym">description</span>rechercher les marchés</button>
+            </div>
+          </div>
+          <div id="ao-results" style="display:none"><div class="glass card"><div class="card-header"><div><div class="card-title">appels d'offres</div><div id="ao-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div></div></div><table><thead><tr><th>intitulé</th><th>acheteur</th><th>type</th><th>lieu</th><th>date limite</th><th>actions</th></tr></thead><tbody id="ao-table"></tbody></table></div></div>
+        </div>
+      </div>
+    </div>
 
 
+        <!-- ═══ PIPELINE ═══ -->
+    <div class="page" id="page-pipeline">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="chip" onclick="filterPipeline('all',this)" style="background:rgba(0,85,212,0.08);color:#0055D4;border-color:rgba(0,85,212,0.2);font-weight:800" id="filter-all">tous</button>
+        <button class="chip" onclick="filterPipeline('new',this)">nouveau</button>
+        <button class="chip" onclick="filterPipeline('contacted',this)">contacté</button>
+        <button class="chip" onclick="filterPipeline('replied',this)">répondu</button>
+        <button class="chip" onclick="filterPipeline('converted',this)">converti</button>
+        <div style="margin-left:auto;font-size:11px;color:#9ca3af" id="pipeline-sub">0 prospects</div>
+      </div>
+      <div id="pipeline-table" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
+    </div>
+
+    <!-- ═══ MESSAGERIE ═══ -->
+    <div class="page" id="page-messagerie">
+
+      <div class="msg-layout glass" style="border:1px solid rgba(255,255,255,0.35)">
+        <div style="border-right:1px solid rgba(255,255,255,0.3);display:flex;flex-direction:column">
+          <div style="padding:16px 18px;border-bottom:1px solid rgba(255,255,255,0.3);font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.3)">
+            <span style="width:7px;height:7px;border-radius:50%;background:#059669;animation:pulse 2s infinite"></span>messages
+            <span class="nav-badge" id="msg-unread-total" style="display:none;margin-left:auto">0</span>
+          </div>
+          <div id="conv-list-body" style="flex:1;overflow-y:auto"><div style="padding:32px 20px;text-align:center;color:#9ca3af;font-size:12px">aucune conversation.</div></div>
+        </div>
+        <div id="chat-zone" style="display:flex;flex-direction:column">
+          <div id="chat-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:#9ca3af">
+            <span class="msym" style="font-size:48px;opacity:.2">forum</span>
+            <div style="font-size:13px;font-weight:600;color:#6b7280">sélectionnez une conversation</div>
+          </div>
+          <div id="chat-active" style="display:none;flex-direction:column;height:100%">
+            <div style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.3);display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.3)">
+              <div id="chat-av" style="width:34px;height:34px;border-radius:9px;background:#0055D4;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">?</div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:800" id="chat-prospect-name">—</div><div style="font-size:10px;color:#9ca3af" id="chat-prospect-email">—</div></div>
+              <div style="font-size:10px;color:#9ca3af;background:rgba(255,255,255,0.5);padding:4px 12px;border-radius:99px;border:1px solid rgba(255,255,255,0.5)" id="chat-subject">—</div>
+            </div>
+            <div id="chat-messages-list" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px"></div>
+            <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,0.3)">
+              <div style="display:flex;gap:8px;align-items:flex-end">
+                <textarea id="chat-reply" rows="1" placeholder="répondre..." style="flex:1;padding:10px 14px;border:1px solid rgba(255,255,255,0.4);border-radius:12px;font-size:13px;font-family:inherit;resize:none;min-height:40px;max-height:120px;outline:none;background:rgba(255,255,255,0.6);transition:all .15s" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendReply()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+                <button onclick="sendReply()" id="chat-send-btn" style="width:40px;height:40px;background:#0055D4;border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;transition:all .12s" onmouseover="this.style.background='#0047B8'" onmouseout="this.style.background='#0055D4'">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7L13 1L9 13L7 8L1 7Z" fill="white"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SÉQUENCES ═══ -->
+    <div class="page" id="page-sequences">
+      <div style="max-width:560px">
+        <div class="glass card">
+          <div class="card-header"><div class="card-title">séquences automatiques</div></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">délai relance 1</label><select class="form-input" id="seq-d1"><option value="1">j+1</option><option value="3" selected>j+3</option><option value="5">j+5</option><option value="7">j+7</option></select></div>
+            <div class="form-group"><label class="form-label">délai relance 2</label><select class="form-input" id="seq-d2"><option value="5">j+5</option><option value="7" selected>j+7</option><option value="10">j+10</option><option value="14">j+14</option></select></div>
+            <div class="form-group"><label class="form-label">délai relance 3</label><select class="form-input" id="seq-d3"><option value="14" selected>j+14</option><option value="21">j+21</option><option value="30">j+30</option></select></div>
+            <div class="form-group"><label class="form-label">ton des relances</label><select class="form-input" id="seq-tone"><option value="professionnel">professionnel</option><option value="direct">direct et concis</option><option value="amical">amical</option><option value="urgence">urgence</option></select></div>
+            <button class="btn btn-primary" onclick="saveSequence()"><span class="msym">save</span>enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ AUTOPILOT ═══ -->
+    <div class="page" id="page-autopilot">
+      <div style="max-width:860px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+          <div>
+            <h2 style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">pilote automatique ia</h2>
+            <p style="font-size:11px;color:#9ca3af;margin-top:4px">prospection autonome · recherche · scoring · email · pipeline</p>
+          </div>
+          <div id="autopilot-toggle" style="display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:99px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);font-size:11px;font-weight:700;color:#9ca3af;cursor:pointer" onclick="toggleAutopilot()">
+            <div class="dot-off"></div><span>inactif</span>
+          </div>
+        </div>
+
+        <div id="autopilot-grid" style="display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="glass card">
+              <div class="card-header"><div class="card-title">configuration</div></div>
+              <div class="card-body">
+                <div class="form-group"><label class="form-label">type de business cible</label><input class="form-input" id="auto-query" placeholder="plombier, électricien..."/></div>
+                <div class="form-group"><label class="form-label">zone géographique</label><input class="form-input" id="auto-zone" placeholder="lyon, paris 15e..."/></div>
+                <div class="form-group"><label class="form-label">prospects par cycle</label><select class="form-input" id="auto-nb"><option value="20">20</option><option value="50" selected>50</option><option value="100">100</option><option value="200">200 (max)</option></select></div>
+                <div class="form-group"><label class="form-label">score minimum</label><input class="form-input" type="number" id="auto-score" value="60" min="0" max="100"/></div>
+                <div class="form-group" style="margin:0"><label class="form-label">action automatique</label><select class="form-input" id="auto-action"><option value="pipeline">pipeline uniquement</option><option value="email">email ia + pipeline</option><option value="email-send">envoyer email + pipeline</option><option value="full" selected>tout (email + sms + pipeline)</option></select></div>
+              </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="launchAutopilot()" id="btn-autopilot">lancer le pilote</button>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center;display:none" onclick="stopAutopilot()" id="btn-stop-autopilot"><span class="msym">stop_circle</span>arrêter</button>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+              <div class="glass" style="border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:8px">prospects</div><div style="font-size:36px;font-weight:800;letter-spacing:-2px;color:#0055D4" id="ap-count-prospects">0</div></div>
+              <div class="glass" style="border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:8px">emails</div><div style="font-size:36px;font-weight:800;letter-spacing:-2px;color:#7c3aed" id="ap-count-emails">0</div></div>
+              <div class="glass" style="border-radius:14px;padding:16px;text-align:center"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:8px">pipeline</div><div style="font-size:36px;font-weight:800;letter-spacing:-2px;color:#059669" id="ap-count-pipeline">0</div></div>
+            </div>
+            <div id="ap-progress-wrap" style="display:none">
+              <div class="glass card"><div class="card-body"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div style="font-size:12px;font-weight:700" id="ap-step-label">en attente...</div><div style="font-size:11px;color:#9ca3af" id="ap-step-pct">0%</div></div><div class="progress-bar"><div class="progress-fill" id="ap-progress-fill" style="width:0%;transition:width .5s"></div></div></div></div>
+            </div>
+            <div class="glass card">
+              <div class="card-header"><div class="card-title">journal temps réel</div><div id="ap-live-dot" style="display:none;width:8px;height:8px;border-radius:50%;background:#059669;animation:pulse 1s infinite"></div></div>
+              <div id="ap-log" style="height:280px;overflow-y:auto;padding:12px 20px;display:flex;flex-direction:column;gap:6px;font-size:12px">
+                <div style="text-align:center;color:#9ca3af;padding:40px 0"><span class="msym" style="font-size:36px;display:block;margin-bottom:10px;opacity:.2">smart_toy</span>configurez et lancez le pilote</div>
+              </div>
+            </div>
+            <div class="glass card" id="ap-results-card" style="display:none">
+              <div class="card-header"><div><div class="card-title">prospects traités</div><div id="ap-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px">0 ajoutés</div></div><button class="btn btn-ghost btn-sm" onclick="goPage('pipeline',document.querySelector('[onclick*=pipeline]'))">voir pipeline →</button></div>
+              <div id="ap-results-list" style="max-height:200px;overflow-y:auto"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ DEVIS ═══ -->
+    <div class="page" id="page-devis">
+      <div style="max-width:680px">
+        <div class="glass card" style="margin-bottom:16px">
+          <div class="card-header"><div><div class="card-title">générateur de devis</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">créez un devis professionnel en quelques secondes</div></div></div>
+          <div class="card-body">
+            <div class="form-row"><div class="form-group"><label class="form-label">nom du client</label><input class="form-input" id="devis-client" placeholder="plomberie leclerc"/></div><div class="form-group"><label class="form-label">votre activité</label><input class="form-input" id="devis-activite" placeholder="agence de communication"/></div></div>
+            <div class="form-group"><label class="form-label">description de la prestation</label><textarea class="form-input" id="devis-desc" placeholder="création d'un site web vitrine..."></textarea></div>
+            <div class="form-row"><div class="form-group"><label class="form-label">budget estimé (€)</label><input class="form-input" id="devis-budget" type="number" placeholder="2500"/></div><div class="form-group"><label class="form-label">délai de réalisation</label><input class="form-input" id="devis-delai" placeholder="4 semaines"/></div></div>
+            <button class="btn btn-primary" id="btn-devis" onclick="generateDevis()"><span id="devis-spinner" style="display:none" class="spinner"></span><span class="msym">auto_awesome</span>générer le devis</button>
+          </div>
+        </div>
+        <div id="devis-result" style="display:none" class="glass card">
+          <div class="card-header"><div class="card-title">devis généré</div><button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('devis-text').textContent)"><span class="msym">content_copy</span>copier</button></div>
+          <div class="card-body"><pre id="devis-text" style="white-space:pre-wrap;font-family:Outfit,sans-serif;font-size:13px;line-height:1.7;color:#1a1a2e"></pre></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CALENDRIER ═══ -->
+  <div class="page" id="page-calendrier">
+      <div style="max-width:900px">
+        <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <h2 style="font-size:20px;font-weight:700;letter-spacing:-0.04em;color:#0a0a1a">calendrier</h2>
+            <p style="font-size:11px;color:#9ca3af;margin-top:4px">planifiez vos relances et rdv</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-ghost btn-sm" onclick="calPrev()"><span class="msym">chevron_left</span></button>
+            <span style="font-size:14px;font-weight:700;color:#0a0a1a;min-width:160px;text-align:center" id="cal-month-label"></span>
+            <button class="btn btn-ghost btn-sm" onclick="calNext()"><span class="msym">chevron_right</span></button>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="addCalEvent()"><span class="msym">add</span>ajouter un rdv</button>
+        </div>
+
+        <!-- Jours de la semaine -->
+        <div class="glass card" style="overflow:hidden">
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid rgba(255,255,255,0.3)">
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Lun</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Mar</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Mer</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Jeu</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Ven</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Sam</div>
+            <div style="padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af">Dim</div>
+          </div>
+          <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr)"></div>
+        </div>
+
+        <!-- Événements du jour -->
+        <div class="glass card" style="margin-top:16px" id="cal-events-card">
+          <div class="card-header">
+            <div class="card-title" id="cal-day-title">sélectionnez un jour</div>
+            <button class="btn btn-ghost btn-sm" onclick="addCalEvent()" id="cal-add-btn" style="display:none"><span class="msym">add</span>ajouter</button>
+          </div>
+          <div id="cal-events-list" style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">cliquez sur un jour pour voir les événements</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RADAR AÉRIEN ═══ -->
+    <div class="page" id="page-radar">
+      <div style="display:flex;flex-direction:column;height:calc(100vh - 60px);gap:0">
+
+        <div style="padding:16px 24px 12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;flex-shrink:0">
+          <div>
+            <h2 style="font-size:18px;font-weight:700;letter-spacing:-0.04em;color:#0a0a1a;display:flex;align-items:center;gap:8px">
+              <span class="msym" style="color:#0055D4;font-size:22px">satellite_alt</span>radar aérien
+            </h2>
+            <p style="font-size:11px;color:#9ca3af;margin-top:2px">scannez un secteur · cliquez sur une entreprise pour ouvrir sa fiche</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id="radar-search" class="form-input" placeholder="type de business (ex: plombier, restaurant...)" style="width:220px;height:36px;font-size:12px"/>
+            <input id="radar-city" class="form-input" placeholder="ville" style="width:140px;height:36px;font-size:12px"/>
+            <button class="btn btn-primary btn-sm" onclick="radarSearch()" id="btn-radar">
+              <span id="radar-spinner" style="display:none" class="spinner"></span>
+              <span class="msym">radar</span>scanner
+            </button>
+            <button class="btn btn-ghost btn-sm" id="radar-toggle-sat" onclick="radarToggleSat()" title="Vue satellite">
+              <span class="msym">satellite</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="radar-stats" style="display:none;padding:0 24px 8px;flex-shrink:0">
+          <span style="font-size:11px;font-weight:700;color:#0055D4;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.12);padding:4px 12px;border-radius:99px" id="radar-count-label"></span>
+        </div>
+
+        <div style="flex:1;position:relative;overflow:hidden">
+          <div id="radar-map" style="width:100%;height:100%"></div>
+          <div style="position:absolute;bottom:16px;left:16px;background:white;border-radius:10px;padding:10px 14px;box-shadow:0 2px 16px rgba(0,0,0,0.1);font-size:10px;font-weight:600;color:#6b7280;display:flex;gap:12px;align-items:center">
+            <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#0055D4"></div>élevé</div>
+            <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#d97706"></div>moyen</div>
+            <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#059669"></div>faible</div>
+          </div>
+        </div>
+
+        <!-- Card flottante fiche -->
+        <div id="radar-sheet" style="position:absolute;top:16px;right:16px;width:340px;max-height:calc(100% - 32px);background:white;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18),0 2px 8px rgba(0,0,0,0.08);z-index:400;transition:opacity .25s ease,transform .25s ease;overflow-y:auto;opacity:0;transform:translateY(-8px) scale(0.97);pointer-events:none;display:block">
+          <div style="padding:0 0 16px 0">
+            <!-- Map embed Google Maps style -->
+            <div id="sheet-map-embed" style="width:100%;height:160px;background:#e8f0fe;position:relative;overflow:hidden;border-radius:20px 20px 0 0">
+              <iframe id="sheet-map-iframe" src="" style="width:100%;height:100%;border:none;display:none" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              <div id="sheet-map-placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8f0fe,#c5d5f8)">
+                <span class="msym" style="font-size:48px;color:#0055D4;opacity:.3">map</span>
+              </div>
+            </div>
+
+            <div style="padding:16px 20px 0">
+              <!-- Header -->
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
+                <div style="flex:1">
+                  <div style="font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:2px" id="sheet-sector">secteur</div>
+                  <div style="font-size:18px;font-weight:800;letter-spacing:-0.03em;color:#0a0a1a;line-height:1.2" id="sheet-name">nom</div>
+                  <div style="font-size:12px;color:#6b7280;margin-top:3px;display:flex;align-items:center;gap:4px">
+                    <span class="msym" style="font-size:14px;color:#9ca3af">location_on</span>
+                    <span id="sheet-addr">adresse</span>
+                  </div>
+                </div>
+                <button onclick="closeRadarSheet()" style="background:#f3f4f6;border:none;border-radius:99px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:18px;flex-shrink:0">✕</button>
+              </div>
+
+              <!-- Note + avis + score -->
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+                <div id="sheet-stars" style="font-size:13px;color:#f59e0b"></div>
+                <span style="font-size:14px;font-weight:800;color:#0a0a1a" id="sheet-rating-val">—</span>
+                <span style="font-size:12px;color:#9ca3af" id="sheet-reviews-val"></span>
+                <div style="margin-left:auto;background:rgba(0,85,212,0.08);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:3px 10px;font-size:10px;font-weight:800;color:#0055D4" id="sheet-score">—</div>
+              </div>
+
+              <!-- Numéro de téléphone style Google Maps -->
+              <div id="sheet-phone-row" style="display:none;margin-bottom:12px">
+                <a id="sheet-phone-link" href="#" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:#f8faff;border:1px solid #e0e8ff;border-radius:12px;text-decoration:none;color:#0055D4;font-size:14px;font-weight:700">
+                  <div style="width:32px;height:32px;border-radius:99px;background:#0055D4;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span class="msym" style="font-size:16px;color:white">phone</span>
+                  </div>
+                  <span id="sheet-phone-text"></span>
+                  <span class="msym" style="margin-left:auto;color:#9ca3af;font-size:16px">chevron_right</span>
+                </a>
+              </div>
+
+              <!-- Lien Maps externe -->
+              <div id="sheet-maps-link-row" style="display:none;margin-bottom:14px">
+                <a id="sheet-maps-link" href="#" target="_blank" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:#f8faff;border:1px solid #e0e8ff;border-radius:12px;text-decoration:none;color:#0055D4;font-size:13px;font-weight:600">
+                  <div style="width:32px;height:32px;border-radius:99px;background:#34a853;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span class="msym" style="font-size:16px;color:white">open_in_new</span>
+                  </div>
+                  Voir sur Google Maps
+                  <span class="msym" style="margin-left:auto;color:#9ca3af;font-size:16px">chevron_right</span>
+                </a>
+              </div>
+
+              <!-- Actions CTA -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+                <button class="btn btn-primary" onclick="addSheetToPipeline()" style="justify-content:center;border-radius:12px;padding:12px">
+                  <span class="msym">conversion_path</span>Pipeline
+                </button>
+                <button class="btn btn-ghost" onclick="generateSheetEmail()" id="btn-sheet-email" style="justify-content:center;border-radius:12px;padding:12px;border:1.5px solid #0055D4;color:#0055D4;background:rgba(0,85,212,0.04)">
+                  <span id="sheet-email-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">mail</span>Email IA
+                </button>
+              </div>
+
+              <!-- Email généré -->
+              <div id="sheet-email-result" style="display:none">
+                <div style="background:#f9f9fb;border-radius:12px;padding:14px;font-size:12px;line-height:1.75;color:#1a1a2e;white-space:pre-wrap;border:1px solid #e5e7eb;max-height:180px;overflow-y:auto" id="sheet-email-text"></div>
+                <button onclick="copySheetEmail()" class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;justify-content:center">
+                  <span class="msym">content_copy</span>copier l'email
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RAPPORT ═══ -->
+    <div class="page" id="page-rapport">
+      <div class="kpi-grid" style="margin-bottom:20px">
+        <div class="glass kpi-card"><span class="kpi-label">total prospects</span><div class="kpi-value" id="r-prospects">0</div></div>
+        <div class="glass kpi-card"><span class="kpi-label">emails générés</span><div class="kpi-value" id="r-emails">0</div></div>
+        <div class="glass kpi-card"><span class="kpi-label">score moyen</span><div class="kpi-value" id="r-score">—</div></div>
+        <div class="glass kpi-card"><span class="kpi-label">taux conversion</span><div class="kpi-value" id="r-conv">0%</div></div>
+      </div>
+      <div class="glass card">
+        <div class="card-header"><div class="card-title">historique des recherches</div></div>
+        <table><thead><tr><th>date</th><th>requête</th><th>prospects</th><th>emails</th></tr></thead><tbody id="rapport-table"><tr><td colspan="4" style="text-align:center;color:#9ca3af;padding:40px">aucune donnée</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- ═══ VEILLE ═══ -->
+  <div class="page" id="page-veille">
+      <div style="max-width:1000px">
+        <!-- Header -->
+        <div style="margin-bottom:24px">
+          <h2 style="font-size:20px;font-weight:700;letter-spacing:-0.04em;color:#0a0a1a">veille concurrentielle</h2>
+          <p style="font-size:12px;color:#9ca3af;margin-top:4px">analysez vos concurrents locaux · forces, faiblesses, opportunités</p>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(0,85,212,0.15)">
+          <div class="card-header" style="background:rgba(0,85,212,0.03)">
+            <div>
+              <div class="card-title" style="color:#0055D4;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:16px">radar</span>scanner le marché local</div>
+              <div style="font-size:10px;color:#9ca3af;margin-top:2px">google maps · analyse ia par concurrent</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">votre secteur d'activité</label>
+                <input class="form-input" id="veille-secteur" placeholder="ex: plombier, agence immobilière..."/>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">ville / zone</label>
+                <input class="form-input" id="veille-ville" placeholder="ex: lyon, paris 15e..."/>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="btn-veille" onclick="runVeille()" style="width:100%;justify-content:center;padding:14px">
+              <span id="veille-spinner" style="display:none" class="spinner"></span>
+              <span class="msym">radar</span>lancer le radar concurrents
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div id="veille-progress" style="display:none;margin-bottom:16px">
+          <div class="glass card"><div class="card-body">
+            <div style="font-size:12px;font-weight:600;color:#0a0a1a;margin-bottom:6px" id="veille-progress-text">scan en cours...</div>
+            <div class="progress-bar"><div class="progress-fill" id="veille-progress-fill" style="width:0%"></div></div>
+          </div></div>
+        </div>
+
+        <!-- Résultats -->
+        <div id="veille-result" style="display:none">
+          <!-- KPIs -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="veille-kpis"></div>
+
+          <!-- Analyse IA globale -->
+          <div class="glass card" style="margin-bottom:20px;border:1px solid rgba(0,85,212,0.12)">
+            <div class="card-header" style="background:rgba(0,85,212,0.03)">
+              <div class="card-title" style="color:#0055D4;display:flex;align-items:center;gap:6px">
+                <span class="msym">auto_awesome</span>synthèse ia — vos arguments de vente
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="veille-analyse" style="font-size:13px;line-height:1.85;color:#1a1a2e;white-space:pre-wrap"></div>
+            </div>
+          </div>
+
+          <!-- Cards concurrents -->
+          <div class="glass card">
+            <div class="card-header">
+              <div class="card-title" id="veille-concurrents-title">principaux concurrents</div>
+              <button class="btn btn-ghost btn-sm" onclick="exportVeilleCSV()"><span class="msym">download</span>csv</button>
+            </div>
+            <div id="veille-concurrents-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;padding:20px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ COLD CALL ═══ -->
+    <div class="page" id="page-coldcall">
+      <div style="max-width:960px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+          <div>
+            <h2 style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">tracker appels</h2>
+            <p style="font-size:11px;color:#9ca3af;margin-top:4px" id="cc-session">aujourd'hui · 0 appel</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select class="form-input" id="cc-kpi-filter" onchange="updateCCStats()" style="font-size:11px;width:auto;padding:7px 12px;border-radius:99px"><option value="today">aujourd'hui</option><option value="week">cette semaine</option><option value="month">ce mois</option><option value="all">tout</option></select>
+            <button class="btn btn-ghost" onclick="exportCC()"><span class="msym">download</span>csv</button>
+            <button class="btn btn-primary" onclick="toggleAssistantAppel()" id="btn-assistant-appel">
+              <span class="msym">mic</span>assistant appel
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI strip -->
+        <div class="glass" style="display:flex;border-radius:16px;overflow:hidden;margin-bottom:20px;border:1px solid rgba(255,255,255,0.4)">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;border-right:1px solid rgba(255,255,255,0.3)">
+            <span style="font-size:28px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="kpi-total">0</span>
+            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">appels</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;border-right:1px solid rgba(255,255,255,0.3)">
+            <span style="font-size:28px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="kpi-contact">—</span>
+            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">ont décroché</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;border-right:1px solid rgba(255,255,255,0.3);color:#059669">
+            <span style="font-size:28px;font-weight:800;letter-spacing:-1px" id="kpi-rdv">0</span>
+            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">rdv pris</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;border-right:1px solid rgba(255,255,255,0.3);color:#0055D4">
+            <span style="font-size:28px;font-weight:800;letter-spacing:-1px" id="kpi-conv">0</span>
+            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">convertis</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;border-right:1px solid rgba(255,255,255,0.3)">
+            <span style="font-size:28px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="kpi-rappel">0</span>
+            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">à rappeler</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;color:#dc2626">
+            <span style="font-size:28px;font-weight:800;letter-spacing:-1px" id="kpi-refus">—</span>
+            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">taux refus</span>
+          </div>
+        </div>
+
+
+        <!-- ═══ assistant appel ═══ -->
+        <div id="assistant-appel" style="display:none;margin-bottom:20px">
+          <div style="background:#0a0a1a;border-radius:20px;overflow:hidden;border:1px solid rgba(0,85,212,0.3);box-shadow:0 0 40px rgba(0,85,212,0.15)">
+
+            <!-- Header assistant -->
+            <div style="padding:16px 24px;background:linear-gradient(135deg,#0055D4,#0047B8);display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div id="assistant-mic-indicator" style="width:10px;height:10px;border-radius:50%;background:#9ca3af;transition:all .3s"></div>
+                <span style="font-size:14px;font-weight:800;color:white;letter-spacing:-.5px">assistant appel</span>
+                <span id="assistant-status-label" style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:600">inactif</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div id="assistant-timer" style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.5);font-family:monospace">00:00</div>
+                <button onclick="toggleAssistantAppel()" style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;width:28px;height:28px;cursor:pointer;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'"></button>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+
+              <!-- Colonne gauche - Script + transcription -->
+              <div style="padding:20px;border-right:1px solid rgba(255,255,255,0.06)">
+
+                <!-- Prospect sélectionné -->
+                <div style="margin-bottom:16px">
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.3);margin-bottom:8px">prospect</div>
+                  <select id="assistant-prospect-select" class="form-input" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:white;font-size:12px" onchange="loadAssistantScript()">
+                    <option value="">— sélectionnez un prospect —</option>
+                  </select>
+                </div>
+
+                <!-- Script d'ouverture -->
+                <div style="margin-bottom:16px">
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(0,212,255,0.7);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+                    <span class="msym" style="font-size:13px">record_voice_over</span>script d'ouverture
+                    <button onclick="genScript()" id="btn-gen-script" style="margin-left:auto;font-size:9px;font-weight:800;background:rgba(0,212,255,0.15);color:#00d4ff;border:1px solid rgba(0,212,255,0.2);padding:3px 10px;border-radius:99px;cursor:pointer;font-family:inherit;transition:all .12s">
+                      <span id="script-spinner" style="display:none" class="spinner" style="width:8px;height:8px"></span>générer
+                    </button>
+                  </div>
+                  <div id="assistant-script" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.7;min-height:80px;font-style:italic">
+                    sélectionnez un prospect pour générer le script...
+                  </div>
+                  <button onclick="copyScript()" style="margin-top:6px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:color .12s" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+                    <span class="msym" style="font-size:13px">content_copy</span>copier le script
+                  </button>
+                </div>
+
+                <!-- Transcription micro -->
+                <div>
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.3);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+                    <span class="msym" style="font-size:13px">mic</span>transcription temps réel
+                    <button onclick="toggleMic()" id="btn-mic" style="margin-left:auto;font-size:9px;font-weight:800;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);padding:3px 10px;border-radius:99px;cursor:pointer;font-family:inherit;transition:all .12s">
+                      activer le micro
+                    </button>
+                  </div>
+                  <div id="transcription-box" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.7;min-height:70px;max-height:120px;overflow-y:auto">
+                    activez le micro pour transcrire la conversation...
+                  </div>
+                </div>
+              </div>
+
+              <!-- Colonne droite - Objections + réponses IA -->
+              <div style="padding:20px">
+                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.3);margin-bottom:12px">objections fréquentes — cliquez pour la réponse ia</div>
+
+                <!-- Boutons objections -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+                  <button onclick="handleObjection('trop cher')" class="obj-btn" style="background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.2);color:#fca5a5;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(220,38,38,0.2)'" onmouseout="this.style.background='rgba(220,38,38,0.1)'"><span class="msym" style="font-size:14px">money_off</span>trop cher</button>
+                  <button onclick="handleObjection('pas intéressé')" class="obj-btn" style="background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.2);color:#fca5a5;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(220,38,38,0.2)'" onmouseout="this.style.background='rgba(220,38,38,0.1)'"><span class="msym" style="font-size:14px">thumb_down</span>pas intéressé</button>
+                  <button onclick="handleObjection('j ai déjà quelqu un')" class="obj-btn" style="background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);color:#fcd34d;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(217,119,6,0.2)'" onmouseout="this.style.background='rgba(217,119,6,0.1)'"><span class="msym" style="font-size:14px">group</span>déjà équipé</button>
+                  <button onclick="handleObjection('pas le temps')" class="obj-btn" style="background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);color:#fcd34d;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(217,119,6,0.2)'" onmouseover="this.style.background='rgba(217,119,6,0.2)'" onmouseout="this.style.background='rgba(217,119,6,0.1)'"><span class="msym" style="font-size:14px">schedule</span>pas le temps</button>
+                  <button onclick="handleObjection('envoyez moi par email')" class="obj-btn" style="background:rgba(0,85,212,0.1);border:1px solid rgba(0,85,212,0.2);color:#93c5fd;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(0,85,212,0.2)'" onmouseout="this.style.background='rgba(0,85,212,0.1)'"><span class="msym" style="font-size:14px">mail</span>par email</button>
+                  <button onclick="handleObjection('rappeler plus tard')" class="obj-btn" style="background:rgba(0,85,212,0.1);border:1px solid rgba(0,85,212,0.2);color:#93c5fd;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(0,85,212,0.2)'" onmouseout="this.style.background='rgba(0,85,212,0.1)'"><span class="msym" style="font-size:14px">phone_callback</span>rappeler</button>
+                  <button onclick="handleObjection('c est quoi Huntlist.')" class="obj-btn" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);color:#c4b5fd;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(124,58,237,0.2)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'"><span class="msym" style="font-size:14px">help</span>c'est quoi ?</button>
+                  <button onclick="handleObjection('le patron est absent')" class="obj-btn" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);color:#c4b5fd;border-radius:10px;padding:10px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(124,58,237,0.2)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'"><span class="msym" style="font-size:14px">person_off</span>patron absent</button>
+                </div>
+
+                <!-- Réponse IA -->
+                <div id="objection-response-wrap" style="display:none">
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(0,212,255,0.7);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+                    <span class="msym" style="font-size:13px;animation:pulse 1s infinite" id="resp-icon">auto_awesome</span>
+                    réponse suggérée
+                  </div>
+                  <div id="objection-response" style="background:rgba(0,85,212,0.12);border:1px solid rgba(0,85,212,0.25);border-radius:12px;padding:16px;font-size:13px;color:white;line-height:1.75;min-height:60px;position:relative">
+                    <div id="resp-loading" style="color:rgba(255,255,255,0.4);font-style:italic;display:flex;align-items:center;gap:8px">
+                      <div class="spinner" style="display:inline-block;border-color:rgba(0,212,255,0.3);border-top-color:#00d4ff"></div>
+                      génération en cours...
+                    </div>
+                    <div id="resp-text" style="display:none"></div>
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:8px">
+                    <button onclick="copyResponse()" style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:color .12s" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+                      <span class="msym" style="font-size:13px">content_copy</span>copier
+                    </button>
+                    <button onclick="regenResponse()" style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:color .12s" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+                      <span class="msym" style="font-size:13px">refresh</span>regénérer
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Questions suggérées -->
+                <div style="margin-top:16px">
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.3);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+                    <span class="msym" style="font-size:13px">psychology</span>questions à poser
+                  </div>
+                  <div id="questions-list" style="display:flex;flex-direction:column;gap:6px">
+                    <div style="font-size:11px;color:rgba(255,255,255,0.25);font-style:italic">génération du script pour afficher les questions...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer — fin appel -->
+            <div style="padding:14px 24px;background:rgba(255,255,255,0.03);border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:12px">
+              <button onclick="finirAppel()" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.25);color:#fca5a5;border-radius:10px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s" onmouseover="this.style.background='rgba(220,38,38,0.25)'" onmouseout="this.style.background='rgba(220,38,38,0.15)'">
+                <span class="msym" style="font-size:15px">call_end</span>terminer l'appel
+              </button>
+              <button onclick="genResume()" id="btn-resume" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);color:#00d4ff;border-radius:10px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s" onmouseover="this.style.background='rgba(0,212,255,0.2)'" onmouseout="this.style.background='rgba(0,212,255,0.1)'">
+                <span id="resume-spinner" style="display:none" class="spinner"></span>
+                <span class="msym" style="font-size:15px">summarize</span>résumé ia
+              </button>
+              <div style="flex:1"></div>
+              <div id="assistant-objection-count" style="font-size:11px;color:rgba(255,255,255,0.25)">0 objection traitée</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cc-main">
+          <!-- Buttons -->
+          <div class="glass card">
+            <div class="card-header"><div class="card-title">résultat de l'appel</div></div>
+            <div style="padding:0 16px 16px">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+                <button onclick="logCC('rdv')" class="cc-btn" data-type="rdv" style="border-color:rgba(5,150,105,0.2);color:#059669">rdv pris<span id="cc-c-rdv">0</span></button>
+                <button onclick="logCC('converti')" class="cc-btn" data-type="converti" style="border-color:rgba(124,58,237,0.2);color:#7c3aed">converti<span id="cc-c-converti">0</span></button>
+                <button onclick="logCC('interesse')" class="cc-btn" data-type="interesse" style="border-color:rgba(0,85,212,0.2);color:#0055D4">intéressé<span id="cc-c-interesse">0</span></button>
+                <button onclick="logCC('rappel')" class="cc-btn" data-type="rappel" style="border-color:rgba(217,119,6,0.2);color:#d97706">à rappeler<span id="cc-c-rappel">0</span></button>
+                <button onclick="logCC('objection')" class="cc-btn" data-type="objection">objection<span id="cc-c-objection">0</span></button>
+                <button onclick="logCC('deja_equipe')" class="cc-btn" data-type="deja_equipe">déjà équipé<span id="cc-c-deja_equipe">0</span></button>
+                <button onclick="logCC('non_repondu')" class="cc-btn" data-type="non_repondu">non répondu<span id="cc-c-non_repondu">0</span></button>
+                <button onclick="logCC('non_interesse')" class="cc-btn" data-type="non_interesse" style="border-color:rgba(220,38,38,0.15);color:#dc2626">non intéressé<span id="cc-c-non_interesse">0</span></button>
+                <button onclick="logCC('raccroche')" class="cc-btn" data-type="raccroche" style="border-color:rgba(220,38,38,0.15);color:#dc2626">raccroché<span id="cc-c-raccroche">0</span></button>
+              </div>
+              <input class="form-input" id="cc-note" placeholder="note — nom, entreprise...">
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="glass card">
+              <div class="card-header"><div class="card-title">objectif journalier</div></div>
+              <div style="padding:0 20px 20px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                  <input type="number" class="form-input" id="cc-goal" value="50" min="1" max="999" style="width:64px;text-align:center;font-weight:800;font-size:16px" oninput="updateCCGoal()">
+                  <span style="font-size:12px;color:#9ca3af">appels / jour</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="cc-goal-bar" style="width:0%;transition:width .4s"></div></div>
+                <div style="display:flex;justify-content:space-between;margin-top:6px">
+                  <span style="font-size:11px;color:#9ca3af" id="cc-goal-label">0 / 50</span>
+                  <span style="font-size:12px;font-weight:800;color:#0055D4" id="cc-goal-pct">0%</span>
+                </div>
+              </div>
+            </div>
+            <div class="glass card">
+              <div class="card-header"><div class="card-title">répartition</div></div>
+              <div id="cc-breakdown" style="padding:4px 20px 16px;display:flex;flex-direction:column;gap:4px"><div style="text-align:center;padding:20px;color:#9ca3af;font-size:12px">aucune donnée</div></div>
+            </div>
+            <button class="btn btn-ghost" onclick="resetCCToday()" style="width:100%;justify-content:center;color:#9ca3af"><span class="msym">restart_alt</span>réinitialiser aujourd'hui</button>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+          <!-- Courbe appels par heure -->
+          <div class="glass card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">appels par heure</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">cadence aujourd'hui</div>
+              </div>
+              <div style="width:8px;height:8px;border-radius:50%;background:#0055D4;animation:pulse 2s infinite"></div>
+            </div>
+            <div style="padding:12px 20px 20px"><canvas id="cc-chart-line" height="120"></canvas></div>
+          </div>
+          <!-- Donut répartition -->
+          <div class="glass card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">répartition résultats</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px" id="cc-donut-sub">aujourd'hui</div>
+              </div>
+            </div>
+            <div style="padding:12px 20px 20px;display:flex;align-items:center;gap:20px">
+              <div style="flex-shrink:0;width:120px;height:120px;position:relative">
+                <canvas id="cc-chart-donut" width="120" height="120"></canvas>
+                <div id="cc-donut-center" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+                  <span style="font-size:22px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="cc-donut-total">0</span>
+                  <span style="font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.08em">appels</span>
+                </div>
+              </div>
+              <div id="cc-donut-legend" style="flex:1;display:flex;flex-direction:column;gap:6px">
+                <div style="text-align:center;color:#9ca3af;font-size:11px;padding:8px 0">aucun appel</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div class="glass card" style="margin-top:16px">
+          <div class="card-header"><div class="card-title">historique</div><select class="form-input" id="cc-hist-filter" onchange="renderCCHistory()" style="font-size:11px;width:auto;padding:6px 12px;border-radius:99px"><option value="today">aujourd'hui</option><option value="week">cette semaine</option><option value="month">ce mois</option><option value="all">tout</option></select></div>
+          <div id="cc-history" style="max-height:260px;overflow-y:auto;padding:0 20px 12px"><div style="text-align:center;padding:28px;color:#9ca3af;font-size:12px">aucun appel enregistré.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <div class="page" id="page-settings">
+      <div>
+        <div style="margin-bottom:24px">
+          <h2 style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">mon compte</h2>
+          <p style="font-size:11px;color:#9ca3af;margin-top:4px">gérez votre profil et vos préférences</p>
+        </div>
+        <div class="alert alert-success" id="settings-saved" style="display:none"><span class="msym">check_circle</span>paramètres enregistrés.</div>
+
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+          <button class="tab active" onclick="switchSettingsTab('tab-profile',this)">mon profil</button>
+          <button class="tab" onclick="switchSettingsTab('tab-resend',this)" id="tab-btn-email" style="display:flex;align-items:center;gap:5px">
+            <span class="msym" style="font-size:13px;color:#0055D4">mail</span>
+            email
+            <span id="resend-status-dot2" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
+          </button>
+          <button class="tab" onclick="switchSettingsTab('tab-ovh',this)" id="tab-btn-ovh" style="display:flex;align-items:center;gap:5px">
+            <span class="msym" style="font-size:13px">sms</span>
+            ovh · sms
+            <span id="ovh-status-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;flex-shrink:0"></span>
+          </button>
+          <button class="tab" onclick="switchSettingsTab('tab-linkedin',this)">linkedin api</button>
+          <button class="tab" onclick="switchSettingsTab('tab-plan',this)">abonnement</button>
+        </div>
+
+        <div id="tab-profile">
+          <div class="glass card">
+            <div class="card-header"><div><div class="card-title">profil commercial</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">ces infos personnalisent vos emails ia</div></div></div>
+            <div class="card-body">
+              <div class="form-row"><div class="form-group"><label class="form-label">prénom</label><input class="form-input" id="prof-prenom" placeholder="jean"/></div><div class="form-group"><label class="form-label">nom</label><input class="form-input" id="prof-nom" placeholder="dupont"/></div></div>
+              <div class="form-group"><label class="form-label">nom de l'entreprise</label><input class="form-input" id="prof-societe" placeholder="plomberie dupont"/></div>
+              <div class="form-group"><label class="form-label">secteur d'activité</label><select class="form-input" id="prof-secteur"><option value="">choisir...</option><option>maçonnerie / gros œuvre</option><option>plomberie / chauffage</option><option>électricité</option><option>isolation / rénovation énergétique</option><option>menuiserie / fenêtres</option><option>peinture / revêtements</option><option>consultant / freelance</option><option>agence / growth</option><option>autre</option></select></div>
+              <div class="form-group"><label class="form-label">votre activité</label><textarea class="form-input" id="prof-activite" placeholder="plombier chauffagiste, 10 ans d'expérience..."></textarea></div>
+              <div class="form-group"><label class="form-label">proposition de valeur</label><input class="form-input" id="prof-valeur" placeholder="intervention en 48h, garantie 5 ans."/></div>
+              <div class="form-group" style="margin:0"><label class="form-label">ton des emails</label><select class="form-input" id="prof-ton"><option value="professionnel">professionnel et direct</option><option value="amical">amical et accessible</option><option value="expert">expert et autoritaire</option><option value="local">local et proche du terrain</option></select></div>
+              <button class="btn btn-primary" style="margin-top:16px" onclick="saveProfile()"><span class="msym">save</span>enregistrer</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ ONGLET GMAIL ═══ -->
+        <div id="tab-gmail" style="display:none">
+          <div class="glass card" style="border:1px solid rgba(234,67,53,0.2)">
+            <div class="card-header" style="background:rgba(234,67,53,0.03)">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#EA4335">
+                  <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" fill="#EA4335"/></svg>
+                  connexion gmail
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">vos emails partent depuis votre vrai compte Gmail · délivrabilité maximale</div>
+              </div>
+              <span class="badge badge-green" id="gmail-connected-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> connecté</span>
+            </div>
+            <div class="card-body">
+
+              <!-- Compte connecté -->
+              <div id="gmail-connected-info" style="display:none;margin-bottom:20px">
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:12px;margin-bottom:12px">
+                  <div style="width:36px;height:36px;border-radius:50%;background:#EA4335;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" fill="white"/></svg>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-size:13px;font-weight:700;color:#0a0a1a" id="gmail-connected-email">—</div>
+                    <div style="font-size:11px;color:#059669;margin-top:2px">compte Gmail connecté · emails envoyés depuis cette adresse</div>
+                  </div>
+                  <button onclick="disconnectGmail()" class="btn btn-ghost btn-sm" style="color:#dc2626;border-color:rgba(220,38,38,0.2)">
+                    <span class="msym">link_off</span>déconnecter
+                  </button>
+                </div>
+                <button class="btn btn-ghost" onclick="sendGmailTest()" style="width:100%;justify-content:center">
+                  <span class="msym">send</span>envoyer un email test
+                </button>
+                <div id="gmail-test-result" style="display:none;margin-top:12px"></div>
+              </div>
+
+              <!-- Pas encore connecté -->
+              <div id="gmail-not-connected-info">
+                <div class="alert alert-info" style="margin-bottom:20px">
+                  <span class="msym">info</span>
+                  <div>
+                    <div style="font-weight:700;margin-bottom:4px">pourquoi connecter Gmail ?</div>
+                    <div style="font-size:11px;line-height:1.65">
+                      vos emails partent depuis votre vraie adresse Gmail → arrivée en boîte principale (pas spam) · les réponses arrivent dans votre Gmail · zéro configuration technique
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bouton connexion -->
+              <button onclick="connectGmail()" id="btn-connect-gmail" class="btn" style="background:white;border:1px solid #dadce0;color:#3c4043;font-size:13px;padding:10px 20px;border-radius:4px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                se connecter avec Google
+              </button>
+
+              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.03);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">ce que Huntlist. peut faire avec votre Gmail</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6b7280">
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>envoyer des emails de prospection en votre nom</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#dc2626">cancel</span>lire vos emails</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#dc2626">cancel</span>supprimer vos emails</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#dc2626">cancel</span>accéder à vos contacts</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ ONGLET EMAIL ═══ -->
+        <div id="tab-resend" style="display:none">
+          <div class="glass card" style="border:1px solid rgba(0,85,212,0.2)">
+            <div class="card-header" style="background:rgba(0,85,212,0.04)">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#0055D4">
+                  <span class="msym" style="font-size:18px">mail</span>envoi d'emails
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">vos emails partent depuis huntlist.fr · délivrabilité maximale</div>
+              </div>
+              <span class="badge badge-green"><span class="msym" style="font-size:11px">check_circle</span> actif</span>
+            </div>
+            <div class="card-body">
+
+              <!-- Info rassurante -->
+              <div class="alert alert-info" style="margin-bottom:20px">
+                <span class="msym">check_circle</span>
+                <div>
+                  <div style="font-weight:700;margin-bottom:3px">envoi d'emails inclus dans votre abonnement</div>
+                  <div style="font-size:11px;line-height:1.6;color:#6b7280">aucune configuration requise · choisissez simplement le nom qui apparaîtra sur vos emails</div>
+                </div>
+              </div>
+
+              <!-- Nom affiché -->
+              <div class="form-group" style="margin-bottom:20px">
+                <label class="form-label">nom affiché à vos prospects</label>
+                <input class="form-input" id="sender-display-name" placeholder="ex : Jean Dupont" style="font-size:14px;font-weight:600"/>
+                <div style="font-size:10px;color:#9ca3af;margin-top:5px">vos prospects verront ce nom dans leur boîte mail</div>
+              </div>
+
+              <!-- Aperçu -->
+              <div style="padding:14px 16px;background:rgba(0,85,212,0.04);border-radius:12px;border:1px solid rgba(0,85,212,0.12);margin-bottom:20px">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">aperçu dans la boîte mail du prospect</div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:36px;height:36px;border-radius:10px;background:#0055D4;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:800" id="sender-avatar-preview">J</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:#1a1a2e" id="sender-name-preview">Jean Dupont</div>
+                    <div style="font-size:11px;color:#9ca3af">contact@huntlist.fr</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:10px">
+                <button class="btn btn-primary" onclick="saveSenderName()"><span class="msym">save</span>enregistrer</button>
+                <button class="btn btn-ghost" onclick="sendSenderTestEmail()" id="btn-sender-test">
+                  <span id="sender-test-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">send</span>envoyer un email test
+                </button>
+              </div>
+              <div id="sender-test-result" style="display:none;margin-top:12px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ ONGLET OVH SMS ═══ -->
+        <div id="tab-ovh" style="display:none">
+          <div class="glass card" style="margin-bottom:16px;border:1px solid rgba(5,150,105,0.2)">
+            <div class="card-header" style="background:rgba(5,150,105,0.04)">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;color:#059669">
+                  <span class="msym" style="font-size:18px">sms</span>ovh sms — envoi sms
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">réseau français · 200 sms offerts/mois · 0.08€/sms supp.</div>
+              </div>
+              <span class="badge badge-green" id="ovh-api-badge" style="display:none"><span class="msym" style="font-size:11px">check_circle</span> connecté</span>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info" style="margin-bottom:16px">
+                <span class="msym">info</span>
+                <div>
+                  <div style="font-weight:700;margin-bottom:4px">obtenir vos identifiants OVH SMS</div>
+                  <div style="font-size:11px;line-height:1.6">
+                    1. connectez-vous sur <strong>api.ovh.com/createToken</strong><br>
+                    2. application key + secret + consumer key<br>
+                    3. droits requis : GET/POST sur /sms/*<br>
+                    4. créez un compte SMS sur <strong>ovhtelecom.fr</strong>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0"><label class="form-label">application key</label><input class="form-input" id="ovh-app-key" placeholder="ex: 1234567890abcdef" type="password"/></div>
+                <div class="form-group" style="margin:0"><label class="form-label">application secret</label><input class="form-input" id="ovh-app-secret" placeholder="ex: abcdef1234567890..." type="password"/></div>
+              </div>
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0"><label class="form-label">consumer key</label><input class="form-input" id="ovh-consumer-key" placeholder="ex: xyz987..." type="password"/></div>
+                <div class="form-group" style="margin:0"><label class="form-label">nom de service sms</label><input class="form-input" id="ovh-service-name" placeholder="ex: sms-xx000000-1"/></div>
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label">expéditeur (max 11 caractères)</label>
+                <input class="form-input" id="ovh-sender" placeholder="Huntlist" maxlength="11"/>
+                <div style="font-size:10px;color:#9ca3af;margin-top:4px">lettres et chiffres uniquement · affiché sur le téléphone du prospect</div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" style="background:#059669;box-shadow:0 4px 16px rgba(5,150,105,0.3)" onclick="saveOvhConfig()"><span class="msym">save</span>enregistrer</button>
+                <button class="btn btn-ghost" onclick="testOvhConnection()" id="btn-test-ovh">
+                  <span id="test-ovh-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">play_arrow</span>tester la connexion
+                </button>
+              </div>
+              <div id="ovh-test-result" style="display:none;margin-top:12px"></div>
+              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.03);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">tarification ovh sms</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6b7280">
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>200 sms / mois offerts par Huntlist.</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>0.08€ / sms supplémentaire</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>réseau français · délivrabilité maximale</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+                <div id="tab-linkedin" style="display:none">
+          <div class="glass card">
+            <div class="card-header">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#0077b5"/></svg>
+                  linkedin api — google custom search
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">gratuit · 100 recherches/jour · clé google requise</div>
+              </div>
+              <span class="badge badge-blue">gratuit</span>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info" style="margin-bottom:16px">
+                <span class="msym">info</span>
+                <div>
+                  <div style="font-weight:700;margin-bottom:4px">comment obtenir votre clé gratuite ?</div>
+                  <div style="font-size:11px;line-height:1.6">
+                    1. allez sur <strong>console.developers.google.com</strong><br>
+                    2. créez un projet → activez "Custom Search API"<br>
+                    3. créez une clé API → copiez-la ici<br>
+                    4. allez sur <strong>programmablesearchengine.google.com</strong><br>
+                    5. créez un moteur de recherche → cochez "toute la toile"<br>
+                    6. copiez l'ID du moteur (CX) → collez-le ici
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">clé api google</label>
+                <input class="form-input" id="google-search-key" placeholder="AIzaSy..." type="password"/>
+                <div style="font-size:10px;color:#9ca3af;margin-top:4px">obtenir sur console.developers.google.com → Custom Search API</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">id moteur de recherche (cx)</label>
+                <input class="form-input" id="google-cx" placeholder="a1b2c3d4e5f6g7h8i:abcdefghijk"/>
+                <div style="font-size:10px;color:#9ca3af;margin-top:4px">obtenir sur programmablesearchengine.google.com</div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="saveLiApiKeys()"><span class="msym">save</span>enregistrer</button>
+                <button class="btn btn-ghost" onclick="testLiApiKeys()" id="btn-test-li">
+                  <span id="test-li-spinner" style="display:none" class="spinner spinner-dark"></span>
+                  <span class="msym">play_arrow</span>tester la connexion
+                </button>
+              </div>
+              <div id="li-test-result" style="display:none;margin-top:12px"></div>
+
+              <div style="margin-top:20px;padding:14px 16px;background:rgba(0,0,0,0.03);border-radius:12px;border:1px solid rgba(0,0,0,0.06)">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:10px">limites du plan gratuit google</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6b7280">
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>100 recherches / jour gratuites</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#059669">check_circle</span>10 résultats max par recherche</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:14px;color:#d97706">info</span>au-delà : 5$ pour 1 000 recherches supplémentaires</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-plan" style="display:none">
+          <div class="glass card">
+            <div class="card-header"><div><div class="card-title">votre abonnement</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">toutes les fonctionnalités sont activées</div></div><span class="badge badge-blue">plan pro</span></div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:20px">
+                <div style="background:rgba(255,255,255,0.5);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.5)"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:6px">prospects ce mois</div><div style="font-size:24px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="plan-prospects-count">—</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">illimités avec pro</div></div>
+                <div style="background:rgba(255,255,255,0.5);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.5)"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:6px">emails générés</div><div style="font-size:24px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="plan-emails-count">—</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">illimités avec pro</div></div>
+              </div>
+
+              <!-- Widget quotas -->
+              <div style="margin-top:20px">
+                <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:14px">utilisation ce mois</div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                      <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#0055D4">mail</span>emails ia</span>
+                      <span style="font-size:11px;font-weight:800;color:#0055D4" id="quota-emails-label">0 / 300</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="quota-emails-bar" style="width:0%"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                      <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#0055D4">psychology</span>fiches pré-appel</span>
+                      <span style="font-size:11px;font-weight:800;color:#0055D4" id="quota-fiches-label">0 / 10</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="quota-fiches-bar" style="width:0%"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                      <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#0055D4">phone_in_talk</span>appels assistés</span>
+                      <span style="font-size:11px;font-weight:800;color:#0055D4" id="quota-appels-label">0 / 100</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="quota-appels-bar" style="width:0%"></div></div>
+                  </div>
+                  <div style="display:flex;justify-content:space-between">
+                    <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#0055D4">description</span>devis</span>
+                    <span style="font-size:11px;font-weight:800;color:#0055D4" id="quota-devis-label">0 / 20</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between">
+                    <span style="font-size:11px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px;color:#0055D4">radar</span>veille concurrentielle</span>
+                    <span style="font-size:11px;font-weight:800;color:#0055D4" id="quota-veille-label">0 / 3</span>
+                  </div>
+                </div>
+                <div style="margin-top:16px;padding:10px 14px;background:rgba(0,85,212,0.04);border-radius:10px;border:1px solid rgba(0,85,212,0.1);font-size:11px;color:#6b7280;display:flex;align-items:center;gap:6px">
+                  <span class="msym" style="font-size:14px;color:#0055D4">refresh</span>
+                  remise à zéro le 1er de chaque mois
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
+                <button class="btn btn-ghost" onclick="alert('portail stripe — bientôt disponible.')"><span class="msym">receipt_long</span>facturation</button>
+                <button class="btn" style="background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.15)" onclick="startCancellation()">annuler l'abonnement</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app-root -->
+
+<!-- ═══ MODALS ═══ -->
+<!-- Prospect Modal -->
+<div class="modal-overlay" id="prospect-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <div><div class="modal-title" id="pm-name">—</div><div style="font-size:12px;color:#9ca3af;margin-top:2px" id="pm-address">—</div></div>
+      <button class="modal-close" onclick="closeProspectModal()"><span class="msym" style="font-size:16px">close</span></button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+      <div id="pm-phone-wrap" style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.5)">
+        <span class="msym" style="font-size:18px;color:#9ca3af">phone</span>
+        <span id="pm-phone" style="font-size:15px;font-weight:800;color:#0a0a1a">—</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:rgba(255,255,255,0.5);border-radius:12px;padding:14px;text-align:center;border:1px solid rgba(255,255,255,0.5)"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:4px">note google</div><div id="pm-rating" style="font-size:22px;font-weight:800;color:#d97706">—</div></div>
+        <div style="background:rgba(255,255,255,0.5);border-radius:12px;padding:14px;text-align:center;border:1px solid rgba(255,255,255,0.5)"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:4px">score ia</div><div id="pm-score" style="font-size:22px;font-weight:800;color:#0055D4">—</div></div>
+      </div>
+      <div id="pm-web-wrap" style="display:none;padding:10px 14px;background:rgba(0,85,212,0.06);border-radius:10px;border:1px solid rgba(0,85,212,0.12)">
+         <a id="pm-website" href="#" target="_blank" style="font-size:12px;color:#0055D4;font-weight:600;text-decoration:none">—</a>
+        &nbsp; <a id="pm-email-finder" href="#" target="_blank" style="font-size:10px;font-weight:800;background:#0055D4;color:#fff;padding:3px 10px;border-radius:99px;text-decoration:none"> trouver email</a>
+      </div>
+      <div class="form-group" style="margin:0"><label class="form-label">statut</label>
+        <select class="form-input" id="pm-status" onchange="updateStatusFromModal()"><option value="new">nouveau</option><option value="contacted">contacté</option><option value="replied">répondu</option><option value="converted">converti</option></select>
+      </div>
+      <div class="form-group" style="margin:0"><label class="form-label">notes</label><textarea class="form-input" id="pm-notes" placeholder="notes sur ce prospect..." oninput="saveProspectNotes()"></textarea></div>
+      <div id="pm-email-preview" style="display:none;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:10px;padding:12px;font-size:12px;color:#6b7280;white-space:pre-wrap;max-height:140px;overflow-y:auto;line-height:1.6"></div>
+    </div>
+      <!-- Fiche IA pré-appel -->
+      <div id="pm-fiche-wrap" style="display:none;flex-direction:column;gap:0;border-radius:14px;overflow:hidden;border:1px solid rgba(0,85,212,0.15)">
+        <!-- Header fiche -->
+        <div style="background:linear-gradient(135deg,#0055D4,#0047B8);padding:14px 18px;display:flex;align-items:center;gap:10px">
+          <span class="msym" style="color:#00d4ff;font-size:20px">psychology</span>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:800;color:white;letter-spacing:-.3px">fiche pré-appel ia</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:1px">analyse générée par claude</div>
+          </div>
+          <button onclick="document.getElementById('pm-fiche-wrap').style.display='none'" style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;width:26px;height:26px;cursor:pointer;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:14px"></button>
+        </div>
+        <!-- Loading state -->
+        <div id="pm-fiche-loading" style="padding:32px;text-align:center;background:rgba(0,85,212,0.03)">
+          <div class="spinner spinner-dark" style="display:inline-block;margin-bottom:10px"></div>
+          <div style="font-size:12px;color:#6b7280" id="pm-fiche-loading-text">analyse du prospect en cours...</div>
+        </div>
+        <!-- Content -->
+        <div id="pm-fiche-content" style="display:none;background:rgba(0,85,212,0.02)">
+          <!-- Accroche -->
+          <div style="padding:16px 18px;border-bottom:1px solid rgba(0,85,212,0.08)">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#0055D4;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">record_voice_over</span>accroche d'ouverture</div>
+            <div id="pm-fiche-accroche" style="font-size:13px;font-weight:700;color:#0a0a1a;line-height:1.6;padding:12px 14px;background:rgba(0,85,212,0.06);border-radius:10px;border-left:3px solid #0055D4"></div>
+          </div>
+          <!-- Points de douleur -->
+          <div style="padding:16px 18px;border-bottom:1px solid rgba(0,85,212,0.08)">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#d97706;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">crisis_alert</span>points de douleur probables</div>
+            <div id="pm-fiche-douleurs" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+          <!-- Objections -->
+          <div style="padding:16px 18px;border-bottom:1px solid rgba(0,85,212,0.08)">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#dc2626;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">shield</span>objections + réponses</div>
+            <div id="pm-fiche-objections" style="display:flex;flex-direction:column;gap:8px"></div>
+          </div>
+          <!-- Tip de closing -->
+          <div style="padding:16px 18px">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#059669;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span class="msym" style="font-size:13px">emoji_events</span>conseil de closing</div>
+            <div id="pm-fiche-closing" style="font-size:12px;color:#1a1a2e;line-height:1.65;padding:12px 14px;background:rgba(5,150,105,0.06);border-radius:10px;border-left:3px solid #059669"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="flex-wrap:wrap;gap:8px">
+      <button class="btn" style="background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.15)" onclick="removePipelineProspect()"><span class="msym">delete</span>retirer</button>
+      <button class="btn btn-ghost" id="pm-email-btn" onclick="openEmailFromModal()"><span class="msym">auto_awesome</span>email ia</button>
+      <button class="btn" style="background:#0055D4;color:white" onclick="openSmsModal(currentPipelineId)" id="pm-sms-btn">
+        <span class="msym">sms</span>SMS
+      </button>
+      <button class="btn" style="background:linear-gradient(135deg,#0055D4,#0047B8);color:white;box-shadow:0 4px 16px rgba(0,85,212,0.3)" id="pm-fiche-btn" onclick="genFichePreAppel()">
+        <span id="pm-fiche-btn-spinner" style="display:none" class="spinner"></span>
+        <span class="msym">psychology</span>fiche pré-appel
+      </button>
+      <button class="btn btn-primary" onclick="closeProspectModal()"><span class="msym">check</span>fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Email Modal -->
+<div class="modal-overlay" id="email-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modal-prospect-name">email pour —</div><button class="modal-close" onclick="closeModal()"><span class="msym" style="font-size:16px">close</span></button></div>
+    <div class="modal-body"><div class="form-group" style="margin:0"><label class="form-label">email généré par l'ia</label><textarea class="form-input" id="modal-email-text" style="min-height:220px"></textarea></div></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="regenerateEmail()"><span id="regen-spinner" style="display:none" class="spinner spinner-dark"></span><span class="msym">refresh</span>regénérer</button>
+      <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('modal-email-text').value)"><span class="msym">content_copy</span>copier</button>
+      <button class="btn" style="background:#00966e;color:white;box-shadow:0 4px 16px rgba(0,150,100,0.3)" onclick="sendEmailViaResend()" id="btn-send-resend-email">
+        <span id="send-brevo-spinner" style="display:none" class="spinner"></span>
+        <span class="msym">send</span>envoyer
+      </button>
+      <button class="btn btn-primary" onclick="closeModal()"><span class="msym">check</span>enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Courrier Modal -->
+<div class="modal-overlay" id="courrier-modal">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-header"><div><div class="modal-title">courrier ia</div><div style="font-size:11px;color:#9ca3af;margin-top:2px" id="courrier-adresse-title">—</div></div><button class="modal-close" onclick="document.getElementById('courrier-modal').classList.remove('open')"><span class="msym" style="font-size:16px">close</span></button></div>
+    <div class="modal-body">
+      <div id="courrier-loading" style="text-align:center;padding:32px;color:#9ca3af"><div class="spinner spinner-dark" style="display:inline-block;margin-right:8px"></div>génération en cours...</div>
+      <textarea id="courrier-text" class="form-input" style="min-height:260px;display:none;font-size:12px;line-height:1.7"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="regenCourrier()"><span class="msym">refresh</span>regénérer</button>
+      <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('courrier-text').value)"><span class="msym">content_copy</span>copier</button>
+      <button class="btn btn-primary" onclick="document.getElementById('courrier-modal').classList.remove('open')"><span class="msym">check</span>fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal-overlay" id="cancel-modal">
+  <div class="modal" style="max-width:460px">
+    <div id="cancel-step-1">
+      <div class="modal-header"><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:10px;background:rgba(220,38,38,0.08);display:flex;align-items:center;justify-content:center"><span class="msym" style="color:#dc2626">warning</span></div><div class="modal-title">annuler votre abonnement ?</div></div><button class="modal-close" onclick="closeCancellation()"><span class="msym" style="font-size:16px">close</span></button></div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:#6b7280;margin-bottom:16px;line-height:1.65">en annulant, vous perdrez immédiatement accès à tout ce que vous avez mis en place.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.12);border-radius:10px;font-size:12px;color:#dc2626;font-weight:600"><span class="msym" style="font-size:15px">group_search</span>tous vos prospects et historique</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.12);border-radius:10px;font-size:12px;color:#dc2626;font-weight:600"><span class="msym" style="font-size:15px">conversion_path</span>votre pipeline crm complet</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.12);border-radius:10px;font-size:12px;color:#dc2626;font-weight:600"><span class="msym" style="font-size:15px">smart_toy</span>séquences et pilote automatique</div>
+        </div>
+        <div class="alert alert-amber"><span class="msym">info</span><span>le mois en cours (<strong id="cancel-current-month"></strong>) sera intégralement facturé.</span></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-primary" style="flex:1;justify-content:center" onclick="closeCancellation()">garder mon abonnement</button><button class="btn" style="flex:1;justify-content:center;background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.15)" onclick="cancelStep(2)">continuer →</button></div>
+    </div>
+    <div id="cancel-step-2" style="display:none">
+      <div class="modal-header"><div class="modal-title">pourquoi nous quittez-vous ?</div></div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">raison *</label><select class="form-input" id="cancel-reason" onchange="checkCancelReason()"><option value="">— sélectionnez —</option><option value="prix">le prix est trop élevé</option><option value="resultats">pas les résultats attendus</option><option value="utilisation">je n'utilise pas assez</option><option value="concurrent">je passe à un autre outil</option><option value="pause">pause d'activité</option><option value="autre">autre raison</option></select></div>
+        <div class="form-group" style="margin:0"><label class="form-label">commentaire (min. 20 caractères) *</label><textarea class="form-input" id="cancel-comment" placeholder="expliquez-nous..." oninput="checkCancelReason()"></textarea></div>
+        <div class="alert alert-error" id="cancel-step2-error" style="display:none;margin-top:12px;margin-bottom:0"><span class="msym">error</span>merci de remplir tous les champs.</div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="cancelStep(1)">← retour</button><button class="btn" id="cancel-step2-btn" style="background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.15)" onclick="tryGoStep3()">continuer →</button></div>
+    </div>
+    <div id="cancel-step-3" style="display:none">
+      <div class="modal-header"><div class="modal-title">confirmation finale</div></div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:#6b7280;margin-bottom:16px;line-height:1.65">tapez exactement <strong style="color:#dc2626;font-family:monospace">ANNULER MON COMPTE</strong> pour confirmer.</p>
+        <div class="form-group" style="margin-bottom:16px"><input class="form-input" id="cancel-confirm-text" placeholder="tapez : ANNULER MON COMPTE" oninput="checkCancelConfirm()" style="border-color:rgba(220,38,38,0.3);font-family:monospace"/></div>
+        <div style="background:rgba(255,255,255,0.5);border-radius:10px;padding:12px 14px;font-size:12px;color:#6b7280;border:1px solid rgba(255,255,255,0.5);line-height:1.9"> abonnement annulé immédiatement<br> mois de <strong id="cancel-month-reminder"></strong> facturé intégralement<br> données supprimées dans 30 jours</div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="cancelStep(2)">← retour</button><button class="btn" id="cancel-final-btn" style="background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.15)" onclick="confirmCancellation()">confirmer l'annulation</button></div>
+    </div>
+    <div id="cancel-step-4" style="display:none">
+      <div class="modal-body" style="text-align:center;padding:48px 32px">
+        <span class="msym" style="font-size:48px;color:#9ca3af;display:block;margin-bottom:16px">sentiment_dissatisfied</span>
+        <div style="font-size:16px;font-weight:800;color:#0a0a1a;margin-bottom:8px">abonnement annulé</div>
+        <div style="font-size:13px;color:#6b7280;line-height:1.7;margin-bottom:24px">votre demande a été enregistrée. vous recevrez une confirmation par email.</div>
+        <button class="btn btn-ghost" onclick="closeCancellation()" style="width:100%;justify-content:center">fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL UPGRADE ═══ -->
+<div class="modal-overlay" id="upgrade-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center">
+          <span class="msym" style="color:#0055D4">rocket_launch</span>
+        </div>
+        <div class="modal-title">passez à l'offre supérieure</div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('upgrade-modal').classList.remove('open')">
+        <span class="msym" style="font-size:16px">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="background:rgba(0,85,212,0.04);border:1px solid rgba(0,85,212,0.12);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">fonctionnalité verrouillée</div>
+        <div style="font-size:16px;font-weight:800;color:#0055D4" id="upgrade-feature">—</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:6px">
+          utilisation : <strong id="upgrade-used">0</strong> / <strong id="upgrade-limit">0</strong>
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:10px">
+          inclus dans le plan <span id="upgrade-plan-name" style="color:#0055D4">pro</span>
+        </div>
+        <div id="upgrade-features-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(0,85,212,0.06),rgba(0,212,255,0.04));border:1px solid rgba(0,85,212,0.15);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:24px;font-weight:800;color:#0055D4" id="upgrade-plan-price">129€/mois</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:2px">sans engagement · résiliable à tout moment</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="document.getElementById('upgrade-modal').classList.remove('open')">plus tard</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="showPage('settings');switchSettingsTab('tab-plan',null);document.getElementById('upgrade-modal').classList.remove('open')">
+        <span class="msym">rocket_launch</span>upgrader maintenant
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script>
 
 
 // ═══ QUOTAS & PLANS ═══
@@ -1809,7 +3833,16 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
 (async function() {
   const sb = _sb;
 
+  // DEV BYPASS — accès direct via ?dev=true
   const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('dev') === 'true') {
+    localStorage.setItem('alma_plan', 'pro');
+    document.getElementById('auth-loading').style.display = 'none';
+    document.getElementById('app-root').style.display = 'flex';
+    updateQuotaUI();
+    loadState();
+    return;
+  }
   const paymentStatus = urlParams.get('payment');
   const paymentPlan = urlParams.get('plan');
   if (paymentStatus === 'success' && paymentPlan) {
@@ -1859,7 +3892,8 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
   }
 
   // 4. Tout est OK → afficher le dashboard
-
+  document.getElementById('auth-loading').style.display = 'none';
+  document.getElementById('app-root').style.display = 'flex';
 
   if (paymentStatus === 'success' && paymentPlan) {
     setTimeout(() => showToast('✓ Abonnement ' + paymentPlan + ' activé — bienvenue !'), 300);
@@ -3730,4 +5764,12 @@ async function sendSenderTestEmail() {
     resultEl.innerHTML = '<div class="alert alert-success"><span class="msym">check_circle</span>email test envoyé à ' + (profile?.email || session.user.email) + '</div>';
     resultEl.style.display = '';
   } catch(e) {
-    resultEl.innerHTML = '<div class
+    resultEl.innerHTML = '<div class="alert alert-error"><span class="msym">error</span>' + e.message + '</div>';
+    resultEl.style.display = '';
+  }
+  hideSpinner('sender-test-spinner');
+  document.getElementById('btn-sender-test').disabled = false;
+}
+
+
+</script>
