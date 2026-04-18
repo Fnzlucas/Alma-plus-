@@ -4486,7 +4486,9 @@ async function searchByPoste() {
 
     console.log('[huntlist] params insee:', params.join('&'), '| dept=', dept, '| cp=', codePostal);
 
-    const pages = Math.ceil(Math.min(volume, 75) / 25);
+    // On récupère plus de pages car le filtre strict va en retirer beaucoup
+    const pagesToFetch = (dept || codePostal) ? Math.min(Math.ceil(volume / 5), 10) : Math.ceil(Math.min(volume, 75) / 25);
+    const pages = pagesToFetch;
     const entreprises = [];
 
     for (let page = 1; page <= pages; page++) {
@@ -4503,8 +4505,29 @@ async function searchByPoste() {
       } catch(e) { console.warn('insee page error', e); break; }
     }
 
+    // ─── Filtre strict côté client sur le département (l'API filtre mollement) ───
+    if (dept && !codePostal) {
+      const deptList = dept.split(',').map(d => d.trim());
+      const before = entreprises.length;
+      const filtered = entreprises.filter(e => {
+        const cp = e.siege?.code_postal || '';
+        if (!cp) return false;
+        const cpDept = cp.length === 5 ? cp.substring(0, 2) : cp.substring(0, 3);
+        return deptList.some(d => cp.startsWith(d) || cpDept === d);
+      });
+      console.log('[huntlist] filtre strict dept', deptList, ':', before, '→', filtered.length);
+      entreprises.length = 0;
+      entreprises.push(...filtered);
+    } else if (codePostal) {
+      const before = entreprises.length;
+      const filtered = entreprises.filter(e => (e.siege?.code_postal || '') === codePostal);
+      console.log('[huntlist] filtre strict cp', codePostal, ':', before, '→', filtered.length);
+      entreprises.length = 0;
+      entreprises.push(...filtered);
+    }
+
     if (!entreprises.length) {
-      if (typeof toast === 'function') toast('aucune entreprise trouvée sur insee avec ces critères', 'warn');
+      if (typeof toast === 'function') toast('aucune entreprise dans cette zone avec ces critères — élargissez la recherche', 'warn');
       btn.disabled = false; spinner.style.display = 'none'; progress.style.display = 'none';
       return;
     }
