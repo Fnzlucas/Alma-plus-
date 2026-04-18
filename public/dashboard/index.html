@@ -4689,11 +4689,24 @@ async function scrapeEmailFromSite(website, preferredPrefix, fallbackDomain) {
   for (const url of urlsToTry) {
     try {
       const res = await proxyFetch(url);
+      // Log précis pour découvrir la structure exacte
+      if (url === urlsToTry[0]) {
+        console.log('[scrape] STRUCTURE RÉPONSE PROXY:', res);
+        if (res && typeof res === 'object') {
+          Object.keys(res).forEach(k => {
+            const v = res[k];
+            const preview = typeof v === 'string' ? v.substring(0, 150) : typeof v;
+            console.log(`   └─ ${k} (${typeof v}):`, preview);
+          });
+        }
+      }
+
       // On tente plusieurs noms de champs car selon ton edge function ça peut varier
       let html = '';
       if (typeof res === 'string') html = res;
       else if (res) {
-        html = res.html || res.body || res.content || res.text || res.data || '';
+        html = res.html || res.body || res.content || res.text || res.data ||
+               res.response || res.result || res.payload || res.page || '';
         // Certaines fonctions renvoient le html à la racine
         if (!html && typeof res === 'object') {
           for (const k of Object.keys(res)) {
