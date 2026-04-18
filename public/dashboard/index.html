@@ -4439,8 +4439,35 @@ async function searchByPoste() {
       '': []
     };
     const tranches = trancheEffMap[taille] || [];
-    const deptMatch = loc.match(/\b(\d{2,3})\b/);
-    const dept = deptMatch ? deptMatch[1] : '';
+
+    // Parsing intelligent de la localisation
+    const DEPT_BY_CITY = {
+      'paris':'75','lyon':'69','marseille':'13','toulouse':'31','bordeaux':'33',
+      'lille':'59','nantes':'44','strasbourg':'67','montpellier':'34','rennes':'35',
+      'nice':'06','grenoble':'38','rouen':'76','dijon':'21','angers':'49',
+      'le havre':'76','saint-etienne':'42','reims':'51','toulon':'83','brest':'29',
+      'limoges':'87','amiens':'80','tours':'37','perpignan':'66','metz':'57',
+      'besancon':'25','orleans':'45','mulhouse':'68','caen':'14','nancy':'54',
+      'clermont-ferrand':'63','idf':'75,77,78,91,92,93,94,95','ile-de-france':'75,77,78,91,92,93,94,95',
+      'paca':'04,05,06,13,83,84','aura':'01,03,07,15,26,38,42,43,63,69,73,74',
+      'bretagne':'22,29,35,56','normandie':'14,27,50,61,76','occitanie':'09,11,12,30,31,32,34,46,48,65,66,81,82',
+      'hauts-de-france':'02,59,60,62,80','grand est':'08,10,51,52,54,55,57,67,68,88',
+      'pays de la loire':'44,49,53,72,85','nouvelle-aquitaine':'16,17,19,23,24,33,40,47,64,79,86,87'
+    };
+
+    let dept = '';
+    const locClean = loc.toLowerCase().trim();
+    const deptDirect = locClean.match(/\b(\d{2,3})\b/);
+    if (deptDirect) {
+      dept = deptDirect[1];
+    } else if (locClean && DEPT_BY_CITY[locClean]) {
+      dept = DEPT_BY_CITY[locClean];
+    } else if (locClean) {
+      // Recherche partielle dans les noms de villes (ex: "paris 15e")
+      for (const city in DEPT_BY_CITY) {
+        if (locClean.includes(city)) { dept = DEPT_BY_CITY[city]; break; }
+      }
+    }
 
     const params = [];
     const searchTerm = secteur || 'société';
@@ -4449,6 +4476,8 @@ async function searchByPoste() {
     if (tranches.length) params.push('tranche_effectif_salarie=' + tranches.join(','));
     params.push('etat_administratif=A');
     params.push('per_page=25');
+
+    console.log('[huntlist] params insee:', params.join('&'), 'dept=', dept);
 
     const pages = Math.ceil(Math.min(volume, 75) / 25);
     const entreprises = [];
@@ -4639,63 +4668,93 @@ async function searchByPoste() {
 
 // Scraping d'un site pour en extraire les vrais emails (ex: rh@, contact@…)
 async function scrapeEmailFromSite(website, preferredPrefix, fallbackDomain) {
-  if (!website || typeof proxyFetch !== 'function') return null;
+  if (!website || typeof proxyFetch !== 'function') {
+    console.log('[scrape] skip — pas de site ou proxyFetch indispo');
+    return null;
+  }
 
-  // URLs à tester dans l'ordre de pertinence
-  const baseUrl = website.startsWith('http') ? website : 'https://' + website;
+  const baseUrl = website.startsWith('http') ? website.replace(/\/$/,'') : 'https://' + website.replace(/\/$/,'');
   const urlsToTry = [
     baseUrl + '/contact',
-    baseUrl + '/mentions-legales',
     baseUrl + '/nous-contacter',
+    baseUrl + '/mentions-legales',
     baseUrl + '/equipe',
     baseUrl + '/a-propos',
     baseUrl
   ];
 
-  const EMAIL_RE = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+  const EMAIL_RE = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}/g;
   const foundEmails = new Set();
 
   for (const url of urlsToTry) {
     try {
       const res = await proxyFetch(url);
-      const html = res.html || res.body || res.content || res.text || '';
-      if (!html) continue;
+      // On tente plusieurs noms de champs car selon ton edge function ça peut varier
+      let html = '';
+      if (typeof res === 'string') html = res;
+      else if (res) {
+        html = res.html || res.body || res.content || res.text || res.data || '';
+        // Certaines fonctions renvoient le html à la racine
+        if (!html && typeof res === 'object') {
+          for (const k of Object.keys(res)) {
+            if (typeof res[k] === 'string' && res[k].length > 200) { html = res[k]; break; }
+          }
+        }
+      }
+
+      if (!html) {
+        console.log('[scrape] pas de html pour', url, 'response keys:', res ? Object.keys(res) : 'null');
+        continue;
+      }
 
       // Nettoyage : on vire les scripts et styles
       const clean = html.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'');
+      // Décodage HTML basique (&#64; = @, etc.)
+      const decoded = clean
+        .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n)))
+        .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h,16)))
+        .replace(/\[at\]/gi, '@').replace(/\(at\)/gi, '@')
+        .replace(/\s+(arobase|at)\s+/gi, '@');
 
-      const matches = clean.match(EMAIL_RE) || [];
+      const matches = decoded.match(EMAIL_RE) || [];
       matches.forEach(m => {
         const mail = m.toLowerCase();
-        // Filtre des faux positifs courants
         if (mail.includes('@sentry.') || mail.includes('@wixpress') || mail.includes('@example') ||
             mail.includes('.png') || mail.includes('.jpg') || mail.includes('.svg') ||
-            mail.includes('u003e') || mail.length > 80) return;
+            mail.includes('.gif') || mail.includes('u003e') || mail.length > 80 ||
+            mail.includes('@2x') || mail.includes('schema.org') || mail.startsWith('email@')) return;
         foundEmails.add(mail);
       });
 
-      if (foundEmails.size > 0) break; // assez trouvé, on arrête
-    } catch(e) { /* page 404 ou erreur, on passe */ }
+      console.log('[scrape]', url, '→', matches.length, 'emails trouvés');
+
+      if (foundEmails.size > 0) break;
+    } catch(e) {
+      console.log('[scrape] erreur', url, e.message);
+    }
   }
 
   if (!foundEmails.size) return null;
 
   const emails = Array.from(foundEmails);
+  console.log('[scrape] all emails:', emails, 'preferredPrefix:', preferredPrefix);
 
-  // Priorité 1 : email contenant le préfixe du poste (rh@, commercial@…)
+  // Priorité 1 : email contenant le préfixe exact du poste
   const exactMatch = emails.find(e => e.startsWith(preferredPrefix + '@'));
   if (exactMatch) return exactMatch;
 
   const containsJob = emails.find(e => e.split('@')[0].includes(preferredPrefix));
   if (containsJob) return containsJob;
 
-  // Priorité 2 : email générique (contact@, info@, accueil@…)
-  const generic = emails.find(e => /^(contact|info|accueil|hello|bonjour|direction)@/.test(e));
+  // Priorité 2 : email générique
+  const generic = emails.find(e => /^(contact|info|accueil|hello|bonjour|direction|commercial|secretariat)@/.test(e));
   if (generic) return generic;
 
-  // Priorité 3 : premier email trouvé qui correspond au domaine probable
-  const sameDomain = emails.find(e => e.endsWith('@' + fallbackDomain));
-  if (sameDomain) return sameDomain;
+  // Priorité 3 : email du domaine fallback
+  if (fallbackDomain) {
+    const sameDomain = emails.find(e => e.endsWith('@' + fallbackDomain));
+    if (sameDomain) return sameDomain;
+  }
 
   return emails[0];
 }
