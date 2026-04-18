@@ -4474,8 +4474,10 @@ async function searchByPoste() {
     }
 
     const params = [];
-    // Query textuelle : secteur OU rien (on laisse les filtres géo + taille faire le tri)
-    if (secteur) params.push('q=' + encodeURIComponent(secteur));
+    // L'API INSEE ignore les filtres seuls sans q textuel — on force un q générique
+    // mais assez large pour ne rien exclure
+    const qText = secteur || 'a'; // 'a' = terme minimal qui match presque tout
+    params.push('q=' + encodeURIComponent(qText));
     if (codePostal) params.push('code_postal=' + codePostal);
     else if (dept) params.push('departement=' + dept);
     if (tranches.length) params.push('tranche_effectif_salarie=' + tranches.join(','));
@@ -4711,11 +4713,18 @@ async function scrapeEmailFromSite(website, preferredPrefix, fallbackDomain) {
       if (typeof res === 'string') html = res;
       else if (res) {
         html = res.html || res.body || res.content || res.text || res.data ||
-               res.response || res.result || res.payload || res.page || '';
-        // Certaines fonctions renvoient le html à la racine
+               res.response || res.result || res.payload || res.page ||
+               res.preview || res.raw || '';
+        // Si on a juste 'preview' qui contient du HTML (cas de ton proxy avec erreur Non-JSON)
+        if (!html && res.preview && typeof res.preview === 'string') {
+          html = res.preview;
+        }
+        // Détection auto
         if (!html && typeof res === 'object') {
           for (const k of Object.keys(res)) {
-            if (typeof res[k] === 'string' && res[k].length > 200) { html = res[k]; break; }
+            if (typeof res[k] === 'string' && res[k].length > 200 && res[k].includes('<')) {
+              html = res[k]; break;
+            }
           }
         }
       }
@@ -4724,6 +4733,7 @@ async function scrapeEmailFromSite(website, preferredPrefix, fallbackDomain) {
         console.log('[scrape] pas de html pour', url, 'response keys:', res ? Object.keys(res) : 'null');
         continue;
       }
+      console.log('[scrape] html reçu pour', url, '· longueur:', html.length, 'chars');
 
       // Nettoyage : on vire les scripts et styles
       const clean = html.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'');
