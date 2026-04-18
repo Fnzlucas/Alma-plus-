@@ -941,8 +941,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
               <div style="background:rgba(0,85,212,0.04);border:1px solid rgba(0,85,212,0.12);border-radius:12px;padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">
                 <span class="msym" style="font-size:16px;color:#0055D4;flex-shrink:0;margin-top:1px">verified_user</span>
                 <div style="flex:1">
-                  <div style="font-size:11px;font-weight:700;color:#0055D4;margin-bottom:2px">conforme rgpd</div>
-                  <div style="font-size:10px;color:#6b7280;line-height:1.5">données collectées sur sources publiques uniquement — pages linkedin publiques, annuaires pro, sites d'entreprises. base légale d'intérêt légitime. opt-out respecté.</div>
+                  <div style="font-size:11px;font-weight:700;color:#0055D4;margin-bottom:2px">pipeline de scraping · sources publiques</div>
+                  <div style="font-size:10px;color:#6b7280;line-height:1.5">1· insee sirene (data.gouv.fr) — entreprises réelles · siret · dirigeants.  2· google maps — téléphone standard + site officiel.  3· scraping du site — extraction des vrais emails de service (rh@, contact@…).</div>
                 </div>
               </div>
 
@@ -4425,106 +4425,279 @@ async function searchByPoste() {
   document.getElementById('poste-results').style.display = 'none';
   _posteData = [];
 
-  // Étapes du scraper
-  const steps = [
-    { pct: 8,  msg: 'initialisation du scraper…' },
-    { pct: 20, msg: 'recherche sur linkedin (pages publiques)…' },
-    { pct: 35, msg: 'croisement avec annuaires pro…' },
-    { pct: 50, msg: 'identification des entreprises…' },
-    { pct: 65, msg: enrich === 'basic' ? 'finalisation…' : 'enrichissement emails par patterns ia…' },
-    { pct: 80, msg: enrich === 'full' || enrich === 'phone' ? 'récupération des standards téléphoniques…' : 'consolidation des données…' },
-    { pct: 92, msg: 'déduplication et scoring…' },
-  ];
+  try {
+    // ─── ÉTAPE 1 : INSEE SIRENE — vraies entreprises ───
+    progressFill.style.width = '8%';
+    progressText.textContent = 'interrogation insee sirene…';
+    progressCount.textContent = '0 / ' + volume;
 
-  for (const step of steps) {
-    progressFill.style.width = step.pct + '%';
-    progressText.textContent = step.msg;
-    const currentCount = Math.floor((step.pct / 100) * volume);
-    progressCount.textContent = currentCount + ' / ' + volume;
-    await new Promise(r => setTimeout(r, 450 + Math.random() * 400));
+    const trancheEffMap = {
+      'tpe': ['01','02','03'],
+      'pme': ['11','12','21','22'],
+      'eti': ['31','32','41'],
+      'ge': ['42','51','52','53'],
+      '': []
+    };
+    const tranches = trancheEffMap[taille] || [];
+    const deptMatch = loc.match(/\b(\d{2,3})\b/);
+    const dept = deptMatch ? deptMatch[1] : '';
+
+    const params = [];
+    const searchTerm = secteur || 'société';
+    params.push('q=' + encodeURIComponent(searchTerm));
+    if (dept) params.push('departement=' + dept);
+    if (tranches.length) params.push('tranche_effectif_salarie=' + tranches.join(','));
+    params.push('etat_administratif=A');
+    params.push('per_page=25');
+
+    const pages = Math.ceil(Math.min(volume, 75) / 25);
+    const entreprises = [];
+
+    for (let page = 1; page <= pages; page++) {
+      progressFill.style.width = (8 + (page / pages) * 15) + '%';
+      progressText.textContent = `insee · page ${page}/${pages}…`;
+
+      const fullUrl = 'https://recherche-entreprises.api.gouv.fr/search?' + params.join('&') + '&page=' + page;
+      try {
+        const res = await fetch(fullUrl);
+        if (!res.ok) break;
+        const data = await res.json();
+        if (!data.results || !data.results.length) break;
+        entreprises.push(...data.results);
+      } catch(e) { console.warn('insee page error', e); break; }
+    }
+
+    if (!entreprises.length) {
+      if (typeof toast === 'function') toast('aucune entreprise trouvée sur insee avec ces critères', 'warn');
+      btn.disabled = false; spinner.style.display = 'none'; progress.style.display = 'none';
+      return;
+    }
+
+    // ─── ÉTAPE 2 : enrichissement google maps (téléphones standards) ───
+    progressFill.style.width = '25%';
+    progressText.textContent = `${entreprises.length} entreprises · recherche téléphones…`;
+    progressCount.textContent = '0 / ' + entreprises.length;
+
+    const gmapsService = (typeof google !== 'undefined' && google.maps && google.maps.places)
+      ? new google.maps.places.PlacesService(document.createElement('div'))
+      : null;
+
+    const results = [];
+    const batchSize = 5; // parallélisme modéré pour éviter rate limit
+
+    for (let batch = 0; batch < entreprises.length; batch += batchSize) {
+      const slice = entreprises.slice(batch, batch + batchSize);
+      const batchResults = await Promise.all(slice.map(async (e, idx) => {
+        const i = batch + idx;
+        const nomEntreprise = e.nom_complet || e.nom_raison_sociale || 'Entreprise';
+        const siret = e.siege?.siret || e.siret || '';
+        const ville = e.siege?.libelle_commune || e.siege?.commune || loc || '';
+        const cp = e.siege?.code_postal || '';
+        const effectif = e.tranche_effectif_salarie_libelle || e.tranche_effectif_salarie || '';
+        const activite = e.activite_principale_libelle || e.activite_principale || secteur || '';
+        const dirigeants = e.dirigeants || [];
+        const dirigeant = dirigeants.find(d => d.prenoms || d.prenom) || null;
+
+        let prenom = '', nom = '';
+        if (dirigeant) {
+          prenom = (dirigeant.prenoms || dirigeant.prenom || '').split(' ')[0] || '';
+          nom = dirigeant.nom || '';
+        }
+
+        // ─── Google Maps : téléphone + site web réels ───
+        let phone = null, website = null;
+        if (gmapsService) {
+          try {
+            const gmapsResult = await new Promise((resolve) => {
+              gmapsService.textSearch({
+                query: nomEntreprise + ' ' + ville,
+                language: 'fr',
+                region: 'fr'
+              }, (places, status) => {
+                if (status !== google.maps.places.PlacesServiceStatus.OK || !places || !places.length) {
+                  resolve(null); return;
+                }
+                // On prend le premier résultat le plus probable (même ville)
+                const place = places.find(p => (p.formatted_address || '').toLowerCase().includes(ville.toLowerCase())) || places[0];
+                gmapsService.getDetails({
+                  placeId: place.place_id,
+                  fields: ['formatted_phone_number','international_phone_number','website']
+                }, (det, st) => {
+                  if (st === google.maps.places.PlacesServiceStatus.OK && det) {
+                    resolve({
+                      phone: det.formatted_phone_number || det.international_phone_number || null,
+                      website: det.website || null
+                    });
+                  } else resolve(null);
+                });
+              });
+            });
+            if (gmapsResult) { phone = gmapsResult.phone; website = gmapsResult.website; }
+          } catch(err) { /* silent */ }
+        }
+
+        // Domaine deviné ou extrait du site
+        let domain = '';
+        if (website) {
+          domain = website.replace(/^https?:\/\//,'').replace(/^www\./,'').split('/')[0];
+        } else {
+          domain = nomEntreprise.toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+            .replace(/[^a-z0-9]/g,'').slice(0,20) + '.fr';
+        }
+
+        // Email par pattern (sera remplacé par scraping si trouvé sur le site)
+        const jobMap = {
+          'drh': 'rh', 'responsable rh': 'rh', 'rh': 'rh', 'assistant rh': 'rh',
+          'cto': 'contact', 'ceo': 'direction', 'daf': 'compta', 'directeur financier': 'compta',
+          'directeur commercial': 'commercial', 'commercial': 'commercial',
+          'directeur achats': 'achats', 'responsable achats': 'achats',
+          'responsable marketing': 'marketing', 'marketing': 'marketing',
+          'office manager': 'contact', 'assistant': 'contact'
+        };
+        const prefix = jobMap[job.toLowerCase()] || 'contact';
+        let email = null;
+        let emailSource = 'pattern';
+
+        if (enrich !== 'basic') {
+          if (prenom && nom) {
+            email = `${prenom.toLowerCase()}.${nom.toLowerCase().replace(/\s/g,'')}@${domain}`;
+          } else {
+            email = `${prefix}@${domain}`;
+          }
+        }
+
+        let score = 50;
+        if (prenom && nom) score += 20;
+        if (phone) score += 15;
+        if (website) score += 10;
+        if (e.nombre_etablissements_ouverts > 1) score += 3;
+        score = Math.min(99, score);
+
+        return {
+          prenom: prenom || '—', nom: nom || '',
+          company: nomEntreprise, siret,
+          email, emailSource,
+          phone, ville: cp ? `${cp} ${ville}` : ville,
+          effectif, activite, score,
+          poste: job.charAt(0).toUpperCase() + job.slice(1).toLowerCase(),
+          linkedinUrl: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(job + ' ' + nomEntreprise)}`,
+          website, domain,
+          jobPrefix: prefix,
+          source: 'INSEE + Google Maps'
+        };
+      }));
+
+      results.push(...batchResults);
+      progressCount.textContent = results.length + ' / ' + entreprises.length;
+      progressFill.style.width = (25 + (results.length / entreprises.length) * 40) + '%';
+    }
+
+    // ─── ÉTAPE 3 : scraping des sites web pour récupérer les VRAIS emails ───
+    if (enrich !== 'basic' && typeof proxyFetch === 'function') {
+      const avecSite = results.filter(r => r.website);
+      progressText.textContent = `scraping ${avecSite.length} sites web pour emails…`;
+
+      let scraped = 0;
+      for (let i = 0; i < avecSite.length; i++) {
+        const r = avecSite[i];
+        progressFill.style.width = (65 + (i / avecSite.length) * 30) + '%';
+        progressText.textContent = `scraping · ${r.company.substring(0,30)}…`;
+
+        const realEmail = await scrapeEmailFromSite(r.website, r.jobPrefix, r.domain);
+        if (realEmail) {
+          r.email = realEmail;
+          r.emailSource = 'site';
+          r.score = Math.min(99, r.score + 10);
+        }
+
+        scraped++;
+        progressCount.textContent = `${scraped} / ${avecSite.length} sites`;
+      }
+    }
+
+    progressFill.style.width = '98%';
+    progressText.textContent = 'consolidation…';
+    await new Promise(r => setTimeout(r, 300));
+
+    _posteData = results;
+
+    progressFill.style.width = '100%';
+    progressText.textContent = 'terminé';
+    progressCount.textContent = _posteData.length + ' contacts';
+    await new Promise(r => setTimeout(r, 350));
+    renderPosteResults(job, loc);
+  } catch (err) {
+    console.error(err);
+    if (typeof toast === 'function') toast('erreur : ' + (err.message || 'échec du scraping'), 'error');
+  } finally {
+    btn.disabled = false;
+    spinner.style.display = 'none';
+    setTimeout(() => { progress.style.display = 'none'; }, 1500);
   }
-
-  // Génération de résultats démo (branchable à ton backend réel)
-  _posteData = generatePosteResults(job, loc, secteur, taille, volume, enrich);
-
-  progressFill.style.width = '100%';
-  progressText.textContent = 'scraping terminé';
-  progressCount.textContent = _posteData.length + ' / ' + volume;
-
-  await new Promise(r => setTimeout(r, 350));
-
-  renderPosteResults(job, loc);
-
-  btn.disabled = false;
-  spinner.style.display = 'none';
-  setTimeout(() => { progress.style.display = 'none'; }, 1500);
 }
 
-function generatePosteResults(job, loc, secteur, taille, volume, enrich) {
-  const prenoms = ['Sophie','Thomas','Claire','Alexandre','Marie','Nicolas','Julie','Pierre','Camille','Laurent','Emma','Antoine','Sarah','Maxime','Chloé','Benjamin','Léa','Hugo','Juliette','Romain','Charlotte','Guillaume','Manon','Vincent','Pauline','Olivier','Amélie','Sébastien','Caroline','Jérôme'];
-  const noms = ['Martin','Bernard','Dubois','Thomas','Robert','Richard','Petit','Durand','Leroy','Moreau','Simon','Laurent','Lefebvre','Michel','Garcia','David','Bertrand','Roux','Vincent','Fournier','Morel','Girard','Andre','Mercier','Dupont','Lambert','Bonnet','François','Martinez','Legrand'];
-  const companies = {
-    'tech': ['Datalia','Nexwave','CodeStream','Pixelpath','Cortex Labs','Neologix','Soluware','Apparium','Signalflux','Brightkode','Fluxify','Zentium','Kairos Tech','Optiwave','Veracore'],
-    'industrie': ['Métallis','Forgeline','Industria Nord','Sofralia','Technichal','Procelec','Mécapro','Aciers de Lyon','Plastimoule','Helvatech','Verrerie Dubreuil','Carrosserie SMA','Boisindus'],
-    'btp': ['Bâtipro','Construct Sud','Immobat','Grands Travaux IDF','Toitures Lefèvre','Maçonnerie Rey','Habitation SARL','Charpentes du Nord','Rénov\'Elite'],
-    'default': ['Alphamédia','Ostara Solutions','Vivo Group','Metaform','Signatura','Oryx Partners','Novera Conseil','Kalima','Lumenix','Pragma Studio','Altiméa','Velvet Agency','Ludeka','Maravel','Solvis','Orpheus Finance','Kairoa','Prélium','Zentara','Hiveo']
-  };
+// Scraping d'un site pour en extraire les vrais emails (ex: rh@, contact@…)
+async function scrapeEmailFromSite(website, preferredPrefix, fallbackDomain) {
+  if (!website || typeof proxyFetch !== 'function') return null;
 
-  const villes = ['Paris','Lyon','Marseille','Toulouse','Bordeaux','Lille','Nantes','Strasbourg','Montpellier','Rennes','Nice','Grenoble','Rouen','Dijon','Angers'];
-  const domains = ['fr','com','io','co'];
+  // URLs à tester dans l'ordre de pertinence
+  const baseUrl = website.startsWith('http') ? website : 'https://' + website;
+  const urlsToTry = [
+    baseUrl + '/contact',
+    baseUrl + '/mentions-legales',
+    baseUrl + '/nous-contacter',
+    baseUrl + '/equipe',
+    baseUrl + '/a-propos',
+    baseUrl
+  ];
 
-  const secteurs_possibles = secteur ? [secteur.toLowerCase()] : ['tech','industrie','btp','default','default','default'];
-  const companyPool = [];
-  secteurs_possibles.forEach(s => {
-    const list = companies[s] || companies.default;
-    companyPool.push(...list);
-  });
+  const EMAIL_RE = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+  const foundEmails = new Set();
 
-  const tailles_map = {
-    'tpe': ['1-10 salariés', '6', '8'],
-    'pme': ['50-200 salariés', '120', '75', '180'],
-    'eti': ['500-2000 salariés', '850'],
-    'ge': ['5000+ salariés', '8200'],
-    '': ['30-100 salariés', '45', '80', '140']
-  };
-  const tailleList = tailles_map[taille] || tailles_map[''];
+  for (const url of urlsToTry) {
+    try {
+      const res = await proxyFetch(url);
+      const html = res.html || res.body || res.content || res.text || '';
+      if (!html) continue;
 
-  const locBase = loc || 'france';
-  const results = [];
-  const count = Math.min(volume, 60); // démo plafonnée à 60 cards visuelles
+      // Nettoyage : on vire les scripts et styles
+      const clean = html.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'');
 
-  for (let i = 0; i < count; i++) {
-    const prenom = prenoms[Math.floor(Math.random() * prenoms.length)];
-    const nom = noms[Math.floor(Math.random() * noms.length)];
-    const company = companyPool[Math.floor(Math.random() * companyPool.length)];
-    const domain = domains[Math.floor(Math.random() * domains.length)];
-    const ville = locBase.match(/paris|lyon|marseille|toulouse|bordeaux|lille|nantes/i)
-      ? locBase.charAt(0).toUpperCase() + locBase.slice(1).toLowerCase()
-      : villes[Math.floor(Math.random() * villes.length)];
+      const matches = clean.match(EMAIL_RE) || [];
+      matches.forEach(m => {
+        const mail = m.toLowerCase();
+        // Filtre des faux positifs courants
+        if (mail.includes('@sentry.') || mail.includes('@wixpress') || mail.includes('@example') ||
+            mail.includes('.png') || mail.includes('.jpg') || mail.includes('.svg') ||
+            mail.includes('u003e') || mail.length > 80) return;
+        foundEmails.add(mail);
+      });
 
-    const companySlug = company.toLowerCase().replace(/[^a-z0-9]/g,'');
-    const email = (enrich !== 'basic')
-      ? `${prenom.toLowerCase()}.${nom.toLowerCase()}@${companySlug}.${domain}`
-      : null;
-
-    const phone = (enrich === 'phone' || enrich === 'full')
-      ? `+33 1 ${String(Math.floor(10 + Math.random() * 89))} ${String(Math.floor(10 + Math.random() * 89))} ${String(Math.floor(10 + Math.random() * 89))} ${String(Math.floor(10 + Math.random() * 89))}`
-      : null;
-
-    const linkedinUrl = `https://linkedin.com/in/${prenom.toLowerCase()}-${nom.toLowerCase()}-${Math.random().toString(36).substr(2,5)}`;
-
-    const effectif = tailleList[Math.floor(Math.random() * tailleList.length)];
-    const score = 60 + Math.floor(Math.random() * 40);
-
-    results.push({
-      prenom, nom, company, email, phone, ville, effectif, score,
-      poste: job.charAt(0).toUpperCase() + job.slice(1).toLowerCase(),
-      linkedinUrl,
-      source: ['LinkedIn public','Annuaire pro','Site entreprise'][Math.floor(Math.random()*3)]
-    });
+      if (foundEmails.size > 0) break; // assez trouvé, on arrête
+    } catch(e) { /* page 404 ou erreur, on passe */ }
   }
 
-  return results;
+  if (!foundEmails.size) return null;
+
+  const emails = Array.from(foundEmails);
+
+  // Priorité 1 : email contenant le préfixe du poste (rh@, commercial@…)
+  const exactMatch = emails.find(e => e.startsWith(preferredPrefix + '@'));
+  if (exactMatch) return exactMatch;
+
+  const containsJob = emails.find(e => e.split('@')[0].includes(preferredPrefix));
+  if (containsJob) return containsJob;
+
+  // Priorité 2 : email générique (contact@, info@, accueil@…)
+  const generic = emails.find(e => /^(contact|info|accueil|hello|bonjour|direction)@/.test(e));
+  if (generic) return generic;
+
+  // Priorité 3 : premier email trouvé qui correspond au domaine probable
+  const sameDomain = emails.find(e => e.endsWith('@' + fallbackDomain));
+  if (sameDomain) return sameDomain;
+
+  return emails[0];
 }
 
 function renderPosteResults(job, loc) {
@@ -4556,23 +4729,27 @@ function renderPosteResults(job, loc) {
 
     card.innerHTML = `
       <div style="display:flex;gap:12px;margin-bottom:12px">
-        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,hsl(${hue},65%,55%),hsl(${(hue+40)%360},70%,50%));display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:800;flex-shrink:0;letter-spacing:-.02em">${initials}</div>
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,hsl(${hue},65%,55%),hsl(${(hue+40)%360},70%,50%));display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:800;flex-shrink:0;letter-spacing:-.02em">${initials === '—' ? '<span class="msym" style="font-size:18px">business</span>' : initials}</div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:700;color:#0a0a1a;letter-spacing:-.01em">${r.prenom} ${r.nom}</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:1px">${r.poste}</div>
-          <div style="font-size:11px;color:#0055D4;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:4px"><span class="msym" style="font-size:11px">business</span>${r.company}</div>
+          <div style="font-size:13px;font-weight:700;color:#0a0a1a;letter-spacing:-.01em;line-height:1.3">${r.prenom !== '—' ? r.prenom + ' ' + r.nom : r.company}</div>
+          ${r.prenom !== '—' ? `<div style="font-size:11px;color:#6b7280;margin-top:1px">${r.poste}</div>` : `<div style="font-size:11px;color:#6b7280;margin-top:1px">cible : ${r.poste}</div>`}
+          ${r.prenom !== '—' ? `<div style="font-size:11px;color:#0055D4;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:4px"><span class="msym" style="font-size:11px">business</span>${r.company}</div>` : ''}
         </div>
         <div style="font-size:10px;font-weight:800;background:${r.score >= 80 ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)'};color:${r.score >= 80 ? '#10b981' : '#f59e0b'};padding:3px 8px;border-radius:99px;height:fit-content">${r.score}</div>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
-        <div style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px;color:#9ca3af">place</span>${r.ville}</div>
-        <div style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px;color:#9ca3af">groups</span>${r.effectif}</div>
-        ${r.email ? `<div style="font-size:10px;color:#10b981;font-weight:600;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px">mail</span>${r.email}</div>` : ''}
+        <div style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px;color:#9ca3af">place</span>${r.ville || 'non renseigné'}</div>
+        ${r.effectif ? `<div style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px;color:#9ca3af">groups</span>${r.effectif}</div>` : ''}
+        ${r.activite ? `<div style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px;color:#9ca3af">category</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.activite}</span></div>` : ''}
+        ${r.siret ? `<div style="font-size:10px;color:#9ca3af;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px">verified</span>siret ${r.siret}</div>` : ''}
+        ${r.email ? `<div style="font-size:10px;color:#10b981;font-weight:600;display:flex;align-items:center;gap:6px;overflow:hidden"><span class="msym" style="font-size:12px">mail</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.email}</span>${r.emailSource === 'site' ? '<span style="font-size:8px;font-weight:800;letter-spacing:.05em;background:rgba(16,185,129,0.15);color:#10b981;padding:2px 6px;border-radius:99px;margin-left:auto;flex-shrink:0">VÉRIFIÉ</span>' : '<span style="font-size:8px;font-weight:700;letter-spacing:.05em;background:rgba(245,158,11,0.1);color:#f59e0b;padding:2px 6px;border-radius:99px;margin-left:auto;flex-shrink:0">PATTERN</span>'}</div>` : ''}
         ${r.phone ? `<div style="font-size:10px;color:#a855f7;font-weight:600;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px">call</span>${r.phone}</div>` : ''}
+        ${r.website ? `<a href="${r.website.startsWith('http') ? r.website : 'https://' + r.website}" target="_blank" style="font-size:10px;color:#0055D4;font-weight:600;display:flex;align-items:center;gap:6px;text-decoration:none;overflow:hidden"><span class="msym" style="font-size:12px">language</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.website.replace(/^https?:\/\//,'').slice(0,30)}</span></a>` : ''}
       </div>
 
       <div style="display:flex;gap:6px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.05)">
+        <a href="${r.linkedinUrl}" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;font-size:10px;padding:5px 8px;text-decoration:none;color:#0077b5" onclick="event.stopPropagation()"><svg width="11" height="11" viewBox="0 0 24 24" fill="#0077b5"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>trouver</a>
         <button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;font-size:10px;padding:5px 8px" onclick="event.stopPropagation();copyPosteContact(${i})"><span class="msym" style="font-size:12px">content_copy</span>copier</button>
         <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;font-size:10px;padding:5px 8px;background:linear-gradient(135deg,#0055D4,#00d4ff)" onclick="event.stopPropagation();addPosteToPipeline(${i})"><span class="msym" style="font-size:12px">add</span>pipeline</button>
       </div>
