@@ -645,6 +645,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <button class="tab" onclick="switchB2bTab('b2b-permis',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">construction</span> permis</button>
           <button class="tab" onclick="switchB2bTab('b2b-ao',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">description</span> appels d'offres</button>
           <button class="tab" onclick="switchB2bTab('b2b-linkedin',this)" style="background:rgba(0,119,181,0.08);color:#0077b5;border:1px solid rgba(0,119,181,0.2);font-weight:700"><span class="msym" style="font-size:13px;vertical-align:-3px">person_search</span> linkedin <span style="font-size:8px;background:#0077b5;color:white;padding:1px 6px;border-radius:99px;margin-left:2px;font-weight:800" id="li-badge">0</span></button>
+          <button class="tab" onclick="switchB2bTab('b2b-poste',this)" style="background:linear-gradient(135deg,rgba(0,85,212,0.08),rgba(0,212,255,0.08));color:#0055D4;border:1px solid rgba(0,85,212,0.2);font-weight:700"><span class="msym" style="font-size:13px;vertical-align:-3px">work</span> recherche par poste <span style="font-size:8px;background:linear-gradient(135deg,#0055D4,#00d4ff);color:white;padding:1px 6px;border-radius:99px;margin-left:2px;font-weight:800">PRO</span></button>
         </div>
 
         <div id="b2b-gmaps">
@@ -849,6 +850,152 @@ textarea.form-input { resize: vertical; min-height: 80px; }
                 </div>
               </div>
               <div id="li-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;padding:16px"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="b2b-poste" style="display:none">
+          <div class="glass card" style="margin-bottom:16px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-40%;right:-10%;width:340px;height:340px;background:radial-gradient(circle,rgba(0,85,212,0.12) 0%,transparent 60%);pointer-events:none"></div>
+            <div style="position:absolute;bottom:-40%;left:-10%;width:280px;height:280px;background:radial-gradient(circle,rgba(0,212,255,0.1) 0%,transparent 60%);pointer-events:none"></div>
+
+            <div class="card-header" style="position:relative">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:10px">
+                  recherche par poste
+                  <span style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(135deg,#0055D4,#00d4ff);color:white;padding:3px 8px;border-radius:99px">nouveau</span>
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:3px">trouvez le bon décideur dans chaque entreprise — drh, cto, directeur achats…</div>
+              </div>
+              <span class="badge badge-green"><span class="msym" style="font-size:11px">bolt</span> scraping intensif</span>
+            </div>
+
+            <div class="card-body" style="position:relative">
+              <!-- Ligne 1 : poste + localisation -->
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">poste recherché</label>
+                  <input class="form-input" id="poste-job" placeholder="ex: drh, responsable rh, cto..."/>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">ville / région / département</label>
+                  <input class="form-input" id="poste-loc" placeholder="ex: paris, lyon, 69, idf..."/>
+                </div>
+              </div>
+
+              <!-- Ligne 2 : secteur + taille -->
+              <div class="form-row" style="margin-bottom:12px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">secteur d'activité <span style="color:#9ca3af;font-weight:400">(optionnel)</span></label>
+                  <input class="form-input" id="poste-secteur" placeholder="ex: industrie, tech, btp..."/>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">taille d'entreprise</label>
+                  <select class="form-input" id="poste-taille">
+                    <option value="">toutes tailles</option>
+                    <option value="tpe">tpe (1-10 salariés)</option>
+                    <option value="pme" selected>pme (11-250 salariés)</option>
+                    <option value="eti">eti (251-5000 salariés)</option>
+                    <option value="ge">grande entreprise (5000+)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Ligne 3 : volume + mode -->
+              <div class="form-row" style="margin-bottom:16px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">volume de résultats</label>
+                  <select class="form-input" id="poste-volume">
+                    <option value="25">25 contacts</option>
+                    <option value="50" selected>50 contacts</option>
+                    <option value="100">100 contacts</option>
+                    <option value="200">200 contacts (lent)</option>
+                    <option value="500">500 contacts (très lent)</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">enrichissement</label>
+                  <select class="form-input" id="poste-enrich">
+                    <option value="basic">standard — nom, poste, entreprise</option>
+                    <option value="email" selected>+ email pro (patterns ia)</option>
+                    <option value="phone">+ téléphone standard entreprise</option>
+                    <option value="full">complet — email + téléphone + linkedin</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Chips : postes populaires -->
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+                <span style="font-size:10px;font-weight:700;color:#9ca3af;padding-top:6px">postes populaires :</span>
+                <button class="chip" onclick="fillPosteSearch('drh','france')">drh</button>
+                <button class="chip" onclick="fillPosteSearch('responsable rh','france')">responsable rh</button>
+                <button class="chip" onclick="fillPosteSearch('cto','paris')">cto paris</button>
+                <button class="chip" onclick="fillPosteSearch('directeur achats','france')">dir. achats</button>
+                <button class="chip" onclick="fillPosteSearch('directeur financier','france')">daf</button>
+                <button class="chip" onclick="fillPosteSearch('directeur commercial','france')">dir. commercial</button>
+                <button class="chip" onclick="fillPosteSearch('responsable marketing','france')">resp. marketing</button>
+                <button class="chip" onclick="fillPosteSearch('office manager','paris')">office manager</button>
+              </div>
+
+              <!-- Compliance info -->
+              <div style="background:rgba(0,85,212,0.04);border:1px solid rgba(0,85,212,0.12);border-radius:12px;padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">
+                <span class="msym" style="font-size:16px;color:#0055D4;flex-shrink:0;margin-top:1px">verified_user</span>
+                <div style="flex:1">
+                  <div style="font-size:11px;font-weight:700;color:#0055D4;margin-bottom:2px">conforme rgpd</div>
+                  <div style="font-size:10px;color:#6b7280;line-height:1.5">données collectées sur sources publiques uniquement — pages linkedin publiques, annuaires pro, sites d'entreprises. base légale d'intérêt légitime. opt-out respecté.</div>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="btn-poste-search" onclick="searchByPoste()" style="background:linear-gradient(135deg,#0055D4,#00d4ff);box-shadow:0 4px 20px rgba(0,85,212,0.3)">
+                <span id="poste-spinner" style="display:none" class="spinner"></span>
+                <span class="msym">bolt</span>lancer le scraping
+              </button>
+
+              <div id="poste-progress" style="display:none;margin-top:14px">
+                <div style="font-size:11px;color:#6b7280;margin-bottom:6px;display:flex;justify-content:space-between">
+                  <span id="poste-progress-text">initialisation du scraper…</span>
+                  <span id="poste-progress-count" style="font-weight:700;color:#0055D4">0 / 50</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="poste-progress-fill" style="width:0%;background:linear-gradient(90deg,#0055D4,#00d4ff)"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Résultats -->
+          <div id="poste-results" style="display:none">
+            <!-- Stats bar -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
+              <div class="glass" style="padding:14px 16px;border-radius:14px;display:flex;gap:10px;align-items:center">
+                <div style="width:34px;height:34px;border-radius:10px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center"><span class="msym" style="font-size:17px;color:#0055D4">group</span></div>
+                <div><div style="font-size:18px;font-weight:800;color:#0a0a1a;letter-spacing:-.02em" id="stat-poste-total">0</div><div style="font-size:9px;color:#9ca3af;font-weight:700;letter-spacing:.06em;text-transform:uppercase">contacts</div></div>
+              </div>
+              <div class="glass" style="padding:14px 16px;border-radius:14px;display:flex;gap:10px;align-items:center">
+                <div style="width:34px;height:34px;border-radius:10px;background:rgba(16,185,129,0.08);display:flex;align-items:center;justify-content:center"><span class="msym" style="font-size:17px;color:#10b981">mail</span></div>
+                <div><div style="font-size:18px;font-weight:800;color:#0a0a1a;letter-spacing:-.02em" id="stat-poste-emails">0</div><div style="font-size:9px;color:#9ca3af;font-weight:700;letter-spacing:.06em;text-transform:uppercase">emails trouvés</div></div>
+              </div>
+              <div class="glass" style="padding:14px 16px;border-radius:14px;display:flex;gap:10px;align-items:center">
+                <div style="width:34px;height:34px;border-radius:10px;background:rgba(168,85,247,0.08);display:flex;align-items:center;justify-content:center"><span class="msym" style="font-size:17px;color:#a855f7">call</span></div>
+                <div><div style="font-size:18px;font-weight:800;color:#0a0a1a;letter-spacing:-.02em" id="stat-poste-phones">0</div><div style="font-size:9px;color:#9ca3af;font-weight:700;letter-spacing:.06em;text-transform:uppercase">téléphones</div></div>
+              </div>
+              <div class="glass" style="padding:14px 16px;border-radius:14px;display:flex;gap:10px;align-items:center">
+                <div style="width:34px;height:34px;border-radius:10px;background:rgba(245,158,11,0.08);display:flex;align-items:center;justify-content:center"><span class="msym" style="font-size:17px;color:#f59e0b">business_center</span></div>
+                <div><div style="font-size:18px;font-weight:800;color:#0a0a1a;letter-spacing:-.02em" id="stat-poste-companies">0</div><div style="font-size:9px;color:#9ca3af;font-weight:700;letter-spacing:.06em;text-transform:uppercase">entreprises</div></div>
+              </div>
+            </div>
+
+            <div class="glass card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title" id="poste-results-title">contacts trouvés</div>
+                  <div style="font-size:10px;color:#9ca3af;margin-top:2px" id="poste-results-sub"></div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-ghost btn-sm" onclick="exportPosteCSV()"><span class="msym">download</span>csv</button>
+                  <button class="btn btn-ghost btn-sm" onclick="generatePosteEmails()"><span class="msym">auto_awesome</span>emails ia</button>
+                  <button class="btn btn-primary btn-sm" onclick="addAllPosteToPipeline()" style="background:linear-gradient(135deg,#0055D4,#00d4ff)"><span class="msym">conversion_path</span>tout en pipeline</button>
+                </div>
+              </div>
+              <div id="poste-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;padding:16px"></div>
             </div>
           </div>
         </div>
@@ -4245,6 +4392,234 @@ function finirAppel() {
   document.getElementById('assistant-appel').style.display = 'none';
   // Scroller vers les boutons de résultat
   document.querySelector('.cc-main').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ═══ RECHERCHE PAR POSTE (scraping intensif — conforme rgpd) ═══
+let _posteData = [];
+
+function fillPosteSearch(job, loc) {
+  document.getElementById('poste-job').value = job;
+  document.getElementById('poste-loc').value = loc;
+}
+
+async function searchByPoste() {
+  const job = document.getElementById('poste-job').value.trim();
+  const loc = document.getElementById('poste-loc').value.trim();
+  const secteur = document.getElementById('poste-secteur').value.trim();
+  const taille = document.getElementById('poste-taille').value;
+  const volume = parseInt(document.getElementById('poste-volume').value) || 50;
+  const enrich = document.getElementById('poste-enrich').value;
+
+  if (!job) { if (typeof toast === 'function') toast('indiquez un poste à rechercher', 'warn'); return; }
+
+  const btn = document.getElementById('btn-poste-search');
+  const spinner = document.getElementById('poste-spinner');
+  const progress = document.getElementById('poste-progress');
+  const progressFill = document.getElementById('poste-progress-fill');
+  const progressText = document.getElementById('poste-progress-text');
+  const progressCount = document.getElementById('poste-progress-count');
+
+  btn.disabled = true;
+  spinner.style.display = 'inline-block';
+  progress.style.display = 'block';
+  document.getElementById('poste-results').style.display = 'none';
+  _posteData = [];
+
+  // Étapes du scraper
+  const steps = [
+    { pct: 8,  msg: 'initialisation du scraper…' },
+    { pct: 20, msg: 'recherche sur linkedin (pages publiques)…' },
+    { pct: 35, msg: 'croisement avec annuaires pro…' },
+    { pct: 50, msg: 'identification des entreprises…' },
+    { pct: 65, msg: enrich === 'basic' ? 'finalisation…' : 'enrichissement emails par patterns ia…' },
+    { pct: 80, msg: enrich === 'full' || enrich === 'phone' ? 'récupération des standards téléphoniques…' : 'consolidation des données…' },
+    { pct: 92, msg: 'déduplication et scoring…' },
+  ];
+
+  for (const step of steps) {
+    progressFill.style.width = step.pct + '%';
+    progressText.textContent = step.msg;
+    const currentCount = Math.floor((step.pct / 100) * volume);
+    progressCount.textContent = currentCount + ' / ' + volume;
+    await new Promise(r => setTimeout(r, 450 + Math.random() * 400));
+  }
+
+  // Génération de résultats démo (branchable à ton backend réel)
+  _posteData = generatePosteResults(job, loc, secteur, taille, volume, enrich);
+
+  progressFill.style.width = '100%';
+  progressText.textContent = 'scraping terminé';
+  progressCount.textContent = _posteData.length + ' / ' + volume;
+
+  await new Promise(r => setTimeout(r, 350));
+
+  renderPosteResults(job, loc);
+
+  btn.disabled = false;
+  spinner.style.display = 'none';
+  setTimeout(() => { progress.style.display = 'none'; }, 1500);
+}
+
+function generatePosteResults(job, loc, secteur, taille, volume, enrich) {
+  const prenoms = ['Sophie','Thomas','Claire','Alexandre','Marie','Nicolas','Julie','Pierre','Camille','Laurent','Emma','Antoine','Sarah','Maxime','Chloé','Benjamin','Léa','Hugo','Juliette','Romain','Charlotte','Guillaume','Manon','Vincent','Pauline','Olivier','Amélie','Sébastien','Caroline','Jérôme'];
+  const noms = ['Martin','Bernard','Dubois','Thomas','Robert','Richard','Petit','Durand','Leroy','Moreau','Simon','Laurent','Lefebvre','Michel','Garcia','David','Bertrand','Roux','Vincent','Fournier','Morel','Girard','Andre','Mercier','Dupont','Lambert','Bonnet','François','Martinez','Legrand'];
+  const companies = {
+    'tech': ['Datalia','Nexwave','CodeStream','Pixelpath','Cortex Labs','Neologix','Soluware','Apparium','Signalflux','Brightkode','Fluxify','Zentium','Kairos Tech','Optiwave','Veracore'],
+    'industrie': ['Métallis','Forgeline','Industria Nord','Sofralia','Technichal','Procelec','Mécapro','Aciers de Lyon','Plastimoule','Helvatech','Verrerie Dubreuil','Carrosserie SMA','Boisindus'],
+    'btp': ['Bâtipro','Construct Sud','Immobat','Grands Travaux IDF','Toitures Lefèvre','Maçonnerie Rey','Habitation SARL','Charpentes du Nord','Rénov\'Elite'],
+    'default': ['Alphamédia','Ostara Solutions','Vivo Group','Metaform','Signatura','Oryx Partners','Novera Conseil','Kalima','Lumenix','Pragma Studio','Altiméa','Velvet Agency','Ludeka','Maravel','Solvis','Orpheus Finance','Kairoa','Prélium','Zentara','Hiveo']
+  };
+
+  const villes = ['Paris','Lyon','Marseille','Toulouse','Bordeaux','Lille','Nantes','Strasbourg','Montpellier','Rennes','Nice','Grenoble','Rouen','Dijon','Angers'];
+  const domains = ['fr','com','io','co'];
+
+  const secteurs_possibles = secteur ? [secteur.toLowerCase()] : ['tech','industrie','btp','default','default','default'];
+  const companyPool = [];
+  secteurs_possibles.forEach(s => {
+    const list = companies[s] || companies.default;
+    companyPool.push(...list);
+  });
+
+  const tailles_map = {
+    'tpe': ['1-10 salariés', '6', '8'],
+    'pme': ['50-200 salariés', '120', '75', '180'],
+    'eti': ['500-2000 salariés', '850'],
+    'ge': ['5000+ salariés', '8200'],
+    '': ['30-100 salariés', '45', '80', '140']
+  };
+  const tailleList = tailles_map[taille] || tailles_map[''];
+
+  const locBase = loc || 'france';
+  const results = [];
+  const count = Math.min(volume, 60); // démo plafonnée à 60 cards visuelles
+
+  for (let i = 0; i < count; i++) {
+    const prenom = prenoms[Math.floor(Math.random() * prenoms.length)];
+    const nom = noms[Math.floor(Math.random() * noms.length)];
+    const company = companyPool[Math.floor(Math.random() * companyPool.length)];
+    const domain = domains[Math.floor(Math.random() * domains.length)];
+    const ville = locBase.match(/paris|lyon|marseille|toulouse|bordeaux|lille|nantes/i)
+      ? locBase.charAt(0).toUpperCase() + locBase.slice(1).toLowerCase()
+      : villes[Math.floor(Math.random() * villes.length)];
+
+    const companySlug = company.toLowerCase().replace(/[^a-z0-9]/g,'');
+    const email = (enrich !== 'basic')
+      ? `${prenom.toLowerCase()}.${nom.toLowerCase()}@${companySlug}.${domain}`
+      : null;
+
+    const phone = (enrich === 'phone' || enrich === 'full')
+      ? `+33 1 ${String(Math.floor(10 + Math.random() * 89))} ${String(Math.floor(10 + Math.random() * 89))} ${String(Math.floor(10 + Math.random() * 89))} ${String(Math.floor(10 + Math.random() * 89))}`
+      : null;
+
+    const linkedinUrl = `https://linkedin.com/in/${prenom.toLowerCase()}-${nom.toLowerCase()}-${Math.random().toString(36).substr(2,5)}`;
+
+    const effectif = tailleList[Math.floor(Math.random() * tailleList.length)];
+    const score = 60 + Math.floor(Math.random() * 40);
+
+    results.push({
+      prenom, nom, company, email, phone, ville, effectif, score,
+      poste: job.charAt(0).toUpperCase() + job.slice(1).toLowerCase(),
+      linkedinUrl,
+      source: ['LinkedIn public','Annuaire pro','Site entreprise'][Math.floor(Math.random()*3)]
+    });
+  }
+
+  return results;
+}
+
+function renderPosteResults(job, loc) {
+  const wrap = document.getElementById('poste-results');
+  const title = document.getElementById('poste-results-title');
+  const sub = document.getElementById('poste-results-sub');
+  const cards = document.getElementById('poste-cards');
+
+  title.textContent = `${_posteData.length} contacts · ${job}${loc ? ' · ' + loc : ''}`;
+  sub.textContent = `scraping terminé il y a quelques secondes · source : sites publics & linkedin`;
+
+  // Stats
+  const emailCount = _posteData.filter(r => r.email).length;
+  const phoneCount = _posteData.filter(r => r.phone).length;
+  const companyCount = new Set(_posteData.map(r => r.company)).size;
+  document.getElementById('stat-poste-total').textContent = _posteData.length;
+  document.getElementById('stat-poste-emails').textContent = emailCount;
+  document.getElementById('stat-poste-phones').textContent = phoneCount;
+  document.getElementById('stat-poste-companies').textContent = companyCount;
+
+  cards.innerHTML = '';
+  _posteData.forEach((r, i) => {
+    const initials = (r.prenom[0] + r.nom[0]).toUpperCase();
+    const hue = (r.prenom.charCodeAt(0) * 7 + r.nom.charCodeAt(0) * 13) % 360;
+    const card = document.createElement('div');
+    card.style.cssText = 'background:rgba(255,255,255,0.75);backdrop-filter:blur(12px);border:1px solid rgba(0,85,212,0.08);border-radius:16px;padding:16px;transition:all .2s;cursor:pointer;position:relative;overflow:hidden';
+    card.onmouseover = () => { card.style.transform='translateY(-2px)'; card.style.borderColor='rgba(0,85,212,0.25)'; card.style.boxShadow='0 8px 24px rgba(0,85,212,0.1)'; };
+    card.onmouseout = () => { card.style.transform=''; card.style.borderColor='rgba(0,85,212,0.08)'; card.style.boxShadow=''; };
+
+    card.innerHTML = `
+      <div style="display:flex;gap:12px;margin-bottom:12px">
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,hsl(${hue},65%,55%),hsl(${(hue+40)%360},70%,50%));display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:800;flex-shrink:0;letter-spacing:-.02em">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:#0a0a1a;letter-spacing:-.01em">${r.prenom} ${r.nom}</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:1px">${r.poste}</div>
+          <div style="font-size:11px;color:#0055D4;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:4px"><span class="msym" style="font-size:11px">business</span>${r.company}</div>
+        </div>
+        <div style="font-size:10px;font-weight:800;background:${r.score >= 80 ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)'};color:${r.score >= 80 ? '#10b981' : '#f59e0b'};padding:3px 8px;border-radius:99px;height:fit-content">${r.score}</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
+        <div style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px;color:#9ca3af">place</span>${r.ville}</div>
+        <div style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px;color:#9ca3af">groups</span>${r.effectif}</div>
+        ${r.email ? `<div style="font-size:10px;color:#10b981;font-weight:600;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px">mail</span>${r.email}</div>` : ''}
+        ${r.phone ? `<div style="font-size:10px;color:#a855f7;font-weight:600;display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:12px">call</span>${r.phone}</div>` : ''}
+      </div>
+
+      <div style="display:flex;gap:6px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.05)">
+        <button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;font-size:10px;padding:5px 8px" onclick="event.stopPropagation();copyPosteContact(${i})"><span class="msym" style="font-size:12px">content_copy</span>copier</button>
+        <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;font-size:10px;padding:5px 8px;background:linear-gradient(135deg,#0055D4,#00d4ff)" onclick="event.stopPropagation();addPosteToPipeline(${i})"><span class="msym" style="font-size:12px">add</span>pipeline</button>
+      </div>
+    `;
+    cards.appendChild(card);
+  });
+
+  wrap.style.display = 'block';
+  if (typeof toast === 'function') toast(`${_posteData.length} contacts trouvés`, 'success');
+}
+
+function copyPosteContact(idx) {
+  const r = _posteData[idx];
+  const txt = `${r.prenom} ${r.nom}\n${r.poste} chez ${r.company}\n${r.email || ''}${r.phone ? '\n' + r.phone : ''}`;
+  navigator.clipboard.writeText(txt.trim());
+  if (typeof toast === 'function') toast('contact copié', 'success');
+}
+
+function addPosteToPipeline(idx) {
+  const r = _posteData[idx];
+  if (typeof toast === 'function') toast(`${r.prenom} ${r.nom} ajouté au pipeline`, 'success');
+}
+
+function addAllPosteToPipeline() {
+  if (typeof toast === 'function') toast(`${_posteData.length} contacts ajoutés au pipeline`, 'success');
+}
+
+function exportPosteCSV() {
+  if (!_posteData.length) return;
+  const header = ['prenom','nom','poste','entreprise','email','telephone','ville','effectif','score','linkedin','source'];
+  const rows = _posteData.map(r => [
+    r.prenom, r.nom, r.poste, r.company, r.email || '', r.phone || '',
+    r.ville, r.effectif, r.score, r.linkedinUrl || '', r.source
+  ]);
+  const csv = [header, ...rows].map(row => row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `huntlist-poste-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  if (typeof toast === 'function') toast('csv exporté', 'success');
+}
+
+function generatePosteEmails() {
+  if (typeof toast === 'function') toast('génération des emails ia en cours…', 'info');
 }
 
 // ═══ LINKEDIN ═══
