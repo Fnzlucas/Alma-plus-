@@ -447,89 +447,141 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- ═══ DASHBOARD ═══ -->
     <div class="page active" id="page-dashboard">
-      <!-- KPI Grid -->
-      <div class="kpi-grid">
-        <div class="glass kpi-card" style="border-radius:16px">
-          <div class="scanline"></div>
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
-            <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:rgba(0,85,212,0.06);border-radius:10px;border:1px solid rgba(0,85,212,0.1)">
-              <span class="msym" style="color:#0055D4">group</span>
-            </div>
-            <span class="badge badge-green" style="display:flex;align-items:center;gap:3px"><span class="msym" style="font-size:11px">trending_up</span> ce mois</span>
-          </div>
-          <span class="kpi-label">prospects trouvés</span>
-          <div class="kpi-value" id="stat-prospects">0</div>
-        </div>
 
-        <div class="glass kpi-card" style="border-radius:16px">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
-            <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.04);border-radius:10px;border:1px solid rgba(0,0,0,0.06)">
-              <span class="msym" style="color:#6b7280">mail</span>
-            </div>
-            <span style="font-size:9px;font-weight:700;color:#9ca3af;border:1px solid #e5e7eb;padding:3px 8px;border-radius:99px;letter-spacing:.04em">par l'ia</span>
-          </div>
-          <span class="kpi-label">emails générés</span>
-          <div class="kpi-value" id="stat-emails">0</div>
-        </div>
+      <!-- ═══ HERO WELCOME CARD ═══ -->
+      <div class="glass card" style="margin-bottom:20px;position:relative;overflow:hidden;border-radius:20px">
+        <div style="position:absolute;top:-40%;right:-10%;width:420px;height:420px;background:radial-gradient(circle,rgba(0,85,212,0.14) 0%,transparent 60%);pointer-events:none"></div>
+        <div style="position:absolute;bottom:-40%;left:-10%;width:340px;height:340px;background:radial-gradient(circle,rgba(0,212,255,0.1) 0%,transparent 60%);pointer-events:none"></div>
 
-        <div class="glass kpi-card" style="border-radius:16px">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
-            <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:rgba(2,132,199,0.06);border-radius:10px;border:1px solid rgba(2,132,199,0.1)">
-              <span class="msym" style="color:#0284c7">conversion_path</span>
-            </div>
-            <span style="font-size:9px;font-weight:700;color:#0284c7;background:rgba(2,132,199,0.06);border:1px solid rgba(2,132,199,0.15);padding:3px 8px;border-radius:99px">actifs</span>
+        <div style="padding:28px 28px 24px;position:relative;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">tableau de bord</div>
+            <div style="font-size:26px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1.15;margin-bottom:6px" id="dash-greeting">bienvenue sur huntlist</div>
+            <div style="font-size:13px;color:#6b7280;line-height:1.5" id="dash-subtitle">lancez votre prospection en quelques clics — données réelles, pipeline vivant.</div>
           </div>
-          <span class="kpi-label">en pipeline</span>
-          <div class="kpi-value" id="stat-pipeline">0</div>
-        </div>
-
-        <div style="background:#0a0a1a;border-radius:16px;padding:22px 24px;position:relative;overflow:hidden">
-          <div style="position:absolute;right:-20px;top:-20px;width:80px;height:80px;background:rgba(0,85,212,0.3);filter:blur(40px);border-radius:50%"></div>
-          <div style="position:absolute;bottom:-20px;left:-10px;width:60px;height:60px;background:rgba(0,212,255,0.2);filter:blur(30px);border-radius:50%"></div>
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;position:relative;z-index:1">
-            <div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.1);border-radius:10px;border:1px solid rgba(255,255,255,0.1)">
-              <span class="msym" style="color:white">emoji_events</span>
-            </div>
-            <span style="font-size:9px;font-weight:700;color:#00d4ff;background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.3);padding:3px 8px;border-radius:99px">optimal</span>
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button class="btn btn-ghost" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'))">
+              <span class="msym">search</span>google maps
+            </button>
+            <button class="btn btn-primary" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'));setTimeout(()=>{var t=document.querySelector('[onclick*=b2b-poste]');if(t)t.click();},100)" style="background:linear-gradient(135deg,#0055D4,#00d4ff);box-shadow:0 4px 20px rgba(0,85,212,0.3)">
+              <span class="msym">bolt</span>recherche par poste
+            </button>
           </div>
-          <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,0.4);display:block;margin-bottom:8px;position:relative;z-index:1">convertis</span>
-          <div style="font-size:36px;font-weight:800;line-height:1;letter-spacing:-2px;color:white;position:relative;z-index:1" id="stat-converted">0</div>
-          <div style="position:absolute;bottom:0;left:0;width:100%;height:1px;background:linear-gradient(to right, transparent, rgba(0,85,212,0.5), transparent)"></div>
         </div>
       </div>
 
-      <!-- Main grid -->
-      <div style="display:grid;grid-template-columns:1fr 300px;gap:20px">
-        <!-- Left -->
+      <!-- ═══ STATS GRID ═══ -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px">
+        <div class="glass" style="padding:18px 20px;border-radius:16px;display:flex;gap:14px;align-items:center;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.4)">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(0,85,212,0.1),rgba(0,85,212,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.15);flex-shrink:0">
+            <span class="msym" style="font-size:20px;color:#0055D4">group</span>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:24px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="stat-prospects">0</div>
+            <div style="font-size:10px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px">prospects</div>
+          </div>
+        </div>
+
+        <div class="glass" style="padding:18px 20px;border-radius:16px;display:flex;gap:14px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(16,185,129,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(16,185,129,0.15);flex-shrink:0">
+            <span class="msym" style="font-size:20px;color:#10b981">mail</span>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:24px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="stat-emails">0</div>
+            <div style="font-size:10px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px">emails générés</div>
+          </div>
+        </div>
+
+        <div class="glass" style="padding:18px 20px;border-radius:16px;display:flex;gap:14px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(168,85,247,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(168,85,247,0.15);flex-shrink:0">
+            <span class="msym" style="font-size:20px;color:#a855f7">conversion_path</span>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:24px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="stat-pipeline">0</div>
+            <div style="font-size:10px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px">en pipeline</div>
+          </div>
+        </div>
+
+        <div class="glass" style="padding:18px 20px;border-radius:16px;display:flex;gap:14px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(245,158,11,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,158,11,0.15);flex-shrink:0">
+            <span class="msym" style="font-size:20px;color:#f59e0b">emoji_events</span>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:24px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="stat-converted">0</div>
+            <div style="font-size:10px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px">convertis</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ MAIN GRID ═══ -->
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:20px">
+
+        <!-- ─── LEFT ─── -->
         <div style="display:flex;flex-direction:column;gap:20px">
-          <!-- Bar chart -->
-          <div class="glass card">
-            <div class="card-header">
+
+          <!-- Performance chart -->
+          <div class="glass card" style="position:relative;overflow:hidden">
+            <div style="position:absolute;top:-50%;right:-10%;width:280px;height:280px;background:radial-gradient(circle,rgba(0,85,212,0.08) 0%,transparent 60%);pointer-events:none"></div>
+            <div class="card-header" style="position:relative">
               <div>
                 <div class="card-title" style="display:flex;align-items:center;gap:8px">
-                  performance des campagnes
-                  <span style="width:6px;height:6px;border-radius:50%;background:#00d4ff"></span>
+                  performance
+                  <span style="width:6px;height:6px;border-radius:50%;background:#00d4ff;animation:pulse 2s infinite"></span>
                 </div>
-                <div style="font-size:10px;color:#9ca3af;margin-top:2px">métriques d'engagement hebdomadaires</div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">engagement hebdomadaire · taux de réponse</div>
               </div>
               <div class="tabs" style="padding:3px">
                 <button class="tab active">semaine</button>
                 <button class="tab">mois</button>
               </div>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="position:relative">
               <div class="bar-chart">
-                <div class="bar-col"><div class="bar" style="height:40%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">lun</span></div>
-                <div class="bar-col"><div class="bar" style="height:65%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">mar</span></div>
+                <div class="bar-col"><div class="bar" style="height:40%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">lun</span></div>
+                <div class="bar-col"><div class="bar" style="height:65%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">mar</span></div>
                 <div class="bar-col" style="position:relative">
-                  <div class="bar neon-sm" style="height:85%;background:#0055D4;"></div>
+                  <div class="bar" style="height:85%;background:linear-gradient(to top,#0055D4,#00d4ff);border-radius:6px 6px 2px 2px;box-shadow:0 0 20px rgba(0,85,212,0.35)"></div>
                   <div style="position:absolute;top:-32px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;background:#0a0a1a;color:white;padding:3px 8px;border-radius:6px;white-space:nowrap">82%</div>
                   <span style="font-size:8px;font-weight:800;color:#0055D4;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">mer</span>
                 </div>
-                <div class="bar-col"><div class="bar" style="height:55%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">jeu</span></div>
-                <div class="bar-col"><div class="bar" style="height:72%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">ven</span></div>
-                <div class="bar-col"><div class="bar" style="height:38%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">sam</span></div>
-                <div class="bar-col"><div class="bar" style="height:25%;background:rgba(0,85,212,0.08);"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">dim</span></div>
+                <div class="bar-col"><div class="bar" style="height:55%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">jeu</span></div>
+                <div class="bar-col"><div class="bar" style="height:72%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">ven</span></div>
+                <div class="bar-col"><div class="bar" style="height:38%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">sam</span></div>
+                <div class="bar-col"><div class="bar" style="height:25%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">dim</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick access cards (actions principales) -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="glass card" style="cursor:pointer;transition:all .2s;border-radius:16px;padding:20px;position:relative;overflow:hidden" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'))" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(0,85,212,0.25)'" onmouseout="this.style.transform='';this.style.borderColor=''">
+              <div style="position:absolute;top:-30%;right:-10%;width:140px;height:140px;background:radial-gradient(circle,rgba(0,85,212,0.12) 0%,transparent 60%);pointer-events:none"></div>
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;position:relative">
+                <div style="width:38px;height:38px;border-radius:11px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.15)">
+                  <span class="msym" style="color:#0055D4;font-size:19px">map</span>
+                </div>
+                <div style="font-size:14px;font-weight:800;color:#0a0a1a;letter-spacing:-.02em">google maps</div>
+              </div>
+              <div style="font-size:11px;color:#6b7280;line-height:1.55;position:relative">trouvez les commerces locaux par ville et catégorie · téléphones & sites inclus.</div>
+              <div style="margin-top:12px;font-size:11px;font-weight:700;color:#0055D4;display:flex;align-items:center;gap:4px;position:relative">
+                démarrer <span class="msym" style="font-size:14px">arrow_forward</span>
+              </div>
+            </div>
+
+            <div class="glass card" style="cursor:pointer;transition:all .2s;border-radius:16px;padding:20px;position:relative;overflow:hidden" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'));setTimeout(()=>{var t=document.querySelector('[onclick*=b2b-poste]');if(t)t.click();},100)" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(0,85,212,0.25)'" onmouseout="this.style.transform='';this.style.borderColor=''">
+              <div style="position:absolute;top:-30%;right:-10%;width:140px;height:140px;background:radial-gradient(circle,rgba(0,212,255,0.14) 0%,transparent 60%);pointer-events:none"></div>
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;position:relative">
+                <div style="width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,rgba(0,85,212,0.1),rgba(0,212,255,0.1));display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.15)">
+                  <span class="msym" style="color:#0055D4;font-size:19px">work</span>
+                </div>
+                <div style="font-size:14px;font-weight:800;color:#0a0a1a;letter-spacing:-.02em;display:flex;align-items:center;gap:6px">
+                  recherche poste
+                  <span style="font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(135deg,#0055D4,#00d4ff);color:white;padding:2px 6px;border-radius:99px">pro</span>
+                </div>
+              </div>
+              <div style="font-size:11px;color:#6b7280;line-height:1.55;position:relative">drh, cto, daf… identifiez le bon décideur dans chaque entreprise française.</div>
+              <div style="margin-top:12px;font-size:11px;font-weight:700;color:#0055D4;display:flex;align-items:center;gap:4px;position:relative">
+                démarrer <span class="msym" style="font-size:14px">arrow_forward</span>
               </div>
             </div>
           </div>
@@ -545,53 +597,62 @@ textarea.form-input { resize: vertical; min-height: 80px; }
                 <span class="msym">add</span>nouvelle recherche
               </button>
             </div>
-            <div id="dash-prospects-list" style="padding:40px 20px;text-align:center;color:#9ca3af">
-              <span class="msym" style="font-size:40px;display:block;margin-bottom:12px;opacity:.25">group_search</span>
-              <div style="font-size:13px;font-weight:600;color:#6b7280;margin-bottom:4px">aucun prospect pour l'instant</div>
-              <div style="font-size:11px">lancez votre première recherche pour commencer.</div>
+            <div id="dash-prospects-list" style="padding:48px 20px;text-align:center;color:#9ca3af">
+              <div style="width:64px;height:64px;border-radius:16px;background:rgba(0,85,212,0.04);border:1px solid rgba(0,85,212,0.08);margin:0 auto 14px;display:flex;align-items:center;justify-content:center">
+                <span class="msym" style="font-size:28px;color:#0055D4;opacity:.4">group_search</span>
+              </div>
+              <div style="font-size:13px;font-weight:700;color:#0a0a1a;margin-bottom:4px">aucun prospect pour l'instant</div>
+              <div style="font-size:11px;color:#9ca3af">lancez votre première recherche pour commencer.</div>
             </div>
           </div>
+
         </div>
 
-        <!-- Right widgets -->
-        <div style="display:flex;flex-direction:column;gap:20px">
+        <!-- ─── RIGHT SIDEBAR ─── -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
           <!-- Insights -->
           <div class="glass card">
             <div class="card-header">
-              <div class="card-title" style="display:flex;align-items:center;gap:6px">
-                <span class="msym" style="color:#0055D4;font-size:16px">psychology</span>
-                insights prospects
+              <div class="card-title" style="display:flex;align-items:center;gap:8px">
+                <div style="width:26px;height:26px;border-radius:8px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center">
+                  <span class="msym" style="color:#0055D4;font-size:15px">psychology</span>
+                </div>
+                insights
               </div>
             </div>
-            <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
-              <div style="padding:16px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);border-radius:12px">
-                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#9ca3af;margin-bottom:8px">meilleur canal</div>
-                <div style="font-size:16px;font-weight:800;color:#0a0a1a;margin-bottom:8px">linkedin outbound</div>
-                <div class="progress-bar"><div class="progress-fill" style="width:78%"></div></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div style="padding:14px;background:linear-gradient(135deg,rgba(0,85,212,0.04),rgba(0,212,255,0.03));border:1px solid rgba(0,85,212,0.1);border-radius:12px">
+                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#0055D4;margin-bottom:6px">meilleur canal</div>
+                <div style="font-size:15px;font-weight:800;color:#0a0a1a;margin-bottom:8px;letter-spacing:-.02em">linkedin outbound</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:78%;background:linear-gradient(90deg,#0055D4,#00d4ff)"></div></div>
               </div>
-              <div style="padding:16px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);border-radius:12px">
+              <div style="padding:14px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);border-radius:12px">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:#9ca3af">temps de réponse</div>
-                  <span class="msym" style="color:#0055D4;font-size:16px">history</span>
+                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#9ca3af">temps de réponse</div>
+                  <span class="msym" style="color:#0055D4;font-size:15px">history</span>
                 </div>
-                <div style="font-size:16px;font-weight:800;color:#0a0a1a">12 minutes</div>
+                <div style="font-size:15px;font-weight:800;color:#0a0a1a;letter-spacing:-.02em">12 minutes</div>
                 <div style="font-size:10px;color:#9ca3af;margin-top:4px">conversion ×4 dans les 15m</div>
               </div>
             </div>
           </div>
 
           <!-- AI Engine -->
-          <div style="background:#0a0a1a;border-radius:16px;padding:24px;position:relative;overflow:hidden" class="neon">
-            <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(0,85,212,0.25);filter:blur(50px);border-radius:50%"></div>
-            <div style="position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(0,212,255,0.2);filter:blur(40px);border-radius:50%"></div>
+          <div style="background:#0a0a1a;border-radius:16px;padding:24px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-40%;right:-20%;width:240px;height:240px;background:radial-gradient(circle,rgba(0,85,212,0.3) 0%,transparent 60%);pointer-events:none"></div>
+            <div style="position:absolute;bottom:-40%;left:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(0,212,255,0.22) 0%,transparent 60%);pointer-events:none"></div>
             <div style="position:relative;z-index:1">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-                <span class="msym" style="color:#00d4ff;animation:pulse 2s infinite">auto_awesome</span>
+                <div style="width:26px;height:26px;border-radius:8px;background:rgba(0,212,255,0.15);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,212,255,0.3)">
+                  <span class="msym" style="color:#00d4ff;font-size:15px">auto_awesome</span>
+                </div>
                 <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:white">moteur ia</span>
               </div>
-              <p style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:20px;line-height:1.65">notre processeur traite 4 202 nouveaux points de données pour optimiser votre prospection.</p>
-              <button class="btn" style="width:100%;justify-content:center;background:white;color:#0055D4;font-size:10px;letter-spacing:.08em;text-transform:uppercase" onclick="launchAutopilot()">
-                activer le routage intelligent
+              <div style="font-size:16px;font-weight:800;color:white;letter-spacing:-.02em;margin-bottom:8px">routage intelligent</div>
+              <p style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:18px;line-height:1.65">notre processeur traite 4 202 points de données pour optimiser votre prospection en temps réel.</p>
+              <button class="btn" style="width:100%;justify-content:center;background:white;color:#0055D4;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800" onclick="launchAutopilot()">
+                activer
               </button>
             </div>
           </div>
@@ -600,23 +661,23 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div class="glass card">
             <div class="card-header"><div class="card-title">agents ia</div></div>
             <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.06);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.1)">
-                  <span class="msym" style="color:#0055D4;font-size:16px">search</span>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background=''">
+                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.12)">
+                  <span class="msym" style="color:#0055D4;font-size:15px">search</span>
                 </div>
                 <span style="font-size:12px;font-weight:600;flex:1;color:#0a0a1a">prospection</span>
                 <div id="ag1" class="dot-off"></div>
               </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.06);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.1)">
-                  <span class="msym" style="color:#0055D4;font-size:16px">psychology</span>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background=''">
+                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.12)">
+                  <span class="msym" style="color:#0055D4;font-size:15px">psychology</span>
                 </div>
                 <span style="font-size:12px;font-weight:600;flex:1;color:#0a0a1a">scoring ia</span>
                 <div id="ag2" class="dot-off"></div>
               </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.06);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.1)">
-                  <span class="msym" style="color:#0055D4;font-size:16px">mail</span>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background=''">
+                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.12)">
+                  <span class="msym" style="color:#0055D4;font-size:15px">mail</span>
                 </div>
                 <span style="font-size:12px;font-weight:600;flex:1;color:#0a0a1a">email ia</span>
                 <div id="ag3" class="dot-off"></div>
@@ -626,11 +687,12 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
           <!-- Activity -->
           <div class="glass card">
-            <div class="card-header"><div class="card-title">activité récente</div></div>
+            <div class="card-header"><div class="card-title">activité</div></div>
             <div style="padding:12px 20px" id="activity-log">
               <div style="text-align:center;color:#9ca3af;font-size:11px;padding:12px 0">aucune activité</div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -640,11 +702,6 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div style="max-width:860px">
         <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap" id="b2b-tabs-wrap">
           <button class="tab active" onclick="switchB2bTab('b2b-gmaps',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">map</span> google maps</button>
-          <button class="tab" onclick="switchB2bTab('b2b-insee',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">account_balance</span> insee</button>
-          <button class="tab" onclick="switchB2bTab('b2b-bodacc',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">gavel</span> bodacc</button>
-          <button class="tab" onclick="switchB2bTab('b2b-permis',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">construction</span> permis</button>
-          <button class="tab" onclick="switchB2bTab('b2b-ao',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">description</span> appels d'offres</button>
-          <button class="tab" onclick="switchB2bTab('b2b-linkedin',this)" style="background:rgba(0,119,181,0.08);color:#0077b5;border:1px solid rgba(0,119,181,0.2);font-weight:700"><span class="msym" style="font-size:13px;vertical-align:-3px">person_search</span> linkedin <span style="font-size:8px;background:#0077b5;color:white;padding:1px 6px;border-radius:99px;margin-left:2px;font-weight:800" id="li-badge">0</span></button>
           <button class="tab" onclick="switchB2bTab('b2b-poste',this)" style="background:linear-gradient(135deg,rgba(0,85,212,0.08),rgba(0,212,255,0.08));color:#0055D4;border:1px solid rgba(0,85,212,0.2);font-weight:700"><span class="msym" style="font-size:13px;vertical-align:-3px">work</span> recherche par poste <span style="font-size:8px;background:linear-gradient(135deg,#0055D4,#00d4ff);color:white;padding:1px 6px;border-radius:99px;margin-left:2px;font-weight:800">PRO</span></button>
         </div>
 
