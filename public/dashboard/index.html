@@ -1359,111 +1359,126 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <div class="page" id="page-radar">
       <div style="display:flex;flex-direction:column;height:calc(100vh - 60px);gap:0">
 
-        <div style="padding:16px 24px 12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;flex-shrink:0">
-          <div>
-            <h2 style="font-size:18px;font-weight:700;letter-spacing:-0.04em;color:#0a0a1a;display:flex;align-items:center;gap:8px">
-              <span class="msym" style="color:#0055D4;font-size:22px">satellite_alt</span>radar aérien
-            </h2>
-            <p style="font-size:11px;color:#9ca3af;margin-top:2px">scannez un secteur · cliquez sur une entreprise pour ouvrir sa fiche</p>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input id="radar-search" class="form-input" placeholder="type de business (ex: plombier, restaurant...)" style="width:220px;height:36px;font-size:12px"/>
-            <input id="radar-city" class="form-input" placeholder="ville" style="width:140px;height:36px;font-size:12px"/>
-            <button class="btn btn-primary btn-sm" onclick="radarSearch()" id="btn-radar">
-              <span id="radar-spinner" style="display:none" class="spinner"></span>
-              <span class="msym">radar</span>scanner
-            </button>
-            <button class="btn btn-ghost btn-sm" id="radar-toggle-sat" onclick="radarToggleSat()" title="Vue satellite">
-              <span class="msym">satellite</span>
-            </button>
-          </div>
-        </div>
+        <!-- ═══ HERO HEADER CARD (floating au top) ═══ -->
+        <div style="padding:16px 24px 0;flex-shrink:0">
+          <div class="glass card" style="position:relative;overflow:hidden;border-radius:18px">
+            <div style="position:absolute;top:-40%;right:-5%;width:360px;height:360px;background:radial-gradient(circle,rgba(16,185,129,0.12) 0%,transparent 60%);pointer-events:none"></div>
+            <div style="position:absolute;bottom:-40%;left:-5%;width:280px;height:280px;background:radial-gradient(circle,rgba(0,212,255,0.1) 0%,transparent 60%);pointer-events:none"></div>
+            <div style="padding:16px 20px;position:relative;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
 
-        <div id="radar-stats" style="display:none;padding:0 24px 8px;flex-shrink:0">
-          <span style="font-size:11px;font-weight:700;color:#0055D4;background:rgba(0,85,212,0.06);border:1px solid rgba(0,85,212,0.12);padding:4px 12px;border-radius:99px" id="radar-count-label"></span>
-        </div>
+              <div style="display:flex;gap:14px;align-items:center;flex:1;min-width:260px">
+                <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#10b981,#00d4ff);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(16,185,129,0.25);flex-shrink:0">
+                  <span class="msym" style="font-size:22px;color:white">satellite_alt</span>
+                </div>
+                <div>
+                  <div style="font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#10b981;margin-bottom:4px">géolocalisation</div>
+                  <div style="font-size:18px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1.15">radar aérien</div>
+                  <div style="font-size:11px;color:#6b7280;margin-top:2px">scannez un secteur · cliquez sur une entreprise pour ouvrir sa fiche</div>
+                </div>
+              </div>
 
-        <div style="flex:1;position:relative;overflow:hidden">
-          <div id="radar-map" style="width:100%;height:100%"></div>
-          <div style="position:absolute;bottom:16px;left:16px;background:white;border-radius:10px;padding:10px 14px;box-shadow:0 2px 16px rgba(0,0,0,0.1);font-size:10px;font-weight:600;color:#6b7280;display:flex;gap:12px;align-items:center">
-            <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#0055D4"></div>élevé</div>
-            <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#d97706"></div>moyen</div>
-            <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:50%;background:#059669"></div>faible</div>
-          </div>
-        </div>
-
-        <!-- Card flottante fiche -->
-        <div id="radar-sheet" style="position:absolute;top:16px;right:16px;width:340px;max-height:calc(100% - 32px);background:white;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18),0 2px 8px rgba(0,0,0,0.08);z-index:400;transition:opacity .25s ease,transform .25s ease;overflow-y:auto;opacity:0;transform:translateY(-8px) scale(0.97);pointer-events:none;display:block">
-          <div style="padding:0 0 16px 0">
-            <!-- Map embed Google Maps style -->
-            <div id="sheet-map-embed" style="width:100%;height:160px;background:#e8f0fe;position:relative;overflow:hidden;border-radius:20px 20px 0 0">
-              <iframe id="sheet-map-iframe" src="" style="width:100%;height:100%;border:none;display:none" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-              <div id="sheet-map-placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8f0fe,#c5d5f8)">
-                <span class="msym" style="font-size:48px;color:#0055D4;opacity:.3">map</span>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <input id="radar-search" class="form-input" placeholder="type de business (ex: plombier...)" style="width:220px;height:38px;font-size:12px"/>
+                <input id="radar-city" class="form-input" placeholder="ville" style="width:140px;height:38px;font-size:12px"/>
+                <button class="btn btn-primary btn-sm" onclick="radarSearch()" id="btn-radar" style="background:linear-gradient(135deg,#10b981,#00d4ff);box-shadow:0 4px 16px rgba(16,185,129,0.3);height:38px">
+                  <span id="radar-spinner" style="display:none" class="spinner"></span>
+                  <span class="msym">radar</span>scanner
+                </button>
+                <button class="btn btn-ghost btn-sm" id="radar-toggle-sat" onclick="radarToggleSat()" title="Vue satellite" style="height:38px">
+                  <span class="msym">satellite</span>
+                </button>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div style="padding:16px 20px 0">
-              <!-- Header -->
-              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
-                <div style="flex:1">
-                  <div style="font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:2px" id="sheet-sector">secteur</div>
-                  <div style="font-size:18px;font-weight:800;letter-spacing:-0.03em;color:#0a0a1a;line-height:1.2" id="sheet-name">nom</div>
-                  <div style="font-size:12px;color:#6b7280;margin-top:3px;display:flex;align-items:center;gap:4px">
-                    <span class="msym" style="font-size:14px;color:#9ca3af">location_on</span>
-                    <span id="sheet-addr">adresse</span>
-                  </div>
+        <!-- Stats counter -->
+        <div id="radar-stats" style="display:none;padding:10px 24px 0;flex-shrink:0">
+          <span style="font-size:11px;font-weight:700;color:#10b981;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(0,212,255,0.05));border:1px solid rgba(16,185,129,0.2);padding:5px 14px;border-radius:99px;display:inline-flex;align-items:center;gap:6px" id="radar-count-label">
+            <span class="msym" style="font-size:13px">location_searching</span>
+            <span></span>
+          </span>
+        </div>
+
+        <!-- Map -->
+        <div style="flex:1;position:relative;overflow:hidden;padding:16px 24px 24px">
+          <div style="width:100%;height:100%;border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.08);position:relative">
+            <div id="radar-map" style="width:100%;height:100%"></div>
+
+            <!-- Legend flottante -->
+            <div style="position:absolute;bottom:16px;left:16px;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:12px;padding:10px 14px;box-shadow:0 4px 20px rgba(0,0,0,0.1);font-size:10px;font-weight:700;color:#6b7280;display:flex;gap:14px;align-items:center;border:1px solid rgba(255,255,255,0.6)">
+              <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:#10b981;box-shadow:0 0 8px rgba(16,185,129,0.4)"></div>élevé</div>
+              <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,0.4)"></div>moyen</div>
+              <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:#6b7280"></div>faible</div>
+            </div>
+          </div>
+
+          <!-- Card flottante fiche -->
+          <div id="radar-sheet" style="position:absolute;top:32px;right:40px;width:340px;max-height:calc(100% - 64px);background:white;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18),0 2px 8px rgba(0,0,0,0.08);z-index:400;transition:opacity .25s ease,transform .25s ease;overflow-y:auto;opacity:0;transform:translateY(-8px) scale(0.97);pointer-events:none;display:block">
+            <div style="padding:0 0 16px 0">
+              <div id="sheet-map-embed" style="width:100%;height:160px;background:#e8f0fe;position:relative;overflow:hidden;border-radius:20px 20px 0 0">
+                <iframe id="sheet-map-iframe" src="" style="width:100%;height:100%;border:none;display:none" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div id="sheet-map-placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8f0fe,#c5d5f8)">
+                  <span class="msym" style="font-size:48px;color:#0055D4;opacity:.3">map</span>
                 </div>
-                <button onclick="closeRadarSheet()" style="background:#f3f4f6;border:none;border-radius:99px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:18px;flex-shrink:0">✕</button>
               </div>
 
-              <!-- Note + avis + score -->
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap">
-                <div id="sheet-stars" style="font-size:13px;color:#f59e0b"></div>
-                <span style="font-size:14px;font-weight:800;color:#0a0a1a" id="sheet-rating-val">—</span>
-                <span style="font-size:12px;color:#9ca3af" id="sheet-reviews-val"></span>
-                <div style="margin-left:auto;background:rgba(0,85,212,0.08);border:1px solid rgba(0,85,212,0.15);border-radius:99px;padding:3px 10px;font-size:10px;font-weight:800;color:#0055D4" id="sheet-score">—</div>
-              </div>
-
-              <!-- Numéro de téléphone style Google Maps -->
-              <div id="sheet-phone-row" style="display:none;margin-bottom:12px">
-                <a id="sheet-phone-link" href="#" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:#f8faff;border:1px solid #e0e8ff;border-radius:12px;text-decoration:none;color:#0055D4;font-size:14px;font-weight:700">
-                  <div style="width:32px;height:32px;border-radius:99px;background:#0055D4;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                    <span class="msym" style="font-size:16px;color:white">phone</span>
+              <div style="padding:16px 20px 0">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
+                  <div style="flex:1">
+                    <div style="font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:2px" id="sheet-sector">secteur</div>
+                    <div style="font-size:18px;font-weight:800;letter-spacing:-0.03em;color:#0a0a1a;line-height:1.2" id="sheet-name">nom</div>
+                    <div style="font-size:12px;color:#6b7280;margin-top:3px;display:flex;align-items:center;gap:4px">
+                      <span class="msym" style="font-size:14px;color:#9ca3af">location_on</span>
+                      <span id="sheet-addr">adresse</span>
+                    </div>
                   </div>
-                  <span id="sheet-phone-text"></span>
-                  <span class="msym" style="margin-left:auto;color:#9ca3af;font-size:16px">chevron_right</span>
-                </a>
-              </div>
+                  <button onclick="closeRadarSheet()" style="background:#f3f4f6;border:none;border-radius:99px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:18px;flex-shrink:0">✕</button>
+                </div>
 
-              <!-- Lien Maps externe -->
-              <div id="sheet-maps-link-row" style="display:none;margin-bottom:14px">
-                <a id="sheet-maps-link" href="#" target="_blank" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:#f8faff;border:1px solid #e0e8ff;border-radius:12px;text-decoration:none;color:#0055D4;font-size:13px;font-weight:600">
-                  <div style="width:32px;height:32px;border-radius:99px;background:#34a853;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                    <span class="msym" style="font-size:16px;color:white">open_in_new</span>
-                  </div>
-                  Voir sur Google Maps
-                  <span class="msym" style="margin-left:auto;color:#9ca3af;font-size:16px">chevron_right</span>
-                </a>
-              </div>
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+                  <div id="sheet-stars" style="font-size:13px;color:#f59e0b"></div>
+                  <span style="font-size:14px;font-weight:800;color:#0a0a1a" id="sheet-rating-val">—</span>
+                  <span style="font-size:12px;color:#9ca3af" id="sheet-reviews-val"></span>
+                  <div style="margin-left:auto;background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(0,212,255,0.08));border:1px solid rgba(16,185,129,0.2);border-radius:99px;padding:3px 10px;font-size:10px;font-weight:800;color:#10b981" id="sheet-score">—</div>
+                </div>
 
-              <!-- Actions CTA -->
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-                <button class="btn btn-primary" onclick="addSheetToPipeline()" style="justify-content:center;border-radius:12px;padding:12px">
-                  <span class="msym">conversion_path</span>Pipeline
-                </button>
-                <button class="btn btn-ghost" onclick="generateSheetEmail()" id="btn-sheet-email" style="justify-content:center;border-radius:12px;padding:12px;border:1.5px solid #0055D4;color:#0055D4;background:rgba(0,85,212,0.04)">
-                  <span id="sheet-email-spinner" style="display:none" class="spinner spinner-dark"></span>
-                  <span class="msym">mail</span>Email IA
-                </button>
-              </div>
+                <div id="sheet-phone-row" style="display:none;margin-bottom:12px">
+                  <a id="sheet-phone-link" href="#" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:linear-gradient(135deg,rgba(0,85,212,0.04),rgba(0,212,255,0.03));border:1px solid rgba(0,85,212,0.12);border-radius:12px;text-decoration:none;color:#0055D4;font-size:14px;font-weight:700">
+                    <div style="width:32px;height:32px;border-radius:99px;background:linear-gradient(135deg,#0055D4,#00d4ff);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                      <span class="msym" style="font-size:16px;color:white">phone</span>
+                    </div>
+                    <span id="sheet-phone-text"></span>
+                    <span class="msym" style="margin-left:auto;color:#9ca3af;font-size:16px">chevron_right</span>
+                  </a>
+                </div>
 
-              <!-- Email généré -->
-              <div id="sheet-email-result" style="display:none">
-                <div style="background:#f9f9fb;border-radius:12px;padding:14px;font-size:12px;line-height:1.75;color:#1a1a2e;white-space:pre-wrap;border:1px solid #e5e7eb;max-height:180px;overflow-y:auto" id="sheet-email-text"></div>
-                <button onclick="copySheetEmail()" class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;justify-content:center">
-                  <span class="msym">content_copy</span>copier l'email
-                </button>
+                <div id="sheet-maps-link-row" style="display:none;margin-bottom:14px">
+                  <a id="sheet-maps-link" href="#" target="_blank" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(255,255,255,0.6);border:1px solid rgba(0,0,0,0.06);border-radius:12px;text-decoration:none;color:#0055D4;font-size:13px;font-weight:600">
+                    <div style="width:32px;height:32px;border-radius:99px;background:#34a853;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                      <span class="msym" style="font-size:16px;color:white">open_in_new</span>
+                    </div>
+                    Voir sur Google Maps
+                    <span class="msym" style="margin-left:auto;color:#9ca3af;font-size:16px">chevron_right</span>
+                  </a>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+                  <button class="btn btn-primary" onclick="addSheetToPipeline()" style="justify-content:center;border-radius:12px;padding:12px;background:linear-gradient(135deg,#0055D4,#00d4ff);box-shadow:0 4px 14px rgba(0,85,212,0.25)">
+                    <span class="msym">conversion_path</span>Pipeline
+                  </button>
+                  <button class="btn btn-ghost" onclick="generateSheetEmail()" id="btn-sheet-email" style="justify-content:center;border-radius:12px;padding:12px;border:1.5px solid rgba(0,85,212,0.2);color:#0055D4;background:rgba(0,85,212,0.04)">
+                    <span id="sheet-email-spinner" style="display:none" class="spinner spinner-dark"></span>
+                    <span class="msym">mail</span>Email IA
+                  </button>
+                </div>
+
+                <div id="sheet-email-result" style="display:none">
+                  <div style="background:#f9f9fb;border-radius:12px;padding:14px;font-size:12px;line-height:1.75;color:#1a1a2e;white-space:pre-wrap;border:1px solid #e5e7eb;max-height:180px;overflow-y:auto" id="sheet-email-text"></div>
+                  <button onclick="copySheetEmail()" class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;justify-content:center">
+                    <span class="msym">content_copy</span>copier l'email
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1601,46 +1616,95 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- ═══ COLD CALL ═══ -->
     <div class="page" id="page-coldcall">
-      <div style="max-width:960px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-          <div>
-            <h2 style="font-size:20px;font-weight:800;letter-spacing:-1px;color:#0a0a1a">tracker appels</h2>
-            <p style="font-size:11px;color:#9ca3af;margin-top:4px" id="cc-session">aujourd'hui · 0 appel</p>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <select class="form-input" id="cc-kpi-filter" onchange="updateCCStats()" style="font-size:11px;width:auto;padding:7px 12px;border-radius:99px"><option value="today">aujourd'hui</option><option value="week">cette semaine</option><option value="month">ce mois</option><option value="all">tout</option></select>
-            <button class="btn btn-ghost" onclick="exportCC()"><span class="msym">download</span>csv</button>
-            <button class="btn btn-primary" onclick="toggleAssistantAppel()" id="btn-assistant-appel">
-              <span class="msym">mic</span>assistant appel
-            </button>
+      <div style="max-width:1040px">
+
+        <!-- ═══ HERO HEADER CARD ═══ -->
+        <div class="glass card" style="margin-bottom:20px;position:relative;overflow:hidden;border-radius:20px">
+          <div style="position:absolute;top:-40%;right:-10%;width:420px;height:420px;background:radial-gradient(circle,rgba(245,158,11,0.12) 0%,transparent 60%);pointer-events:none"></div>
+          <div style="position:absolute;bottom:-40%;left:-10%;width:340px;height:340px;background:radial-gradient(circle,rgba(239,68,68,0.08) 0%,transparent 60%);pointer-events:none"></div>
+          <div style="padding:26px 28px;position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+
+            <div style="display:flex;gap:16px;align-items:center">
+              <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(245,158,11,0.25);flex-shrink:0">
+                <span class="msym" style="font-size:28px;color:white">settings_phone</span>
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#f59e0b;margin-bottom:6px">phoning</div>
+                <div style="font-size:24px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1.15;margin-bottom:4px">tracker appels</div>
+                <div style="font-size:12px;color:#6b7280;line-height:1.5" id="cc-session">aujourd'hui · 0 appel · assistant ia en veille</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <select class="form-input" id="cc-kpi-filter" onchange="updateCCStats()" style="font-size:11px;width:auto;padding:9px 14px;border-radius:99px;height:auto"><option value="today">aujourd'hui</option><option value="week">cette semaine</option><option value="month">ce mois</option><option value="all">tout</option></select>
+              <button class="btn btn-ghost" onclick="exportCC()"><span class="msym">download</span>csv</button>
+              <button class="btn btn-primary" onclick="toggleAssistantAppel()" id="btn-assistant-appel" style="background:linear-gradient(135deg,#f59e0b,#ef4444);box-shadow:0 4px 16px rgba(245,158,11,0.3)">
+                <span class="msym">mic</span>assistant appel
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- KPI strip -->
-        <div class="glass" style="display:flex;border-radius:16px;overflow:hidden;margin-bottom:20px;border:1px solid rgba(255,255,255,0.4)">
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;border-right:1px solid rgba(255,255,255,0.3)">
-            <span style="font-size:28px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="kpi-total">0</span>
-            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">appels</span>
+        <!-- ═══ STATS GRID ═══ -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px">
+          <div class="glass" style="padding:16px 18px;border-radius:16px;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
+            <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(245,158,11,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,158,11,0.15);flex-shrink:0">
+              <span class="msym" style="font-size:19px;color:#f59e0b">call</span>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:22px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="kpi-total">0</div>
+              <div style="font-size:9px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:3px">appels</div>
+            </div>
           </div>
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;border-right:1px solid rgba(255,255,255,0.3)">
-            <span style="font-size:28px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="kpi-contact">—</span>
-            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">ont décroché</span>
+
+          <div class="glass" style="padding:16px 18px;border-radius:16px;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
+            <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,rgba(0,85,212,0.1),rgba(0,85,212,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.15);flex-shrink:0">
+              <span class="msym" style="font-size:19px;color:#0055D4">record_voice_over</span>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:22px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="kpi-contact">—</div>
+              <div style="font-size:9px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:3px">décrochés</div>
+            </div>
           </div>
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;border-right:1px solid rgba(255,255,255,0.3);color:#059669">
-            <span style="font-size:28px;font-weight:800;letter-spacing:-1px" id="kpi-rdv">0</span>
-            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">rdv pris</span>
+
+          <div class="glass" style="padding:16px 18px;border-radius:16px;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
+            <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(16,185,129,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(16,185,129,0.15);flex-shrink:0">
+              <span class="msym" style="font-size:19px;color:#10b981">event_available</span>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:22px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="kpi-rdv">0</div>
+              <div style="font-size:9px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:3px">rdv pris</div>
+            </div>
           </div>
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;border-right:1px solid rgba(255,255,255,0.3);color:#0055D4">
-            <span style="font-size:28px;font-weight:800;letter-spacing:-1px" id="kpi-conv">0</span>
-            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">convertis</span>
+
+          <div class="glass" style="padding:16px 18px;border-radius:16px;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
+            <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(168,85,247,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(168,85,247,0.15);flex-shrink:0">
+              <span class="msym" style="font-size:19px;color:#a855f7">verified</span>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:22px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="kpi-conv">0</div>
+              <div style="font-size:9px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:3px">convertis</div>
+            </div>
           </div>
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;border-right:1px solid rgba(255,255,255,0.3)">
-            <span style="font-size:28px;font-weight:800;letter-spacing:-1px;color:#0a0a1a" id="kpi-rappel">0</span>
-            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">à rappeler</span>
+
+          <div class="glass" style="padding:16px 18px;border-radius:16px;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
+            <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,rgba(6,182,212,0.1),rgba(6,182,212,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(6,182,212,0.15);flex-shrink:0">
+              <span class="msym" style="font-size:19px;color:#06b6d4">phone_callback</span>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:22px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="kpi-rappel">0</div>
+              <div style="font-size:9px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:3px">à rappeler</div>
+            </div>
           </div>
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px;gap:3px;color:#dc2626">
-            <span style="font-size:28px;font-weight:800;letter-spacing:-1px" id="kpi-refus">—</span>
-            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;text-align:center">taux refus</span>
+
+          <div class="glass" style="padding:16px 18px;border-radius:16px;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
+            <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,rgba(239,68,68,0.1),rgba(239,68,68,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(239,68,68,0.15);flex-shrink:0">
+              <span class="msym" style="font-size:19px;color:#ef4444">block</span>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:22px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="kpi-refus">—</div>
+              <div style="font-size:9px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:3px">taux refus</div>
+            </div>
           </div>
         </div>
 
