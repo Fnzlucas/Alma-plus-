@@ -3971,7 +3971,7 @@ async function launchAutopilot(){
             }catch(e){ apLog('error','envoi échoué — '+p.name+' : '+e.message); }
             await sleep(300);
           }
-        catch(e){apLog('error','erreur email '+p.name);}
+        }catch(e){apLog('error','erreur email '+p.name);}
         await sleep(400);
       }
     }
