@@ -2449,7 +2449,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div id="upgrade-features-list" style="display:flex;flex-direction:column;gap:8px"></div>
       </div>
       <div style="background:linear-gradient(135deg,rgba(0,85,212,0.06),rgba(0,212,255,0.04));border:1px solid rgba(0,85,212,0.15);border-radius:12px;padding:16px;text-align:center">
-        <div style="font-size:24px;font-weight:800;color:#0055D4" id="upgrade-plan-price">129€/mois</div>
+        <div style="font-size:24px;font-weight:800;color:#0055D4" id="upgrade-plan-price">49€/mois</div>
         <div style="font-size:11px;color:#9ca3af;margin-top:2px">sans engagement · résiliable à tout moment</div>
       </div>
     </div>
@@ -2468,10 +2468,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
 // ═══ QUOTAS & PLANS ═══
 const PLANS = {
-  starter: { name:'starter', emails:300,  fiches:200,  appels:100, devis:20,  veille:10, prospects:500,      autopilot:false },
-  pro:     { name:'pro',     emails:4000, fiches:1000, appels:500, devis:100, veille:50, prospects:Infinity, autopilot:true  },
-  ultra:   { name:'ultra',   emails:Infinity, fiches:Infinity, appels:Infinity, devis:Infinity, veille:Infinity, prospects:Infinity, autopilot:true },
-  agency:  { name:'agence',  emails:Infinity, fiches:Infinity, appels:Infinity, devis:Infinity, veille:Infinity, prospects:Infinity, autopilot:true },
+  starter: { name:'solo',    emails:300,      fiches:200,      appels:100, devis:20,       veille:10, prospects:500,      autopilot:false, price:'19€/mois' },
+  pro:     { name:'pro',     emails:4000,     fiches:1000,     appels:500, devis:100,      veille:50, prospects:Infinity, autopilot:true,  price:'49€/mois' },
+  ultra:   { name:'agence',  emails:Infinity, fiches:Infinity, appels:Infinity, devis:Infinity, veille:Infinity, prospects:Infinity, autopilot:true, price:'99€/mois' },
+  agency:  { name:'agence',  emails:Infinity, fiches:Infinity, appels:Infinity, devis:Infinity, veille:Infinity, prospects:Infinity, autopilot:true, price:'99€/mois' },
 };
 
 function getCurrentPlan(){ return localStorage.getItem('alma_plan')||'starter'; }
@@ -2501,7 +2501,7 @@ function showUpgradeModal(type, used, limit){
   const labels={emails:'emails ia',fiches:'fiches pré-appel',appels:'appels assistés ia',devis:'devis',veille:'analyses de marché',autopilot:'pilote automatique',prospects:'prospects'};
   const plan=getCurrentPlan();
   const nextPlan=plan==='starter'?'pro':plan==='pro'?'ultra':'agence';
-  const nextPrice=plan==='starter'?'129€/mois':plan==='pro'?'290€/mois':'sur devis';
+  const nextPrice=plan==='starter'?'49€/mois':plan==='pro'?'99€/mois':'sur devis';
   document.getElementById('upgrade-feature').textContent=labels[type]||type;
   document.getElementById('upgrade-used').textContent=used;
   document.getElementById('upgrade-limit').textContent=limit===Infinity?'illimité':limit;
