@@ -3954,7 +3954,26 @@ async function launchAutopilot(){
       for(let i=0;i<prospects.length;i++){
         if(_apStop) break;
         const p=prospects[i];apSetProgress(65+Math.round(i/prospects.length*25),'email '+(i+1)+'/'+prospects.length+' — '+p.name);
-        try{const profile=getProfile();const prompt='rédige un email de prospection en 150 mots max.\nprospect: '+p.name+' ('+p.address+')\nnote: '+p.rating+'/5 ('+p.reviews+' avis)\nexpéditeur: '+profile.prenom+' '+profile.nom+', '+profile.societe+'\nactivité: '+profile.activite+'\nvaleur: '+profile.valeur;const d=await claudeAPI([{role:'user',content:prompt}],400, 'emails');p.email_generated=d.content?.[0]?.text||null;totalEmails++;apUpdateCounters(totalProspects,totalEmails,totalPipeline);apLog('email','email généré pour <strong>'+p.name+'</strong>');}
+        try{const profile=getProfile();const prompt='rédige un email de prospection en 150 mots max.\nprospect: '+p.name+' ('+p.address+')\nnote: '+p.rating+'/5 ('+p.reviews+' avis)\nexpéditeur: '+profile.prenom+' '+profile.nom+', '+profile.societe+'\nactivité: '+profile.activite+'\nvaleur: '+profile.valeur;const d=await claudeAPI([{role:'user',content:prompt}],400, 'emails');p.email_generated=d.content?.[0]?.text||null;totalEmails++;apUpdateCounters(totalProspects,totalEmails,totalPipeline);apLog('email','email généré pour <strong>'+p.name+'</strong>');
+          // ── Scrape email depuis le site web ──
+          if(p.website && !p.email){
+            try{
+              const scrapeRes=await fetch('/api/scrape-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.website})});
+              const scrapeData=await scrapeRes.json();
+              if(scrapeData.primary){ p.email=scrapeData.primary; apLog('info','email trouvé : <strong>'+p.email+'</strong>'); }
+              else { apLog('info','aucun email trouvé sur '+p.website); }
+            }catch(_){ apLog('info','scraping email indisponible'); }
+          }
+          // ── Envoi email si action = email-send ou full ──
+          const autoAction=document.getElementById('auto-action')?.value;
+          if((autoAction==='email-send'||autoAction==='full') && p.email && p.email_generated){
+            try{
+              const subject='Bonjour '+p.name+' — une proposition pour vous';
+              await resendSendEmail(p.email, subject, p.email_generated);
+              apLog('success','email envoyé à <strong>'+p.name+'</strong> ('+p.email+')');
+            }catch(e){ apLog('error','envoi échoué — '+p.name+' : '+e.message); }
+            await sleep(300);
+          }
         catch(e){apLog('error','erreur email '+p.name);}
         await sleep(400);
       }
