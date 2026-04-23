@@ -332,7 +332,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 <!-- Loading screen -->
 <div id="auth-loading" style="display:none"></div>
 
-<div class="app" id="app-root"
+<div class="app" id="app-root" style="display:flex"
 
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar glass-sidebar" id="sidebar">
@@ -4266,8 +4266,10 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
   localStorage.setItem('alma_plan', 'pro');
   document.getElementById('auth-loading').style.display = 'none';
   document.getElementById('app-root').style.display = 'flex';
-  updateQuotaUI();
-  loadState();
+  try { updateQuotaUI(); } catch(e) {}
+  try { loadState(); } catch(e) {}
+  try { refreshAll(); } catch(e) {}
+  try { goPage('dashboard', document.getElementById('nav-dashboard')); } catch(e) {}
   return;
 
   // DEV BYPASS — accès direct via ?dev=true
