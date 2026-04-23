@@ -275,7 +275,7 @@ nav{
       <div class="hero-badge-dot"></div>
       tarification simple et transparente
     </div>
-    <h1 class="hero-title">le <span style="text-transform:uppercase!important">ca</span> d'un commercial<br/>à partir de <em>2,50€ par jour.</em></h1>
+    <h1 class="hero-title">le <span style="text-transform:uppercase!important">ca</span> d'un commercial<br/>à partir de <em>0,63€ par jour.</em></h1>
     <p class="hero-sub">sans frais cachés, sans engagement. changez de plan à tout moment.</p>
 
     <!-- Toggle -->
@@ -294,9 +294,9 @@ nav{
     <!-- STARTER -->
     <div class="plan-card">
       <span class="plan-badge badge-hidden">·</span>
-      <div class="plan-name">starter</div>
+      <div class="plan-name">solo</div>
       <div class="plan-price">
-        <span class="price-amount" id="price-starter">79</span>
+        <span class="price-amount" id="price-starter">19</span>
         <div>
           <div class="price-period">€ / mois</div>
         </div>
@@ -327,7 +327,7 @@ nav{
       </span>
       <div class="plan-name plan-name-dark">pro</div>
       <div class="plan-price">
-        <span class="price-amount price-amount-dark" id="price-pro">149</span>
+        <span class="price-amount price-amount-dark" id="price-pro">49</span>
         <div>
           <div class="price-period price-period-dark">€ / mois</div>
         </div>
@@ -355,7 +355,7 @@ nav{
       <span class="plan-badge badge-hidden">·</span>
       <div class="plan-name">ultra</div>
       <div class="plan-price">
-        <span class="price-amount" id="price-ultra">299</span>
+        <span class="price-amount" id="price-ultra">99</span>
         <div><div class="price-period">€ / mois</div></div>
       </div>
       <div class="price-annual-note" id="note-ultra">&nbsp;</div>
@@ -437,8 +437,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
 // ── Toggle mensuel/annuel ──
-const PRICES_MONTHLY = { starter: 79,  pro: 149,  ultra: 299  }
-const PRICES_ANNUAL  = { starter: 66,  pro: 124,  ultra: 249  }
+const PRICES_MONTHLY = { starter: 19,  pro: 49,  ultra: 99  }
+const PRICES_ANNUAL  = { starter: 16,  pro: 41,  ultra: 83  }
 
 let billing = 'monthly'
 
@@ -451,9 +451,9 @@ function setBilling(mode) {
   document.getElementById('price-pro').textContent     = prices.pro
   document.getElementById('price-ultra').textContent   = prices.ultra
   if (mode === 'annual') {
-    document.getElementById('note-starter').innerHTML = '<span class="save">790€ / an</span> — 2 mois offerts'
-    document.getElementById('note-pro').innerHTML     = '<span class="save">1 490€ / an</span> — 2 mois offerts'
-    document.getElementById('note-ultra').innerHTML   = '<span class="save">2 990€ / an</span> — 2 mois offerts'
+    document.getElementById('note-starter').innerHTML = '<span class="save">190€ / an</span> — 2 mois offerts'
+    document.getElementById('note-pro').innerHTML     = '<span class="save">490€ / an</span> — 2 mois offerts'
+    document.getElementById('note-ultra').innerHTML   = '<span class="save">990€ / an</span> — 2 mois offerts'
   } else {
     document.getElementById('note-starter').innerHTML = '&nbsp;'
     document.getElementById('note-pro').innerHTML     = '&nbsp;'
