@@ -4262,6 +4262,14 @@ GÉNÈRE EXACTEMENT ce JSON (rien d'autre, pas de markdown) :
 (async function() {
   const sb = _sb;
 
+  // BYPASS TOTAL — affichage direct sans auth
+  localStorage.setItem('alma_plan', 'pro');
+  document.getElementById('auth-loading').style.display = 'none';
+  document.getElementById('app-root').style.display = 'flex';
+  updateQuotaUI();
+  loadState();
+  return;
+
   // DEV BYPASS — accès direct via ?dev=true
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('dev') === 'true') {
