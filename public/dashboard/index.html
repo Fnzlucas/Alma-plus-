@@ -700,8 +700,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap" id="b2b-tabs-wrap">
           <button class="tab active" onclick="switchB2bTab('b2b-gmaps',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">map</span> google maps</button>
           <button class="tab" onclick="switchB2bTab('b2b-poste',this)" style="background:linear-gradient(135deg,rgba(0,85,212,0.08),rgba(0,212,255,0.08));color:#0055D4;border:1px solid rgba(0,85,212,0.2);font-weight:700"><span class="msym" style="font-size:13px;vertical-align:-3px">work</span> recherche par poste <span style="font-size:8px;background:linear-gradient(135deg,#0055D4,#00d4ff);color:white;padding:1px 6px;border-radius:99px;margin-left:2px;font-weight:800">PRO</span></button>
-          <button class="tab" onclick="switchB2bTab('b2b-pagesblanches',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">person_search</span> pages blanches</button>
-          <button class="tab" onclick="switchB2bTab('b2b-importcsv',this)"><span class="msym" style="font-size:13px;vertical-align:-3px">upload_file</span> import fichier</button>
+          <button class="tab" onclick="switchB2bTab('b2b-dpe',this)" style="background:linear-gradient(135deg,rgba(5,150,105,0.08),rgba(16,185,129,0.08));color:#059669;border:1px solid rgba(5,150,105,0.2);font-weight:700"><span class="msym" style="font-size:13px;vertical-align:-3px">eco</span> DPE passoires thermiques <span style="font-size:8px;background:linear-gradient(135deg,#059669,#10b981);color:white;padding:1px 6px;border-radius:99px;margin-left:2px;font-weight:800">2028</span></button>
         </div>
 
         <div id="b2b-gmaps">
@@ -1056,44 +1055,60 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           </div>
         </div>
 
-        <div id="b2b-pagesblanches" style="display:none">
+        <div id="b2b-dpe" style="display:none">
           <div class="glass card" style="margin-bottom:16px">
-            <div class="card-header"><div><div class="card-title">pages blanches — particuliers</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">annuaire public · recherche par ville / code postal</div></div></div>
+            <div class="card-header">
+              <div>
+                <div class="card-title" style="display:flex;align-items:center;gap:8px;">
+                  <span class="msym" style="color:#059669">eco</span> Passoires thermiques — DPE F & G
+                </div>
+                <div style="font-size:10px;color:#9ca3af;margin-top:2px">Logements avec obligation légale de rénover avant 2028 · ADEME data.gouv.fr</div>
+              </div>
+              <div style="background:linear-gradient(135deg,rgba(5,150,105,0.1),rgba(16,185,129,0.1));border:1px solid rgba(5,150,105,0.2);border-radius:12px;padding:8px 14px;text-align:center">
+                <div style="font-size:18px;font-weight:900;color:#059669">5,6M</div>
+                <div style="font-size:9px;color:#059669;font-weight:700">logements ciblés</div>
+              </div>
+            </div>
             <div class="card-body">
               <div class="form-row" style="margin-bottom:12px">
-                <div class="form-group" style="margin:0"><label class="form-label">prénom ou nom</label><input class="form-input" id="pb-nom" placeholder="ex: Martin, Jean..."/></div>
-                <div class="form-group" style="margin:0"><label class="form-label">ville ou code postal</label><input class="form-input" id="pb-ville" placeholder="ex: Lyon, 69000..."/></div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">ville ou code postal</label>
+                  <input class="form-input" id="dpe-ville" placeholder="ex: Lyon, 69000, Marseille..."/>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">classe DPE</label>
+                  <select class="form-input" id="dpe-classe">
+                    <option value="F,G">F + G (toutes passoires)</option>
+                    <option value="G">G uniquement (urgence 2025)</option>
+                    <option value="F">F uniquement (échéance 2034)</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">type de logement</label>
+                  <select class="form-input" id="dpe-type">
+                    <option value="">tous</option>
+                    <option value="Maison">maison</option>
+                    <option value="Appartement">appartement</option>
+                  </select>
+                </div>
               </div>
-              <button class="btn btn-primary" onclick="searchPagesBlanches()"><span id="pb-spinner" style="display:none" class="spinner"></span><span class="msym">person_search</span>rechercher</button>
+              <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#059669;display:flex;align-items:flex-start;gap:8px">
+                <span class="msym" style="font-size:16px;flex-shrink:0">info</span>
+                <span><strong>Loi Climat & Résilience :</strong> les logements G sont interdits à la location depuis 2025, les F en 2028. Ces propriétaires ont une <strong>obligation légale de rénover</strong> — ce sont les prospects les plus chauds du marché rénovation.</span>
+              </div>
+              <button class="btn btn-primary" onclick="searchDPE()" style="background:linear-gradient(135deg,#059669,#10b981);border:none"><span id="dpe-spinner" style="display:none" class="spinner"></span><span class="msym">eco</span>rechercher les passoires thermiques</button>
             </div>
           </div>
-          <div id="pb-results" style="display:none">
+          <div id="dpe-results" style="display:none">
             <div class="glass card">
-              <div class="card-header"><div><div class="card-title">résultats pages blanches</div><div id="pb-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div></div></div>
-              <table><thead><tr><th>nom</th><th>adresse</th><th>ville</th><th>téléphone</th><th>actions</th></tr></thead><tbody id="pb-table"></tbody></table>
-            </div>
-          </div>
-        </div>
-
-        <div id="b2b-importcsv" style="display:none">
-          <div class="glass card" style="margin-bottom:16px">
-            <div class="card-header"><div><div class="card-title">import fichier clients</div><div style="font-size:10px;color:#9ca3af;margin-top:2px">collez ou importez une liste CSV · colonnes : nom, téléphone, ville</div></div></div>
-            <div class="card-body">
-              <div class="form-group" style="margin-bottom:12px">
-                <label class="form-label">coller le contenu CSV (nom,téléphone,ville)</label>
-                <textarea class="form-input" id="csv-content" rows="6" placeholder="Jean Martin,0612345678,Lyon&#10;Marie Dupont,0698765432,Paris&#10;..."></textarea>
+              <div class="card-header">
+                <div>
+                  <div class="card-title">passoires thermiques détectées</div>
+                  <div id="dpe-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div>
+                </div>
+                <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px" onclick="exportDPECSV()"><span class="msym" style="font-size:13px">download</span> export CSV</button>
               </div>
-              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                <label class="btn btn-secondary" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px"><span class="msym" style="font-size:14px">upload</span>importer fichier .csv<input type="file" accept=".csv,.txt" id="csv-file-input" style="display:none" onchange="loadCSVFile(this)"/></label>
-                <span style="font-size:11px;color:#9ca3af">ou collez directement ci-dessus</span>
-              </div>
-              <button class="btn btn-primary" onclick="parseImportCSV()"><span class="msym">table_rows</span>analyser et importer</button>
-            </div>
-          </div>
-          <div id="csv-results" style="display:none">
-            <div class="glass card">
-              <div class="card-header"><div><div class="card-title">contacts importés</div><div id="csv-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div></div></div>
-              <table><thead><tr><th>nom</th><th>téléphone</th><th>ville</th><th>actions</th></tr></thead><tbody id="csv-table"></tbody></table>
+              <table><thead><tr><th>adresse</th><th>ville</th><th>classe</th><th>type</th><th>date DPE</th><th>actions</th></tr></thead><tbody id="dpe-table"></tbody></table>
             </div>
           </div>
         </div>
@@ -2715,7 +2730,7 @@ function goPage(name, btn) {
 }
 
 function switchB2bTab(tabId, btn) {
-  ['b2b-gmaps','b2b-insee','b2b-bodacc','b2b-permis','b2b-ao','b2b-linkedin','b2b-poste','b2b-pagesblanches','b2b-importcsv'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='none';});
+  ['b2b-gmaps','b2b-insee','b2b-bodacc','b2b-permis','b2b-ao','b2b-linkedin','b2b-poste','b2b-dpe'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='none';});
   document.getElementById(tabId).style.display='';
   document.querySelectorAll('#page-prospection button.tab').forEach(t=>t.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -6771,130 +6786,119 @@ async function sendSenderTestEmail() {
 
 
 
-// ═══ PAGES BLANCHES ═══
-async function searchPagesBlanches() {
-  const nom = document.getElementById('pb-nom').value.trim();
-  const ville = document.getElementById('pb-ville').value.trim();
+// ═══ DPE PASSOIRES THERMIQUES ═══
+let dpeData = [];
+
+async function searchDPE() {
+  const ville = document.getElementById('dpe-ville').value.trim();
   if (!ville) { alert('renseignez une ville ou un code postal.'); return; }
-  showSpinner('pb-spinner');
-  document.getElementById('pb-results').style.display = 'none';
+  const classe = document.getElementById('dpe-classe').value;
+  const type = document.getElementById('dpe-type').value;
+
+  document.getElementById('dpe-spinner').style.display = '';
+  document.getElementById('dpe-results').style.display = 'none';
+
   try {
-    const res = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/pages-blanches', {
+    // Géocodage
+    const geoRes = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(ville) + '&limit=1');
+    const geoData = await geoRes.json();
+    const feat = geoData.features?.[0];
+    const nomVille = feat?.properties?.city || ville;
+    const codePostal = feat?.properties?.postcode || '';
+    const codeDept = codePostal ? codePostal.slice(0,2) : ville;
+
+    // Classes à chercher
+    const classes = classe.split(',');
+    const classFilter = classes.map(c => `classe_consommation_energie="${c}"`).join(' OR ');
+
+    // API ADEME DPE via Edge Function Supabase
+    const dpeRes = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/dpe-proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': HUNTLIST_CONFIG.supaAnon },
-      body: JSON.stringify({ nom, ville })
+      body: JSON.stringify({ ville: codePostal || nomVille, classe, type })
     });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    const results = data.contacts || [];
-    if (results.length === 0) {
-      document.getElementById('pb-results-sub').textContent = 'aucun résultat pour ' + (data.ville || ville);
-      document.getElementById('pb-table').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:20px">aucun contact trouvé — essayez avec un nom différent</td></tr>';
-      document.getElementById('pb-results').style.display = '';
-      hideSpinner('pb-spinner');
+
+    if (!dpeRes.ok) throw new Error('Erreur serveur DPE (' + dpeRes.status + ')');
+    const dpeJson = await dpeRes.json();
+    if (dpeJson.error) throw new Error(dpeJson.error);
+    dpeData = dpeJson.results || [];
+
+    if (dpeData.length === 0) {
+      document.getElementById('dpe-results-sub').textContent = 'aucun résultat pour ' + nomVille;
+      document.getElementById('dpe-table').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:20px">aucune passoire thermique trouvée — essayez un code postal différent</td></tr>';
+      document.getElementById('dpe-results').style.display = '';
+      document.getElementById('dpe-spinner').style.display = 'none';
       return;
     }
-    document.getElementById('pb-results-sub').textContent = results.length + ' contacts · ' + (data.ville || ville) + ' · pages blanches';
-    document.getElementById('pb-table').innerHTML = results.map(r => `
-      <tr>
-        <td style="font-weight:600">${r.nom}</td>
-        <td style="color:#6b7280;font-size:12px">${r.adresse||'—'}</td>
-        <td>${r.ville}</td>
-        <td style="font-family:monospace;font-size:12px">${r.tel||'—'}</td>
+
+    const classeColors = { 'G': '#dc2626', 'F': '#ea580c', 'E': '#d97706' };
+    document.getElementById('dpe-results-sub').textContent = dpeData.length + ' passoires thermiques · ' + nomVille + ' · classe ' + classe + ' · source ADEME';
+    document.getElementById('dpe-table').innerHTML = dpeData.map(r => {
+      const cl = r.classe_consommation_energie || '?';
+      const color = classeColors[cl] || '#9ca3af';
+      const date = r.date_etablissement_dpe ? r.date_etablissement_dpe.slice(0,10) : '—';
+      const surface = r.surface_habitable_logement ? Math.round(r.surface_habitable_logement) + ' m²' : '—';
+      return `<tr>
+        <td style="font-weight:600;font-size:12px">${r.adresse_ban || '—'}</td>
+        <td style="font-size:12px">${r.nom_commune_ban || nomVille}</td>
+        <td><span style="background:${color};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px">${cl}</span></td>
+        <td style="font-size:12px;color:#6b7280">${r.type_batiment || '—'} ${surface}</td>
+        <td style="font-size:11px;color:#9ca3af">${date}</td>
         <td>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="addProspectFromPB('${r.nom.replace(/'/g,"\'")}','${r.tel||''}','${r.ville}','${(r.adresse||'').replace(/'/g,"\'")}')">
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="addProspectFromDPE('${(r.adresse_ban||'').replace(/'/g,"\'")}','${r.nom_commune_ban||nomVille}','${cl}','${r.type_batiment||''}')">
             <span class="msym" style="font-size:12px">add</span> ajouter
           </button>
         </td>
-      </tr>`).join('');
-    document.getElementById('pb-results').style.display = '';
+      </tr>`;
+    }).join('');
+    document.getElementById('dpe-results').style.display = '';
+
   } catch(e) {
-    alert('erreur pages blanches : ' + e.message);
+    alert('erreur DPE : ' + e.message);
   }
-  hideSpinner('pb-spinner');
+  document.getElementById('dpe-spinner').style.display = 'none';
 }
 
-function addProspectFromPB(nom, tel, ville, adresse) {
+function addProspectFromDPE(adresse, ville, classe, type) {
   const p = {
     id: Date.now() + Math.random(),
-    name: nom,
-    company: 'Particulier',
-    phone: tel,
+    name: adresse,
+    company: (type || 'Logement') + ' · DPE ' + classe,
     city: ville,
-    address: adresse,
-    source: 'Pages Blanches',
+    source: 'DPE ADEME',
     status: 'new',
-    date: new Date().toLocaleDateString('fr-FR')
+    date: new Date().toLocaleDateString('fr-FR'),
+    notes: 'Passoire thermique classe ' + classe + ' — obligation légale de rénover'
   };
   state.prospects.unshift(p);
   saveState();
   refreshAll();
-  showToast('prospect ajouté : ' + nom);
-}
-
-// ═══ IMPORT CSV ═══
-function loadCSVFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { document.getElementById('csv-content').value = e.target.result; };
-  reader.readAsText(file, 'UTF-8');
-}
-
-function parseImportCSV() {
-  const raw = document.getElementById('csv-content').value.trim();
-  if (!raw) { alert('aucun contenu à analyser.'); return; }
-  const lines = raw.split('\n').filter(l => l.trim());
-  const results = [];
-  for (const line of lines) {
-    const parts = line.split(',').map(p => p.trim().replace(/^["']|["']$/g, ''));
-    if (parts.length >= 1 && parts[0]) {
-      results.push({
-        nom: parts[0] || '',
-        tel: parts[1] || '',
-        ville: parts[2] || ''
-      });
-    }
-  }
-  if (!results.length) { alert('aucun contact trouvé. vérifiez le format : nom,téléphone,ville'); return; }
-  document.getElementById('csv-results-sub').textContent = results.length + ' contacts importés';
-  document.getElementById('csv-table').innerHTML = results.map(r => `
-    <tr>
-      <td style="font-weight:600">${r.nom}</td>
-      <td style="font-family:monospace;font-size:12px">${r.tel}</td>
-      <td>${r.ville}</td>
-      <td>
-        <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="addProspectFromCSV('${r.nom.replace(/'/g,"\'")}','${r.tel}','${r.ville}')">
-          <span class="msym" style="font-size:12px">add</span> ajouter
-        </button>
-      </td>
-    </tr>`).join('');
-  document.getElementById('csv-results').style.display = '';
-}
-
-function addProspectFromCSV(nom, tel, ville) {
-  const p = {
-    id: Date.now() + Math.random(),
-    name: nom,
-    company: 'Particulier',
-    phone: tel,
-    city: ville,
-    source: 'Import CSV',
-    status: 'new',
-    date: new Date().toLocaleDateString('fr-FR')
-  };
-  state.prospects.unshift(p);
-  saveState();
-  refreshAll();
-  showToast('prospect ajouté : ' + nom);
-}
-
-function showToast(msg) {
   const t = document.createElement('div');
-  t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1a1a2e;color:white;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
-  t.textContent = '✓ ' + msg;
+  t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#059669;color:white;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 32px rgba(5,150,105,0.4)';
+  t.textContent = '✓ prospect ajouté : ' + adresse;
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
+}
+
+function exportDPECSV() {
+  if (!dpeData.length) return;
+  const rows = [['adresse','ville','classe DPE','type','surface','date DPE']];
+  dpeData.forEach(r => {
+    rows.push([
+      r.adresse_ban || '',
+      r.nom_commune_ban || '',
+      r.classe_consommation_energie || '',
+      r.type_batiment || '',
+      r.surface_habitable_logement ? Math.round(r.surface_habitable_logement) + ' m²' : '',
+      r.date_etablissement_dpe ? r.date_etablissement_dpe.slice(0,10) : ''
+    ]);
+  });
+  const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dpe-passoires-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
 }
 
 </script>
