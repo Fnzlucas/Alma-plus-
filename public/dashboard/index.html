@@ -1091,6 +1091,16 @@ textarea.form-input { resize: vertical; min-height: 80px; }
                     <option value="Appartement">appartement</option>
                   </select>
                 </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">volume de résultats</label>
+                  <select class="form-input" id="dpe-volume">
+                    <option value="50">50 résultats</option>
+                    <option value="100">100 résultats</option>
+                    <option value="250" selected>250 résultats</option>
+                    <option value="500">500 résultats</option>
+                    <option value="1000">1000 résultats</option>
+                  </select>
+                </div>
               </div>
               <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#059669;display:flex;align-items:flex-start;gap:8px">
                 <span class="msym" style="font-size:16px;flex-shrink:0">info</span>
@@ -6892,6 +6902,7 @@ async function searchDPE() {
     const classes = classe.split(',').map(c => c.trim()).filter(Boolean);
 
     // API ADEME DPE — dataset "dpe03existant" (nouveau nom depuis 2025, l'ancien dpe-v2 est mort)
+    const dpeVolume = parseInt(document.getElementById('dpe-volume')?.value) || 250;
     const ADEME_DS = 'https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines';
     const qsParts = [];
     qsParts.push('etiquette_dpe:(' + classes.map(c => '"' + c + '"').join(' OR ') + ')');
@@ -6899,7 +6910,7 @@ async function searchDPE() {
     if (type) qsParts.push('type_batiment:"' + type.toLowerCase() + '"');
 
     const ademeUrl = ADEME_DS
-      + '?size=50'
+      + '?size=' + dpeVolume
       + '&qs=' + encodeURIComponent(qsParts.join(' AND '))
       + (codePostal ? '' : '&q=' + encodeURIComponent(nomVille) + '&q_fields=nom_commune_ban');
 
@@ -6914,7 +6925,7 @@ async function searchDPE() {
 
     // Fallback : recherche full-text simple, filtrage classe côté client
     if (!rawResults.length) {
-      const fallbackUrl = ADEME_DS + '?size=100&q=' + encodeURIComponent(codePostal || nomVille);
+      const fallbackUrl = ADEME_DS + '?size=' + Math.min(dpeVolume * 4, 2000) + '&q=' + encodeURIComponent(codePostal || nomVille);
       const fbRes = await fetch(fallbackUrl);
       if (!fbRes.ok) throw new Error('Erreur API ADEME (' + fbRes.status + ')');
       const fbJson = await fbRes.json();
