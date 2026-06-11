@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,300,0,0&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&libraries=places&language=fr&loading=async" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&libraries=places,geometry&language=fr&loading=async" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 tailwind.config = {
@@ -2829,19 +2829,52 @@ function searchProspects() {
   if(!type||!city) return alert('renseignez un type de business et une ville.');
   showSpinner('search-spinner');document.getElementById('btn-search').disabled=true;
   show('search-progress');
-  document.getElementById('search-progress-text').textContent='recherche google maps...';
-  document.getElementById('search-progress-fill').style.width='20%';
+  document.getElementById('search-progress-text').textContent='localisation de la ville...';
+  document.getElementById('search-progress-fill').style.width='10%';
   hide('search-results');
-  const service=new google.maps.places.PlacesService(document.createElement('div'));
-  let allResults=[];
-  function doTextSearch(pageToken){
-    const req=pageToken?{query:type+' '+city,language:'fr',region:'fr',pageToken}:{query:type+' '+city,language:'fr',region:'fr'};
-    service.textSearch(req,function(results,status,pagination){
-      if(status===google.maps.places.PlacesServiceStatus.OK&&results){ allResults=allResults.concat(results); document.getElementById('search-progress-text').textContent=allResults.length+' résultats...'; if(allResults.length<maxResults&&pagination&&pagination.hasNextPage){setTimeout(()=>pagination.nextPage(),300);}else{processResults(allResults.slice(0,maxResults));}}
-      else if(allResults.length>0){processResults(allResults.slice(0,maxResults));}
-      else{hideSpinner('search-spinner');hide('search-progress');document.getElementById('btn-search').disabled=false;alert('aucun résultat pour "'+type+' '+city+'".');}
-    });
-  }
+
+  // 1. Geocode la ville pour obtenir les coordonnées exactes
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: city + ', France' }, function(geoResults, geoStatus) {
+    let locationBias = null;
+    if (geoStatus === google.maps.GeocoderStatus.OK && geoResults[0]) {
+      locationBias = geoResults[0].geometry.location;
+    }
+
+    const service=new google.maps.places.PlacesService(document.createElement('div'));
+    let allResults=[];
+
+    function doTextSearch(){
+      // Force location + radius si on a les coordonnées
+      const req = locationBias
+        ? { query: type + ' ' + city, language: 'fr', region: 'fr', location: locationBias, radius: 15000 }
+        : { query: type + ' ' + city, language: 'fr', region: 'fr' };
+
+      document.getElementById('search-progress-text').textContent='recherche google maps...';
+      document.getElementById('search-progress-fill').style.width='20%';
+
+      service.textSearch(req,function(results,status,pagination){
+        if(status===google.maps.places.PlacesServiceStatus.OK&&results){
+          // Filtrer les résultats hors zone si on a des coordonnées
+          let filtered = results;
+          if (locationBias && google.maps.geometry) {
+            filtered = results.filter(p => {
+              if (!p.geometry || !p.geometry.location) return true;
+              const dist = google.maps.geometry.spherical.computeDistanceBetween(locationBias, p.geometry.location);
+              return dist <= 30000; // 30km max
+            });
+          }
+          allResults=allResults.concat(filtered);
+          document.getElementById('search-progress-text').textContent=allResults.length+' résultats...';
+          if(allResults.length<maxResults&&pagination&&pagination.hasNextPage){setTimeout(()=>pagination.nextPage(),300);}
+          else{processResults(allResults.slice(0,maxResults));}
+        }
+        else if(allResults.length>0){processResults(allResults.slice(0,maxResults));}
+        else{hideSpinner('search-spinner');hide('search-progress');document.getElementById('btn-search').disabled=false;alert('aucun résultat pour "'+type+' '+city+'".');}
+      });
+    }
+
+    doTextSearch();
   function processResults(results){
     hideSpinner('search-spinner');hide('search-progress');document.getElementById('btn-search').disabled=false;
     if(!results||!results.length){alert('aucun résultat.');return;}
@@ -2875,6 +2908,7 @@ function searchProspects() {
     });
   }
   doTextSearch();
+  }); // fin geocoder
 }
 
 function renderProspectsTable(prospects,type,city,minScore){
@@ -3988,7 +4022,26 @@ async function launchAutopilot(){
   try{
     const service=new google.maps.places.PlacesService(document.createElement('div'));
     apLog('search','recherche google maps places...');apSetProgress(15,'recherche des établissements...');
-    let places=await new Promise(resolve=>{service.textSearch({query:query+' '+zone,language:'fr',region:'fr'},(results,status)=>{resolve(status===google.maps.places.PlacesServiceStatus.OK?results:[]);});});
+    // Geocode la zone pour forcer la localisation
+    let apLocationBias = null;
+    try {
+      apLocationBias = await new Promise(resolve => {
+        new google.maps.Geocoder().geocode({ address: zone + ', France' }, (res, st) => {
+          resolve(st === google.maps.GeocoderStatus.OK && res[0] ? res[0].geometry.location : null);
+        });
+      });
+    } catch(_) {}
+    const apReq = apLocationBias
+      ? {query:query+' '+zone,language:'fr',region:'fr',location:apLocationBias,radius:15000}
+      : {query:query+' '+zone,language:'fr',region:'fr'};
+    let places=await new Promise(resolve=>{service.textSearch(apReq,(results,status)=>{resolve(status===google.maps.places.PlacesServiceStatus.OK?results:[]);});});
+    // Filtre distance — on vire tout ce qui est à plus de 30km
+    if (apLocationBias && google.maps.geometry) {
+      places = places.filter(p => {
+        if (!p.geometry || !p.geometry.location) return true;
+        return google.maps.geometry.spherical.computeDistanceBetween(apLocationBias, p.geometry.location) <= 30000;
+      });
+    }
     if(_apStop){apFinish('arrêté.');return;}if(!places.length){apFinish('aucun résultat google maps.');return;}
     apLog('success',places.length+' établissements trouvés');apSetProgress(30,'enrichissement...');
     const prospects=[];
@@ -4014,9 +4067,8 @@ async function launchAutopilot(){
           // ── Scrape email depuis le site web ──
           if(p.website && !p.email){
             try{
-              const scrapeRes=await fetch('/api/scrape-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.website})});
-              const scrapeData=await scrapeRes.json();
-              if(scrapeData.primary){ p.email=scrapeData.primary; apLog('info','email trouvé : <strong>'+p.email+'</strong>'); }
+              const foundEmail = await scrapeEmailFromSite(p.website);
+              if(foundEmail){ p.email=foundEmail; apLog('info','email trouvé : <strong>'+p.email+'</strong>'); }
               else { apLog('info','aucun email trouvé sur '+p.website); }
             }catch(_){ apLog('info','scraping email indisponible'); }
           }
@@ -6486,24 +6538,33 @@ async function sendResendTestEmail() {
   }
 }
 
-// Fonction core — passe par l'API proxy Vercel (clé Resend côté serveur)
+// Fonction core — tente l'API Vercel (Resend), fallback automatique sur Brevo
 async function resendSendEmail(toEmail, subject, htmlContent) {
   const senderName = getSenderName() || 'Huntlist.';
-  const res = await fetch('/api/send-email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      fromName: senderName,
-      to: toEmail,
-      subject: subject,
-      body: htmlContent.replace(/\n/g, '<br/>')
-    })
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'erreur envoi (' + res.status + ')');
+  // 1. Tentative via la route Vercel /api/send-email (Resend côté serveur)
+  try {
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fromName: senderName,
+        to: toEmail,
+        subject: subject,
+        body: htmlContent.replace(/\n/g, '<br/>')
+      })
+    });
+    if (res.ok) return res.json();
+    // Route présente mais erreur serveur → on lit l'erreur avant de fallback
+    console.warn('[email] /api/send-email a échoué (' + res.status + '), fallback Brevo...');
+  } catch(e) {
+    console.warn('[email] /api/send-email indisponible, fallback Brevo...', e.message);
   }
-  return res.json();
+  // 2. Fallback : Brevo direct depuis le navigateur
+  const brevoCfg = (typeof getBrevoConfig === 'function') ? getBrevoConfig() : {};
+  if (brevoCfg.key && brevoCfg.emailFrom) {
+    return brevoSendEmail(toEmail, null, subject, htmlContent);
+  }
+  throw new Error('aucun canal d\'envoi disponible — configurez Brevo dans Paramètres, ou déployez la route /api/send-email sur Vercel.');
 }
 
 // ══════════════════════════════════════════════════════════
@@ -6807,21 +6868,48 @@ async function searchDPE() {
     const codePostal = feat?.properties?.postcode || '';
     const codeDept = codePostal ? codePostal.slice(0,2) : ville;
 
-    // Classes à chercher
-    const classes = classe.split(',');
-    const classFilter = classes.map(c => `classe_consommation_energie="${c}"`).join(' OR ');
+    // Classes à chercher (F, G ou les deux)
+    const classes = classe.split(',').map(c => c.trim()).filter(Boolean);
 
-    // API ADEME DPE via Edge Function Supabase
-    const dpeRes = await fetch(HUNTLIST_CONFIG.supaUrl + '/functions/v1/dpe-proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': HUNTLIST_CONFIG.supaAnon },
-      body: JSON.stringify({ ville: codePostal || nomVille, classe, type })
-    });
+    // API ADEME DPE v2 — appel direct (pas de proxy nécessaire, l'API supporte le CORS)
+    const qsParts = [];
+    qsParts.push('etiquette_dpe:(' + classes.map(c => '"' + c + '"').join(' OR ') + ')');
+    if (codePostal) qsParts.push('code_postal_ban:"' + codePostal + '"');
+    if (type) qsParts.push('type_batiment:"' + type.toLowerCase() + '"');
 
-    if (!dpeRes.ok) throw new Error('Erreur serveur DPE (' + dpeRes.status + ')');
+    const ademeUrl = 'https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-existants/lines'
+      + '?size=50'
+      + '&qs=' + encodeURIComponent(qsParts.join(' AND '))
+      + (codePostal ? '' : '&q=' + encodeURIComponent(nomVille) + '&q_fields=nom_commune_ban')
+      + '&sort=-date_etablissement_dpe'
+      + '&select=' + encodeURIComponent('adresse_ban,nom_commune_ban,etiquette_dpe,date_etablissement_dpe,type_batiment,surface_habitable_logement,annee_construction');
+
+    const dpeRes = await fetch(ademeUrl);
+    if (!dpeRes.ok) throw new Error('Erreur API ADEME (' + dpeRes.status + ')');
     const dpeJson = await dpeRes.json();
-    if (dpeJson.error) throw new Error(dpeJson.error);
-    dpeData = dpeJson.results || [];
+    let rawResults = dpeJson.results || [];
+
+    // Fallback : si 0 résultat, recherche full-text simple (plus permissive)
+    if (!rawResults.length) {
+      const fallbackUrl = 'https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-existants/lines'
+        + '?size=50&q=' + encodeURIComponent(codePostal || nomVille)
+        + '&sort=-date_etablissement_dpe';
+      const fbRes = await fetch(fallbackUrl);
+      if (fbRes.ok) {
+        const fbJson = await fbRes.json();
+        rawResults = (fbJson.results || []).filter(r => classes.includes(r.etiquette_dpe));
+      }
+    }
+
+    // Mapping vers les noms de champs attendus par le rendu
+    dpeData = rawResults.map(r => ({
+      classe_consommation_energie: r.etiquette_dpe,
+      adresse_ban: r.adresse_ban || r.adresse_brut,
+      nom_commune_ban: r.nom_commune_ban || r.nom_commune_brut,
+      date_etablissement_dpe: r.date_etablissement_dpe,
+      type_batiment: r.type_batiment,
+      surface_habitable_logement: r.surface_habitable_logement
+    }));
 
     if (dpeData.length === 0) {
       document.getElementById('dpe-results-sub').textContent = 'aucun résultat pour ' + nomVille;
