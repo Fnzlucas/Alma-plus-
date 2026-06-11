@@ -4874,6 +4874,26 @@ async function searchByPoste() {
       for (const city in DEPT_BY_CITY) {
         if (locClean.includes(city)) { dept = DEPT_BY_CITY[city]; break; }
       }
+      // ─── Fallback : géocodage via l'API adresse gouv pour TOUTE ville française ───
+      if (!dept) {
+        try {
+          progressText.textContent = 'localisation de ' + loc + '…';
+          const geoRes = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(loc) + '&type=municipality&limit=1');
+          const geoData = await geoRes.json();
+          const feat = geoData.features?.[0];
+          if (feat?.properties?.postcode) {
+            codePostal = '';
+            dept = feat.properties.postcode.substring(0,2);
+            console.log('[huntlist] géocodage', loc, '→ dept', dept);
+          }
+        } catch(e) { console.warn('[huntlist] géocodage échoué pour', loc); }
+      }
+      // Si toujours rien → on bloque plutôt que de chercher dans toute la France
+      if (!dept && !codePostal) {
+        if (typeof toast === 'function') toast('ville "' + loc + '" non reconnue — essayez avec le code postal ou le numéro de département', 'warn');
+        btn.disabled = false; spinner.style.display = 'none'; progress.style.display = 'none';
+        return;
+      }
     }
 
     const params = [];
