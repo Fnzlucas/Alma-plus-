@@ -1118,7 +1118,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
                 </div>
                 <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px" onclick="exportDPECSV()"><span class="msym" style="font-size:13px">download</span> export CSV</button>
               </div>
-              <table><thead><tr><th>adresse</th><th>ville</th><th>classe</th><th>type</th><th>date DPE</th><th>actions</th></tr></thead><tbody id="dpe-table"></tbody></table>
+              <table><thead><tr><th>adresse</th><th>ville</th><th>classe</th><th>type</th><th>profil</th><th>téléphone</th><th>actions</th></tr></thead><tbody id="dpe-table"></tbody></table>
             </div>
           </div>
         </div>
@@ -6954,18 +6954,106 @@ async function searchDPE() {
     }
 
     const classeColors = { 'G': '#dc2626', 'F': '#ea580c', 'E': '#d97706' };
-    document.getElementById('dpe-results-sub').textContent = dpeData.length + ' passoires thermiques · ' + nomVille + ' · classe ' + classe + ' · source ADEME';
+    document.getElementById('dpe-results-sub').textContent = dpeData.length + ' passoires · ' + nomVille + ' · détection pro en cours…';
+
+    // ─── Détection PRO : croisement adresse → SIRENE par code postal ───
+    // On charge une fois les entreprises du code postal, puis on matche par numéro+voie
+    const cpForSirene = codePostal || dpeData[0]?.adresse_ban?.match(/\b(\d{5})\b/)?.[1] || '';
+    let entreprisesCP = [];
+    if (cpForSirene) {
+      try {
+        for (let page = 1; page <= 3; page++) {
+          const sireneUrl = 'https://recherche-entreprises.api.gouv.fr/search?code_postal=' + cpForSirene + '&etat_administratif=A&per_page=25&page=' + page;
+          const sr = await fetch(sireneUrl);
+          if (!sr.ok) break;
+          const sd = await sr.json();
+          if (!sd.results || !sd.results.length) break;
+          entreprisesCP.push(...sd.results);
+          if (sd.results.length < 25) break;
+        }
+      } catch(_) {}
+    }
+
+    // Normalisation d'adresse pour matching (numéro + 1er mot significatif de la voie)
+    function normAddr(a) {
+      return (a || '').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/\b(rue|avenue|av|bd|boulevard|impasse|allee|chemin|place|route|rte|cours|quai)\b/g,' ')
+        .replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+    }
+    function addrKey(a) {
+      const n = normAddr(a);
+      const num = n.match(/^\d+/)?.[0] || '';
+      const words = n.replace(/^\d+\s*/,'').split(' ').filter(w => w.length > 2);
+      return num + '|' + (words[0] || '');
+    }
+
+    // Index des entreprises par clé d'adresse
+    const proByAddr = {};
+    entreprisesCP.forEach(e => {
+      const ad = [e.siege?.numero_voie, e.siege?.type_voie, e.siege?.libelle_voie].filter(Boolean).join(' ')
+                 || e.siege?.adresse || e.siege?.libelle_commune || '';
+      const key = addrKey(ad);
+      if (key && key !== '|') proByAddr[key] = e;
+    });
+
+    // Marque chaque passoire pro/particulier + récupère l'entreprise
+    dpeData.forEach(r => {
+      const key = addrKey(r.adresse_ban);
+      const ent = proByAddr[key];
+      if (ent) {
+        r.isPro = true;
+        r.proNom = ent.nom_complet || ent.nom_raison_sociale || '';
+        r.proSiret = ent.siege?.siret || ent.siret || '';
+        const dirs = ent.dirigeants || [];
+        const d = dirs.find(x => x.prenoms || x.prenom);
+        r.proDirigeant = d ? ((d.prenoms || d.prenom || '').split(' ')[0] + ' ' + (d.nom || '')).trim() : '';
+      } else {
+        r.isPro = false;
+      }
+    });
+
+    // ─── Enrichissement téléphone pour les PRO uniquement (Google Maps) ───
+    const gmaps = (typeof google !== 'undefined' && google.maps && google.maps.places)
+      ? new google.maps.places.PlacesService(document.createElement('div')) : null;
+    const pros = dpeData.filter(r => r.isPro);
+    if (gmaps && pros.length) {
+      for (let i = 0; i < pros.length; i++) {
+        const r = pros[i];
+        document.getElementById('dpe-results-sub').textContent = 'téléphones pro : ' + (i+1) + '/' + pros.length + '…';
+        try {
+          r.proPhone = await new Promise(resolve => {
+            gmaps.textSearch({ query: r.proNom + ' ' + (r.nom_commune_ban || nomVille), language:'fr', region:'fr' }, (places, st) => {
+              if (st !== google.maps.places.PlacesServiceStatus.OK || !places?.length) { resolve(null); return; }
+              gmaps.getDetails({ placeId: places[0].place_id, fields:['formatted_phone_number','international_phone_number'] }, (det, st2) => {
+                resolve((st2 === google.maps.places.PlacesServiceStatus.OK && det) ? (det.formatted_phone_number || det.international_phone_number || null) : null);
+              });
+            });
+          });
+        } catch(_) { r.proPhone = null; }
+        await new Promise(res => setTimeout(res, 150));
+      }
+    }
+
+    const nbPro = dpeData.filter(r => r.isPro).length;
+    document.getElementById('dpe-results-sub').textContent = dpeData.length + ' passoires · ' + nbPro + ' pro détectés · ' + nomVille + ' · source ADEME + SIRENE';
     document.getElementById('dpe-table').innerHTML = dpeData.map(r => {
       const cl = r.classe_consommation_energie || '?';
       const color = classeColors[cl] || '#9ca3af';
-      const date = r.date_etablissement_dpe ? r.date_etablissement_dpe.slice(0,10) : '—';
       const surface = r.surface_habitable_logement ? Math.round(r.surface_habitable_logement) + ' m²' : '—';
+      const profilBadge = r.isPro
+        ? `<span style="background:rgba(0,85,212,0.1);color:#0055D4;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;border:1px solid rgba(0,85,212,0.2)" title="${(r.proNom||'').replace(/"/g,'')}">PRO</span>`
+        : `<span style="background:rgba(107,114,128,0.1);color:#6b7280;font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px">particulier</span>`;
+      const phoneCell = r.isPro && r.proPhone
+        ? `<a href="tel:${r.proPhone.replace(/\s/g,'')}" style="color:#059669;font-weight:700;font-size:12px;text-decoration:none">${r.proPhone}</a>`
+        : (r.isPro ? '<span style="color:#d97706;font-size:11px">non trouvé</span>' : '<span style="color:#d1d5db;font-size:11px">—</span>');
       return `<tr>
-        <td style="font-weight:600;font-size:12px">${r.adresse_ban || '—'}</td>
+        <td style="font-weight:600;font-size:12px">${r.adresse_ban || '—'}${r.isPro && r.proNom ? '<br><span style="font-size:10px;color:#0055D4;font-weight:600">'+r.proNom+'</span>' : ''}</td>
         <td style="font-size:12px">${r.nom_commune_ban || nomVille}</td>
         <td><span style="background:${color};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px">${cl}</span></td>
         <td style="font-size:12px;color:#6b7280">${r.type_batiment || '—'} ${surface}</td>
-        <td style="font-size:11px;color:#9ca3af">${date}</td>
+        <td>${profilBadge}</td>
+        <td>${phoneCell}</td>
         <td>
           <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="addProspectFromDPE('${(r.adresse_ban||'').replace(/'/g,"\'")}','${r.nom_commune_ban||nomVille}','${cl}','${r.type_batiment||''}')">
             <span class="msym" style="font-size:12px">add</span> ajouter
