@@ -1110,15 +1110,34 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             </div>
           </div>
           <div id="dpe-results" style="display:none">
-            <div class="glass card">
-              <div class="card-header">
-                <div>
-                  <div class="card-title">passoires thermiques détectées</div>
-                  <div id="dpe-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div>
-                </div>
-                <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px" onclick="exportDPECSV()"><span class="msym" style="font-size:13px">download</span> export CSV</button>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div>
+                <div class="card-title">passoires thermiques détectées</div>
+                <div id="dpe-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div>
               </div>
-              <table><thead><tr><th>adresse</th><th>ville</th><th>classe</th><th>type</th><th>profil</th><th>téléphone</th><th>actions</th></tr></thead><tbody id="dpe-table"></tbody></table>
+              <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px" onclick="exportDPECSV()"><span class="msym" style="font-size:13px">download</span> export CSV</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+              <!-- BLOC PRO -->
+              <div class="glass card" style="border-top:3px solid #0055D4">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title" style="display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:16px;color:#0055D4">business_center</span> Professionnels</div>
+                    <div id="dpe-pro-sub" style="font-size:10px;color:#9ca3af;margin-top:2px">SCI, syndics, bailleurs · téléphone inclus</div>
+                  </div>
+                </div>
+                <table><thead><tr><th>adresse / entreprise</th><th>classe</th><th>téléphone</th><th></th></tr></thead><tbody id="dpe-table-pro"></tbody></table>
+              </div>
+              <!-- BLOC PARTICULIER -->
+              <div class="glass card" style="border-top:3px solid #9ca3af">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title" style="display:flex;align-items:center;gap:6px"><span class="msym" style="font-size:16px;color:#6b7280">home</span> Particuliers</div>
+                    <div id="dpe-part-sub" style="font-size:10px;color:#9ca3af;margin-top:2px">adresse + classe DPE uniquement</div>
+                  </div>
+                </div>
+                <table><thead><tr><th>adresse</th><th>classe</th><th>type</th><th></th></tr></thead><tbody id="dpe-table-part"></tbody></table>
+              </div>
             </div>
           </div>
         </div>
@@ -7036,31 +7055,42 @@ async function searchDPE() {
     }
 
     const nbPro = dpeData.filter(r => r.isPro).length;
-    document.getElementById('dpe-results-sub').textContent = dpeData.length + ' passoires · ' + nbPro + ' pro détectés · ' + nomVille + ' · source ADEME + SIRENE';
-    document.getElementById('dpe-table').innerHTML = dpeData.map(r => {
+    const nbPart = dpeData.length - nbPro;
+    document.getElementById('dpe-results-sub').textContent = dpeData.length + ' passoires · ' + nomVille + ' · source ADEME + SIRENE';
+    document.getElementById('dpe-pro-sub').textContent = nbPro + ' professionnel' + (nbPro>1?'s':'') + ' · téléphone inclus';
+    document.getElementById('dpe-part-sub').textContent = nbPart + ' particulier' + (nbPart>1?'s':'') + ' · adresse + classe';
+
+    const proRows = dpeData.filter(r => r.isPro);
+    const partRows = dpeData.filter(r => !r.isPro);
+
+    // ─── Tableau PRO ───
+    document.getElementById('dpe-table-pro').innerHTML = proRows.length ? proRows.map(r => {
       const cl = r.classe_consommation_energie || '?';
       const color = classeColors[cl] || '#9ca3af';
-      const surface = r.surface_habitable_logement ? Math.round(r.surface_habitable_logement) + ' m²' : '—';
-      const profilBadge = r.isPro
-        ? `<span style="background:rgba(0,85,212,0.1);color:#0055D4;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;border:1px solid rgba(0,85,212,0.2)" title="${(r.proNom||'').replace(/"/g,'')}">PRO</span>`
-        : `<span style="background:rgba(107,114,128,0.1);color:#6b7280;font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px">particulier</span>`;
-      const phoneCell = r.isPro && r.proPhone
+      const phoneCell = r.proPhone
         ? `<a href="tel:${r.proPhone.replace(/\s/g,'')}" style="color:#059669;font-weight:700;font-size:12px;text-decoration:none">${r.proPhone}</a>`
-        : (r.isPro ? '<span style="color:#d97706;font-size:11px">non trouvé</span>' : '<span style="color:#d1d5db;font-size:11px">—</span>');
+        : '<span style="color:#d97706;font-size:11px">non trouvé</span>';
       return `<tr>
-        <td style="font-weight:600;font-size:12px">${r.adresse_ban || '—'}${r.isPro && r.proNom ? '<br><span style="font-size:10px;color:#0055D4;font-weight:600">'+r.proNom+'</span>' : ''}</td>
-        <td style="font-size:12px">${r.nom_commune_ban || nomVille}</td>
+        <td style="font-size:12px"><span style="font-weight:600">${r.adresse_ban || '—'}</span>${r.proNom ? '<br><span style="font-size:10px;color:#0055D4;font-weight:600">'+r.proNom+'</span>' : ''}</td>
         <td><span style="background:${color};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px">${cl}</span></td>
-        <td style="font-size:12px;color:#6b7280">${r.type_batiment || '—'} ${surface}</td>
-        <td>${profilBadge}</td>
         <td>${phoneCell}</td>
-        <td>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="addProspectFromDPE('${(r.adresse_ban||'').replace(/'/g,"\'")}','${r.nom_commune_ban||nomVille}','${cl}','${r.type_batiment||''}')">
-            <span class="msym" style="font-size:12px">add</span> ajouter
-          </button>
-        </td>
+        <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:10px" onclick="addProspectFromDPE('${(r.adresse_ban||'').replace(/'/g,"\'")}','${r.nom_commune_ban||nomVille}','${cl}','${r.type_batiment||''}')"><span class="msym" style="font-size:12px">add</span></button></td>
       </tr>`;
-    }).join('');
+    }).join('') : '<tr><td colspan="4" style="text-align:center;color:#9ca3af;padding:24px;font-size:12px">aucun professionnel détecté sur cette zone</td></tr>';
+
+    // ─── Tableau PARTICULIER ───
+    document.getElementById('dpe-table-part').innerHTML = partRows.length ? partRows.map(r => {
+      const cl = r.classe_consommation_energie || '?';
+      const color = classeColors[cl] || '#9ca3af';
+      const surface = r.surface_habitable_logement ? Math.round(r.surface_habitable_logement) + ' m²' : '';
+      return `<tr>
+        <td style="font-weight:600;font-size:12px">${r.adresse_ban || '—'}</td>
+        <td><span style="background:${color};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px">${cl}</span></td>
+        <td style="font-size:11px;color:#6b7280">${r.type_batiment || '—'} ${surface}</td>
+        <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:10px" onclick="addProspectFromDPE('${(r.adresse_ban||'').replace(/'/g,"\'")}','${r.nom_commune_ban||nomVille}','${cl}','${r.type_batiment||''}')"><span class="msym" style="font-size:12px">add</span></button></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="4" style="text-align:center;color:#9ca3af;padding:24px;font-size:12px">aucun particulier sur cette zone</td></tr>';
+
     document.getElementById('dpe-results').style.display = '';
 
   } catch(e) {
