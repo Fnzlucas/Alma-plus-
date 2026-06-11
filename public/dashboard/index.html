@@ -4120,13 +4120,13 @@ if(useBodacc){promises.push(proxyFetch('https://bodacc-datadila.opendatasoft.com
 
         // ═══ DPE — ADEME Open Data ═══
         if(useDPE){promises.push(
-          fetch('https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-existants/lines?size=25&q='+encodeURIComponent(zone)+'&q_fields=commune_name,code_postal&sort=-date_reception_dpe&select=adresse_ban,commune_name,code_postal,etiquette_dpe,annee_construction,type_batiment,surface_habitable_logement')
+          fetch('https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines?size=25&q='+encodeURIComponent(zone)+'&q_fields=nom_commune_ban,code_postal_ban')
           .then(r=>r.json())
           .then(d=>{
             const items=(d.results||[]).filter(i=>i.etiquette_dpe==='F'||i.etiquette_dpe==='G');
             items.forEach(r=>{
               const adresse=(r.adresse_ban||'').split(',')[0]||'dpe '+nomCommune;
-              addSignal(adresse,r.commune_name||nomCommune,'DPE',{etiquette:r.etiquette_dpe,surface:r.surface_habitable_logement,type:r.type_batiment});
+              addSignal(adresse,r.nom_commune_ban||r.commune_name||nomCommune,'DPE',{etiquette:r.etiquette_dpe,surface:r.surface_habitable_logement,type:r.type_batiment});
             });
             setSourceStatus('dpe','ok',items.length);
           })
@@ -6891,44 +6891,47 @@ async function searchDPE() {
     // Classes à chercher (F, G ou les deux)
     const classes = classe.split(',').map(c => c.trim()).filter(Boolean);
 
-    // API ADEME DPE v2 — appel direct (pas de proxy nécessaire, l'API supporte le CORS)
+    // API ADEME DPE — dataset "dpe03existant" (nouveau nom depuis 2025, l'ancien dpe-v2 est mort)
+    const ADEME_DS = 'https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines';
     const qsParts = [];
     qsParts.push('etiquette_dpe:(' + classes.map(c => '"' + c + '"').join(' OR ') + ')');
     if (codePostal) qsParts.push('code_postal_ban:"' + codePostal + '"');
     if (type) qsParts.push('type_batiment:"' + type.toLowerCase() + '"');
 
-    const ademeUrl = 'https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-existants/lines'
+    const ademeUrl = ADEME_DS
       + '?size=50'
       + '&qs=' + encodeURIComponent(qsParts.join(' AND '))
-      + (codePostal ? '' : '&q=' + encodeURIComponent(nomVille) + '&q_fields=nom_commune_ban')
-      + '&sort=-date_etablissement_dpe'
-      + '&select=' + encodeURIComponent('adresse_ban,nom_commune_ban,etiquette_dpe,date_etablissement_dpe,type_batiment,surface_habitable_logement,annee_construction');
+      + (codePostal ? '' : '&q=' + encodeURIComponent(nomVille) + '&q_fields=nom_commune_ban');
 
-    const dpeRes = await fetch(ademeUrl);
-    if (!dpeRes.ok) throw new Error('Erreur API ADEME (' + dpeRes.status + ')');
-    const dpeJson = await dpeRes.json();
-    let rawResults = dpeJson.results || [];
-
-    // Fallback : si 0 résultat, recherche full-text simple (plus permissive)
-    if (!rawResults.length) {
-      const fallbackUrl = 'https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-existants/lines'
-        + '?size=50&q=' + encodeURIComponent(codePostal || nomVille)
-        + '&sort=-date_etablissement_dpe';
-      const fbRes = await fetch(fallbackUrl);
-      if (fbRes.ok) {
-        const fbJson = await fbRes.json();
-        rawResults = (fbJson.results || []).filter(r => classes.includes(r.etiquette_dpe));
+    let rawResults = [];
+    try {
+      const dpeRes = await fetch(ademeUrl);
+      if (dpeRes.ok) {
+        const dpeJson = await dpeRes.json();
+        rawResults = dpeJson.results || [];
       }
+    } catch(_) {}
+
+    // Fallback : recherche full-text simple, filtrage classe côté client
+    if (!rawResults.length) {
+      const fallbackUrl = ADEME_DS + '?size=100&q=' + encodeURIComponent(codePostal || nomVille);
+      const fbRes = await fetch(fallbackUrl);
+      if (!fbRes.ok) throw new Error('Erreur API ADEME (' + fbRes.status + ')');
+      const fbJson = await fbRes.json();
+      rawResults = (fbJson.results || []).filter(r => {
+        const et = r.etiquette_dpe || r.classe_consommation_energie || r.etiquette_energie || '';
+        return classes.includes(et);
+      });
     }
 
-    // Mapping vers les noms de champs attendus par le rendu
+    // Mapping défensif — on couvre les variantes de noms de champs
     dpeData = rawResults.map(r => ({
-      classe_consommation_energie: r.etiquette_dpe,
-      adresse_ban: r.adresse_ban || r.adresse_brut,
-      nom_commune_ban: r.nom_commune_ban || r.nom_commune_brut,
-      date_etablissement_dpe: r.date_etablissement_dpe,
-      type_batiment: r.type_batiment,
-      surface_habitable_logement: r.surface_habitable_logement
+      classe_consommation_energie: r.etiquette_dpe || r.classe_consommation_energie || r.etiquette_energie || '?',
+      adresse_ban: r.adresse_ban || r.adresse_brut || r.geo_adresse || '',
+      nom_commune_ban: r.nom_commune_ban || r.nom_commune_brut || r.commune || nomVille,
+      date_etablissement_dpe: r.date_etablissement_dpe || r.date_dpe || r.date_reception_dpe || '',
+      type_batiment: r.type_batiment || '',
+      surface_habitable_logement: r.surface_habitable_logement || null
     }));
 
     if (dpeData.length === 0) {
