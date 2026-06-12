@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhK-hKjLuDvi-xH3hqgY-9L1w0WxQF4_A&libraries=places,geometry&language=fr&loading=async" async defer></script>
+<script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 tailwind.config = {
@@ -1115,9 +1116,22 @@ textarea.form-input { resize: vertical; min-height: 80px; }
                 <div class="card-title">passoires thermiques détectées</div>
                 <div id="dpe-results-sub" style="font-size:10px;color:#9ca3af;margin-top:2px"></div>
               </div>
-              <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px" onclick="exportDPECSV()"><span class="msym" style="font-size:13px">download</span> export CSV</button>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px" id="dpe-view-toggle" onclick="toggleDPEView()"><span class="msym" style="font-size:13px">map</span> <span id="dpe-view-label">vue liste</span></button>
+                <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px" onclick="exportDPECSV()"><span class="msym" style="font-size:13px">download</span> export CSV</button>
+              </div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+            <!-- CARTE -->
+            <div id="dpe-map-wrap" class="glass card" style="padding:0;overflow:hidden;margin-bottom:16px">
+              <div id="dpe-map" style="width:100%;height:520px;background:#eef1f5"></div>
+              <div style="display:flex;gap:16px;padding:10px 16px;font-size:11px;color:#6b7280;border-top:1px solid rgba(0,0,0,0.05);flex-wrap:wrap">
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:50%;background:#dc2626;display:inline-block"></span> classe G</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:50%;background:#ea580c;display:inline-block"></span> classe F</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:50%;background:#0055D4;display:inline-block"></span> professionnel</span>
+                <span style="margin-left:auto;color:#9ca3af" id="dpe-map-note"></span>
+              </div>
+            </div>
+            <div id="dpe-tables-wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
               <!-- BLOC PRO -->
               <div class="glass card" style="border-top:3px solid #0055D4">
                 <div class="card-header">
@@ -1126,7 +1140,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
                     <div id="dpe-pro-sub" style="font-size:10px;color:#9ca3af;margin-top:2px">SCI, syndics, bailleurs · téléphone inclus</div>
                   </div>
                 </div>
-                <table><thead><tr><th>adresse / entreprise</th><th>classe</th><th>téléphone</th><th></th></tr></thead><tbody id="dpe-table-pro"></tbody></table>
+                <table><thead><tr><th>adresse / entreprise</th><th>dirigeant</th><th>classe</th><th>téléphone</th><th></th></tr></thead><tbody id="dpe-table-pro"></tbody></table>
               </div>
               <!-- BLOC PARTICULIER -->
               <div class="glass card" style="border-top:3px solid #9ca3af">
@@ -6931,6 +6945,7 @@ async function searchDPE() {
     const ademeUrl = ADEME_DS
       + '?size=' + dpeVolume
       + '&qs=' + encodeURIComponent(qsParts.join(' AND '))
+      + '&select=' + encodeURIComponent('_geopoint,adresse_ban,code_postal_ban,nom_commune_ban,etiquette_dpe,date_etablissement_dpe,type_batiment,surface_habitable_logement')
       + (codePostal ? '' : '&q=' + encodeURIComponent(nomVille) + '&q_fields=nom_commune_ban');
 
     let rawResults = [];
@@ -6955,14 +6970,28 @@ async function searchDPE() {
     }
 
     // Mapping défensif — on couvre les variantes de noms de champs
-    dpeData = rawResults.map(r => ({
-      classe_consommation_energie: r.etiquette_dpe || r.classe_consommation_energie || r.etiquette_energie || '?',
-      adresse_ban: r.adresse_ban || r.adresse_brut || r.geo_adresse || '',
-      nom_commune_ban: r.nom_commune_ban || r.nom_commune_brut || r.commune || nomVille,
-      date_etablissement_dpe: r.date_etablissement_dpe || r.date_dpe || r.date_reception_dpe || '',
-      type_batiment: r.type_batiment || '',
-      surface_habitable_logement: r.surface_habitable_logement || null
-    }));
+    dpeData = rawResults.map(r => {
+      // Coordonnées : l'ADEME fournit souvent _geopoint "lat,lon" ou des champs séparés
+      let lat = null, lon = null;
+      if (r._geopoint && typeof r._geopoint === 'string' && r._geopoint.includes(',')) {
+        const parts = r._geopoint.split(',');
+        lat = parseFloat(parts[0]); lon = parseFloat(parts[1]);
+      }
+      if (lat == null && r.coordonnee_cartographique_y_ban && r.coordonnee_cartographique_x_ban) {
+        lat = parseFloat(r.coordonnee_cartographique_y_ban); lon = parseFloat(r.coordonnee_cartographique_x_ban);
+      }
+      return {
+        classe_consommation_energie: r.etiquette_dpe || r.classe_consommation_energie || r.etiquette_energie || '?',
+        adresse_ban: r.adresse_ban || r.adresse_brut || r.geo_adresse || '',
+        nom_commune_ban: r.nom_commune_ban || r.nom_commune_brut || r.commune || nomVille,
+        code_postal_ban: r.code_postal_ban || r.code_postal_brut || '',
+        date_etablissement_dpe: r.date_etablissement_dpe || r.date_dpe || r.date_reception_dpe || '',
+        type_batiment: r.type_batiment || '',
+        surface_habitable_logement: r.surface_habitable_logement || null,
+        lat: (lat && !isNaN(lat)) ? lat : null,
+        lon: (lon && !isNaN(lon)) ? lon : null
+      };
+    });
 
     if (dpeData.length === 0) {
       document.getElementById('dpe-results-sub').textContent = 'aucun résultat pour ' + nomVille;
@@ -7027,6 +7056,11 @@ async function searchDPE() {
         const dirs = ent.dirigeants || [];
         const d = dirs.find(x => x.prenoms || x.prenom);
         r.proDirigeant = d ? ((d.prenoms || d.prenom || '').split(' ')[0] + ' ' + (d.nom || '')).trim() : '';
+        // Lien de recherche LinkedIn (pas de scraping direct — recherche pré-remplie)
+        if (r.proDirigeant) {
+          const q = encodeURIComponent(r.proDirigeant + ' ' + (r.proNom || ''));
+          r.proLinkedin = 'https://www.linkedin.com/search/results/people/?keywords=' + q;
+        }
       } else {
         r.isPro = false;
       }
@@ -7070,8 +7104,12 @@ async function searchDPE() {
       const phoneCell = r.proPhone
         ? `<a href="tel:${r.proPhone.replace(/\s/g,'')}" style="color:#059669;font-weight:700;font-size:12px;text-decoration:none">${r.proPhone}</a>`
         : '<span style="color:#d97706;font-size:11px">non trouvé</span>';
+      const dirigeantCell = r.proDirigeant
+        ? `<span style="font-size:12px;font-weight:600">${r.proDirigeant}</span>${r.proLinkedin ? ' <a href="'+r.proLinkedin+'" target="_blank" rel="noopener" title="rechercher sur LinkedIn" style="text-decoration:none;color:#0a66c2;font-weight:800;font-size:11px;vertical-align:middle">in</a>' : ''}`
+        : '<span style="color:#d1d5db;font-size:11px">—</span>';
       return `<tr>
         <td style="font-size:12px"><span style="font-weight:600">${r.adresse_ban || '—'}</span>${r.proNom ? '<br><span style="font-size:10px;color:#0055D4;font-weight:600">'+r.proNom+'</span>' : ''}</td>
+        <td>${dirigeantCell}</td>
         <td><span style="background:${color};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px">${cl}</span></td>
         <td>${phoneCell}</td>
         <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:10px" onclick="addProspectFromDPE('${(r.adresse_ban||'').replace(/'/g,"\'")}','${r.nom_commune_ban||nomVille}','${cl}','${r.type_batiment||''}')"><span class="msym" style="font-size:12px">add</span></button></td>
@@ -7093,10 +7131,126 @@ async function searchDPE() {
 
     document.getElementById('dpe-results').style.display = '';
 
+    // Construit la carte (géocode les points manquants en arrière-plan)
+    buildDPEMap(dpeData, nomVille);
+
   } catch(e) {
     alert('erreur DPE : ' + e.message);
   }
   document.getElementById('dpe-spinner').style.display = 'none';
+}
+
+// ─── CARTE DPE avec clustering ───
+let dpeMapInstance = null, dpeMarkers = [], dpeMarkerCluster = null;
+
+async function buildDPEMap(data, ville) {
+  if (typeof google === 'undefined' || !google.maps) return;
+  const mapEl = document.getElementById('dpe-map');
+  if (!mapEl) return;
+
+  // Centre : moyenne des points connus, sinon géocode la ville
+  let center = null;
+  const withCoords = data.filter(d => d.lat && d.lon);
+  if (withCoords.length) {
+    center = { lat: withCoords[0].lat, lng: withCoords[0].lon };
+  } else {
+    try {
+      const gr = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(ville) + '&type=municipality&limit=1');
+      const gd = await gr.json();
+      const c = gd.features?.[0]?.geometry?.coordinates;
+      if (c) center = { lat: c[1], lng: c[0] };
+    } catch(_) {}
+  }
+  if (!center) center = { lat: 46.6, lng: 2.4 }; // centre France fallback
+
+  dpeMapInstance = new google.maps.Map(mapEl, {
+    center, zoom: 13, mapTypeControl: false, streetViewControl: false, fullscreenControl: true,
+    styles: [{featureType:'poi',stylers:[{visibility:'off'}]},{featureType:'transit',stylers:[{visibility:'off'}]}]
+  });
+
+  // Nettoyage anciens marqueurs
+  dpeMarkers.forEach(m => m.setMap(null));
+  dpeMarkers = [];
+
+  const classeColor = { 'G':'#dc2626', 'F':'#ea580c', 'E':'#d97706' };
+  const bounds = new google.maps.LatLngBounds();
+  let placed = 0, toGeocode = [];
+
+  function placeMarker(d) {
+    const isPro = d.isPro;
+    const color = isPro ? '#0055D4' : (classeColor[d.classe_consommation_energie] || '#9ca3af');
+    const marker = new google.maps.Marker({
+      position: { lat: d.lat, lng: d.lon },
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: color, fillOpacity: 0.85, strokeColor: '#fff', strokeWeight: 1.5, scale: isPro ? 8 : 6
+      },
+      title: d.adresse_ban
+    });
+    const info = new google.maps.InfoWindow({
+      content: `<div style="font-family:sans-serif;font-size:12px;max-width:220px">
+        <strong>${d.adresse_ban || '—'}</strong><br>
+        <span style="color:#6b7280">${d.nom_commune_ban || ''}</span><br>
+        <span style="background:${classeColor[d.classe_consommation_energie]||'#9ca3af'};color:#fff;font-size:10px;font-weight:800;padding:1px 7px;border-radius:20px">classe ${d.classe_consommation_energie}</span>
+        ${isPro ? '<br><span style="color:#0055D4;font-weight:700;font-size:11px;margin-top:4px;display:inline-block">PRO · '+(d.proNom||'')+'</span>' : ''}
+        ${isPro && d.proPhone ? '<br><a href="tel:'+d.proPhone.replace(/\s/g,'')+'" style="color:#059669;font-weight:700">'+d.proPhone+'</a>' : ''}
+      </div>`
+    });
+    marker.addListener('click', () => info.open(dpeMapInstance, marker));
+    dpeMarkers.push(marker);
+    bounds.extend(marker.getPosition());
+    placed++;
+  }
+
+  // 1. Place direct les points qui ont déjà des coords
+  data.forEach(d => { if (d.lat && d.lon) placeMarker(d); else toGeocode.push(d); });
+
+  function applyCluster() {
+    if (dpeMarkerCluster) { dpeMarkerCluster.clearMarkers(); dpeMarkerCluster.setMap(null); dpeMarkerCluster = null; }
+    if (typeof markerClusterer !== 'undefined' && markerClusterer.MarkerClusterer && dpeMarkers.length) {
+      dpeMarkerCluster = new markerClusterer.MarkerClusterer({ map: dpeMapInstance, markers: dpeMarkers });
+    }
+  }
+
+  if (placed) { dpeMapInstance.fitBounds(bounds); applyCluster(); }
+
+  // 2. Géocode le reste en arrière-plan (par paquets, sans bloquer l'UI)
+  const noteEl = document.getElementById('dpe-map-note');
+  if (toGeocode.length) {
+    if (noteEl) noteEl.textContent = 'localisation de ' + toGeocode.length + ' adresses…';
+    let done = 0;
+    for (const d of toGeocode) {
+      try {
+        const q = (d.adresse_ban || '') + ' ' + (d.code_postal_ban || '') + ' ' + (d.nom_commune_ban || ville);
+        const gr = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(q) + '&limit=1');
+        const gd = await gr.json();
+        const c = gd.features?.[0]?.geometry?.coordinates;
+        if (c) { d.lat = c[1]; d.lon = c[0]; placeMarker(d); }
+      } catch(_) {}
+      done++;
+      if (done % 15 === 0) {
+        if (noteEl) noteEl.textContent = 'localisation… ' + done + '/' + toGeocode.length;
+        if (placed) { dpeMapInstance.fitBounds(bounds); applyCluster(); }
+        await new Promise(r => setTimeout(r, 60)); // souffle pour pas saturer la BAN
+      }
+    }
+    if (placed) { dpeMapInstance.fitBounds(bounds); applyCluster(); }
+  }
+  if (noteEl) noteEl.textContent = placed + ' points sur la carte';
+}
+
+function toggleDPEView() {
+  const map = document.getElementById('dpe-map-wrap');
+  const tables = document.getElementById('dpe-tables-wrap');
+  const label = document.getElementById('dpe-view-label');
+  const showingMap = map.style.display !== 'none';
+  if (showingMap) {
+    map.style.display = 'none'; tables.style.display = 'grid'; label.textContent = 'vue carte';
+  } else {
+    map.style.display = 'block'; tables.style.display = 'grid';
+    label.textContent = 'vue liste';
+    if (dpeMapInstance) google.maps.event.trigger(dpeMapInstance, 'resize');
+  }
 }
 
 function addProspectFromDPE(adresse, ville, classe, type) {
