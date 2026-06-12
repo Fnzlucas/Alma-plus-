@@ -7148,23 +7148,23 @@ async function buildDPEMap(data, ville) {
   const mapEl = document.getElementById('dpe-map');
   if (!mapEl) return;
 
-  // Centre : moyenne des points connus, sinon géocode la ville
-  let center = null;
-  const withCoords = data.filter(d => d.lat && d.lon);
-  if (withCoords.length) {
-    center = { lat: withCoords[0].lat, lng: withCoords[0].lon };
-  } else {
-    try {
-      const gr = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(ville) + '&type=municipality&limit=1');
-      const gd = await gr.json();
-      const c = gd.features?.[0]?.geometry?.coordinates;
-      if (c) center = { lat: c[1], lng: c[0] };
-    } catch(_) {}
+  // Centre IMMÉDIAT sur la ville cherchée (géocodage rapide via BAN)
+  let center = null, cityZoom = 13;
+  try {
+    const gr = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(ville) + '&type=municipality&limit=1');
+    const gd = await gr.json();
+    const c = gd.features?.[0]?.geometry?.coordinates;
+    if (c) center = { lat: c[1], lng: c[0] };
+  } catch(_) {}
+  // Fallback : 1er point connu, sinon centre France
+  if (!center) {
+    const wc = data.find(d => d.lat && d.lon);
+    center = wc ? { lat: wc.lat, lng: wc.lon } : { lat: 46.6, lng: 2.4 };
+    if (!wc) cityZoom = 6;
   }
-  if (!center) center = { lat: 46.6, lng: 2.4 }; // centre France fallback
 
   dpeMapInstance = new google.maps.Map(mapEl, {
-    center, zoom: 13, mapTypeControl: false, streetViewControl: false, fullscreenControl: true,
+    center, zoom: cityZoom, mapTypeControl: false, streetViewControl: false, fullscreenControl: true,
     styles: [{featureType:'poi',stylers:[{visibility:'off'}]},{featureType:'transit',stylers:[{visibility:'off'}]}]
   });
 
@@ -7212,7 +7212,7 @@ async function buildDPEMap(data, ville) {
     }
   }
 
-  if (placed) { dpeMapInstance.fitBounds(bounds); applyCluster(); }
+  if (placed) { applyCluster(); }
 
   // 2. Géocode le reste en arrière-plan (par paquets, sans bloquer l'UI)
   const noteEl = document.getElementById('dpe-map-note');
@@ -7230,11 +7230,11 @@ async function buildDPEMap(data, ville) {
       done++;
       if (done % 15 === 0) {
         if (noteEl) noteEl.textContent = 'localisation… ' + done + '/' + toGeocode.length;
-        if (placed) { dpeMapInstance.fitBounds(bounds); applyCluster(); }
-        await new Promise(r => setTimeout(r, 60)); // souffle pour pas saturer la BAN
+        applyCluster(); // rafraîchit les points sans recentrer (la carte reste sur la ville)
+        await new Promise(r => setTimeout(r, 60));
       }
     }
-    if (placed) { dpeMapInstance.fitBounds(bounds); applyCluster(); }
+    applyCluster();
   }
   if (noteEl) noteEl.textContent = placed + ' points sur la carte';
 }
