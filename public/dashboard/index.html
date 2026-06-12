@@ -82,6 +82,24 @@ body {
 .nav-item:hover { background: rgba(255,255,255,0.55); color: #1a1a2e; }
 .nav-item.active { background: rgba(0,85,212,0.07); color: #0055D4; font-weight: 700; border: 1px solid rgba(0,85,212,0.1); }
 .nav-item .msym { font-size: 17px; flex-shrink: 0; }
+
+/* ═══ APPLE-LIKE SKIN OVERRIDE ═══ */
+body { background: #F5F5F7 !important; background-image: none !important; color: #1D1D1F !important; }
+.glass-sidebar { background: #FFFFFF !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; border-right: 1px solid rgba(0,0,0,0.05) !important; }
+.sidebar { width: 270px !important; padding: 28px 16px !important; }
+.main { margin-left: 270px !important; background: #F5F5F7 !important; }
+.nav-section { color: #86868B !important; font-size: 10px !important; padding: 18px 16px 8px !important; }
+.nav-item { padding: 11px 16px !important; border-radius: 14px !important; font-size: 14px !important; font-weight: 600 !important; color: #86868B !important; letter-spacing: -0.01em !important; }
+.nav-item:hover { background: #F5F5F7 !important; color: #1D1D1F !important; }
+.nav-item.active { background: rgba(0,102,204,0.06) !important; color: #0066CC !important; font-weight: 600 !important; border: none !important; }
+.nav-item .msym { font-size: 20px !important; }
+.topbar { height: 76px !important; background: #F5F5F7 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; border-bottom: none !important; padding: 0 40px !important; }
+.content { padding: 0 40px 40px !important; }
+/* topbar pills → style doux Apple */
+#api-pill { background: #fff !important; border: 1px solid rgba(0,0,0,0.05) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+#topbar-search { background: #fff !important; border: 1px solid rgba(0,0,0,0.05) !important; border-radius: 16px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+/* logo dot + sidebar header */
+.glass-sidebar > div:first-child p { color: #86868B !important; }
 .nav-badge { margin-left: auto; font-size: 9px; font-weight: 800; background: #0055D4; color: white; padding: 2px 6px; border-radius: 99px; }
 .nav-badge-red { background: #dc2626; }
 
@@ -339,10 +357,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 <aside class="sidebar glass-sidebar" id="sidebar">
   <div style="margin-bottom:24px;padding:0 4px;display:flex;align-items:center;justify-content:space-between">
     <div>
-      <div style="display:flex;align-items:center;gap:.45rem;margin-bottom:3px"><svg viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:26px;height:26px;flex-shrink:0"><rect width="66" height="66" rx="14" fill="#0055D4"/><path d="M16 18 L34 33 L16 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 18 L48 33 L30 48" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/></svg><span style="font-size:1.1rem;font-weight:700;letter-spacing:-0.03em;color:#0a0a1a">Huntlist.</span></div>
+      <div style="display:flex;align-items:center;gap:.55rem;margin-bottom:3px"><span style="font-size:1.6rem;font-weight:700;letter-spacing:-0.03em;color:#0066CC">Huntlist</span></div>
       <p style="font-size:9px;color:#9ca3af;font-weight:600;letter-spacing:.18em;text-transform:uppercase;margin-top:3px">tableau de bord</p>
     </div>
-    <div style="width:7px;height:7px;border-radius:50%;background:#00d4ff;animation:pulse 2s infinite"></div>
   </div>
 
   <nav style="flex:1;overflow-y:auto;padding-right:4px" class="sidebar-scroll">
@@ -446,253 +463,129 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <!-- ═══ DASHBOARD ═══ -->
     <div class="page active" id="page-dashboard">
 
-      <!-- ═══ HERO WELCOME CARD ═══ -->
-      <div class="glass card" style="margin-bottom:20px;position:relative;overflow:hidden;border-radius:20px">
-        <div style="position:absolute;top:-40%;right:-10%;width:420px;height:420px;background:radial-gradient(circle,rgba(0,85,212,0.14) 0%,transparent 60%);pointer-events:none"></div>
-        <div style="position:absolute;bottom:-40%;left:-10%;width:340px;height:340px;background:radial-gradient(circle,rgba(0,212,255,0.1) 0%,transparent 60%);pointer-events:none"></div>
+      <!-- ═══ HERO ═══ -->
+      <div style="position:relative;width:100%;border-radius:24px;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:40px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.04);margin-bottom:32px">
+        <div style="max-width:520px">
+          <div style="font-size:28px;font-weight:700;letter-spacing:-0.01em;color:#1D1D1F;margin-bottom:8px;line-height:1.15" id="dash-greeting">Bonjour 👋</div>
+          <div style="font-size:17px;color:#86868B;line-height:1.45;letter-spacing:-0.01em" id="dash-subtitle">Lancez votre prospection en quelques clics — données réelles, pipeline vivant.</div>
+        </div>
+        <button class="btn btn-primary" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'));setTimeout(()=>{var t=document.querySelector('[onclick*=b2b-poste]');if(t)t.click();},100)" style="background:#0066CC;color:#fff;padding:14px 26px;border-radius:9999px;font-size:15px;font-weight:600;letter-spacing:-0.01em;border:none;box-shadow:0 8px 24px rgba(0,102,204,0.22);cursor:pointer;flex-shrink:0">Lancer une campagne</button>
+      </div>
 
-        <div style="padding:28px 28px 24px;position:relative;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
-          <div>
-            <div style="font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">tableau de bord</div>
-            <div style="font-size:26px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1.15;margin-bottom:6px" id="dash-greeting">bienvenue sur huntlist</div>
-            <div style="font-size:13px;color:#6b7280;line-height:1.5" id="dash-subtitle">lancez votre prospection en quelques clics — données réelles, pipeline vivant.</div>
+      <!-- ═══ KPI GRID ═══ -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;margin-bottom:32px">
+        <!-- prospects -->
+        <div style="background:#fff;padding:24px;border-radius:24px;box-shadow:0 4px 24px rgba(0,0,0,0.04)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+            <div style="width:48px;height:48px;border-radius:16px;background:rgba(0,102,204,0.1);display:flex;align-items:center;justify-content:center;color:#0066CC">
+              <span class="msym" style="font-variation-settings:'FILL' 1;font-size:24px">groups</span>
+            </div>
+            <span style="color:#22c55e;font-size:12px;font-weight:500;display:flex;align-items:center;gap:2px">+14% <span class="msym" style="font-size:16px">trending_up</span></span>
           </div>
-          <div style="display:flex;gap:8px;flex-shrink:0">
-            <button class="btn btn-ghost" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'))">
-              <span class="msym">search</span>google maps
-            </button>
-            <button class="btn btn-primary" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'));setTimeout(()=>{var t=document.querySelector('[onclick*=b2b-poste]');if(t)t.click();},100)" style="background:linear-gradient(135deg,#0055D4,#00d4ff);box-shadow:0 4px 20px rgba(0,85,212,0.3)">
-              <span class="msym">bolt</span>recherche par poste
-            </button>
+          <p style="color:#86868B;font-size:12px;font-weight:500;letter-spacing:0.02em;margin-bottom:4px">Prospects Totaux</p>
+          <h3 style="font-size:28px;font-weight:600;letter-spacing:-0.01em;color:#1D1D1F" id="stat-prospects">0</h3>
+        </div>
+        <!-- emails -->
+        <div style="background:#fff;padding:24px;border-radius:24px;box-shadow:0 4px 24px rgba(0,0,0,0.04)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+            <div style="width:48px;height:48px;border-radius:16px;background:rgba(0,78,159,0.1);display:flex;align-items:center;justify-content:center;color:#004e9f">
+              <span class="msym" style="font-variation-settings:'FILL' 1;font-size:24px">forward_to_inbox</span>
+            </div>
+            <span style="color:#22c55e;font-size:12px;font-weight:500;display:flex;align-items:center;gap:2px">+5.2% <span class="msym" style="font-size:16px">trending_up</span></span>
           </div>
+          <p style="color:#86868B;font-size:12px;font-weight:500;letter-spacing:0.02em;margin-bottom:4px">Emails Générés</p>
+          <h3 style="font-size:28px;font-weight:600;letter-spacing:-0.01em;color:#1D1D1F" id="stat-emails">0</h3>
+        </div>
+        <!-- pipeline -->
+        <div style="background:#fff;padding:24px;border-radius:24px;box-shadow:0 4px 24px rgba(0,0,0,0.04)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+            <div style="width:48px;height:48px;border-radius:16px;background:#e4e2e4;display:flex;align-items:center;justify-content:center;color:#1D1D1F">
+              <span class="msym" style="font-variation-settings:'FILL' 1;font-size:24px">account_tree</span>
+            </div>
+            <span style="color:#86868B;font-size:12px;font-weight:500;display:flex;align-items:center;gap:2px">Stable <span class="msym" style="font-size:16px">remove</span></span>
+          </div>
+          <p style="color:#86868B;font-size:12px;font-weight:500;letter-spacing:0.02em;margin-bottom:4px">Dans le Pipeline</p>
+          <h3 style="font-size:28px;font-weight:600;letter-spacing:-0.01em;color:#1D1D1F" id="stat-pipeline">0</h3>
+        </div>
+        <!-- convertis -->
+        <div style="background:#fff;padding:24px;border-radius:24px;box-shadow:0 4px 24px rgba(0,0,0,0.04)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+            <div style="width:48px;height:48px;border-radius:16px;background:rgba(121,48,0,0.1);display:flex;align-items:center;justify-content:center;color:#793000">
+              <span class="msym" style="font-variation-settings:'FILL' 1;font-size:24px">check_circle</span>
+            </div>
+            <span style="color:#22c55e;font-size:12px;font-weight:500;display:flex;align-items:center;gap:2px">+8% <span class="msym" style="font-size:16px">trending_up</span></span>
+          </div>
+          <p style="color:#86868B;font-size:12px;font-weight:500;letter-spacing:0.02em;margin-bottom:4px">Convertis</p>
+          <h3 style="font-size:28px;font-weight:600;letter-spacing:-0.01em;color:#1D1D1F" id="stat-converted">0</h3>
         </div>
       </div>
 
-      <!-- ═══ STATS GRID ═══ -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px">
-        <div class="glass" style="padding:18px 20px;border-radius:16px;display:flex;gap:14px;align-items:center;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.4)">
-          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(0,85,212,0.1),rgba(0,85,212,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.15);flex-shrink:0">
-            <span class="msym" style="font-size:20px;color:#0055D4">group</span>
+      <!-- ═══ BENTO : leads récents + insights ═══ -->
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:32px;margin-bottom:32px">
+        <!-- Leads récents -->
+        <div style="background:#fff;padding:32px;border-radius:24px;box-shadow:0 4px 24px rgba(0,0,0,0.04)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+            <div>
+              <h4 style="font-size:22px;font-weight:600;letter-spacing:-0.01em;color:#1D1D1F">Leads récents</h4>
+              <p style="color:#86868B;font-size:13px;margin-top:2px" id="dash-prospect-sub">aucune recherche effectuée</p>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'))" style="color:#0066CC;font-size:12px;font-weight:600;background:none;border:none;cursor:pointer">voir tout</button>
           </div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:24px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="stat-prospects">0</div>
-            <div style="font-size:10px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px">prospects</div>
-          </div>
-        </div>
-
-        <div class="glass" style="padding:18px 20px;border-radius:16px;display:flex;gap:14px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
-          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(16,185,129,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(16,185,129,0.15);flex-shrink:0">
-            <span class="msym" style="font-size:20px;color:#10b981">mail</span>
-          </div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:24px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="stat-emails">0</div>
-            <div style="font-size:10px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px">emails générés</div>
+          <div id="dash-prospects-list" style="padding:48px 20px;text-align:center;color:#9ca3af">
+            <span class="msym" style="font-size:42px;opacity:0.25;display:block;margin-bottom:10px">person_search</span>
+            <p style="font-size:14px">lancez une recherche pour voir vos premiers prospects ici</p>
           </div>
         </div>
 
-        <div class="glass" style="padding:18px 20px;border-radius:16px;display:flex;gap:14px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
-          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(168,85,247,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(168,85,247,0.15);flex-shrink:0">
-            <span class="msym" style="font-size:20px;color:#a855f7">conversion_path</span>
+        <!-- Insights -->
+        <div style="display:flex;flex-direction:column;gap:24px">
+          <!-- best channel -->
+          <div style="background:#0066CC;padding:28px;border-radius:24px;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,102,204,0.22)">
+            <div style="position:relative;z-index:2">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+                <span class="msym" style="font-size:18px">stars</span>
+                <span style="font-size:11px;font-weight:600;opacity:0.85;text-transform:uppercase;letter-spacing:0.12em">Meilleur canal</span>
+              </div>
+              <h4 style="font-size:22px;font-weight:600;letter-spacing:-0.01em;margin-bottom:6px">Recherche par poste</h4>
+              <p style="font-size:14px;color:#dfe8ff;line-height:1.4">Le canal qui sort le plus de décideurs qualifiés avec téléphone.</p>
+              <button onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'))" style="margin-top:20px;background:#fff;color:#0066CC;padding:9px 18px;border-radius:9999px;font-size:12px;font-weight:600;border:none;cursor:pointer">Optimiser</button>
+            </div>
+            <span class="msym" style="position:absolute;right:-16px;bottom:-16px;font-size:120px;opacity:0.1;transform:rotate(12deg)">hub</span>
           </div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:24px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="stat-pipeline">0</div>
-            <div style="font-size:10px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px">en pipeline</div>
-          </div>
-        </div>
-
-        <div class="glass" style="padding:18px 20px;border-radius:16px;display:flex;gap:14px;align-items:center;border:1px solid rgba(255,255,255,0.4)">
-          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(245,158,11,0.04));display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,158,11,0.15);flex-shrink:0">
-            <span class="msym" style="font-size:20px;color:#f59e0b">emoji_events</span>
-          </div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:24px;font-weight:800;color:#0a0a1a;letter-spacing:-.03em;line-height:1" id="stat-converted">0</div>
-            <div style="font-size:10px;color:#9ca3af;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px">convertis</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ═══ MAIN GRID ═══ -->
-      <div style="display:grid;grid-template-columns:1fr 320px;gap:20px">
-
-        <!-- ─── LEFT ─── -->
-        <div style="display:flex;flex-direction:column;gap:20px">
-
-          <!-- Performance chart -->
-          <div class="glass card" style="position:relative;overflow:hidden">
-            <div style="position:absolute;top:-50%;right:-10%;width:280px;height:280px;background:radial-gradient(circle,rgba(0,85,212,0.08) 0%,transparent 60%);pointer-events:none"></div>
-            <div class="card-header" style="position:relative">
+          <!-- répartition -->
+          <div style="background:#fff;padding:28px;border-radius:24px;box-shadow:0 4px 24px rgba(0,0,0,0.04);flex:1">
+            <h4 style="font-size:17px;font-weight:600;letter-spacing:-0.01em;color:#1D1D1F;margin-bottom:20px">Répartition par secteur</h4>
+            <div style="display:flex;flex-direction:column;gap:16px">
               <div>
-                <div class="card-title" style="display:flex;align-items:center;gap:8px">
-                  performance
-                  <span style="width:6px;height:6px;border-radius:50%;background:#00d4ff;animation:pulse 2s infinite"></span>
-                </div>
-                <div style="font-size:10px;color:#9ca3af;margin-top:2px">engagement hebdomadaire · taux de réponse</div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:#1D1D1F">Commerce local</span><span style="font-weight:700">42%</span></div>
+                <div style="width:100%;background:#F5F5F7;height:6px;border-radius:9999px;overflow:hidden"><div style="background:#0066CC;height:100%;width:42%"></div></div>
               </div>
-              <div class="tabs" style="padding:3px">
-                <button class="tab active">semaine</button>
-                <button class="tab">mois</button>
-              </div>
-            </div>
-            <div class="card-body" style="position:relative">
-              <div class="bar-chart">
-                <div class="bar-col"><div class="bar" style="height:40%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">lun</span></div>
-                <div class="bar-col"><div class="bar" style="height:65%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">mar</span></div>
-                <div class="bar-col" style="position:relative">
-                  <div class="bar" style="height:85%;background:linear-gradient(to top,#0055D4,#00d4ff);border-radius:6px 6px 2px 2px;box-shadow:0 0 20px rgba(0,85,212,0.35)"></div>
-                  <div style="position:absolute;top:-32px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;background:#0a0a1a;color:white;padding:3px 8px;border-radius:6px;white-space:nowrap">82%</div>
-                  <span style="font-size:8px;font-weight:800;color:#0055D4;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">mer</span>
-                </div>
-                <div class="bar-col"><div class="bar" style="height:55%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">jeu</span></div>
-                <div class="bar-col"><div class="bar" style="height:72%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">ven</span></div>
-                <div class="bar-col"><div class="bar" style="height:38%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">sam</span></div>
-                <div class="bar-col"><div class="bar" style="height:25%;background:linear-gradient(to top,rgba(0,85,212,0.08),rgba(0,85,212,0.15));border-radius:6px 6px 2px 2px"></div><span style="font-size:8px;font-weight:800;color:#9ca3af;margin-top:10px;text-transform:uppercase;letter-spacing:.1em">dim</span></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick access cards (actions principales) -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="glass card" style="cursor:pointer;transition:all .2s;border-radius:16px;padding:20px;position:relative;overflow:hidden" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'))" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(0,85,212,0.25)'" onmouseout="this.style.transform='';this.style.borderColor=''">
-              <div style="position:absolute;top:-30%;right:-10%;width:140px;height:140px;background:radial-gradient(circle,rgba(0,85,212,0.12) 0%,transparent 60%);pointer-events:none"></div>
-              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;position:relative">
-                <div style="width:38px;height:38px;border-radius:11px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.15)">
-                  <span class="msym" style="color:#0055D4;font-size:19px">map</span>
-                </div>
-                <div style="font-size:14px;font-weight:800;color:#0a0a1a;letter-spacing:-.02em">google maps</div>
-              </div>
-              <div style="font-size:11px;color:#6b7280;line-height:1.55;position:relative">trouvez les commerces locaux par ville et catégorie · téléphones & sites inclus.</div>
-              <div style="margin-top:12px;font-size:11px;font-weight:700;color:#0055D4;display:flex;align-items:center;gap:4px;position:relative">
-                démarrer <span class="msym" style="font-size:14px">arrow_forward</span>
-              </div>
-            </div>
-
-            <div class="glass card" style="cursor:pointer;transition:all .2s;border-radius:16px;padding:20px;position:relative;overflow:hidden" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'));setTimeout(()=>{var t=document.querySelector('[onclick*=b2b-poste]');if(t)t.click();},100)" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(0,85,212,0.25)'" onmouseout="this.style.transform='';this.style.borderColor=''">
-              <div style="position:absolute;top:-30%;right:-10%;width:140px;height:140px;background:radial-gradient(circle,rgba(0,212,255,0.14) 0%,transparent 60%);pointer-events:none"></div>
-              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;position:relative">
-                <div style="width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,rgba(0,85,212,0.1),rgba(0,212,255,0.1));display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.15)">
-                  <span class="msym" style="color:#0055D4;font-size:19px">work</span>
-                </div>
-                <div style="font-size:14px;font-weight:800;color:#0a0a1a;letter-spacing:-.02em;display:flex;align-items:center;gap:6px">
-                  recherche poste
-                  <span style="font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(135deg,#0055D4,#00d4ff);color:white;padding:2px 6px;border-radius:99px">pro</span>
-                </div>
-              </div>
-              <div style="font-size:11px;color:#6b7280;line-height:1.55;position:relative">drh, cto, daf… identifiez le bon décideur dans chaque entreprise française.</div>
-              <div style="margin-top:12px;font-size:11px;font-weight:700;color:#0055D4;display:flex;align-items:center;gap:4px;position:relative">
-                démarrer <span class="msym" style="font-size:14px">arrow_forward</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Recent prospects -->
-          <div class="glass card">
-            <div class="card-header">
               <div>
-                <div class="card-title">leads récents</div>
-                <div style="font-size:10px;color:#9ca3af;margin-top:2px" id="dash-prospect-sub">aucune recherche effectuée</div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:#1D1D1F">Rénovation / DPE</span><span style="font-weight:700">28%</span></div>
+                <div style="width:100%;background:#F5F5F7;height:6px;border-radius:9999px;overflow:hidden"><div style="background:#004e9f;height:100%;width:28%"></div></div>
               </div>
-              <button class="btn btn-ghost btn-sm" onclick="goPage('prospection',document.querySelector('[onclick*=prospection]'))">
-                <span class="msym">add</span>nouvelle recherche
-              </button>
-            </div>
-            <div id="dash-prospects-list" style="padding:48px 20px;text-align:center;color:#9ca3af">
-              <div style="width:64px;height:64px;border-radius:16px;background:rgba(0,85,212,0.04);border:1px solid rgba(0,85,212,0.08);margin:0 auto 14px;display:flex;align-items:center;justify-content:center">
-                <span class="msym" style="font-size:28px;color:#0055D4;opacity:.4">group_search</span>
-              </div>
-              <div style="font-size:13px;font-weight:700;color:#0a0a1a;margin-bottom:4px">aucun prospect pour l'instant</div>
-              <div style="font-size:11px;color:#9ca3af">lancez votre première recherche pour commencer.</div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- ─── RIGHT SIDEBAR ─── -->
-        <div style="display:flex;flex-direction:column;gap:16px">
-
-          <!-- Insights -->
-          <div class="glass card">
-            <div class="card-header">
-              <div class="card-title" style="display:flex;align-items:center;gap:8px">
-                <div style="width:26px;height:26px;border-radius:8px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center">
-                  <span class="msym" style="color:#0055D4;font-size:15px">psychology</span>
-                </div>
-                insights
-              </div>
-            </div>
-            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-              <div style="padding:14px;background:linear-gradient(135deg,rgba(0,85,212,0.04),rgba(0,212,255,0.03));border:1px solid rgba(0,85,212,0.1);border-radius:12px">
-                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#0055D4;margin-bottom:6px">meilleur canal</div>
-                <div style="font-size:15px;font-weight:800;color:#0a0a1a;margin-bottom:8px;letter-spacing:-.02em">linkedin outbound</div>
-                <div class="progress-bar"><div class="progress-fill" style="width:78%;background:linear-gradient(90deg,#0055D4,#00d4ff)"></div></div>
-              </div>
-              <div style="padding:14px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);border-radius:12px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                  <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#9ca3af">temps de réponse</div>
-                  <span class="msym" style="color:#0055D4;font-size:15px">history</span>
-                </div>
-                <div style="font-size:15px;font-weight:800;color:#0a0a1a;letter-spacing:-.02em">12 minutes</div>
-                <div style="font-size:10px;color:#9ca3af;margin-top:4px">conversion ×4 dans les 15m</div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:#1D1D1F">B2B / Services</span><span style="font-weight:700">20%</span></div>
+                <div style="width:100%;background:#F5F5F7;height:6px;border-radius:9999px;overflow:hidden"><div style="background:#c6c6c8;height:100%;width:20%"></div></div>
               </div>
             </div>
           </div>
-
-          <!-- AI Engine -->
-          <div style="background:#0a0a1a;border-radius:16px;padding:24px;position:relative;overflow:hidden">
-            <div style="position:absolute;top:-40%;right:-20%;width:240px;height:240px;background:radial-gradient(circle,rgba(0,85,212,0.3) 0%,transparent 60%);pointer-events:none"></div>
-            <div style="position:absolute;bottom:-40%;left:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(0,212,255,0.22) 0%,transparent 60%);pointer-events:none"></div>
-            <div style="position:relative;z-index:1">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-                <div style="width:26px;height:26px;border-radius:8px;background:rgba(0,212,255,0.15);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,212,255,0.3)">
-                  <span class="msym" style="color:#00d4ff;font-size:15px">auto_awesome</span>
-                </div>
-                <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:white">moteur ia</span>
-              </div>
-              <div style="font-size:16px;font-weight:800;color:white;letter-spacing:-.02em;margin-bottom:8px">routage intelligent</div>
-              <p style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:18px;line-height:1.65">notre processeur traite 4 202 points de données pour optimiser votre prospection en temps réel.</p>
-              <button class="btn" style="width:100%;justify-content:center;background:white;color:#0055D4;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800" onclick="launchAutopilot()">
-                activer
-              </button>
-            </div>
-          </div>
-
-          <!-- Agents -->
-          <div class="glass card">
-            <div class="card-header"><div class="card-title">agents ia</div></div>
-            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background=''">
-                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.12)">
-                  <span class="msym" style="color:#0055D4;font-size:15px">search</span>
-                </div>
-                <span style="font-size:12px;font-weight:600;flex:1;color:#0a0a1a">prospection</span>
-                <div id="ag1" class="dot-off"></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background=''">
-                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.12)">
-                  <span class="msym" style="color:#0055D4;font-size:15px">psychology</span>
-                </div>
-                <span style="font-size:12px;font-weight:600;flex:1;color:#0a0a1a">scoring ia</span>
-                <div id="ag2" class="dot-off"></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background=''">
-                <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,85,212,0.08);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,85,212,0.12)">
-                  <span class="msym" style="color:#0055D4;font-size:15px">mail</span>
-                </div>
-                <span style="font-size:12px;font-weight:600;flex:1;color:#0a0a1a">email ia</span>
-                <div id="ag3" class="dot-off"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Activity -->
-          <div class="glass card">
-            <div class="card-header"><div class="card-title">activité</div></div>
-            <div style="padding:12px 20px" id="activity-log">
-              <div style="text-align:center;color:#9ca3af;font-size:11px;padding:12px 0">aucune activité</div>
-            </div>
-          </div>
-
         </div>
       </div>
+
+      <!-- ═══ AUTOPILOT STATUS + ACTIVITY ═══ -->
+      <div style="background:#fff;padding:32px;border-radius:24px;box-shadow:0 4px 24px rgba(0,0,0,0.04)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+          <h4 style="font-size:22px;font-weight:600;letter-spacing:-0.01em;color:#1D1D1F">Activité & autopilot</h4>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div id="ag1" class="dot-off"></div>
+            <div id="ag2" class="dot-off"></div>
+            <div id="ag3" class="dot-off"></div>
+          </div>
+        </div>
+        <div id="activity-log" style="display:flex;flex-direction:column"></div>
+      </div>
+
     </div>
 
     <!-- ═══ prospection ═══ -->
